@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Ugo\'s Bootcamp</string>
+    <string name="textview">TextView</string>
+    <string name="name">Name</string>
+    <string name="name_input">Name Input</string>
+    <string name="greet_me">Greet Me</string>
+</resources>
