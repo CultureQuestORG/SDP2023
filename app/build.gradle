@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.ugosbootcamp'
+    namespace 'ch.epfl.culturequest'
     compileSdk 33
 
     defaultConfig {
