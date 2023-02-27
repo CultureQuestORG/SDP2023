@@ -1,4 +1,4 @@
-package com.example.ugosbootcamp;
+package ch.epfl.culturequest;
 
 import android.content.Intent;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package com.example.ugosbootcamp;
+package ch.epfl.culturequest;
 
 import androidx.appcompat.app.AppCompatActivity;
 

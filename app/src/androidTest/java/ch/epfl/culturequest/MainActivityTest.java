@@ -1,4 +1,4 @@
-package com.example.ugosbootcamp;
+package ch.epfl.culturequest;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
