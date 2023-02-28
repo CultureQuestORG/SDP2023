@@ -22,4 +22,10 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("name", name);
         startActivity(intent);
     }
+
+    // Method goToFirebase to go to FirebaseActivity
+    public void goToFirebase(View view) {
+        Intent intent = new Intent(this, FirebaseActivity.class);
+        startActivity(intent);
+    }
 }
