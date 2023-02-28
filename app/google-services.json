@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "991981303299",
+    "project_id": "culturequest-6534c",
+    "storage_bucket": "culturequest-6534c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991981303299:android:87c4e4001f86db96eac036",
+        "android_client_info": {
+          "package_name": "ch.epfl.culturequest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "991981303299-j0d1js5qn037rq36s0q9609eqovp01jr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.epfl.culturequest",
+            "certificate_hash": "6c691c45f230d2111f2ebe9db9cbde40eb673d5d"
+          }
+        },
+        {
+          "client_id": "991981303299-tkgqgvo8psqnu2g9b18oc00h4taoqr83.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAH6uuzxLxE26CG5L7TaVyLEsEogDe6gr4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "991981303299-i8is9thesnpol4mq7tiv4eco0s72ctce.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
