@@ -12,6 +12,11 @@
         android:theme="@style/Theme.CultureQuest"
         tools:targetApi="31">
         <activity
+            android:name=".NavigationActivity"
+            android:exported="false"
+            android:label="@string/title_activity_navigation"
+            android:theme="@style/Theme.CultureQuest.NoActionBar" />
+        <activity
             android:name=".GreetingActivity"
             android:exported="false" />
         <activity

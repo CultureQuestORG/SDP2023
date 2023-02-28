@@ -22,4 +22,10 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("name", name);
         startActivity(intent);
     }
+
+    // Navigation activity
+    public void startNavigationActivity(View view) {
+        Intent intent = new Intent(this, NavigationActivity.class);
+        startActivity(intent);
+    }
 }
