@@ -25,17 +25,19 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAOX9DP_26lvquYBK6t2eGqbgwh4Fq1dFI" />
+            android:value="${MAPS_API_KEY}" />
 
         <activity
             android:name=".MapsActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">
+            <!-- uncomment when testing this activity
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
         </activity>
         <activity
             android:name=".GreetingActivity"
