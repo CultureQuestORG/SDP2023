@@ -16,7 +16,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
-import ch.epfl.culturequest.GreetingActivity;
 import ch.epfl.culturequest.MainActivity;
 
 /**
@@ -101,7 +100,7 @@ public class Authenticator implements AuthService {
 
             //in case of failure when signing in, we will just
             // redirect back to the main page so they can attempt to sign in again
-            Intent intent = new Intent(activity, GreetingActivity.class);
+            Intent intent = new Intent(activity, MainActivity.class);
             activity.startActivity(intent);
         }
     }
