@@ -1,6 +1,7 @@
 package ch.epfl.culturequest;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -19,6 +20,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeUnit;
+
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.database.MockDatabase;
 
@@ -35,7 +38,7 @@ public class FirebaseActivityTest {
     }
 
     @Test
-    public void testSetAndGet() {
+    public void testSetAndGet(){
         //add a phone number to the field
         onView(withId(R.id.editTextPhone)).perform(typeText("1234567890"));
         //add a email to the field
@@ -44,7 +47,7 @@ public class FirebaseActivityTest {
         //press the set button
         onView(withId(R.id.buttonSet)).perform(click());
         // remove the email from the field
-        onView(withId(R.id.editTextEmailAddress)).perform(typeText(""));
+        onView(withId(R.id.editTextEmailAddress)).perform(clearText());
         //press the get button
         onView(withId(R.id.buttonGet)).perform(click());
         //check if the email is the same as the one we set
