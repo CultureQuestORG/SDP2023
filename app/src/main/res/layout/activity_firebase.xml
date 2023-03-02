@@ -18,7 +18,7 @@
         app:layout_constraintHorizontal_bias="0.213"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.366" />
+        app:layout_constraintVertical_bias="0.1" />
 
     <Button
         android:id="@+id/buttonSet"
@@ -31,7 +31,7 @@
         app:layout_constraintHorizontal_bias="0.8"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.366" />
+        app:layout_constraintVertical_bias="0.1" />
 
     <EditText
         android:id="@+id/editTextPhone"
