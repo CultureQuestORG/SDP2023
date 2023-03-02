@@ -22,4 +22,10 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("name", name);
         startActivity(intent);
     }
+
+    // Go to MapsActivity
+    public void showMaps(View view){
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
 }
