@@ -7,13 +7,12 @@
     tools:visibility="visible">
 
 
-
     <Button
         android:id="@+id/buttonGet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/get"
         android:onClick="get"
+        android:text="@string/get"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.213"
@@ -25,12 +24,14 @@
         android:id="@+id/buttonSet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="84dp"
-        android:layout_marginTop="248dp"
-        android:text="@string/set"
         android:onClick="set"
-        app:layout_constraintStart_toEndOf="@+id/buttonGet"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="@string/set"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.366" />
 
     <EditText
         android:id="@+id/editTextPhone"
@@ -40,7 +41,9 @@
         android:ems="10"
         android:inputType="phone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonGet" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonGet"
+        android:autofillHints=""
+        tools:ignore="LabelFor" />
 
     <EditText
         android:id="@+id/editTextEmailAddress"
@@ -51,6 +54,8 @@
         android:ems="10"
         android:inputType="textEmailAddress"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPhone" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextPhone"
+        android:autofillHints=""
+        tools:ignore="LabelFor" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
