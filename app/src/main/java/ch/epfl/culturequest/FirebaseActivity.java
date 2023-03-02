@@ -6,17 +6,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.database.Database;
+
 public class FirebaseActivity extends AppCompatActivity {
+    Database database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_firebase);
+        database = new Database();
     }
 
     // Method set sets the data in the database
@@ -25,23 +26,17 @@ public class FirebaseActivity extends AppCompatActivity {
         String phone = ((TextView)findViewById(R.id.editTextPhone)).getText().toString();
         String mail = ((TextView)findViewById(R.id.editTextEmailAddress)).getText().toString();
 
-        FirebaseDatabase.getInstance().getReference(phone).setValue(mail);
+        // set the data in the database
+        database.set(phone, mail);
     }
 
     // Method get fetches the data from the database
     public void get(View view) {
         String phone = ((TextView)findViewById(R.id.editTextPhone)).getText().toString();
-        CompletableFuture<String> future = new CompletableFuture<>();
-        FirebaseDatabase.getInstance().getReference(phone).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                future.complete(task.getResult().getValue().toString());
-            } else {
-                future.completeExceptionally(task.getException());
-            }
-        });
-        future.thenAccept(mail -> {
-            ((TextView)findViewById(R.id.editTextEmailAddress)).setText(mail);
-        });
+
+        CompletableFuture<String> future = database.get(phone).thenApply(o -> (String)o);
+
+        future.thenAccept(mail -> ((TextView)findViewById(R.id.editTextEmailAddress)).setText(mail));
     }
 
 
