@@ -32,4 +32,12 @@ public class MainActivityTest {
         onView(withId(R.id.greetingTextView)).check(matches(withText("Hello John Doe")));
     }
 
+    @Test
+    public void testGoToFirebaseActivity() {
+        onView(withId(R.id.firebaseButton)).perform(click());
+        //check if we are in the firebase activity
+        onView(withId(R.id.editTextPhone)).check(matches(withText("")));
+        onView(withId(R.id.editTextEmailAddress)).check(matches(withText("")));
+    }
+
 }
