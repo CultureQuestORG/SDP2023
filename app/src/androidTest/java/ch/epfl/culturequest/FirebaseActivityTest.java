@@ -38,7 +38,7 @@ public class FirebaseActivityTest {
     }
 
     @Test
-    public void testSetAndGet(){
+    public void fillingUserInfoSavesItInDatabase(){
         //add a phone number to the field
         onView(withId(R.id.editTextPhone)).perform(typeText("1234567890"));
         //add a email to the field

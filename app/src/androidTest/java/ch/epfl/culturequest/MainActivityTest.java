@@ -33,7 +33,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void testGoToFirebaseActivity() {
+    public void ClickOnFirebaseButtonFiresFirebaseActivity() {
         onView(withId(R.id.firebaseButton)).perform(click());
         //check if we are in the firebase activity
         onView(withId(R.id.editTextPhone)).check(matches(withText("")));
