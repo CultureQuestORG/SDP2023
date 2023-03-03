@@ -26,7 +26,7 @@ check_android_task:
     -camera-back none
   before_script: |
     touch local.properties
-    echo MAPS_API_KEY=$MAPS_API_KEY
+    echo MAPS_API_KEY=$MAPS_API_KEY >> local.properties
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest
