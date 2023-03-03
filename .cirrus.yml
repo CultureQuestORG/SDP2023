@@ -23,6 +23,9 @@ check_android_task:
     -no-snapshot
     -no-window
     -camera-back none
+  before_script:
+    touch local.properties
+    echo MAPS_API_KEY=abcd
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest
