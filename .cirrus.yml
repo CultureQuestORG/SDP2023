@@ -6,6 +6,7 @@ container:
 
 env:
   CC_TEST_REPORTER_ID: ENCRYPTED[b0285782afbfb5a2a5ab6c2476f3cde563270cd3b2e77ee23f68f79a16c366578de8e9686dab40bdf8280984ec8c0d82]
+  MAPS_API_KEY: ABCD
 check_android_task:
   name: Run Android tests
   install_emulator_script:
@@ -23,9 +24,9 @@ check_android_task:
     -no-snapshot
     -no-window
     -camera-back none
-  before_script:
+  before_script: |
     touch local.properties
-    echo MAPS_API_KEY=abcd
+    echo MAPS_API_KEY=$MAPS_API_KEY
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest
