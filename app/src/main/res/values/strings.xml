@@ -4,4 +4,13 @@
     <string name="name">Name</string>
     <string name="name_input">Name Input</string>
     <string name="greet_me">Greet Me</string>
+    <string name="nav_button">Navigation Button</string>
+
+    <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_leaderboard">LeaderBoard</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_map">Map</string>
+    <string name="title_scan">Scan</string>
+
 </resources>

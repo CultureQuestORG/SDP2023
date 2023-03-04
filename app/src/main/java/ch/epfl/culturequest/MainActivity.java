@@ -25,11 +25,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    // Method setName to go to GreetingActivity
-    public void setName(View view) {
-        Intent intent = new Intent(this, GreetingActivity.class);
-        String name = ((EditText) findViewById(R.id.personName)).getText().toString();
-        intent.putExtra("name", name);
+    // Navigation activity
+    public void startNavigationActivity(View view) {
+        Intent intent = new Intent(this, NavigationActivity.class);
         startActivity(intent);
     }
 }
