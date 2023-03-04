@@ -1,6 +1,5 @@
 package ch.epfl.culturequest;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
@@ -16,6 +15,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import ch.epfl.culturequest.databinding.ActivityMapsBinding;
 
+/**
+ * Class that represents a basic Maps Activity
+ *
+ */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
@@ -44,16 +47,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker at EPFL and move the camera
+        // Add a marker at EPFL and center the camera there
         LatLng EPFL = new LatLng(46.520536, 6.568318);
         LatLng satellite = new LatLng(46.520544, 6.567825);
         mMap.addMarker(new MarkerOptions().position(satellite).title("Satellite"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL));
+        // Prepare the infoWindow listener
         mMap.setOnInfoWindowClickListener(this);
-        // changes zoom
+        // change zoom
         mMap.moveCamera(CameraUpdateFactory.zoomTo(10f));
     }
 
+    /**
+     * Displays coordinates of the given marker when the infoWindow is getting clicked on
+     * @param marker the marker for which the infoWindow is clicked
+     */
     @Override
     public void onInfoWindowClick(Marker marker) {
         Toast.makeText(this, String.format("Lattitude: %f\nLongitude: %f", marker.getPosition().latitude, marker.getPosition().longitude) , Toast.LENGTH_LONG).show();
