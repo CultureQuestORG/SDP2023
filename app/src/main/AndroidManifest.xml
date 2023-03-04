@@ -14,8 +14,12 @@
         <activity
             android:name=".GreetingActivity"
             android:exported="false" />
-        <activity android:name=".FirebaseActivity"
+        <activity
+            android:name=".FirebaseActivity"
             android:exported="false" />
+        <activity
+            android:name=".SignUpActivity"
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

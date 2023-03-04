@@ -8,6 +8,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.signin.internal.SignInHubActivity;
+
 public class GreetingActivity extends AppCompatActivity {
 
     @Override
