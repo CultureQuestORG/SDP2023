@@ -19,11 +19,10 @@ import java.util.List;
 import ch.epfl.culturequest.MainActivity;
 
 /**
- * A authenticator to sign in the app using google
+ * A authenticator to sign in the app using google.
  *
  * To launch from an activity simply:
  * Instantiate an attribute with new Authenticator(this) and call sign in and sign out methods
- *
  */
 public class Authenticator implements AuthService {
 
@@ -42,7 +41,11 @@ public class Authenticator implements AuthService {
      */
     @Override
     public void signIn() {
-        if (user == null) signInLauncher.launch(signInIntent());
+        if (user == null) {
+            signInLauncher.launch(signInIntent());
+        } else {
+            redirectToHomePage();
+        }
     }
 
     /**
@@ -57,8 +60,7 @@ public class Authenticator implements AuthService {
                     .signOut(activity)
                     .addOnCompleteListener(task -> {
                         ///TODO return to the homepage to sign in
-                        Intent intent = new Intent(activity, MainActivity.class);
-                        activity.startActivity(intent);
+                        redirectToSignInPage();
                     });
         }
     }
@@ -100,9 +102,22 @@ public class Authenticator implements AuthService {
 
             //in case of failure when signing in, we will just
             // redirect back to the main page so they can attempt to sign in again
-            Intent intent = new Intent(activity, MainActivity.class);
-            activity.startActivity(intent);
+            redirectToSignInPage();
         }
     }
 
+    private void redirectToSignInPage() {
+        //modify later
+        Intent intent = new Intent(activity, MainActivity.class);
+        activity.startActivity(intent);
+    }
+
+    private void redirectToHomePage() {
+        Intent intent = new Intent(activity, MainActivity.class);
+        activity.startActivity(intent);
+    }
+
+    public FirebaseUser getUser() {
+        return user;
+    }
 }
