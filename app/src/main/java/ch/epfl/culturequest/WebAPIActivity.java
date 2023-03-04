@@ -23,57 +23,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WebAPIActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bored_api);
-    }
+    public static String BASE_URL = "https://www.boredapi.com/api/";
 
     private BoredAPI setupRetrofit() {
         Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://www.boredapi.com/api/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
-
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
         return retrofit.create(BoredAPI.class);
     }
-
-    public void fetchAndDisplayActivity(View view) {
-        BoredAPI boredAPI = setupRetrofit();
-
-        boredAPI.getActivity().enqueue(new Callback<BoredActivity>() {
-            @Override
-            public void onResponse(Call<BoredActivity> call, Response<BoredActivity> response) {
-                if (response.isSuccessful()) {
-                    BoredActivity boredActivity = response.body();
-                    addActivityToDatabase(boredActivity.activity);
-                    TextView textView = findViewById(R.id.mainTextView);
-                    textView.setText(boredActivity.activity);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BoredActivity> call, Throwable t) {
-                // Handle error
-                TextView textView = findViewById(R.id.mainTextView);
-
-                System.out.println(t.getMessage());
-
-                if (getDatabase().getAll().size() > 0) {
-                    String randomActivity = getRandomActivityFromDatabase();
-                    textView.setText(randomActivity + " (Cached)");
-                }
-                else{
-                    textView.setText("Couldn't fetch activity");
-                }
-            }
-        });
-    }
-
     private SharedPreferences getDatabase() {
         return getPreferences(Context.MODE_PRIVATE);
     }
-
     private void addActivityToDatabase(String activity) {
         SharedPreferences database = getDatabase();
         SharedPreferences.Editor editor = database.edit();
@@ -89,6 +50,44 @@ public class WebAPIActivity extends AppCompatActivity {
         return activityList.get(randomIndex);
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_bored_api);
+    }
 
 
+    private void displayCachedResponseOrError() {
+        TextView textView = findViewById(R.id.mainTextView);
+        if (getDatabase().getAll().size() > 0) {
+            String randomActivity = getRandomActivityFromDatabase();
+            textView.setText(randomActivity + " (Cached)");
+        }
+        else{
+            textView.setText("Couldn't fetch activity");
+        }
+    }
+
+    public void fetchAndDisplayActivity(View view) {
+        BoredAPI boredAPI = setupRetrofit();
+        boredAPI.getActivity().enqueue(new Callback<BoredActivity>() {
+            @Override
+            public void onResponse(Call<BoredActivity> call, Response<BoredActivity> response) {
+                if (response.isSuccessful()) {
+                    BoredActivity boredActivity = response.body();
+                    addActivityToDatabase(boredActivity.activity);
+                    TextView textView = findViewById(R.id.mainTextView);
+                    textView.setText(boredActivity.activity);
+                }
+                else{
+                    displayCachedResponseOrError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BoredActivity> call, Throwable t) {
+                displayCachedResponseOrError();
+            }
+        });
+    }
 }

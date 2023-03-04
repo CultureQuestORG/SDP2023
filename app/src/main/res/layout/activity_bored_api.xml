@@ -9,9 +9,9 @@
 
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="133dp"
-        android:layout_height="56dp"
+        android:id="@+id/fetchActivityButton"
+        android:layout_width="151dp"
+        android:layout_height="73dp"
         android:onClick="fetchAndDisplayActivity"
         android:text="Get Activity"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,35 +21,35 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.591" />
 
+
     <TextView
         android:id="@+id/mainTextView"
-        android:layout_width="322dp"
-        android:layout_height="38dp"
+        android:layout_width="350dp"
+        android:layout_height="69dp"
+        android:layout_marginTop="264dp"
         android:gravity="center"
         android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.961" />
 
-
     <TextView
         android:id="@+id/textView3"
-        android:layout_width="307dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="280dp"
+        android:layout_width="368dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="152dp"
+        android:fontFamily="sans-serif-condensed"
         android:gravity="center"
         android:text="Random activity of the day is: "
-        android:textSize="20sp"
+        android:textColor="#0000FF"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textColor="#0000FF"
-        android:textStyle="bold"
-        android:fontFamily="sans-serif-condensed"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
