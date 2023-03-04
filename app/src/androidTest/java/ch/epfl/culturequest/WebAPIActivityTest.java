@@ -12,6 +12,7 @@ import static org.hamcrest.core.StringContains.containsString;
 import static java.lang.Thread.sleep;
 import static ch.epfl.culturequest.WebAPIActivity.BASE_URL;
 
+import android.content.Context;
 import android.content.res.Resources;
 
 import androidx.test.espresso.IdlingRegistry;
@@ -32,26 +33,30 @@ import java.io.InputStream;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
+import utils.EspressoIdlingResource;
 
 @RunWith(AndroidJUnit4.class)
 public class WebAPIActivityTest{
 
     private MockWebServer mockWebServer = new MockWebServer();
 
-    private void enqueueMockResponse(String fileName) throws IOException {
+    private void enqueueMockResponse(String fileName, int delay) throws IOException {
 
         InputStream fileStream = getInstrumentation().getTargetContext().getAssets().open(fileName);
 
         mockWebServer.enqueue(new MockResponse()
-            .setResponseCode(200)
-            .addHeader("Content-Type", "application/json")
-            .setBody(IOUtils.toString(fileStream, "UTF-8")));
+                .setResponseCode(200)
+                .setBodyDelay(delay, java.util.concurrent.TimeUnit.SECONDS)
+                .addHeader("Content-Type", "application/json")
+                .setBody(IOUtils.toString(fileStream, "UTF-8")));
     }
 
     @Before
     public void setUp() throws IOException {
         BASE_URL = "http://localhost:8080/";
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
         mockWebServer.start(8080);
+        //clear SharedPreferences database
     }
 
     @Rule
@@ -59,19 +64,41 @@ public class WebAPIActivityTest{
 
     // test that WebAPIActivity correctly displays the activity name when the API returns a valid response
     @Test
-    public void activityNameCorrectlyDisplayed() throws IOException {
+    public void activityNameCorrectlyDisplayedNoDelay() throws IOException {
 
-        enqueueMockResponse("success_response.json");
+        enqueueMockResponse("success_response.json",0);
         onView(withId(R.id.fetchActivityButton)).perform(click());
         onView(withId(R.id.mainTextView)).check(matches(withText("Study a foreign language")));
+    }
+
+    @Test
+    public void activateNameCorrectlyDisplayedWithDelay() throws IOException, InterruptedException {
+
+        enqueueMockResponse("success_response.json", 5);
+        onView(withId(R.id.fetchActivityButton)).perform(click());
+        onView(withId(R.id.mainTextView)).check(matches(withText("Study a foreign language")));
+    }
+
+    @Test
+    public void errorDisplayedWhenErrorAndNoCachedActivity() throws IOException, InterruptedException {
+
+        getInstrumentation().getTargetContext().getSharedPreferences("cachedActivities", Context.MODE_PRIVATE).edit().clear().commit();
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500).setBody("Server error").addHeader("Content-Type", "text/plain"));
+        onView(withId(R.id.fetchActivityButton)).perform(click());
+        onView(withId(R.id.mainTextView)).check(matches(withText("Couldn't fetch activity")));
+    }
+
+    private void fillCache() throws IOException {
+        enqueueMockResponse("success_response.json", 0);
+        onView(withId(R.id.fetchActivityButton)).perform(click());
     }
 
     @Test
     // test that WebAPIActivity correctly displays a cached activity when the API returns an error
     public void cachedActivityCorrectlyDisplayedWhen500() throws IOException, InterruptedException {
 
+        fillCache();
         mockWebServer.enqueue(new MockResponse().setResponseCode(500).setBody("Server error").addHeader("Content-Type", "text/plain"));
-
         onView(withId(R.id.fetchActivityButton)).perform(click());
         onView(withId(R.id.mainTextView)).check(matches(withText(containsString("Cached"))));
     }
@@ -80,6 +107,7 @@ public class WebAPIActivityTest{
     @Test
     public void cachedActivityCorrectlyDisplayedWhenUnreachable() throws IOException, InterruptedException {
 
+        fillCache();
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
         onView(withId(R.id.fetchActivityButton)).perform(click());
         onView(withId(R.id.mainTextView)).check(matches(withText(containsString("Cached"))));
@@ -88,6 +116,7 @@ public class WebAPIActivityTest{
     @After
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
     }
 
 }

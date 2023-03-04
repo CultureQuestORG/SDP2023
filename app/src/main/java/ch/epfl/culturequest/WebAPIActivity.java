@@ -2,7 +2,11 @@ package ch.epfl.culturequest;
 
 import static com.google.android.material.internal.ContextUtils.getActivity;
 
+import static utils.EspressoIdlingResource.countingIdlingResource;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.test.espresso.IdlingResource;
+import androidx.test.espresso.idling.CountingIdlingResource;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -33,8 +37,16 @@ public class WebAPIActivity extends AppCompatActivity {
         return retrofit.create(BoredAPI.class);
     }
     private SharedPreferences getDatabase() {
-        return getPreferences(Context.MODE_PRIVATE);
+        return getSharedPreferences("cachedActivities", Context.MODE_PRIVATE);
     }
+
+    private void clearDatabase() {
+        SharedPreferences database = getDatabase();
+        SharedPreferences.Editor editor = database.edit();
+        editor.clear();
+        editor.apply();
+    }
+
     private void addActivityToDatabase(String activity) {
         SharedPreferences database = getDatabase();
         SharedPreferences.Editor editor = database.edit();
@@ -70,6 +82,8 @@ public class WebAPIActivity extends AppCompatActivity {
 
     public void fetchAndDisplayActivity(View view) {
         BoredAPI boredAPI = setupRetrofit();
+
+        countingIdlingResource.increment();
         boredAPI.getActivity().enqueue(new Callback<BoredActivity>() {
             @Override
             public void onResponse(Call<BoredActivity> call, Response<BoredActivity> response) {
@@ -82,11 +96,13 @@ public class WebAPIActivity extends AppCompatActivity {
                 else{
                     displayCachedResponseOrError();
                 }
+                countingIdlingResource.decrement();
             }
 
             @Override
             public void onFailure(Call<BoredActivity> call, Throwable t) {
                 displayCachedResponseOrError();
+                countingIdlingResource.decrement();
             }
         });
     }
