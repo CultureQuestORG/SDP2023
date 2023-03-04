@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "296582792540",
+    "firebase_url": "https://culturequest-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "culturequest",
+    "storage_bucket": "culturequest.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:296582792540:android:e65399b3c0c1b9f7abad99",
+        "android_client_info": {
+          "package_name": "ch.epfl.culturequest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "296582792540-lvnti78uju34ke8coe53hcp133gp9odg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKfb69hKuQ0DxEKeNFEZIc5qGhH5Byauw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "296582792540-lvnti78uju34ke8coe53hcp133gp9odg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

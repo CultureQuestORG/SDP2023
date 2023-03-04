@@ -4,4 +4,7 @@
     <string name="name">Name</string>
     <string name="name_input">Name Input</string>
     <string name="greet_me">Greet Me</string>
+    <string name="firebase">FireBase</string>
+    <string name="set">SET</string>
+    <string name="get">GET</string>
 </resources>
