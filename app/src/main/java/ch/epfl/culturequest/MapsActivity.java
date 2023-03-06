@@ -59,6 +59,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(this, String.format("Lattitude: %f\nLongitude: %f", marker.getPosition().latitude, marker.getPosition().longitude) , Toast.LENGTH_LONG).show();
+        Toast.makeText(this, String.format("%s is located at:\nLattitude: %f\nLongitude: %f", marker.getTitle(), marker.getPosition().latitude, marker.getPosition().longitude) , Toast.LENGTH_LONG).show();
     }
 }
