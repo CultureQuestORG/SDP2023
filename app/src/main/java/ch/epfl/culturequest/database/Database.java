@@ -3,23 +3,20 @@ package ch.epfl.culturequest.database;
 import java.util.concurrent.CompletableFuture;
 
 public class Database  implements DatabaseInterface{
-    private static DatabaseInterface  database = new FireDatabase();
-
-    public Database() {
-    }
+    private static DatabaseInterface  databaseInstance = new FireDatabase();
 
     public static void init(DatabaseInterface database) {
-        Database.database = database;
+        Database.databaseInstance = database;
     }
 
     @Override
     public void set(String key, Object value) {
-        database.set(key, value);
+        databaseInstance.set(key, value);
     }
 
     @Override
     public CompletableFuture<Object> get(String key) {
-        return database.get(key);
+        return databaseInstance.get(key);
     }
 
 

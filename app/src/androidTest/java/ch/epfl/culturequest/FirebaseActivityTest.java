@@ -38,22 +38,16 @@ public class FirebaseActivityTest {
     }
 
     @Test
-    public void fillingUserInfoSavesItInDatabase(){
-        //add a phone number to the field
+    public void fillingUserInfoSavesItInDatabase() {
         onView(withId(R.id.editTextPhone)).perform(typeText("1234567890"));
-        //add a email to the field
         String email = "johndoe@gmail.com";
         onView(withId(R.id.editTextEmailAddress)).perform(typeText(email));
-        //press the set button
         onView(withId(R.id.buttonSet)).perform(click());
         // remove the email from the field
         onView(withId(R.id.editTextEmailAddress)).perform(clearText());
-        //press the get button
         onView(withId(R.id.buttonGet)).perform(click());
         //check if the email is the same as the one we set
         onView(withId(R.id.editTextEmailAddress)).check(matches(withText(email)));
-
-
 
     }
 }
