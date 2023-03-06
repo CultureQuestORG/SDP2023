@@ -8,14 +8,22 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:296582792540:android:e65399b3c0c1b9f7abad99",
+        "mobilesdk_app_id": "1:296582792540:android:acddfa02b4bc8ce7abad99",
         "android_client_info": {
           "package_name": "ch.epfl.culturequest"
         }
       },
       "oauth_client": [
         {
-          "client_id": "296582792540-lvnti78uju34ke8coe53hcp133gp9odg.apps.googleusercontent.com",
+          "client_id": "296582792540-ckebd29nm4hkes5a1jo9feqlf2hi1tlm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.epfl.culturequest",
+            "certificate_hash": "6c691c45f230d2111f2ebe9db9cbde40eb673d5d"
+          }
+        },
+        {
+          "client_id": "296582792540-aebvhljtf5vspef2s1s21017qj27c4hj.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -28,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "296582792540-lvnti78uju34ke8coe53hcp133gp9odg.apps.googleusercontent.com",
+              "client_id": "296582792540-aebvhljtf5vspef2s1s21017qj27c4hj.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
