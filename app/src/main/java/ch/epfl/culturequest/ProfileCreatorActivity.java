@@ -1,34 +1,66 @@
 package ch.epfl.culturequest;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.ComponentActivity;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.annotation.XmlRes;
 
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
+
+import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.social.User;
 
 public class ProfileCreatorActivity extends ComponentActivity {
-    private final FirebaseUser USER = FirebaseAuth.getInstance().getCurrentUser();
+
+    public final static int PICK_IMAGE_REQUEST = 1234;
+
+    private Profile profile;
+    private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), this::setProfilePicture);
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_creation);
-        assert USER != null;
-        ((TextView)findViewById(R.id.email_text)).setText(USER.getEmail());
-        String fullName = USER.getDisplayName();
-        String[] names = fullName.split(" ");
-        ((TextView)findViewById(R.id.first_name_text)).setText(names[0]);
-        ((TextView)findViewById(R.id.last_name_text)).setText(names[1]);
+        profile = new Profile(new User(FirebaseAuth.getInstance().getCurrentUser()), null);
+        ((TextView) findViewById(R.id.email_text)).setText(profile.getEmail());
+        ((TextView) findViewById(R.id.first_name_text)).setText(profile.getFirstName());
+        ((TextView) findViewById(R.id.last_name_text)).setText(profile.getLastName());
     }
 
 
-    public void createProfile(View view){
+    public void createProfile(View view) {
+        Database db = new Database();
+        //need albert here
+        //db.set(profile.getUid(), profile);
         System.out.println("created!!");
     }
 
+    public void selectProfilePicture(View view) {
+        //Weird: doesnt request permission
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        profilePictureSelector.launch(intent);
+    }
+
+    private void setProfilePicture(ActivityResult result) {
+        if (result.getResultCode() == RESULT_OK && result.getData() != null){
+            Uri profilePicture = result.getData().getData();
+            Picasso.get().load(profilePicture).into((ImageView) findViewById(R.id.profile_picture));
+            profile.updateProfilePicture(profilePicture);
+        }
+    }
 
 }
