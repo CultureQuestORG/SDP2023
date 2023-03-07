@@ -2,9 +2,11 @@ package ch.epfl.culturequest;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -25,6 +27,14 @@ public class MainActivityTest {
         onView(withId(R.id.navButton)).perform(click());
         intended(hasComponent(NavigationActivity.class.getName()));
         Intents.release();
+    }
+
+    @Test
+    public void ClickOnFirebaseButtonFiresFirebaseActivity() {
+        onView(withId(R.id.firebaseButton)).perform(click());
+        //check if we are in the firebase activity
+        onView(withId(R.id.editTextPhone)).check(matches(withText("")));
+        onView(withId(R.id.editTextEmailAddress)).check(matches(withText("")));
     }
 
 }

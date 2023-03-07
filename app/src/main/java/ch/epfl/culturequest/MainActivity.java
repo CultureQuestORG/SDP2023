@@ -30,4 +30,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, NavigationActivity.class);
         startActivity(intent);
     }
+
+    // Method goToFirebase to go to FirebaseActivity
+    public void goToFirebase(View view) {
+        Intent intent = new Intent(this, FirebaseActivity.class);
+        startActivity(intent);
+    }
 }
