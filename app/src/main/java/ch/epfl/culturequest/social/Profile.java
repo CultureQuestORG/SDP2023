@@ -9,26 +9,23 @@ import java.util.Objects;
 /**
  * Creates a profile for users
  */
-public class Profile implements User {
+public class Profile {
 
-    private final User user;
-    private final String uid, fullName,firstName, lastName, email, phoneNumber;
+    private final FirebaseUser user;
+    private final String uid, name, username, email, phoneNumber;
     private Uri profilePicture;
 
-    public Profile(User user, Uri profilePicture) {
-        this.user = user;
+    public Profile(FirebaseUser user, String username, Uri profilePicture) {
+        this.user = Objects.requireNonNull(user);
+        this.username = username;
         this.uid = user.getUid();
-        String[] fullName = Objects.requireNonNull(user.getDisplayName()).split(" ");
-        this.fullName = user.getDisplayName();
-        this.firstName = fullName[0];
-        this.lastName = fullName[1];
+        this.name = user.getDisplayName();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
     }
 
-
-    public User getUser() {
+    public FirebaseUser getUser() {
         return user;
     }
 
@@ -36,17 +33,12 @@ public class Profile implements User {
         return uid;
     }
 
-    @Override
-    public String getDisplayName() {
-        return fullName;
+    public String getUsername() {
+        return username;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
+    public String getName() {
+        return name;
     }
 
     public String getEmail() {
