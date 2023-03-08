@@ -10,11 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import ch.epfl.culturequest.databinding.FragmentMapBinding;
 
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private FragmentMapBinding binding;
+    private GoogleMap mMap;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -30,8 +37,23 @@ public class MapFragment extends Fragment {
     }
 
     @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Add a marker at EPFL and center the camera there
+        LatLng EPFL = new LatLng(46.520536, 6.568318);
+        LatLng satellite = new LatLng(46.520544, 6.567825);
+        mMap.addMarker(new MarkerOptions().position(satellite).title("Satellite"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL));
+        // change zoom
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(10f));
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
+
+
 }
