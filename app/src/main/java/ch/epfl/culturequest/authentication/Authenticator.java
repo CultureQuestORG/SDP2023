@@ -11,12 +11,14 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
+import com.firebase.ui.auth.data.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
 import ch.epfl.culturequest.MainActivity;
+import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
 
@@ -116,7 +118,7 @@ public class Authenticator implements AuthService {
     }
 
     private void redirectToHomePage() {
-        Intent intent = new Intent(activity, ProfileCreatorActivity.class);
+        Intent intent = new Intent(activity, NavigationActivity.class);
         activity.startActivity(intent);
     }
 

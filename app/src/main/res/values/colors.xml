@@ -4,6 +4,7 @@
     <color name="colorSecondary">#F2B872</color>
     <color name="colorAccent">#52D9CB</color>
     <color name="grey">#F2F2F2</color>
-    <color name="black">#0D0126</color>
+    <color name="black">#000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
 </resources>
