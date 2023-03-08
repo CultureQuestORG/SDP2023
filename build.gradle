@@ -1,4 +1,10 @@
 buildscript {
+
+    dependencies {
+        // Add the dependency for the Google services Gradle plugin
+        classpath 'com.google.gms:google-services:4.3.15'
+
+    }
     ext {
         agp_version = '7.4.1'
     }
@@ -8,3 +14,4 @@ plugins {
     id 'com.android.library' version '7.4.1' apply false
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin' version '2.0.1' apply false
 }
+

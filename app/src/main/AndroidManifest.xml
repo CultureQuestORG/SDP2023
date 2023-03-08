@@ -32,8 +32,14 @@
             android:exported="true"
             android:label="@string/title_activity_maps"/>
         <activity
-            android:name=".GreetingActivity"
+            android:name=".NavigationActivity"
+            android:exported="false"
+            android:label="@string/title_activity_navigation" />
+
+        <activity
+            android:name=".FirebaseActivity"
             android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
