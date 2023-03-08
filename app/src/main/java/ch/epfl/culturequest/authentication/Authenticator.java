@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.List;
 
 import ch.epfl.culturequest.MainActivity;
+import ch.epfl.culturequest.NavigationActivity;
 
 /**
  * A authenticator to sign in the app using google.
@@ -93,8 +94,7 @@ public class Authenticator implements AuthService {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            user = FirebaseAuth.getInstance().getCurrentUser();
-            //TODO must redirect to the welcome page of the application
+            redirectToHomePage();
         } else {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
@@ -113,7 +113,7 @@ public class Authenticator implements AuthService {
     }
 
     private void redirectToHomePage() {
-        Intent intent = new Intent(activity, MainActivity.class);
+        Intent intent = new Intent(activity, NavigationActivity.class);
         activity.startActivity(intent);
     }
 
