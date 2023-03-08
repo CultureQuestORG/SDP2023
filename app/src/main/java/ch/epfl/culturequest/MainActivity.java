@@ -10,10 +10,8 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import ch.epfl.culturequest.authentication.Authenticator;
-
 public class MainActivity extends AppCompatActivity {
-    Authenticator a = new Authenticator(this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Method goToFirebase to go to FirebaseActivity
     public void goToFirebase(View view) {
-        a.signIn();
+        Intent intent = new Intent(this, FirebaseActivity.class);
+        startActivity(intent);
     }
 }
