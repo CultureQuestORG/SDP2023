@@ -1,9 +1,5 @@
 package ch.epfl.culturequest.ui.scan;
 
-
-import android.content.ContentResolver;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -112,7 +108,6 @@ public class ScanFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
