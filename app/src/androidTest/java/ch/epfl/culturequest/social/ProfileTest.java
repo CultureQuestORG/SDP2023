@@ -35,7 +35,6 @@ public class ProfileTest {
     private Profile profile;
     private FirebaseUser user;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    String path = "res/drawable/logo_compact.png";
     private Uri defaultUri = Uri.parse("res/drawable/logo_compact.png");
 
     @Before
@@ -66,6 +65,11 @@ public class ProfileTest {
     @Test
     public void profileHasCorrectEmail() {
         assertThat(profile.getEmail(), is(user.getEmail()));
+    }
+
+    @Test
+    public void nameIsTheSame(){
+        assertThat(profile.getName(), is(user.getDisplayName()));
     }
 
     @Test
