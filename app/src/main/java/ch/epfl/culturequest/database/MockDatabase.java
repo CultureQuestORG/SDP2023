@@ -3,6 +3,8 @@ package ch.epfl.culturequest.database;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.social.Profile;
+
 public class MockDatabase implements DatabaseInterface {
     HashMap<String, Object> map;
 
@@ -24,5 +26,17 @@ public class MockDatabase implements DatabaseInterface {
         CompletableFuture<Object> future = new CompletableFuture<>();
         future.complete(map.get(key));
         return future;
+    }
+
+    @Override
+    public CompletableFuture<Profile> getProfile(String UId) {
+        CompletableFuture<Profile> future = new CompletableFuture<>();
+        future.complete((Profile) map.get("users/"+UId));
+        return future;
+    }
+
+    @Override
+    public void setProfile(Profile profile) {
+        map.put("users/"+profile.getUid(), profile);
     }
 }

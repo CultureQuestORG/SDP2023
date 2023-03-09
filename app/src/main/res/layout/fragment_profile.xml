@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.profile.ProfileFragment">
+    android:visibility="visible"
+    tools:context=".ui.profile.ProfileFragment"
+    tools:visibility="visible">
 
     <TextView
         android:id="@+id/text_profile"
@@ -18,5 +20,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/profilePicture"
+        android:layout_width="125dp"
+        android:layout_height="123dp"
+        android:src="@drawable/basic_profile_picture"
+        app:layout_constraintBottom_toTopOf="@+id/text_profile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
