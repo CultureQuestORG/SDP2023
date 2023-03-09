@@ -78,11 +78,6 @@ public class ProfileTest {
     }
 
     @Test
-    public void profileUserIsCurrentUser() {
-        assertThat(profile.getUser(), is(FirebaseAuth.getInstance().getCurrentUser()));
-    }
-
-    @Test
     public void profilePicIsCorrect() {
         assertThat(profile.getProfilePictureUrl(), is(defaultUri));
     }

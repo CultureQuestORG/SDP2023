@@ -2,6 +2,7 @@ package ch.epfl.culturequest.social;
 
 import android.net.Uri;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Objects;
@@ -11,7 +12,6 @@ import java.util.Objects;
  */
 public class Profile {
 
-    private final FirebaseUser user;
     private final String uid, name, username, email, phoneNumber;
     private Uri profilePicture;
 
@@ -28,17 +28,13 @@ public class Profile {
      * @param profilePicture Profile picture. Can be set to null
      */
     public Profile(FirebaseUser user, String username, Uri profilePicture) {
-        this.user = Objects.requireNonNull(user);
+        user = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser());
         this.username = username;
         this.uid = user.getUid();
         this.name = user.getDisplayName();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
-    }
-
-    public FirebaseUser getUser() {
-        return user;
     }
 
     public String getUid() {
