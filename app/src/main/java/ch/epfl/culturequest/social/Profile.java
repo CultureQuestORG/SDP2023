@@ -57,7 +57,7 @@ public class Profile {
         return phoneNumber;
     }
 
-    public Uri getProfilePictureUrl() {
+    public Uri getProfilePicture() {
         return profilePicture;
     }
 

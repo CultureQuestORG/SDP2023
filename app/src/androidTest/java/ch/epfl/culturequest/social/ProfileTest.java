@@ -79,13 +79,13 @@ public class ProfileTest {
 
     @Test
     public void profilePicIsCorrect() {
-        assertThat(profile.getProfilePictureUrl(), is(defaultUri));
+        assertThat(profile.getProfilePicture(), is(defaultUri));
     }
 
     @Test
     public void updatingProfilePicWorks(){
         Uri newPic = Uri.parse("res/drawable/logo_plain.png");
         profile.updateProfilePicture(newPic);
-        assertThat(profile.getProfilePictureUrl(), is(newPic));
+        assertThat(profile.getProfilePicture(), is(newPic));
     }
 }
