@@ -5,6 +5,7 @@ import static android.app.Activity.RESULT_OK;
 import android.content.Intent;
 
 import androidx.activity.ComponentActivity;
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 
 import com.firebase.ui.auth.AuthUI;
@@ -30,22 +31,36 @@ import ch.epfl.culturequest.SignUpActivity;
  */
 public class Authenticator implements AuthService {
 
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser user;
     private final ActivityResultLauncher<Intent> signInLauncher;
     private final ComponentActivity activity;
+    private final boolean isAnonymous;
 
-    public Authenticator(ComponentActivity activity) {
+    public Authenticator(ComponentActivity activity, boolean isAnonymous) {
         this.activity = activity;
         this.user = FirebaseAuth.getInstance().getCurrentUser();
-        this.signInLauncher = activity.registerForActivityResult(new FirebaseAuthUIActivityResultContract(), this::onSignInResult);
+        this.isAnonymous = isAnonymous;
+        this.signInLauncher = isAnonymous ? null : activity.registerForActivityResult(new FirebaseAuthUIActivityResultContract(), this::onSignInResult);
     }
+
 
     /**
      * Launches the sign in intent for a user to sign in using Google
      */
     @Override
     public void signIn() {
-        if (user == null) {
+        if (isAnonymous) {
+            FirebaseAuth
+                    .getInstance()
+                    .signInAnonymously()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            user = mAuth.getCurrentUser();
+                            redirectToHomePage();
+                        }
+                    });
+        } else if (user == null) {
             signInLauncher.launch(signInIntent());
         } else {
             redirectToHomePage();
@@ -60,10 +75,13 @@ public class Authenticator implements AuthService {
     @Override
     public void signOut() {
         if (user != null) {
-            AuthUI.getInstance()
+            if(isAnonymous){
+                FirebaseAuth.getInstance().signOut();
+                redirectToSignInPage();
+            }
+            else AuthUI.getInstance()
                     .signOut(activity)
                     .addOnCompleteListener(task -> {
-                        ///TODO return to the homepage to sign in
                         redirectToSignInPage();
                     });
         }

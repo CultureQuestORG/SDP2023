@@ -8,8 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import ch.epfl.culturequest.authentication.Authenticator;
 
 public class SignUpActivity extends AppCompatActivity {
-    Authenticator auth = new Authenticator(this);
-
+    Authenticator auth = new Authenticator(this, false);
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
