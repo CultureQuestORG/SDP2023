@@ -37,9 +37,15 @@ public class Authenticator implements AuthService {
     private final ComponentActivity activity;
     private final boolean isAnonymous;
 
+    /**
+     * Authenticator for the login part of the app.
+     * @param activity Activity from which we create an authenticator
+     * @param isAnonymous This is used for testing. We login anonymously when testing so that
+     *                    we dont need a user to physically login with google
+     */
     public Authenticator(ComponentActivity activity, boolean isAnonymous) {
         this.activity = activity;
-        this.user = FirebaseAuth.getInstance().getCurrentUser();
+        this.user = mAuth.getCurrentUser();
         this.isAnonymous = isAnonymous;
         this.signInLauncher = isAnonymous ? null : activity.registerForActivityResult(new FirebaseAuthUIActivityResultContract(), this::onSignInResult);
     }
@@ -76,7 +82,7 @@ public class Authenticator implements AuthService {
     public void signOut() {
         if (user != null) {
             if(isAnonymous){
-                FirebaseAuth.getInstance().signOut();
+                mAuth.signOut();
                 redirectToSignInPage();
             }
             else AuthUI.getInstance()
@@ -113,24 +119,16 @@ public class Authenticator implements AuthService {
      * @param result the result of the authentication process
      */
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
-        IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            user = FirebaseAuth.getInstance().getCurrentUser();
+            user = mAuth.getCurrentUser();
             Intent profileCreation = new Intent(activity, ProfileCreatorActivity.class);
             activity.startActivity(profileCreation);
         } else {
-            // Sign in failed. If response is null the user canceled the
-            // sign-in flow using the back button. Otherwise check
-            // response.getError().getErrorCode() and handle the error.
-
-            //in case of failure when signing in, we will just
-            // redirect back to the main page so they can attempt to sign in again
             redirectToSignInPage();
         }
     }
 
     private void redirectToSignInPage() {
-        //modify later
         Intent intent = new Intent(activity, SignUpActivity.class);
         activity.startActivity(intent);
     }
