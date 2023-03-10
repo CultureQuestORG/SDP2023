@@ -2,23 +2,20 @@ package ch.epfl.culturequest.authentication;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.Activity;
 import android.content.Intent;
 
 import androidx.activity.ComponentActivity;
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
-import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
-import com.firebase.ui.auth.data.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
-import ch.epfl.culturequest.MainActivity;
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
@@ -63,13 +60,13 @@ public class Authenticator implements AuthService {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
-                            redirectToHomePage();
+                            redirectTo(ProfileCreatorActivity.class);
                         }
                     });
         } else if (user == null) {
             signInLauncher.launch(signInIntent());
         } else {
-            redirectToHomePage();
+            redirectTo(NavigationActivity.class);
         }
     }
 
@@ -83,13 +80,11 @@ public class Authenticator implements AuthService {
         if (user != null) {
             if(isAnonymous){
                 mAuth.signOut();
-                redirectToSignInPage();
+                redirectTo(SignUpActivity.class);
             }
             else AuthUI.getInstance()
                     .signOut(activity)
-                    .addOnCompleteListener(task -> {
-                        redirectToSignInPage();
-                    });
+                    .addOnCompleteListener(task -> redirectTo(SignUpActivity.class));
         }
     }
 
@@ -121,21 +116,14 @@ public class Authenticator implements AuthService {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         if (result.getResultCode() == RESULT_OK) {
             user = mAuth.getCurrentUser();
-            Intent profileCreation = new Intent(activity, ProfileCreatorActivity.class);
-            activity.startActivity(profileCreation);
+            redirectTo(ProfileCreatorActivity.class);
         } else {
-            redirectToSignInPage();
+            redirectTo(SignUpActivity.class);
         }
     }
 
-    private void redirectToSignInPage() {
-        Intent intent = new Intent(activity, SignUpActivity.class);
-        activity.startActivity(intent);
-    }
-
-    private void redirectToHomePage() {
-        Intent intent = new Intent(activity, NavigationActivity.class);
-        activity.startActivity(intent);
+    private void redirectTo(Class<? extends Activity> cls) {
+        activity.startActivity(new Intent(activity, cls));
     }
 
     public FirebaseUser getUser() {
