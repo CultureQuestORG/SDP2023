@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
@@ -28,11 +30,12 @@ public class ProfileFragment extends Fragment {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textProfile;
-        final ImageView imageView = binding.profilePicture;
+        final TextView textView = binding.profileName;
+        final CircleImageView profilePicture = binding.profilePicture;
+
 
         profileViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        profileViewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(imageView));
+        profileViewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(profilePicture));
         return root;
     }
 
