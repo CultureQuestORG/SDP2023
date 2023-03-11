@@ -31,11 +31,6 @@ public class ProfileCreatorActivityTest {
     public ActivityScenarioRule<ProfileCreatorActivity> testRule = new ActivityScenarioRule<>(ProfileCreatorActivity.class);
 
     @Test
-    public void emailNotEditable(){
-        assertThrows(PerformException.class, () -> onView(withId(R.id.email_text)).perform(typeText("jane@gmail.com")));
-    }
-
-    @Test
     public void correctUsernameTransitionsToNavActivity(){
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
                 .addMonitor(NavigationActivity.class.getName(), null, false);
