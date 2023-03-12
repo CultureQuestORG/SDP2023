@@ -1,11 +1,14 @@
 package ch.epfl.culturequest.database;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.social.Profile;
+
 public class FireDatabase implements DatabaseInterface {
-        FirebaseDatabase database;
+    FirebaseDatabase database;
 
     public FireDatabase() {
         database = FirebaseDatabase.getInstance();
@@ -29,4 +32,25 @@ public class FireDatabase implements DatabaseInterface {
         });
         return future;
     }
+
+    @Override
+    public CompletableFuture<Profile> getProfile(String UId) {
+        CompletableFuture<Profile> future = new CompletableFuture<>();
+        FirebaseDatabase.getInstance().getReference("users").child(UId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                System.out.println("Good:"+ task.getResult());
+
+                future.complete(task.getResult().getValue(Profile.class));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public void setProfile(Profile profile) {
+        database.getReference("users").child(profile.getUid()).setValue(profile);
+    }
+
 }
