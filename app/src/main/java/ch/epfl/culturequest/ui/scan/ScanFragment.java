@@ -121,4 +121,9 @@ public class ScanFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    // Returns a copy of the contentUri
+    public Uri getContentUri() {
+        return contentUri.buildUpon().build();
+    }
 }

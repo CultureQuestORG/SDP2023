@@ -16,7 +16,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -78,12 +77,7 @@ public class ScanFragmentTest {
     @Test
     @After
     public void deleteAllImagesInSharedStorage() {
-        Uri collection;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-        } else {
-            collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        }
+        Uri collection = fragmentTestRule.getFragment().getContentUri();
 
         ContentResolver contentResolver = getApplicationContext().getContentResolver();
         contentResolver.delete(collection, null, null);
@@ -92,12 +86,7 @@ public class ScanFragmentTest {
     }
 
     private int countPendingImagesInSharedStorage() {
-        Uri collection;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-        } else {
-            collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        }
+        Uri collection = fragmentTestRule.getFragment().getContentUri();
 
         String selection = MediaStore.Images.Media.DISPLAY_NAME + " LIKE ?";
         String[] selectionArgs = new String[]{"pending_%"};
@@ -114,12 +103,7 @@ public class ScanFragmentTest {
     }
 
     private int countReadyImagesInSharedStorage() {
-        Uri collection;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-        } else {
-            collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        }
+        Uri collection = fragmentTestRule.getFragment().getContentUri();
 
         String selection = MediaStore.Images.Media.DISPLAY_NAME + " NOT LIKE ?";
         String[] selectionArgs = new String[]{"pending_%"};
