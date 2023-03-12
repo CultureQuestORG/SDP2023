@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -29,6 +28,8 @@ import ch.epfl.culturequest.databinding.FragmentScanBinding;
 public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
+    private ContentResolver resolver;
+    private Uri contentUri;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -38,21 +39,26 @@ public class ScanFragment extends Fragment {
         binding = FragmentScanBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // Gets the content resolver to access the MediaStore
+        resolver = requireActivity().getApplicationContext().getContentResolver();
+
+        // Gets the Uri where the image will be stored (here we use the primary external storage
+        // to be able to share the images with other apps and to have Read/Write access)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            contentUri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+        } else {
+            contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        }
+
         // Adds a listener to the scan button and performs action
-        binding.scanAction.scanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.joconde);
-                boolean isWifiAvailable = false;
-                try {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        storeImageLocally(bitmap, isWifiAvailable);
-                    } else {
-                        throw new RuntimeException("Android version not supported");
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        binding.scanAction.scanButton.setOnClickListener(view -> {
+            // Creates the bitmap image from the drawable folder
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.joconde);
+            boolean isWifiAvailable = false;
+            try {
+                storeImageLocally(bitmap, isWifiAvailable);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
 
@@ -62,47 +68,37 @@ public class ScanFragment extends Fragment {
     }
 
     /**
-     * Stores the given bitmap image in the shared folder: /storage/emulated/0/Pictures
+     * Stores the given bitmap image in the shared folder: "/sdcard/Pictures".
      * This folder was chosen because it allows to share the image with other apps.
-     * It creates a new entry in the MediaStore and sets the IS_PENDING flag to 1 is Wifi is
-     * not available and to 0 otherwise.
-     * This flag indicates that the image still needs to be sent to Google Lens.
+     * It creates a new entry in the MediaStore and adds the "pending_" prefix to the image name
+     * if this image still needs to be sent to Google Lens.
      *
      * @param bitmap          the bitmap image to store
      * @param isWifiAvailable indicates if wifi is available or not
      * @throws IOException if the image could not be stored
      */
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     public void storeImageLocally(Bitmap bitmap, boolean isWifiAvailable) throws IOException {
-        ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
-
         // Creates a new entry in the MediaStore
         final ContentValues values = new ContentValues();
-        // Sets the displayed name in file system and ensures that the name is unique
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, System.currentTimeMillis() + ".jpeg");
         // Sets the image type : here jpeg (Android default)
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-        // Indicates that this image still needs to be processed or not (useful to highlight that this
-        // image still needs to be sent to Google Lens when wifi is not available)
+        // The name if this image still needs to be processed or not (useful to highlight that this
+        // image still needs to be sent to Google Lens when wifi is not available).
         if (isWifiAvailable) {
-            values.put(MediaStore.Images.Media.IS_PENDING, 0);
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, System.currentTimeMillis() + ".jpeg");
         } else {
-            values.put(MediaStore.Images.Media.IS_PENDING, 1);
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, "pending_" + System.currentTimeMillis()
+                    + ".jpeg");
         }
 
         Uri uri = null;
-
         try {
-            // Creates the Uri where the image will be stored
-            Uri contentUri;
-            contentUri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-            // Inserts the new entry in the MediaStore and returns its Uri
+            // Inserts the new entry in the MediaStore and returns its uri
             uri = resolver.insert(contentUri, values);
-
             if (uri == null)
-                throw new IOException("Failed to create new MediaStore record.");
+                throw new IOException("Failed to create new MediaStore entry.");
 
-            // Opens the output stream to write the image
+            // Opens the output stream to store the image
             try (final OutputStream stream = resolver.openOutputStream(uri)) {
                 if (stream == null)
                     throw new IOException("Failed to open output stream.");
