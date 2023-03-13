@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
+import java.util.List;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
@@ -40,6 +41,13 @@ public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
+    private HandlerThread backgroundThread;
+    private Handler backgroundHandler;
+    private CameraManager cameraManager;
+    private TextureView textureView;
+    private CameraCaptureSession cameraCaptureSession;
+    private CameraDevice cameraDevice;
+    private CaptureRequest captureRequest;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -48,6 +56,10 @@ public class ScanFragment extends Fragment {
 
         binding = FragmentScanBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Creates the LocalStorage to store the images locally
+        ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
+        localStorage = new LocalStorage(resolver);
 
         // Request the permissions
         requestPermissions();
@@ -79,10 +91,6 @@ public class ScanFragment extends Fragment {
             }});
 
 
-        // Creates the LocalStorage to store the images locally
-        ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
-        localStorage = new LocalStorage(resolver);
-
         // Adds a listener to the scan button and performs action
         binding.scanAction.scanButton.setOnClickListener(view -> {
             // Creates the bitmap image from the drawable folder
@@ -95,8 +103,6 @@ public class ScanFragment extends Fragment {
             }
         });
 
-        final TextView textView = binding.textScan;
-        ScanViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
