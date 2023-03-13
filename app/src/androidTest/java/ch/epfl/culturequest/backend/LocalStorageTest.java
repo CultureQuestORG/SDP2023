@@ -36,28 +36,36 @@ public class LocalStorageTest {
 
     @Test
     public void storeImageLocallyWithNoWifiStoresOnePendingImageInSharedStorage() {
-        int initialCount = countPendingImagesInSharedStorage();
+        String selection = MediaStore.Images.Media.DISPLAY_NAME + " LIKE ?";
+        String[] selectionArgs = new String[]{"pending_%"};
+        int initialPendingImageCount = countSelectedImagesInSharedStorage(selection, selectionArgs);
+
         Bitmap bitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.joconde);
         try {
             fragmentTestRule.getFragment().localStorage.storeImageLocally(bitmap, false);
         } catch (Exception e) {
             fail("Should not have thrown any exception");
         }
-        int finalCount = countPendingImagesInSharedStorage();
-        assertThat(finalCount, is(initialCount + 1));
+
+        int finalPendingImageCount = countSelectedImagesInSharedStorage(selection, selectionArgs);
+        assertThat(finalPendingImageCount, is(initialPendingImageCount + 1));
     }
 
     @Test
     public void storeImageLocallyWithWifiStoresOneReadyImageInSharedStorage() {
-        int initialCount = countReadyImagesInSharedStorage();
+        String selection = MediaStore.Images.Media.DISPLAY_NAME + " NOT LIKE ?";
+        String[] selectionArgs = new String[]{"pending_%"};
+        int initialReadyImageCount = countSelectedImagesInSharedStorage(selection, selectionArgs);
+
         Bitmap bitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.joconde);
         try {
             fragmentTestRule.getFragment().localStorage.storeImageLocally(bitmap, true);
         } catch (Exception e) {
             fail("Should not have thrown any exception");
         }
-        int finalCount = countReadyImagesInSharedStorage();
-        assertThat(finalCount, is(initialCount + 1));
+
+        int finalReadyImageCount = countSelectedImagesInSharedStorage(selection, selectionArgs);
+        assertThat(finalReadyImageCount, is(initialReadyImageCount + 1));
     }
 
     @Test
@@ -68,7 +76,6 @@ public class LocalStorageTest {
         assertThat(exception.getMessage(), is("Failed to save image."));
     }
 
-
     @Test
     @After
     public void deleteAllImagesInSharedStorage() {
@@ -76,32 +83,12 @@ public class LocalStorageTest {
 
         ContentResolver contentResolver = getApplicationContext().getContentResolver();
         contentResolver.delete(collection, null, null);
-        int totalCount = countPendingImagesInSharedStorage() + countReadyImagesInSharedStorage();
-        assertThat(totalCount, is(0));
+        int totalImageCount = countSelectedImagesInSharedStorage(null, null);
+        assertThat(totalImageCount, is(0));
     }
 
-    private int countPendingImagesInSharedStorage() {
+    private int countSelectedImagesInSharedStorage(String selection, String[] selectionArgs) {
         Uri collection = fragmentTestRule.getFragment().localStorage.contentUri;
-
-        String selection = MediaStore.Images.Media.DISPLAY_NAME + " LIKE ?";
-        String[] selectionArgs = new String[]{"pending_%"};
-
-        // Counts the number of ready images (not pending) in the shared storage
-        try (Cursor cursor = getApplicationContext().getContentResolver().query(
-                collection,
-                null,
-                selection,
-                selectionArgs,
-                null)) {
-            return cursor.getCount();
-        }
-    }
-
-    private int countReadyImagesInSharedStorage() {
-        Uri collection = fragmentTestRule.getFragment().localStorage.contentUri;
-
-        String selection = MediaStore.Images.Media.DISPLAY_NAME + " NOT LIKE ?";
-        String[] selectionArgs = new String[]{"pending_%"};
 
         // Counts the number of ready images (not pending) in the shared storage
         try (Cursor cursor = getApplicationContext().getContentResolver().query(
