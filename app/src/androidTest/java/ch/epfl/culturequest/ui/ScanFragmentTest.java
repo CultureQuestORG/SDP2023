@@ -9,14 +9,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.fail;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.provider.MediaStore;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -42,78 +38,32 @@ public class ScanFragmentTest {
 
     @Test
     public void clickOnScanButtonStoresOneImageInSharedStorage() {
-        int initialCount = countPendingImagesInSharedStorage() + countReadyImagesInSharedStorage();
+        int initialCount = countImagesInSharedStorage();
         onView(withId(R.id.scan_button)).perform(click());
-        int finalCount = countPendingImagesInSharedStorage() + countReadyImagesInSharedStorage();
-        assertThat(finalCount, is(initialCount + 1));
-    }
-
-    @Test
-    public void storeImageLocallyWithNoWifiStoresOnePendingImageInSharedStorage() {
-        int initialCount = countPendingImagesInSharedStorage();
-        Bitmap bitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.joconde);
-        try {
-            fragmentTestRule.getFragment().storeImageLocally(bitmap, false);
-        } catch (Exception e) {
-            fail("Should not have thrown any exception");
-        }
-        int finalCount = countPendingImagesInSharedStorage();
-        assertThat(finalCount, is(initialCount + 1));
-    }
-
-    @Test
-    public void storeImageLocallyWithWifiStoresOneReadyImageInSharedStorage() {
-        int initialCount = countReadyImagesInSharedStorage();
-        Bitmap bitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.joconde);
-        try {
-            fragmentTestRule.getFragment().storeImageLocally(bitmap, true);
-        } catch (Exception e) {
-            fail("Should not have thrown any exception");
-        }
-        int finalCount = countReadyImagesInSharedStorage();
+        int finalCount = countImagesInSharedStorage();
         assertThat(finalCount, is(initialCount + 1));
     }
 
     @Test
     @After
     public void deleteAllImagesInSharedStorage() {
-        Uri collection = fragmentTestRule.getFragment().getContentUri();
+        Uri collection = fragmentTestRule.getFragment().localStorage.contentUri;
 
         ContentResolver contentResolver = getApplicationContext().getContentResolver();
         contentResolver.delete(collection, null, null);
-        int totalCount = countPendingImagesInSharedStorage() + countReadyImagesInSharedStorage();
+        int totalCount = countImagesInSharedStorage();
         assertThat(totalCount, is(0));
     }
 
-    private int countPendingImagesInSharedStorage() {
-        Uri collection = fragmentTestRule.getFragment().getContentUri();
-
-        String selection = MediaStore.Images.Media.DISPLAY_NAME + " LIKE ?";
-        String[] selectionArgs = new String[]{"pending_%"};
+    private int countImagesInSharedStorage() {
+        Uri collection = fragmentTestRule.getFragment().localStorage.contentUri;
 
         // Counts the number of ready images (not pending) in the shared storage
         try (Cursor cursor = getApplicationContext().getContentResolver().query(
                 collection,
                 null,
-                selection,
-                selectionArgs,
-                null)) {
-            return cursor.getCount();
-        }
-    }
-
-    private int countReadyImagesInSharedStorage() {
-        Uri collection = fragmentTestRule.getFragment().getContentUri();
-
-        String selection = MediaStore.Images.Media.DISPLAY_NAME + " NOT LIKE ?";
-        String[] selectionArgs = new String[]{"pending_%"};
-
-        // Counts the number of ready images (not pending) in the shared storage
-        try (Cursor cursor = getApplicationContext().getContentResolver().query(
-                collection,
                 null,
-                selection,
-                selectionArgs,
+                null,
                 null)) {
             return cursor.getCount();
         }
