@@ -19,8 +19,6 @@ public class MapsViewModel extends ViewModel{
     public MapsViewModel() {
         isLocationPermissionGranted = new MutableLiveData<>(false);
         currentLocation = new MutableLiveData<>(DEFAULT);
-
-
     }
 
     public boolean isLocationPermissionGranted() {

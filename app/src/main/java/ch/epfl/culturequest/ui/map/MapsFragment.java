@@ -23,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.tasks.Task;
 
 import java.util.Map;
@@ -33,7 +34,7 @@ import ch.epfl.culturequest.databinding.FragmentMapsBinding;
 public class MapsFragment extends Fragment {
 
     private final static float DEFAULT_ZOOM = 15f;
-    private FusedLocationProviderClient client;
+    private FusedLocationProviderClient fusedLocationClient;
     private FragmentMapsBinding binding;
     private MapsViewModel viewModel;
     private GoogleMap mMap;
@@ -56,6 +57,7 @@ public class MapsFragment extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             mMap = googleMap;
+            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.maps_style_json));
             getLocationPermission();
             mMap.moveCamera(CameraUpdateFactory
                     .newLatLngZoom(viewModel.getCurrentLocation(), DEFAULT_ZOOM)); // Set to Default location anyway
@@ -82,10 +84,11 @@ public class MapsFragment extends Fragment {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         View mapView = binding.getRoot();
 
-        client = LocationServices.getFusedLocationProviderClient(getActivity());
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
         launcher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
                 (granted) -> onRequestPermissionsResult(granted));
+
         return mapView;
     }
 
@@ -161,7 +164,7 @@ public class MapsFragment extends Fragment {
          */
         try {
             if (viewModel.isLocationPermissionGranted()) {
-                Task<Location> locationResult = client.getLastLocation();
+                Task<Location> locationResult = fusedLocationClient.getLastLocation();
                 locationResult.addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {
                         // Set the map's camera position to the current location of the device.
