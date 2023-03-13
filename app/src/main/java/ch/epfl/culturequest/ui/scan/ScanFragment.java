@@ -1,20 +1,16 @@
 package ch.epfl.culturequest.ui.scan;
 
+
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.SurfaceTexture;
-import android.hardware.camera2.CameraManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -28,7 +24,6 @@ public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
-    private CameraSetup cameraSetup;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -42,51 +37,20 @@ public class ScanFragment extends Fragment {
         ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
         localStorage = new LocalStorage(resolver);
 
-        // Request the permissions
-        requestPermissions();
-
-        TextureView textureView = root.findViewById(R.id.camera_feedback);
-        getContext();
-        CameraManager cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
-        cameraSetup = new CameraSetup(cameraManager, textureView);
-
-
-        // Adds a listener to the textureView to display images
-        textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-            @Override
-            public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
-                cameraSetup.openCamera();
-            }
-            @Override
-            public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {
-
-            }
-
-            @Override
-            public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surfaceTexture) {
-                return false;
-            }
-
-            @Override
-            public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surfaceTexture) {
-
-            }});
-
-
         // Adds a listener to the scan button and performs action
-        binding.scanAction.scanButton.setOnClickListener(view -> cameraSetup.takePicture().thenAccept(captureTaken -> {
-            if(captureTaken) {
-                cameraSetup.getLatestImage().thenAccept(bitmap -> {
-                    boolean isWifiAvailable = false;
-                    try {
-                        localStorage.storeImageLocally(bitmap, isWifiAvailable);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        binding.scanAction.scanButton.setOnClickListener(view -> {
+            // Creates the bitmap image from the drawable folder
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.joconde);
+            boolean isWifiAvailable = false;
+            try {
+                localStorage.storeImageLocally(bitmap, isWifiAvailable);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        }));
+        });
 
+        final TextView textView = binding.textScan;
+        ScanViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
@@ -96,35 +60,4 @@ public class ScanFragment extends Fragment {
         binding = null;
     }
 
-
-    /////////////////////////// PERMISSIONS ///////////////////////////
-
-    // The callback for the permission request
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Permission is granted. Continue the action or workflow in your
-                    // app.
-                } else {
-                    // Explain to the user that the feature is unavailable because the
-                    // feature requires a permission that the user has denied. At the
-                    // same time, respect the user's decision. Don't link to system
-                    // settings in an effort to convince the user to change their
-                    // decision.
-                }
-            });
-
-    // Method to request the permissions
-    private void requestPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                getContext(), android.Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED) {
-            // You can use the API that requires the permission.
-        } else {
-            // You can directly ask for the permission.
-            // The registered ActivityResultCallback gets the result of this request.
-            requestPermissionLauncher.launch(
-                    android.Manifest.permission.CAMERA);
-        }
-    }
 }
