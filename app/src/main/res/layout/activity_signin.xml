@@ -24,20 +24,8 @@
         android:layout_below="@id/imageView"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="0dp"
-        android:layout_marginTop="-239dp"
+        android:layout_marginTop="-299dp"
         android:layout_marginEnd="83dp"
-        android:layout_marginBottom="670dp" />
-
-    <Button
-        android:id="@+id/sign_out"
-        android:layout_width="245dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/imageView"
-        android:layout_alignParentEnd="true"
-        android:text="Signout"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="-331dp"
-        android:layout_marginEnd="77dp"
         android:layout_marginBottom="670dp" />
 
 </RelativeLayout>

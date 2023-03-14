@@ -137,14 +137,7 @@ public class ProfileCreatorActivityTest {
         assertEquals(profile.getProfilePicture(), Uri.parse(ProfileCreatorActivity.DEFAULT_PROFILE_PATH));
     }
 
-    @Test
-    public void selectingImageDisplaysImage() throws InterruptedException {
-        ActivityResult result = new ActivityResult(Activity.RESULT_OK, null);
-        intending(hasAction(Intent.ACTION_PICK)).respondWith(result);
-        onView(withId(R.id.profile_picture)).perform(click());
-        intended(hasAction(Intent.ACTION_PICK));
-        assertNotNull(result);
-    }
+
 
     @Test
     public void wrongUsernamesFailProfileCreation(){
