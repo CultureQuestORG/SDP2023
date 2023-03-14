@@ -31,10 +31,6 @@ public class ScanFragmentTest {
     @Rule
     public FragmentTestRule<?, ScanFragment> fragmentTestRule = FragmentTestRule.create(ScanFragment.class);
 
-    @Test
-    public void textViewDisplaysCorrectText() {
-
-    }
 
     @Test
     public void clickOnScanButtonStoresOneImageInSharedStorage() {
