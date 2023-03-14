@@ -21,72 +21,57 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="138dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="452dp"
-        android:fontFamily="@font/lexend"
-        android:paddingStart="10dp"
-        android:text="Add Profile Picture"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.385"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/profile_picture"
-        android:layout_width="119dp"
-        android:layout_height="115dp"
+        android:layout_width="193dp"
+        android:layout_height="158dp"
         android:layout_marginStart="162dp"
         android:layout_marginEnd="159dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
         android:onClick="selectProfilePicture"
-        android:src="@android:drawable/ic_menu_add"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
+        android:src="@drawable/plus"
+        app:layout_constraintBottom_toTopOf="@+id/profile_pic_text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/profile_pic_text"
+        android:layout_width="193dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="604dp"
+        android:fontFamily="@font/lexend"
+        android:paddingStart="10dp"
+        android:text="Add Profile Picture"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.46"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/username"
         android:layout_width="320dp"
         android:layout_height="52dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="75dp"
+        android:layout_marginTop="60dp"
         android:background="@drawable/my_border"
         android:ems="10"
+        android:hint="Username"
         android:inputType="textPersonName"
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.386"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="301dp"
-        android:layout_height="18dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="184dp"
-        android:layout_marginEnd="65dp"
-        android:fontFamily="@font/lexend"
-        android:paddingStart="10dp"
-        android:text="Username"
-        android:textSize="14sp"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
     <Button
         android:id="@+id/create_profile"
         android:layout_width="397dp"
         android:layout_height="65dp"
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/rounded_button"
         android:onClick="createProfile"
         android:text="Create my account"
@@ -94,6 +79,20 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="157dp"
+        android:layout_height="105dp"
+        android:layout_marginStart="128dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="127dp"
+        android:layout_marginBottom="53dp"
+        app:layout_constraintBottom_toTopOf="@+id/username"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:srcCompat="@drawable/logo_compact" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
