@@ -1,27 +1,15 @@
 package ch.epfl.culturequest.ui.scan;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CaptureRequest;
-
-import android.content.ContentResolver;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.util.Size;
 import android.view.LayoutInflater;
-import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -31,7 +19,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
-import java.util.List;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
@@ -41,13 +28,7 @@ public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
-    private HandlerThread backgroundThread;
-    private Handler backgroundHandler;
-    private CameraManager cameraManager;
-    private TextureView textureView;
-    private CameraCaptureSession cameraCaptureSession;
-    private CameraDevice cameraDevice;
-    private CaptureRequest captureRequest;
+    private CameraSetup cameraSetup;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -64,16 +45,15 @@ public class ScanFragment extends Fragment {
         // Request the permissions
         requestPermissions();
 
-        textureView = root.findViewById(R.id.camera_feedback);
-        cameraManager = (CameraManager) getActivity().getSystemService(getContext().CAMERA_SERVICE);
-        backgroundThread = new HandlerThread("Camera feedback");
-        backgroundThread.start();
-        backgroundHandler = new Handler(backgroundThread.getLooper());
+        TextureView textureView = root.findViewById(R.id.camera_feedback);
+        getContext();
+        CameraManager cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
+        cameraSetup = new CameraSetup(cameraManager, textureView);
 
         textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
-                openCamera();
+                cameraSetup.openCamera();
             }
             @Override
             public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {
@@ -92,16 +72,18 @@ public class ScanFragment extends Fragment {
 
 
         // Adds a listener to the scan button and performs action
-        binding.scanAction.scanButton.setOnClickListener(view -> {
-            // Creates the bitmap image from the drawable folder
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.joconde);
-            boolean isWifiAvailable = false;
-            try {
-                localStorage.storeImageLocally(bitmap, isWifiAvailable);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        binding.scanAction.scanButton.setOnClickListener(view -> cameraSetup.takePicture().thenAccept(captureTaken -> {
+            if(captureTaken) {
+                cameraSetup.getLatestImage().thenAccept(bitmap -> {
+                    boolean isWifiAvailable = false;
+                    try {
+                        localStorage.storeImageLocally(bitmap, isWifiAvailable);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
             }
-        });
+        }));
 
         return root;
     }
@@ -112,7 +94,11 @@ public class ScanFragment extends Fragment {
         binding = null;
     }
 
-    private ActivityResultLauncher<String> requestPermissionLauncher =
+
+    /////////////////////////// PERMISSIONS ///////////////////////////
+
+    // The callback for the permission request
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     // Permission is granted. Continue the action or workflow in your
@@ -137,66 +123,6 @@ public class ScanFragment extends Fragment {
             // The registered ActivityResultCallback gets the result of this request.
             requestPermissionLauncher.launch(
                     android.Manifest.permission.CAMERA);
-        }
-    }
-
-    private void openCamera() {
-        try {
-            cameraManager.openCamera("0", new CameraDevice.StateCallback() {
-                @Override
-                public void onOpened(@NonNull CameraDevice camera) {
-                    cameraDevice = camera;
-                    CaptureRequest.Builder builder = null;
-                    Size[] sizes;
-                    try {
-                         builder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-                         sizes = cameraManager.getCameraCharacteristics("0").get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(SurfaceTexture.class);
-                    } catch (CameraAccessException e) {
-                        onError(camera, CameraDevice.StateCallback.ERROR_CAMERA_DEVICE);
-                        return;
-                    }
-
-                    textureView.getSurfaceTexture().setDefaultBufferSize(sizes[0].getWidth(), sizes[0].getHeight());
-                    Surface surfaceTexture = new Surface(textureView.getSurfaceTexture());
-                    builder.addTarget(surfaceTexture);
-
-                    CaptureRequest.Builder finalBuilder = builder;
-                    try {
-                        cameraDevice.createCaptureSession(List.of(surfaceTexture), new CameraCaptureSession.StateCallback() {
-                            @Override
-                            public void onConfigured(@NonNull CameraCaptureSession session) {
-                                cameraCaptureSession = session;
-                                try {
-                                    captureRequest = finalBuilder.build();
-                                    cameraCaptureSession.setRepeatingRequest(captureRequest, null, backgroundHandler);
-                                } catch (CameraAccessException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            @Override
-                            public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-                                cameraCaptureSession = null;
-                            }
-                        }, backgroundHandler);
-                    } catch (CameraAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                @Override
-                public void onDisconnected(@NonNull CameraDevice camera) {
-                    cameraDevice.close();
-                }
-
-                @Override
-                public void onError(@NonNull CameraDevice camera, int i) {
-                    cameraDevice.close();
-                    cameraDevice = null;
-                }
-            }, backgroundHandler);
-        } catch (SecurityException | CameraAccessException e) {
-            e.printStackTrace();
         }
     }
 }
