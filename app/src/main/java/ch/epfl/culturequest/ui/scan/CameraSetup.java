@@ -44,6 +44,13 @@ public class CameraSetup {
     private ImageReader imageReader;
     private CaptureRequest photoRequest;
     private Image latestImage;
+    private final ImageReader.OnImageAvailableListener onImageAvailableListener = imageReader -> {
+        Image image = imageReader.acquireLatestImage();
+        if (image != null) {
+            latestImage = image;
+        }
+    };
+
 
     /**
      * Camera Setup Manager that handles the camera classes and the background thread.
@@ -131,7 +138,6 @@ public class CameraSetup {
         return CompletableFuture.completedFuture(bitmap);
     }
 
-
     ///////////////////////////Camera Setup/////////////////////////////
     private final CameraDevice.StateCallback cameraState = new CameraDevice.StateCallback() {
         @Override
@@ -207,6 +213,7 @@ public class CameraSetup {
 
     ///////////////////////////// Texture Transform ///////////////////////////
 
+
     /**
      * Sets the texture transform to the texture view
      * @param characteristics the characteristics of the camera
@@ -270,8 +277,8 @@ public class CameraSetup {
         // Transform the texture
         textureView.setTransform(matrix);
     }
-
     //Returns the rotation of the display
+
     private int getDisplayRotation() {
         switch (textureView.getDisplay().getRotation()) {
             case Surface.ROTATION_0:
@@ -304,14 +311,6 @@ public class CameraSetup {
         Integer cameraOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
         return (360 - (cameraOrientation != null ? cameraOrientation : 0)) % 360;
     }
-
-    ///////////////////////////// Image Reader ///////////////////////////
-    private final ImageReader.OnImageAvailableListener onImageAvailableListener = imageReader -> {
-        Image image = imageReader.acquireLatestImage();
-        if (image != null) {
-            latestImage = image;
-        }
-    };
 
 
     /////////////////////////// Background Thread ///////////////////////////
