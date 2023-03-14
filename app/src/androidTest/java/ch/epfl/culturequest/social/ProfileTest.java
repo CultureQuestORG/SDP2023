@@ -16,28 +16,44 @@ import com.google.firebase.auth.FirebaseUser;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileTest {
 
-    private Profile profile;
+    private static Profile profile;
     private static FirebaseUser user;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private Uri defaultUri = Uri.parse("res/drawable/logo_compact.png");
+    private static Uri defaultUri = Uri.parse("res/drawable/logo_compact.png");
 
     @Before
     public void setup() throws InterruptedException {
-        mAuth
+        FirebaseAuth.getInstance()
                 .signInAnonymously()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        user = mAuth.getCurrentUser();
-                        profile = new Profile(user,"joker", defaultUri);
+                        user = FirebaseAuth.getInstance().getCurrentUser();
                     }
                 });
-        Thread.sleep(1000);
+        Thread.sleep(2000);
+
+        if (user != null) {
+            profile = new Profile(user, "joker", defaultUri);
+        }
+        else System.exit(0);
+    }
+
+    @After
+    public void signOut(){
+        FirebaseAuth.getInstance().signOut();
+    }
+
+    @AfterClass
+    public static void destroyUser(){
+        if(user != null){
+            user.delete();
+        }
     }
 
     @Test
@@ -75,12 +91,5 @@ public class ProfileTest {
         Uri newPic = Uri.parse("res/drawable/logo_plain.png");
         profile.updateProfilePicture(newPic);
         assertThat(profile.getProfilePicture(), is(newPic));
-    }
-
-    @AfterClass
-    public static void destroyUser(){
-        if(user != null){
-            user.delete();
-        }
     }
 }

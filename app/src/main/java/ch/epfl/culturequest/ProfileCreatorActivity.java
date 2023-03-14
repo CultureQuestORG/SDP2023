@@ -70,6 +70,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         }
     }
 
+    //used for testing purposes
+    public Profile getProfile() {
+        return profile;
+    }
 
     /**
      * Function called when user clicks on the buttont "Create my Account"
@@ -89,6 +93,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             if (profileView.getDrawable().equals(initialDrawable)) {
                 profile.updateProfilePicture(Uri.parse(DEFAULT_PROFILE_PATH));
             }
+            //database.setProfile!!
             Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
             startActivity(successfulProfileCreation);
         } else {

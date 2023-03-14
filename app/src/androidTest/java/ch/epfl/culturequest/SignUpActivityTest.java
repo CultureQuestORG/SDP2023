@@ -23,6 +23,7 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +34,15 @@ import ch.epfl.culturequest.authentication.Authenticator;
 public class SignUpActivityTest {
     @Rule
     public ActivityScenarioRule<SignUpActivity> testRule = new ActivityScenarioRule<>(SignUpActivity.class);
-
+    FirebaseUser user ;
+    @Before
+    public void setup(){
+        FirebaseAuth
+                .getInstance()
+                .signInAnonymously()
+                .addOnCompleteListener(task ->
+                        user = FirebaseAuth.getInstance().getCurrentUser());
+    }
 
     @Test
     public void googleSignInButtonIsClickable() {

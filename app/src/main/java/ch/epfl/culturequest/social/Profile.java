@@ -2,19 +2,18 @@ package ch.epfl.culturequest.social;
 
 import android.net.Uri;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Creates a profile for users
  */
 public class Profile {
 
-    private final String uid, name, email, phoneNumber;
     private String username;
     private Uri profilePicture;
+    private FirebaseUser user;
 
     /**
      * Creates a Profile for a user.
@@ -23,23 +22,17 @@ public class Profile {
      * only when the user has correctly signed in and has correctly set they're username.
      * So user will normally never be null, and there is no need for sanitization of username as
      * it's already been dealt with
-     *
-     * @param user current user signed in
-     * @param username username of user
+     *  @param username username of user
      * @param profilePicture Profile picture. Can be set to null
      */
-    public Profile(FirebaseUser user, String username, Uri profilePicture) {
-        user = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser());
+    public Profile(@NotNull FirebaseUser user, String username, Uri profilePicture) {
+        this.user = user;
         this.username = username;
-        this.uid = user.getUid();
-        this.name = user.getDisplayName();
-        this.email = user.getEmail();
-        this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
     }
 
     public String getUid() {
-        return uid;
+        return user.getUid();
     }
 
     public String getUsername() {
@@ -47,15 +40,15 @@ public class Profile {
     }
 
     public String getName() {
-        return name;
+        return user.getDisplayName();
     }
 
     public String getEmail() {
-        return email;
+        return user.getEmail();
     }
 
     public String getPhoneNumber() {
-        return phoneNumber;
+        return user.getPhoneNumber();
     }
 
     public Uri getProfilePicture() {
