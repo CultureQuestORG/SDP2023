@@ -12,7 +12,8 @@ import java.util.Objects;
  */
 public class Profile {
 
-    private final String uid, name, username, email, phoneNumber;
+    private final String uid, name, email, phoneNumber;
+    private String username;
     private Uri profilePicture;
 
     /**
@@ -59,6 +60,10 @@ public class Profile {
 
     public Uri getProfilePicture() {
         return profilePicture;
+    }
+
+    public void updateUsername(String username){
+        this.username = username;
     }
 
     public void updateProfilePicture(Uri profilePicture) {
