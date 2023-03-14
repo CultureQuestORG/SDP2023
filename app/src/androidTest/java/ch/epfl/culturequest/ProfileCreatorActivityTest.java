@@ -11,27 +11,46 @@ import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentat
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
 
 import android.app.Instrumentation;
 import android.content.Intent;
 
-import androidx.test.espresso.PerformException;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import org.junit.Rule;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileCreatorActivityTest {
 
-    @Rule
-    public ActivityScenarioRule<ProfileCreatorActivity> testRule = new ActivityScenarioRule<>(ProfileCreatorActivity.class);
+    private ActivityScenario<ProfileCreatorActivity> scenario;
+
+    private static FirebaseUser user;
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+    @Before
+    public void setup() throws InterruptedException {
+        mAuth
+                .signInAnonymously()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        user = mAuth.getCurrentUser();
+                    }
+                });
+        Thread.sleep(2000);
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), ProfileCreatorActivity.class);
+        scenario = ActivityScenario.launch(intent);
+    }
 
     @Test
-    public void correctUsernameTransitionsToNavActivity(){
+    public void correctUsernameTransitionsToNavActivity() {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
                 .addMonitor(NavigationActivity.class.getName(), null, false);
 
@@ -48,7 +67,7 @@ public class ProfileCreatorActivityTest {
     }
 
     @Test
-    public void wrongUserNameDoesntChangeIntent(){
+    public void wrongUserNameDoesntChangeIntent() {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
                 .addMonitor(NavigationActivity.class.getName(), null, false);
         onView(withId(R.id.username)).perform(typeText("  !+ "));
@@ -64,5 +83,10 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+    }
+
+    @AfterClass
+    public static void destroy() {
+        if (user != null) user.delete();
     }
 }
