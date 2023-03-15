@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 
 public class ProfileViewModel extends ViewModel {
@@ -16,12 +17,12 @@ public class ProfileViewModel extends ViewModel {
         mText = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         Database db = new Database();
+        //EspressoIdlingResource.increment();
         db.getProfile("123").whenComplete((p, e) -> {
             mText.setValue(p.getName());
             profilePictureUri.setValue(p.getProfilePicture());
-
-
         });
+        //EspressoIdlingResource.decrement();
 
 
 

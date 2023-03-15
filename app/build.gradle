@@ -37,42 +37,38 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-auth:20.4.1'
-    implementation platform('com.google.firebase:firebase-bom:31.2.2')
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
-    implementation 'com.google.firebase:firebase-firestore'
-    implementation 'com.squareup.picasso:picasso:2.71828'
-
-    implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation "androidx.fragment:fragment:1.5.5"
+    implementation 'androidx.fragment:fragment:1.5.5'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
-    implementation 'androidx.navigation:navigation-ui:2.5.3'
-    implementation "androidx.test.espresso:espresso-contrib:3.5.1"
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-database'
-    implementation 'com.google.firebase:firebase-storage'
     implementation 'androidx.navigation:navigation-runtime:2.5.3'
-    implementation 'com.google.firebase:firebase-auth:21.1.0'
-    implementation 'com.squareup.picasso:picasso:2.8'
+    implementation 'androidx.navigation:navigation-ui:2.5.3'
+    implementation 'androidx.test.espresso:espresso-contrib:3.5.1'
+    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+    implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-database'
+
+    implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation platform('com.google.firebase:firebase-bom:31.2.3')
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
+    androidTestImplementation 'androidx.test:monitor:1.6.1'
     androidTestImplementation "androidx.navigation:navigation-testing:2.5.3"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:3.5.1"
     androidTestImplementation 'com.21buttons:fragment-test-rule:2.0.1'
     debugImplementation "androidx.fragment:fragment-testing:1.5.5"
-    debugImplementation "androidx.test:monitor:1.6.1"
     debugImplementation 'com.21buttons:fragment-test-rule-extras:2.0.1'
 }
 

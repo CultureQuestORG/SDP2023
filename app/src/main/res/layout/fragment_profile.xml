@@ -10,7 +10,7 @@
 
 
     <TextView
-        android:id="@+id/profile_name"
+        android:id="@+id/profileName"
         android:layout_width="252dp"
         android:layout_height="41dp"
         android:layout_marginTop="8dp"
@@ -30,7 +30,7 @@
         android:layout_height="123dp"
         android:layout_marginTop="10dp"
         android:src="@drawable/basic_profile_picture"
-        app:layout_constraintBottom_toTopOf="@+id/profile_name"
+        app:layout_constraintBottom_toTopOf="@+id/profileName"
         app:layout_constraintEnd_toEndOf="parent"
 
         app:layout_constraintHorizontal_bias="0.055"
