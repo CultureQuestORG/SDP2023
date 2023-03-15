@@ -22,6 +22,8 @@ import androidx.core.content.ContextCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
+import java.util.Objects;
+
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.CircleTransform;
 
@@ -32,7 +34,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     public static String DEFAULT_PROFILE_PATH = "res/drawable/profile_icon_selector.xml";
 
     private final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
-    private final Profile profile = new Profile(FirebaseAuth.getInstance().getCurrentUser(), null, null);
+    private final Profile profile = new Profile(
+            Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()), null, null);
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -68,11 +71,6 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         } else {
             requestPermissionLauncher.launch(GALLERY_PERMISSION);
         }
-    }
-
-    //used for testing purposes
-    public Profile getProfile() {
-        return profile;
     }
 
     /**
@@ -124,4 +122,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                 && username.matches(USERNAME_REGEX)
                 && !username.contains(" ");
     }
+
+    //used for testing purposes
+    public Profile getProfile() {
+        return profile;
+    }
+
 }

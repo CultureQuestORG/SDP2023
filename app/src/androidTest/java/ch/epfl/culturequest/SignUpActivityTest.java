@@ -2,8 +2,6 @@ package ch.epfl.culturequest;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.pressBack;
-import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -19,22 +17,20 @@ import android.content.Intent;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import ch.epfl.culturequest.authentication.Authenticator;
-
 @RunWith(AndroidJUnit4.class)
 public class SignUpActivityTest {
     @Rule
     public ActivityScenarioRule<SignUpActivity> testRule = new ActivityScenarioRule<>(SignUpActivity.class);
-    FirebaseUser user ;
+    static FirebaseUser user ;
     @Before
     public void setup(){
         FirebaseAuth
@@ -65,5 +61,10 @@ public class SignUpActivityTest {
             Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), NavigationActivity.class);
             assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
         }
+    }
+
+    @AfterClass
+    public static void destroyUser(){
+        user.delete();
     }
 }
