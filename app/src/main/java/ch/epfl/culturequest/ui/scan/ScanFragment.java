@@ -76,18 +76,21 @@ public class ScanFragment extends Fragment {
         ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
         localStorage = new LocalStorage(resolver);
 
-        // Request the permissions
-        requestPermissions();
+        PackageManager pm = getContext().getPackageManager();
 
-        TextureView textureView = root.findViewById(R.id.camera_feedback);
-        getContext();
-        CameraManager cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
-        cameraSetup = new CameraSetup(cameraManager, textureView);
+        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+            // Request the permissions
+            requestPermissions();
 
-        textureView.setSurfaceTextureListener(surfaceTextureListener);
+            TextureView textureView = root.findViewById(R.id.camera_feedback);
+            CameraManager cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
+            cameraSetup = new CameraSetup(cameraManager, textureView);
 
-        // Adds a listener to the scan button and performs action
-        binding.scanAction.scanButton.setOnClickListener(scanButtonListener);
+            textureView.setSurfaceTextureListener(surfaceTextureListener);
+
+            // Adds a listener to the scan button and performs action
+            binding.scanAction.scanButton.setOnClickListener(scanButtonListener);
+        }
 
         return root;
     }
