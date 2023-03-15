@@ -88,7 +88,8 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
             '**/Manifest*.*',
             '**/*Test*.*',
             'android/**/*.*',
-            'ch/epfl/culturequest/ui/map/MapFragment.class',
+            '**/databinding/*',
+            'ch/epfl/culturequest/ui/map/MapFragment.java',
     ]
     def debugTree = fileTree(dir: "$project.buildDir/intermediates/javac/debug/classes", excludes: fileFilter)
     def mainSrc = "$project.projectDir/src/main/java"
