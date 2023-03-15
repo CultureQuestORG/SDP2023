@@ -60,7 +60,7 @@ public class MapsFragment extends Fragment {
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.maps_style_json));
             getLocationPermission();
             mMap.moveCamera(CameraUpdateFactory
-                    .newLatLngZoom(viewModel.getCurrentLocation(), DEFAULT_ZOOM)); // Set to Default location anyway
+                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM)); // Set to Default location anyway
         }
     };
 
@@ -70,6 +70,14 @@ public class MapsFragment extends Fragment {
             outState.putParcelable("location", lastKnownLocation);
         }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mMap != null) {
+            getLocationPermission();
+        }
     }
 
     @Nullable
@@ -86,6 +94,11 @@ public class MapsFragment extends Fragment {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
+        viewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location -> {
+            if (mMap != null) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
+            }
+        });
         launcher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
                 (granted) -> onRequestPermissionsResult(granted));
 
@@ -105,14 +118,16 @@ public class MapsFragment extends Fragment {
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             viewModel.setIsLocationPermissionGranted(true);
+            updateLocationUI();
+            getDeviceLocation();
         } else {
             launcher.launch(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION});
-
         }
     }
 
 
     public void onRequestPermissionsResult(Map<String, Boolean> grantResults) {
+        Log.i("onRequestPermissionsResult", grantResults.toString());
         viewModel.setIsLocationPermissionGranted(false);
         if (grantResults.size() > 0
                 && Boolean.TRUE.equals(grantResults.get(Manifest.permission.ACCESS_FINE_LOCATION))) { // If request is cancelled, the result arrays are empty.
@@ -180,7 +195,7 @@ public class MapsFragment extends Fragment {
                         Log.e("MapsFragment", "Exception: %s", task.getException());
                         viewModel.resetCurrentLocation();
                         mMap.moveCamera(CameraUpdateFactory
-                                .newLatLngZoom(viewModel.getCurrentLocation(), DEFAULT_ZOOM));
+                                .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
                         mMap.getUiSettings().setMyLocationButtonEnabled(false);
                     }
                 });

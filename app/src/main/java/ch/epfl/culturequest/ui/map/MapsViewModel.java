@@ -4,7 +4,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.libraries.places.api.net.PlacesClient;
+
+import java.util.Objects;
 
 public class MapsViewModel extends ViewModel{
 
@@ -13,8 +14,6 @@ public class MapsViewModel extends ViewModel{
     private final MutableLiveData<Boolean> isLocationPermissionGranted;
 
     private final MutableLiveData<LatLng> currentLocation;
-
-    private PlacesClient placesClient;
 
     public MapsViewModel() {
         isLocationPermissionGranted = new MutableLiveData<>(false);
@@ -29,11 +28,12 @@ public class MapsViewModel extends ViewModel{
         isLocationPermissionGranted.setValue(permission);
     }
 
-    public LatLng getCurrentLocation() {
-        return currentLocation.getValue();
+    public MutableLiveData<LatLng> getCurrentLocation() {
+        return currentLocation;
     }
 
     public void setCurrentLocation(LatLng current){
+        Objects.requireNonNull(current, "Current location cannot be null");
         currentLocation.setValue(current);
     }
 
