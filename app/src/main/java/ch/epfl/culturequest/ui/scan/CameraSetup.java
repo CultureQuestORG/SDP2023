@@ -71,7 +71,7 @@ public class CameraSetup {
      */
     public void openCamera() {
         try {
-            String cameraId = "0";
+            String cameraId =cameraManager.getCameraIdList()[0];
 
             //We open the camera
             cameraManager.openCamera(cameraId, cameraState, backgroundHandler);
@@ -199,15 +199,15 @@ public class CameraSetup {
 
         @Override
         public void onDisconnected(@NonNull CameraDevice camera) {
-            cameraDevice.close();
             closeThread();
+            cameraDevice.close();
         }
 
         @Override
         public void onError(@NonNull CameraDevice camera, int i) {
+            closeThread();
             cameraDevice.close();
             cameraDevice = null;
-            closeThread();
         }
     };
 
@@ -328,13 +328,8 @@ public class CameraSetup {
      */
     private void closeThread() {
         backgroundThread.quitSafely();
-        try {
-            backgroundThread.join();
-            backgroundThread = null;
-            backgroundHandler = null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        backgroundThread = null;
+        backgroundHandler = null;
     }
 
 }
