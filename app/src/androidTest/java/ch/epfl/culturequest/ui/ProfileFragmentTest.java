@@ -40,7 +40,7 @@ public class ProfileFragmentTest {
 
         Database.init(new MockDatabase());
         Database db = new Database();
-        db.setProfile(new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com","0707070707", "file://res/drawable/logo_compact.png"));
+        db.setProfile(new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com","0707070707", "file://res/drawable/logo_compact.png", null));
 
 
         activityScenario = ActivityScenario.launch(FragmentActivity.class);

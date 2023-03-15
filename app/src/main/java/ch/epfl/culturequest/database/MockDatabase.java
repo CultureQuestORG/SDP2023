@@ -3,6 +3,7 @@ package ch.epfl.culturequest.database;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 
 public class MockDatabase implements DatabaseInterface {
@@ -39,4 +40,17 @@ public class MockDatabase implements DatabaseInterface {
     public void setProfile(Profile profile) {
         map.put("users/"+profile.getUid(), profile);
     }
+
+    @Override
+    public CompletableFuture<Image> getImage(String UId) {
+        CompletableFuture<Image> future = new CompletableFuture<>();
+        future.complete((Image) map.get("pictures/"+UId));
+        return future;
+    }
+
+    @Override
+    public void setImage(Image image) {
+        map.put("pictures/"+image.getUid(), image);
+    }
 }
+

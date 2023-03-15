@@ -4,7 +4,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.List;
+
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 
@@ -13,16 +17,30 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<String> mText;
     private final MutableLiveData<String> profilePictureUri;
 
+    private final MutableLiveData<List<Image>> pictures;
+
     public ProfileViewModel() {
         mText = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
+        pictures = new MutableLiveData<>();
         Database db = new Database();
-        //EspressoIdlingResource.increment();
+        EspressoIdlingResource.increment();
         db.getProfile("123").whenComplete((p, e) -> {
             mText.setValue(p.getName());
             profilePictureUri.setValue(p.getProfilePicture());
+            if (p.getImages() != null)
+                pictures.setValue(p.getImages());
+
+            p.addObserver((profile, arg) -> {
+                if (p.getImages() != null)
+                    pictures.setValue(p.getImages());
+                System.out.println("Profile changed");
+            });
+
         });
-        //EspressoIdlingResource.decrement();
+        EspressoIdlingResource.decrement();
+
+
 
 
 
@@ -37,5 +55,9 @@ public class ProfileViewModel extends ViewModel {
 
     public LiveData<String> getProfilePictureUri() {
         return profilePictureUri;
+    }
+
+    public LiveData<List<Image>> getPictures() {
+        return pictures;
     }
 }

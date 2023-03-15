@@ -1,7 +1,7 @@
 package ch.epfl.culturequest.database;
 
+import ch.epfl.culturequest.social.Image;
 import java.util.concurrent.CompletableFuture;
-
 import ch.epfl.culturequest.social.Profile;
 
 public interface DatabaseInterface {
@@ -12,4 +12,7 @@ public interface DatabaseInterface {
 
     void setProfile(Profile profile);
 
+    CompletableFuture<Image> getImage(String UId);
+
+    void setImage(Image picture);
 }
