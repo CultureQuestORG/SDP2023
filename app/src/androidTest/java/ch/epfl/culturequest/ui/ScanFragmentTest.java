@@ -10,11 +10,13 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.Matchers.is;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.GrantPermissionRule;
 
 import com.android21buttons.fragmenttestrule.FragmentTestRule;
 
@@ -28,6 +30,8 @@ import ch.epfl.culturequest.ui.scan.ScanFragment;
 
 @RunWith(AndroidJUnit4.class)
 public class ScanFragmentTest {
+    @Rule
+    public GrantPermissionRule permissionCamera = GrantPermissionRule.grant(Manifest.permission.CAMERA);
     @Rule
     public FragmentTestRule<?, ScanFragment> fragmentTestRule = FragmentTestRule.create(ScanFragment.class);
 

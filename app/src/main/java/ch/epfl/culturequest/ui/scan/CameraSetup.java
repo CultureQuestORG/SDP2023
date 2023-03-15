@@ -277,8 +277,8 @@ public class CameraSetup {
         // Transform the texture
         textureView.setTransform(matrix);
     }
-    //Returns the rotation of the display
 
+    //Returns the rotation of the display
     private int getDisplayRotation() {
         switch (textureView.getDisplay().getRotation()) {
             case Surface.ROTATION_0:

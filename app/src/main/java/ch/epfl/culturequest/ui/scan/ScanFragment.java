@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
@@ -30,6 +31,38 @@ public class ScanFragment extends Fragment {
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
     private CameraSetup cameraSetup;
+
+    //SurfaceTextureListener is used to detect when the TextureView is ready to be used
+    private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
+            cameraSetup.openCamera();
+        }
+        @Override
+        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {}
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surfaceTexture) {
+            return false;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surfaceTexture) {
+        }};
+
+    // ScanButtonListener is used to detect when the scan button is clicked
+    private final View.OnClickListener scanButtonListener = view -> cameraSetup.takePicture().thenAccept(captureTaken -> {
+        if(captureTaken) {
+            cameraSetup.getLatestImage().thenAccept(bitmap -> {
+                boolean isWifiAvailable = false;
+                try {
+                    localStorage.storeImageLocally(bitmap, isWifiAvailable);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+    });
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -51,37 +84,10 @@ public class ScanFragment extends Fragment {
         CameraManager cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
         cameraSetup = new CameraSetup(cameraManager, textureView);
 
-        textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-            @Override
-            public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
-                cameraSetup.openCamera();
-            }
-            @Override
-            public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {}
-
-            @Override
-            public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surfaceTexture) {
-                return false;
-            }
-
-            @Override
-            public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surfaceTexture) {
-            }});
-
+        textureView.setSurfaceTextureListener(surfaceTextureListener);
 
         // Adds a listener to the scan button and performs action
-        binding.scanAction.scanButton.setOnClickListener(view -> cameraSetup.takePicture().thenAccept(captureTaken -> {
-            if(captureTaken) {
-                cameraSetup.getLatestImage().thenAccept(bitmap -> {
-                    boolean isWifiAvailable = false;
-                    try {
-                        localStorage.storeImageLocally(bitmap, isWifiAvailable);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
-        }));
+        binding.scanAction.scanButton.setOnClickListener(scanButtonListener);
 
         return root;
     }
