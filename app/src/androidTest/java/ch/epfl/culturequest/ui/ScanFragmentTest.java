@@ -32,11 +32,6 @@ public class ScanFragmentTest {
     public FragmentTestRule<?, ScanFragment> fragmentTestRule = FragmentTestRule.create(ScanFragment.class);
 
     @Test
-    public void textViewDisplaysCorrectText() {
-        onView(withId(R.id.text_scan)).check(matches(withText("This is scan fragment")));
-    }
-
-    @Test
     public void clickOnScanButtonStoresOneImageInSharedStorage() {
         int initialCount = countImagesInSharedStorage();
         onView(withId(R.id.scan_button)).perform(click());
