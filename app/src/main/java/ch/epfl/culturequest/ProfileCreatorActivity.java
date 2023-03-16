@@ -19,7 +19,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
+
+import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
@@ -89,7 +92,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             if (profileView.getDrawable().equals(initialDrawable)) {
                 profile.setProfilePicture(DEFAULT_PROFILE_PATH);
             }
-            db.setProfile(profile);
+
+            if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()){
+                db.setProfile(profile);
+            }
             Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
             startActivity(successfulProfileCreation);
         } else {

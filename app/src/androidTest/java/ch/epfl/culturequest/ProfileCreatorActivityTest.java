@@ -46,10 +46,12 @@ import com.google.firebase.auth.FirebaseUser;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 import ch.epfl.culturequest.social.Profile;
@@ -58,33 +60,38 @@ import ch.epfl.culturequest.social.Profile;
 public class ProfileCreatorActivityTest {
 
     private static FirebaseUser user;
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
 
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
 
-    private Profile profile;
-    private ImageView profilePic;
+    private static Profile profile;
 
-    @Before
-    public void setup() throws InterruptedException {
-        mAuth
+    @BeforeClass
+    public static void setup() throws InterruptedException {
+        FirebaseAuth.getInstance()
                 .signInAnonymously()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        user = mAuth.getCurrentUser();
+                        user = FirebaseAuth.getInstance().getCurrentUser();
                     }
                 });
         Thread.sleep(2000);
-        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), ProfileCreatorActivity.class);
+    }
+
+    @Before
+    public void init(){
         ActivityScenario
                 .launch(ProfileCreatorActivity.class)
                 .onActivity(activity -> {
                     profile = activity.getProfile();
-                    profilePic = activity.findViewById(R.id.profile_picture);
                 });
         Intents.init();
+    }
+
+    @After
+    public void release(){
+        Intents.release();
     }
 
     @Test
@@ -92,7 +99,7 @@ public class ProfileCreatorActivityTest {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
                 .addMonitor(NavigationActivity.class.getName(), null, false);
 
-        onView(withId(R.id.username)).perform(typeText("lucamouchel"), pressBack());
+        onView(withId(R.id.username)).perform(typeText("abcd"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
 
         NavigationActivity secondActivity = (NavigationActivity) activityMonitor
@@ -101,6 +108,8 @@ public class ProfileCreatorActivityTest {
 
         Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), NavigationActivity.class);
         assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
+        ActivityScenario.launch(NavigationActivity.class).onActivity(NavigationActivity::onBackPressed);
+
     }
 
     @Test
@@ -135,37 +144,34 @@ public class ProfileCreatorActivityTest {
         Thread.sleep(2000);
         assertEquals(profile.getUsername(), "JohnDoe");
         assertEquals(profile.getProfilePicture(), ProfileCreatorActivity.DEFAULT_PROFILE_PATH);
+        ActivityScenario.launch(NavigationActivity.class).onActivity(NavigationActivity::onBackPressed);
     }
 
 
 
     @Test
     public void wrongUsernamesFailProfileCreation(){
-        writeUsernameAndClickCreate("");
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
-
-        writeUsernameAndClickCreate("lol");
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
-
-        writeUsernameAndClickCreate("abcdefghijklmnopqrstuvxyz");
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
-
-        writeUsernameAndClickCreate("john doe");
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
-    }
-    private void writeUsernameAndClickCreate(String toWrite){
-        onView(withId(R.id.username)).perform(typeText(toWrite), pressBack());
+        onView(withId(R.id.username)).perform(typeText(""));
         onView(withId(R.id.create_profile)).perform(click());
-    }
+        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
 
-    @After
-    public void release(){
-        Intents.release();
+        onView(withId(R.id.username)).perform(typeText("lol"), pressBack());
+        onView(withId(R.id.create_profile)).perform(click());
+        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+
+        onView(withId(R.id.username)).perform(typeText("abcdefghijklmnopqrstuvxyz"), pressBack());
+        onView(withId(R.id.create_profile)).perform(click());
+        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+
+        onView(withId(R.id.username)).perform(typeText("john Doe"), pressBack());
+        onView(withId(R.id.create_profile)).perform(click());
+        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
     }
 
 
     @AfterClass
     public static void destroy() {
+        Intents.release();
         user.delete();
     }
 
