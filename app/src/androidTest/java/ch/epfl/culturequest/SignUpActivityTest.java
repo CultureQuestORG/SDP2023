@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNull;
 import android.app.Instrumentation;
 import android.content.Intent;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -28,16 +29,16 @@ import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class SignUpActivityTest {
-    @Rule
-    public ActivityScenarioRule<SignUpActivity> testRule = new ActivityScenarioRule<>(SignUpActivity.class);
-    static FirebaseUser user ;
+    private static FirebaseUser user;
+
+    private static FirebaseAuth auth = FirebaseAuth.getInstance();
+
     @Before
-    public void setup(){
-        FirebaseAuth
-                .getInstance()
-                .signInAnonymously()
-                .addOnCompleteListener(task ->
-                        user = FirebaseAuth.getInstance().getCurrentUser());
+    public void setup() {
+        if (auth.getCurrentUser() != null) {
+            auth.signOut();
+        }
+        ActivityScenario.launch(SignUpActivity.class);
     }
 
     @Test
@@ -47,7 +48,12 @@ public class SignUpActivityTest {
 
     @Test
     public void signInTransitionsToNavActivityForNonNullUser() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        auth.signInAnonymously().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                user = auth.getCurrentUser();
+
+            }
+        });
         if (user != null) {
             Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
                     .addMonitor(NavigationActivity.class.getName(), null, false);
@@ -64,7 +70,7 @@ public class SignUpActivityTest {
     }
 
     @AfterClass
-    public static void destroyUser(){
+    public static void destroyUser() {
         user.delete();
     }
 }
