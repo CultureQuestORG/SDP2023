@@ -23,11 +23,11 @@
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
 
-    <fragment
+   <fragment
         android:id="@+id/navigation_map"
-        android:name="ch.epfl.culturequest.ui.map.MapFragment"
+        android:name="ch.epfl.culturequest.ui.map.MapsFragment"
         android:label="@string/title_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_maps" />
 
     <fragment
         android:id="@+id/navigation_scan"
