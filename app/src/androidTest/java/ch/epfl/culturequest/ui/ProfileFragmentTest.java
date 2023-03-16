@@ -1,9 +1,13 @@
 package ch.epfl.culturequest.ui;
 
+
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+
+import android.net.Uri;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -17,9 +21,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.database.MockDatabase;
+import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.ProfileFragment;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
@@ -27,8 +36,10 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 @RunWith(AndroidJUnit4.class)
 public class ProfileFragmentTest {
 
-    private ActivityScenario<FragmentActivity> activityScenario;
     private ProfileFragment fragment;
+
+    private Profile profile;
+    private Image image;
 
 
 
@@ -40,10 +51,16 @@ public class ProfileFragmentTest {
 
         Database.init(new MockDatabase());
         Database db = new Database();
-        db.setProfile(new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com","0707070707", "file://res/drawable/logo_compact.png", null));
+        image = new Image("Piece of Art","bla bla",  "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8"
+                ,123, "123");
+        db.setImage(image);
 
 
-        activityScenario = ActivityScenario.launch(FragmentActivity.class);
+        profile=new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com","0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", List.of(image));
+        db.setProfile(profile);
+
+
+        ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
         activityScenario.onActivity(activity -> {
             fragment = new ProfileFragment();
             FragmentManager fragmentManager = activity.getSupportFragmentManager();
@@ -60,13 +77,14 @@ public class ProfileFragmentTest {
     }
 
     @Test
-    public void textViewDisplaysCorrectText() throws InterruptedException {
-            // Wait for the database to be accessed
+    public void textViewDisplaysCorrectText() {
 
 
+        onView(withId(R.id.profileName)).check(matches(withText("Johnny Doe")));
+        profile.setName("John Doe");
+        onView(withId(R.id.profileName)).check(matches(withText("John Doe")));
 
-            //Thread.sleep(10000);
-            onView(withId(R.id.profileName)).check(matches(withText("Johnny Doe")));
+
 
 
 

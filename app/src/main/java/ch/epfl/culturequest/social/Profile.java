@@ -108,24 +108,34 @@ public class Profile extends Observable{
 
     public void setName(String name) {
         this.name = name;
+        setChanged();
+        notifyObservers();
 
     }
 
     public void setUsername(String username) {
         this.username = username;
+        setChanged();
+        notifyObservers();
 
     }
 
     public void setEmail(String email) {
         this.email = email;
+        setChanged();
+        notifyObservers();
     }
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+        setChanged();
+        notifyObservers();
     }
 
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
+        setChanged();
+        notifyObservers();
     }
 
     public List<Image> getImages() {

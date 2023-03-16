@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,11 +12,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
-import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -41,7 +37,7 @@ public class ProfileFragment extends Fragment {
         final RecyclerView pictureGrid = binding.pictureGrid;
 
 
-        profileViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        profileViewModel.getName().observe(getViewLifecycleOwner(), textView::setText);
         profileViewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(profilePicture));
         profileViewModel.getPictures().observe(getViewLifecycleOwner(), images -> {
             // Create a new PictureAdapter and set it as the adapter for the RecyclerView

@@ -14,27 +14,28 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ProfileViewModel extends ViewModel {
 
-    private final MutableLiveData<String> mText;
+    private final MutableLiveData<String> name;
     private final MutableLiveData<String> profilePictureUri;
 
     private final MutableLiveData<List<Image>> pictures;
 
     public ProfileViewModel() {
-        mText = new MutableLiveData<>();
+        name = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
         Database db = new Database();
         EspressoIdlingResource.increment();
         db.getProfile("123").whenComplete((p, e) -> {
-            mText.setValue(p.getName());
+            name.setValue(p.getName());
             profilePictureUri.setValue(p.getProfilePicture());
-            if (p.getImages() != null)
-                pictures.setValue(p.getImages());
+            pictures.setValue(p.getImages());
 
             p.addObserver((profileObject, arg) -> {
                 Profile profile = (Profile) profileObject;
-                if (profile.getImages() != null)
-                    pictures.setValue(profile.getImages());
+                name.postValue(profile.getName());
+                profilePictureUri.postValue(profile.getProfilePicture());
+                pictures.postValue(profile.getImages());
+
             });
 
         });
@@ -49,8 +50,8 @@ public class ProfileViewModel extends ViewModel {
 
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public LiveData<String> getName() {
+        return name;
     }
 
     public LiveData<String> getProfilePictureUri() {
