@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.database;
 
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.concurrent.CompletableFuture;
@@ -33,19 +34,8 @@ public class FireDatabase implements DatabaseInterface {
         return future;
     }
 
-    @Override
-    public CompletableFuture<Profile> getProfile(String UId) {
-        CompletableFuture<Profile> future = new CompletableFuture<>();
-        FirebaseDatabase.getInstance().getReference("users").child(UId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                future.complete(task.getResult().getValue(Profile.class));
-            } else {
-                future.completeExceptionally(task.getException());
-            }
-        });
-        return future;
 
-    }
+
 
     @Override
     public void setProfile(Profile profile) {
@@ -53,18 +43,31 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     @Override
+    public CompletableFuture<Profile> getProfile(String UId) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(UId);
+        return getValue(usersRef, Profile.class);
+    }
+
+    @Override
     public CompletableFuture<Image> getImage(String UId) {
-        CompletableFuture<Image> future = new CompletableFuture<>();
-        FirebaseDatabase.getInstance().getReference("images").child(UId).get().addOnCompleteListener(task -> {
+        DatabaseReference imagesRef = FirebaseDatabase.getInstance().getReference("images").child(UId);
+        return getValue(imagesRef, Image.class);
+    }
+
+    private <T> CompletableFuture<T> getValue(DatabaseReference ref, Class<T> valueType) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        ref.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                future.complete(task.getResult().getValue(Image.class));
+                T value = task.getResult().getValue(valueType);
+                future.complete(value);
             } else {
                 future.completeExceptionally(task.getException());
             }
         });
         return future;
-
     }
+
+
 
     @Override
     public void setImage(Image image) {
