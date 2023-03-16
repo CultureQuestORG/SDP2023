@@ -1,18 +1,18 @@
 package ch.epfl.culturequest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
-import org.mockito.Mockito;
 
-import static org.junit.Assert.*;
-
-import android.os.Looper;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 import ch.epfl.culturequest.ui.map.MapsViewModel;
 import io.reactivex.android.plugins.RxAndroidPlugins;

@@ -114,7 +114,7 @@ public class MapsFragment extends Fragment {
          * device. The result of the permission request is handled by a callback,
          * onRequestPermissionsResult.
          */
-        if (ContextCompat.checkSelfPermission(getContext(),
+        if (viewModel.isLocationPermissionGranted() || ContextCompat.checkSelfPermission(getContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             viewModel.setIsLocationPermissionGranted(true);
@@ -127,7 +127,6 @@ public class MapsFragment extends Fragment {
 
 
     public void onRequestPermissionsResult(Map<String, Boolean> grantResults) {
-        Log.i("onRequestPermissionsResult", grantResults.toString());
         viewModel.setIsLocationPermissionGranted(false);
         if (grantResults.size() > 0
                 && Boolean.TRUE.equals(grantResults.get(Manifest.permission.ACCESS_FINE_LOCATION))) { // If request is cancelled, the result arrays are empty.
