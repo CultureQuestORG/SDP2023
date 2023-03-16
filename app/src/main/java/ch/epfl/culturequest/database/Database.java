@@ -2,6 +2,8 @@ package ch.epfl.culturequest.database;
 
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Profile;
 
 
 public class Database  implements DatabaseInterface{
@@ -24,6 +26,26 @@ public class Database  implements DatabaseInterface{
     @Override
     public CompletableFuture<Object> get(String key) {
         return databaseInstance.get(key);
+    }
+
+    @Override
+    public CompletableFuture<Profile> getProfile(String UId) {
+        return databaseInstance.getProfile(UId);
+    }
+
+    @Override
+    public void setProfile(Profile profile) {
+        databaseInstance.setProfile(profile);
+    }
+
+    @Override
+    public CompletableFuture<Image> getImage(String UId) {
+        return databaseInstance.getImage(UId);
+    }
+
+    @Override
+    public void setImage(Image picture) {
+        databaseInstance.setImage(picture);
     }
 
 
