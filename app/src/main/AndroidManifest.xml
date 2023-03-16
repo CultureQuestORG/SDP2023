@@ -42,9 +42,6 @@
             android:name=".FirebaseActivity"
             android:exported="false" />
         <activity
-            android:name=".MapsActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

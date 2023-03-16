@@ -38,13 +38,4 @@ public class MainActivityTest {
         onView(withId(R.id.editTextEmailAddress)).check(matches(withText("")));
     }
 
-    @Test
-    public void clickOnMapsButtonLaunchesMapsActivity(){
-        Intents.init();
-        onView(withId(R.id.maps_main_button)).perform(click());
-        //Checks whether the intent sent is towards the Maps Activity
-        Intents.intended(IntentMatchers.hasComponent(MapsActivity.class.getName()));
-        Intents.release();
-    }
-
 }
