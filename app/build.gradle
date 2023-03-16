@@ -53,6 +53,11 @@ dependencies {
     implementation "androidx.test.espresso:espresso-contrib:3.5.1"
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-database'
+    implementation 'org.jsoup:jsoup:1.15.4'
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.5.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -62,6 +67,8 @@ dependencies {
     androidTestImplementation "androidx.navigation:navigation-testing:2.5.3"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:3.5.1"
     androidTestImplementation 'com.21buttons:fragment-test-rule:2.0.1'
+    androidTestImplementation 'commons-io:commons-io:2.8.0'
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:4.9.3"
     debugImplementation "androidx.fragment:fragment-testing:1.5.5"
     debugImplementation "androidx.test:monitor:1.6.1"
     debugImplementation 'com.21buttons:fragment-test-rule-extras:2.0.1'

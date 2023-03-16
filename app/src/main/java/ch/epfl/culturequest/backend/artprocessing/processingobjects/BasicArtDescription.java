@@ -1,4 +1,4 @@
-package artprocessing.processingobjects;
+package ch.epfl.culturequest.backend.artprocessing.processingobjects;
 
 /**
  * A basic description of a piece of art (name, summary, type, year, city, country, museum)

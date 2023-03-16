@@ -1,8 +1,8 @@
-package artprocessing.apis;
+package ch.epfl.culturequest.backend.artprocessing.apis;
 
 import java.util.concurrent.CompletableFuture;
 
-import artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 
 
 /**

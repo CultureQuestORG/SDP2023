@@ -1,17 +1,16 @@
-package artprocessing.apis;
+package ch.epfl.culturequest.backend.artprocessing.apis;
 
 import androidx.annotation.NonNull;
 
 import org.jsoup.Jsoup;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import artprocessing.processingobjects.ArtRecognition;
-import artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;

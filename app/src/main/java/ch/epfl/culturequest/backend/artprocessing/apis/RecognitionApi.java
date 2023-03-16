@@ -1,4 +1,4 @@
-package artprocessing.apis;
+package ch.epfl.culturequest.backend.artprocessing.apis;
 
 import androidx.annotation.NonNull;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import artprocessing.processingobjects.ArtRecognition;
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;

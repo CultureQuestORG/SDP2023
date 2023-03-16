@@ -1,4 +1,4 @@
-package artprocessing.processingobjects;
+package ch.epfl.culturequest.backend.artprocessing.processingobjects;
 
 public class ArtRecognition {
 

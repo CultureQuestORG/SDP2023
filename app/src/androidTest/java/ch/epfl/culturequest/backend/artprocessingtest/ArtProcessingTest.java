@@ -1,4 +1,4 @@
-package artprocessingtest;
+package ch.epfl.culturequest.backend.artprocessingtest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -7,12 +7,10 @@ import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 
-import artprocessing.apis.WikipediaDescriptionApi;
-import artprocessing.processingobjects.ArtDescription;
-import artprocessing.processingobjects.ArtRecognition;
-import artprocessing.apis.DescriptionApi;
-import artprocessing.apis.RecognitionApi;
-import artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.backend.artprocessing.apis.WikipediaDescriptionApi;
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
+import ch.epfl.culturequest.backend.artprocessing.apis.RecognitionApi;
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 
 public class ArtProcessingTest {
 
