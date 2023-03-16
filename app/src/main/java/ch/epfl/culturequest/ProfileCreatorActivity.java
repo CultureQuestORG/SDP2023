@@ -57,13 +57,14 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         //do nothing!! We don't want the user to go back to the sign in page
     }
 
     /**
      * Called when clicking on the add profile pic icon. Basically asks for permissions
      * to read external storage, then opens the gallery for the user to select a profile pic
+     *
      * @param view
      */
     public void selectProfilePicture(View view) {
@@ -85,15 +86,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     public void createProfile(View view) {
         EditText textView = findViewById(R.id.username);
         String username = textView.getText().toString();
-        if (usernameIsValid(username)) {
-            profile.setUsername(username);
-            //checks if user actually selected profile pic,
-            //if they dont, we set a default profile pic
-            if (profileView.getDrawable().equals(initialDrawable)) {
-                profile.setProfilePicture(DEFAULT_PROFILE_PATH);
-            }
-
-            if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()){
+        if (isValid(username)) {
+            setDefaultPicIfNoneSelected();
+            if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
                 db.setProfile(profile);
             }
             Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
@@ -108,12 +103,27 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
     }
 
+    private boolean isValid(String username) {
+        if (usernameIsValid(username)) {
+            profile.setUsername(username);
+            return true;
+        }
+        return false;
+    }
+
+    private void setDefaultPicIfNoneSelected() {
+        if (profileView.getDrawable().equals(initialDrawable)) {
+            profile.setProfilePicture(DEFAULT_PROFILE_PATH);
+        }
+    }
+
+
     private void displayProfilePic(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
             Uri profilePicture = result.getData().getData();
             CircleImageView image = findViewById(R.id.profile_picture);
             Picasso.get().load(profilePicture).into(image);
-            ((TextView)findViewById(R.id.profile_pic_text)).setText("");
+            ((TextView) findViewById(R.id.profile_pic_text)).setText("");
             profile.setProfilePicture(profilePicture.getPath());
         }
     }
