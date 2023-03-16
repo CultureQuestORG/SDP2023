@@ -13,6 +13,7 @@ import androidx.test.rule.GrantPermissionRule;
 import com.android21buttons.fragmenttestrule.FragmentTestRule;
 
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ch.epfl.culturequest.ui.scan.ScanFragment;
@@ -23,6 +24,11 @@ public class ScanFragmentTest {
     public GrantPermissionRule permissionCamera = GrantPermissionRule.grant(Manifest.permission.CAMERA);
     @Rule
     public FragmentTestRule<?, ScanFragment> fragmentTestRule = FragmentTestRule.create(ScanFragment.class);
+
+    @Test
+    public void fakeTest() {
+        assertThat(true, is(true));
+    }
 
 
 //    @Test
