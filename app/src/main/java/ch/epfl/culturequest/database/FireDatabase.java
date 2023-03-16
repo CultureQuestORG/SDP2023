@@ -39,8 +39,6 @@ public class FireDatabase implements DatabaseInterface {
         FirebaseDatabase.getInstance().getReference("users").child(UId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 future.complete(task.getResult().getValue(Profile.class));
-
-                System.out.println("Profile: " + task.getResult().getValue(Profile.class));
             } else {
                 future.completeExceptionally(task.getException());
             }
