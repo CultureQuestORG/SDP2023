@@ -12,4 +12,9 @@
     <string name="firebase">FireBase</string>
     <string name="set">SET</string>
     <string name="get">GET</string>
+    <string name="help_button_for_scan">Help button for scan</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="scan_help_description">Take a picture of the artwork or monument you want by clicking on the scan icon to collect it and learn more about it!</string>
+    <string name="understood">Understood</string>
 </resources>
