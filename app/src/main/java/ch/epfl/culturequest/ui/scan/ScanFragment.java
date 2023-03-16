@@ -4,8 +4,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
+import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.TextureView;
@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
@@ -76,20 +75,22 @@ public class ScanFragment extends Fragment {
         ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
         localStorage = new LocalStorage(resolver);
 
-        PackageManager pm = getContext().getPackageManager();
+        CameraManager cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
 
-        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-            // Request the permissions
-            requestPermissions();
+        try {
+            if (cameraManager != null && cameraManager.getCameraIdList().length > 0) {
+                // Request the permissions
+                requestPermissions();
 
-            TextureView textureView = root.findViewById(R.id.camera_feedback);
-            CameraManager cameraManager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
-            cameraSetup = new CameraSetup(cameraManager, textureView);
+                TextureView textureView = root.findViewById(R.id.camera_feedback);
+                cameraSetup = new CameraSetup(cameraManager, textureView);
 
-            textureView.setSurfaceTextureListener(surfaceTextureListener);
+                textureView.setSurfaceTextureListener(surfaceTextureListener);
 
-            // Adds a listener to the scan button and performs action
-            binding.scanAction.scanButton.setOnClickListener(scanButtonListener);
+                // Adds a listener to the scan button and performs action
+                binding.scanAction.scanButton.setOnClickListener(scanButtonListener);
+            }
+        } catch (CameraAccessException ignored) {
         }
 
         return root;
