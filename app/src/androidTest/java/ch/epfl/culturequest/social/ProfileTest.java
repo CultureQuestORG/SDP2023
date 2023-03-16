@@ -7,6 +7,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 import android.net.Uri;
 
@@ -17,13 +18,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
+
+import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.database.MockDatabase;
+
 @RunWith(AndroidJUnit4.class)
 public class ProfileTest {
 
     private Profile profile;
     private FirebaseUser user;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private String defaultUriString = "res/drawable/logo_compact.png";
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private final String defaultUriString = "res/drawable/logo_compact.png";
+
+
 
     @Before
     public void setup() throws InterruptedException {
@@ -38,6 +46,7 @@ public class ProfileTest {
         if (user != null) {
             profile = new Profile("joker", defaultUriString);
         } else System.exit(0);
+
     }
 
     @Test
@@ -76,4 +85,89 @@ public class ProfileTest {
         profile.setProfilePicture(newPic);
         assertThat(profile.getProfilePicture(), is(newPic));
     }
+
+    @Test
+    public void setPhoneNumberWorks(){
+        String newPhone = "123456789";
+        profile.setPhoneNumber(newPhone);
+        assertThat(profile.getPhoneNumber(), is(newPhone));
+    }
+
+    @Test
+    public void setEmailWorks(){
+        String newEmail = "john.doe@gmail.com";
+        profile.setEmail(newEmail);
+        assertThat(profile.getEmail(), is(newEmail));
+    }
+
+    @Test
+    public void setUsernameWorks(){
+        String newUsername = "johnny";
+        profile.setUsername(newUsername);
+        assertThat(profile.getUsername(), is(newUsername));
+    }
+
+    @Test
+    public void setUidWorks(){
+        String newUid = "123456789";
+        profile.setUid(newUid);
+        assertThat(profile.getUid(), is(newUid));
+    }
+
+    @Test
+    public void setNameWorks(){
+        String newName = "John Doe Jr.";
+        profile.setName(newName);
+        assertThat(profile.getName(), is(newName));
+    }
+
+    @Test
+    public void emptyConstructorWorks(){
+        Profile emptyProfile = new Profile();
+        assertThat(emptyProfile.getUid(), is(""));
+        assertThat(emptyProfile.getName(), is(""));
+        assertThat(emptyProfile.getUsername(), is(""));
+        assertThat(emptyProfile.getEmail(), is(""));
+        assertThat(emptyProfile.getPhoneNumber(), is(""));
+        assertThat(emptyProfile.getProfilePicture(), is(""));
+        //users images should be an empty list
+        assertThat(emptyProfile.getImages().size(), is(0));
+
+    }
+
+    @Test
+    public void setImageWorks(){
+        Database.init(new MockDatabase());
+        Database db = new Database();
+        Image image = new Image("imageTest","this is an image",defaultUriString, 12345,"myUid");
+        db.setImage(image);
+        HashMap<String, Boolean> images = new HashMap<>();
+        images.put(image.getUid(), true);
+        profile.addObserver(((o, arg) -> {
+            assertThat(profile.getImages().size(), is(images.size()));
+            assertThat(profile.getImages().get(0).getUid(), is(image.getUid()));
+        }));
+        profile.setImages(images);
+
+
+
+
+
+    }
+
+
+
+    @Test
+    public void toStringWorks(){
+        assertThat(profile.toString(), is("Profile: \n" +
+                "uid: " + profile.getUid() + "\n" +
+                "name: " + profile.getName() + "\n" +
+                "username: " + profile.getUsername() + "\n" +
+                "email: " + profile.getEmail() + "\n" +
+                "phoneNumber: " + profile.getPhoneNumber() + "\n" +
+                "profilePicture: " + profile.getProfilePicture() + "\n" +
+                "pictures: " + profile.getImages() + "\n"));
+    }
+
+
 }

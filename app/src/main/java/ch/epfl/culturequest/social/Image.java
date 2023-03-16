@@ -8,16 +8,18 @@ public class Image implements Comparable<Image> {
     private String description;
     private String src;
 
-    private String UId;
+    private String Uid;
     private long time;
 
 
 
-    public Image(String title, String description, String src, long time) {
+    public Image(String title, String description, String src, long time, String Uid) {
         this.title = title;
         this.description = description;
         this.src = src;
         this.time = time;
+        this.Uid = Uid;
+
     }
 
     public Image(){
@@ -25,6 +27,7 @@ public class Image implements Comparable<Image> {
         this.description = "";
         this.src = "";
         this.time = 0;
+        this.Uid = "";
     }
 
     public String getTitle() {
@@ -60,22 +63,23 @@ public class Image implements Comparable<Image> {
     }
 
     public String getUid() {
-        return UId;
+        return Uid;
     }
 
     public void setUId(String UId) {
-        this.UId = UId;
+        this.Uid = UId;
     }
 
     @Override
     public int compareTo(Image other) {
-        return this.time < other.time ? 1 : -1;
+        return Long.compare(this.time,other.time);
+
     }
 
     @Override
     public String toString() {
         return "Image [description=" + description + ", src=" + src + ", time=" + time + ", title=" + title + ", UId="
-                + UId + "]";
+                + Uid + "]";
     }
 }
 

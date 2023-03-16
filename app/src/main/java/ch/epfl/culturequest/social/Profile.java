@@ -73,16 +73,8 @@ public class Profile extends Observable{
         this.username = "";
         this.email = "";
         this.phoneNumber = "";
-        this.profilePicture = null;
-        this.images =
-                List.of();/*new Image("La Joconde", "bla bla bla ","https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",1234),
-                        new Image("La Joconde", "bla bla bla ","https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",1234),
-                        new Image("La Joconde", "bla bla bla ","https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",1234),
-                        new Image("La Joconde", "bla bla bla ","https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",1234),
-                        new Image("La Joconde", "bla bla bla ","https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",1234),
-                        new Image("La Joconde", "bla bla bla ","https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",1234),
-                        new Image("La Joconde", "bla bla bla ","https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",1234));*/
-
+        this.profilePicture = "";
+        this.images = List.of();
     }
 
     public String getUid() {
@@ -149,7 +141,6 @@ public class Profile extends Observable{
             this.images = images.stream().map(CompletableFuture::join).sorted().collect(Collectors.toList());
             setChanged();
             notifyObservers();
-            System.out.println("FETCHED IMAGES:"+this.images);
         });
 
 

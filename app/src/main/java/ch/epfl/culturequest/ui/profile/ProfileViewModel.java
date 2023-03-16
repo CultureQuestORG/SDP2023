@@ -35,7 +35,6 @@ public class ProfileViewModel extends ViewModel {
                 Profile profile = (Profile) profileObject;
                 if (profile.getImages() != null)
                     pictures.setValue(profile.getImages());
-                System.out.println("Profile changed");
             });
 
         });
