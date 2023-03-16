@@ -31,9 +31,10 @@ public class ProfileViewModel extends ViewModel {
             if (p.getImages() != null)
                 pictures.setValue(p.getImages());
 
-            p.addObserver((profile, arg) -> {
-                if (p.getImages() != null)
-                    pictures.setValue(p.getImages());
+            p.addObserver((profileObject, arg) -> {
+                Profile profile = (Profile) profileObject;
+                if (profile.getImages() != null)
+                    pictures.setValue(profile.getImages());
                 System.out.println("Profile changed");
             });
 

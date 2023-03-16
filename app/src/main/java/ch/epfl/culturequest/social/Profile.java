@@ -146,7 +146,8 @@ public class Profile extends Observable{
 
         //wait for all the images to be fetched and then set the list of images
         CompletableFuture.allOf(images.toArray(new CompletableFuture[0])).thenRun(() -> {
-            this.images = images.stream().map(CompletableFuture::join).collect(Collectors.toList());
+            this.images = images.stream().map(CompletableFuture::join).sorted().collect(Collectors.toList());
+            setChanged();
             notifyObservers();
             System.out.println("FETCHED IMAGES:"+this.images);
         });
