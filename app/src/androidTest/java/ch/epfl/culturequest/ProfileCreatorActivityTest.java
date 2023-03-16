@@ -134,7 +134,7 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(2000);
         assertEquals(profile.getUsername(), "JohnDoe");
-        assertEquals(profile.getProfilePicture(), Uri.parse(ProfileCreatorActivity.DEFAULT_PROFILE_PATH));
+        assertEquals(profile.getProfilePicture(), ProfileCreatorActivity.DEFAULT_PROFILE_PATH);
     }
 
 

@@ -28,7 +28,7 @@ public class AuthenticatorTest {
     @Test
     public void authenticatorSignInMatchesCurrentUser() throws InterruptedException {
         authenticator.signIn();
-        Thread.sleep(4000);
+        Thread.sleep(2000);
         assertEquals(authenticator.getUser(), FirebaseAuth.getInstance().getCurrentUser());
     }
 

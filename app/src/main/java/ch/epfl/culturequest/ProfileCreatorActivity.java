@@ -19,13 +19,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
-import java.util.Objects;
-
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.ui.CircleTransform;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class ProfileCreatorActivity extends AppCompatActivity {
@@ -34,8 +32,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     public static String DEFAULT_PROFILE_PATH = "res/drawable/profile_icon_selector.xml";
 
     private final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
-    private final Profile profile = new Profile(
-            Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()), null, null);
+    private final Profile profile = new Profile(null, null);
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -45,6 +42,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                     });
     private ImageView profileView;
     private Drawable initialDrawable;
+    private Database db = new Database();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,13 +83,13 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         EditText textView = findViewById(R.id.username);
         String username = textView.getText().toString();
         if (usernameIsValid(username)) {
-            profile.updateUsername(username);
+            profile.setUsername(username);
             //checks if user actually selected profile pic,
             //if they dont, we set a default profile pic
             if (profileView.getDrawable().equals(initialDrawable)) {
-                profile.updateProfilePicture(Uri.parse(DEFAULT_PROFILE_PATH));
+                profile.setProfilePicture(DEFAULT_PROFILE_PATH);
             }
-            //database.setProfile!!
+            db.setProfile(profile);
             Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
             startActivity(successfulProfileCreation);
         } else {
@@ -107,10 +105,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     private void displayProfilePic(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
             Uri profilePicture = result.getData().getData();
-            ImageView image = findViewById(R.id.profile_picture);
-            Picasso.get().load(profilePicture).transform(new CircleTransform()).into(image);
+            CircleImageView image = findViewById(R.id.profile_picture);
+            Picasso.get().load(profilePicture).into(image);
             ((TextView)findViewById(R.id.profile_pic_text)).setText("");
-            profile.updateProfilePicture(profilePicture);
+            profile.setProfilePicture(profilePicture.getPath());
         }
     }
 
@@ -124,6 +122,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     }
 
     //used for testing purposes
+
+
     public Profile getProfile() {
         return profile;
     }
