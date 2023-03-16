@@ -66,9 +66,6 @@ public class ImageTest {
         assertThat(image.compareTo(image2) < 0, is(true));
         assertThat(image2.compareTo(image) > 0, is(true));
         assertThat(image.compareTo(image) == 0, is(true));
-
-
-
     }
 
     @Test
