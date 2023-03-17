@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.backend.artprocessing.apis;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 
 import java.io.IOException;
@@ -21,12 +23,12 @@ import okhttp3.Response;
 
 
 public class RecognitionApi {
-    public static String baseGoogleLensAPIURL="https://lens.google.com/uploadbyurl?url=";
+    public static String baseGoogleLensAPIURL="https://lens.google.com/uploadbyurl";
 
     /** Returns an art recognition object (as a future) given the URL of the image associated to the scanned piece of art */
     public CompletableFuture<ArtRecognition> getArtName(String imageURL) {
 
-        String apiEndpoint = baseGoogleLensAPIURL + imageURL;
+        String apiEndpoint = Uri.parse(baseGoogleLensAPIURL).buildUpon().appendQueryParameter("url", imageURL).build().toString();
 
         return getArtFromParsing(getApiResponse(apiEndpoint));
 
