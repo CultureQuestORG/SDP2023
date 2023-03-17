@@ -21,7 +21,7 @@ import okhttp3.Response;
 
 
 public class RecognitionApi {
-    private final String baseGoogleLensAPIURL="https://lens.google.com/uploadbyurl?url=";
+    public static String baseGoogleLensAPIURL="https://lens.google.com/uploadbyurl?url=";
 
     /** Returns an art recognition object (as a future) given the URL of the image associated to the scanned piece of art */
     public CompletableFuture<ArtRecognition> getArtName(String imageURL) {
