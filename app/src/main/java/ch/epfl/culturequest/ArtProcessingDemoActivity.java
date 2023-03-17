@@ -22,6 +22,10 @@ public class ArtProcessingDemoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_art_processing_demo);
         // get the image from the extra
         scannedImage = getIntent().getParcelableExtra("bitmap");
+
+        ImageView imageView = findViewById(R.id.imageView);
+        imageView.setImageBitmap(scannedImage);
+
         processImage();
     }
 
@@ -31,8 +35,6 @@ public class ArtProcessingDemoActivity extends AppCompatActivity {
         artImageUpload.uploadAndGetUrlFromImage(scannedImage).thenAccept(url -> {
             new ProcessingApi().getArtDescriptionFromUrl(url).thenAccept(artDescription -> {
                 // do something with the artDescription object
-                ImageView imageView = findViewById(R.id.imageView);
-                imageView.setImageBitmap(scannedImage);
 
                 TextView artNameView = findViewById(R.id.artName);
                 artNameView.setText(artDescription.getName());
