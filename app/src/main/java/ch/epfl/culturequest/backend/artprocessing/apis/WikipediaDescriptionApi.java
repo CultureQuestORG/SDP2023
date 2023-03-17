@@ -45,11 +45,12 @@ public class WikipediaDescriptionApi {
                         String city = getCityFromLocation(parsedLocation);
                         String country = getCountryFromLocation(parsedLocation);
                         String year = getYear(pageHtml);
+                        String artist = getArtist(pageHtml);
 
-                        return new BasicArtDescription(artName, artSummary, artType, year, city, country, museumName);
+                        return new BasicArtDescription(artName, artist, artSummary, artType, year, city, country, museumName);
                     }
 
-                    return new BasicArtDescription(artName, artSummary, artType, null, null, null, null);
+                    return new BasicArtDescription(artName, null, artSummary, artType, null, null, null, null);
 
                 });
     }
@@ -231,6 +232,19 @@ public class WikipediaDescriptionApi {
         }
 
         return null;
+    }
 
+    public String getArtist(String pageHtml){
+        String artistRegex = "(?<=Artist<\\/th>).*?<\\/td>";
+
+        Pattern pattern = Pattern.compile(artistRegex);
+        Matcher matcher = pattern.matcher(pageHtml);
+        if (matcher.find()) {
+            String artistHtml = matcher.group(0);
+            String cleanedArtistText = cleanHtml(artistHtml);
+            return cleanedArtistText;
+        }
+
+        return null;
     }
 }

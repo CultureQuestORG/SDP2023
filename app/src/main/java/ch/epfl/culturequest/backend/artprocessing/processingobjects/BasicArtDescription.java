@@ -20,7 +20,10 @@ public class BasicArtDescription {
 
     private String name;
 
-    public BasicArtDescription(String name, String summary, ArtType type, String year, String city, String country, String museum) {
+    private String artist;
+
+    public BasicArtDescription(String name, String artist, String summary, ArtType type, String year, String city, String country, String museum) {
+        this.artist = artist;
         this.name = name;
         this.summary = summary;
         this.city = city;
@@ -57,6 +60,8 @@ public class BasicArtDescription {
     public String getYear() {
         return year;
     }
+
+    public String getArtist() { return artist;}
 
 
 

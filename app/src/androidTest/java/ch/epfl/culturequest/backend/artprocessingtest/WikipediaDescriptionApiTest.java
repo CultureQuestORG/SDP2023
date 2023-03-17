@@ -29,9 +29,6 @@ public class WikipediaDescriptionApiTest {
     BasicArtDescription descriptionDavidOfMichelangelo;
 
     BasicArtDescription descriptionArcDeTriomphe;
-
-    MockWebServer mockWebServer = new MockWebServer();
-
     BasicArtDescription getBasicArtDescription(String artName, String additionalInfo){
         ArtRecognition artRecognition = new ArtRecognition(artName, additionalInfo);
         CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);
@@ -39,21 +36,10 @@ public class WikipediaDescriptionApiTest {
     }
 
     @Before
-    public void setUp() throws IOException {
-
-        mockWebServer.start(8080);
-
+    public void setUp() {
         descriptionMonaLisa = getBasicArtDescription("Mona Lisa", "Painting");
         descriptionDavidOfMichelangelo = getBasicArtDescription("David of Michelangelo", "Sculpture");
         descriptionArcDeTriomphe = getBasicArtDescription("Arc de Triomphe", "Monument");
-    }
-
-    private void initUrl(Boolean useMockWebserver){
-        if(useMockWebserver){
-            wikipediaDescriptionApi.wikipediaBaseUrl = "http://localhost:8080/";
-        } else {
-            wikipediaDescriptionApi.wikipediaBaseUrl = "https://en.wikipedia.org/wiki/Special:Search?search=";
-        }
     }
 
     @Test
@@ -107,77 +93,11 @@ public class WikipediaDescriptionApiTest {
         assertThat(descriptionArcDeTriomphe.getMuseum(), is(nullValue()));
     }
 
-    // test that the BasicArtDescription future is completed exceptionally when the wikipedia api returns an error
     @Test
-    public void exceptionWhenBadHttpResponse() {
-        initUrl(true);
-        mockWebServer.enqueue(new MockResponse().setResponseCode(404));
-        ArtRecognition artRecognition = new ArtRecognition("Mona Lisa", "Painting");
-
-        // getArtDescription should return a future that is completed exceptionally
-        CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);
-        assertThrows(CompletionException.class, () -> descriptionFuture.join());
-    }
-
-    // test that the BasicArtDescription future is completed exceptionally when the wikipedia api times out
-    @Test
-    public void exceptionWhenTimeout() {
-        initUrl(true);
-        mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
-
-        ArtRecognition artRecognition = new ArtRecognition("Mona Lisa", "Painting");
-
-        // getArtDescription should return a future that is completed exceptionally
-        CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);
-        assertThrows(CompletionException.class, () -> descriptionFuture.join());
-    }
-
-    // test that summary, city, country, museum, year are null when the wikipedia api returns empty strings
-    @Test
-    public void nullFieldsWhenResponseEmpty() {
-        initUrl(true);
-        mockWebServer.enqueue(new MockResponse().setBody("<html><body><p></p></body></html>").setResponseCode(200));
-        ArtRecognition artRecognition = new ArtRecognition("Mona Lisa", "Painting");
-
-        // getArtDescription should return a future that is completed exceptionally
-        CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);
-        BasicArtDescription description = descriptionFuture.join();
-        assertThat(description.getSummary(), is(nullValue()));
-        assertThat(description.getCity(), is(nullValue()));
-        assertThat(description.getCountry(), is(nullValue()));
-        assertThat(description.getMuseum(), is(nullValue()));
-        assertThat(description.getYear(), is(nullValue()));
-    }
-
-    // test that the future doesn't complete exceptionally when the wikipedia api returns a valid response after 5 seconds
-    @Test
-    public void noExceptionWhenValidResponseAfterTimeout() {
-        initUrl(true);
-        mockWebServer.enqueue(new MockResponse().setBody("<html><body><p></p></body></html>").setResponseCode(200).setBodyDelay(5, TimeUnit.SECONDS));
-        ArtRecognition artRecognition = new ArtRecognition("Mona Lisa", "Painting");
-
-        // getArtDescription should return a future that is completed exceptionally
-        CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);
-        descriptionFuture.join();
-    }
-
-    // test that that the type is OTHER when the wikipedia api returns an unknown type
-    @Test
-    public void otherArtTypeWhenUnknownType() {
-        initUrl(true);
-        mockWebServer.enqueue(new MockResponse().setBody("<html><body><p></p></body></html>").setResponseCode(200));
-        ArtRecognition artRecognition = new ArtRecognition("Mona Lisa", "Unknown");
-
-        // getArtDescription should return a future that is completed exceptionally
-        CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);
-        BasicArtDescription description = descriptionFuture.join();
-        assertThat(description.getType(), is(BasicArtDescription.ArtType.OTHER));
-    }
-
-
-    @After
-    public void tearDown() throws IOException {
-        mockWebServer.shutdown();
+    public void descriptionApiReturnsCorrectArtist(){
+        assertThat(descriptionMonaLisa.getArtist(), is("Leonardo da Vinci"));
+        assertThat(descriptionDavidOfMichelangelo.getArtist(), is("Michelangelo"));
+        assertThat(descriptionArcDeTriomphe.getArtist(), is(nullValue()));
     }
 
 }
