@@ -2,6 +2,7 @@ package ch.epfl.culturequest.ui.scan;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -23,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
 
+import ch.epfl.culturequest.ArtProcessingDemoActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
@@ -58,6 +60,12 @@ public class ScanFragment extends Fragment {
                 boolean isWifiAvailable = false;
                 try {
                     localStorage.storeImageLocally(bitmap, isWifiAvailable);
+
+                    // launch ArtProcessingDemoActivity with the bitmap as an extra
+                    Intent intent = new Intent(getActivity(), ArtProcessingDemoActivity.class);
+                    intent.putExtra("bitmap", bitmap);
+                    startActivity(intent);
+
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
