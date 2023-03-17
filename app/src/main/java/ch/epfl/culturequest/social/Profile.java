@@ -8,10 +8,9 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Observable;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.Observable;
-import java.util.Observer;
 
 import ch.epfl.culturequest.database.Database;
 
@@ -22,8 +21,6 @@ public class Profile extends Observable{
 
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
-
-
     private List<Image> images;
 
 
@@ -98,6 +95,7 @@ public class Profile extends Observable{
     }
 
     public String getProfilePicture() {
+        System.out.println(profilePicture);
         return profilePicture;
     }
 
@@ -152,10 +150,14 @@ public class Profile extends Observable{
             setChanged();
             notifyObservers();
         });
-
-
+    }
+    public static Profile getActiveProfile(){
+        return new Profile();
     }
 
+    public  Profile setActiveProfile(){
+        return this;
+    }
     @NonNull
     @Override
     public String toString(){

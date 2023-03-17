@@ -40,14 +40,6 @@ public class ProfileViewModel extends ViewModel {
 
         });
         EspressoIdlingResource.decrement();
-
-
-
-
-
-
-
-
     }
 
     public LiveData<String> getName() {
