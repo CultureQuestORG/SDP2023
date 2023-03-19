@@ -1,6 +1,7 @@
 package ch.epfl.culturequest.database;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.social.Image;
@@ -57,6 +58,20 @@ public class MockDatabase implements DatabaseInterface {
     public CompletableFuture<Integer> getRank(String UId) {
         CompletableFuture<Integer> future = new CompletableFuture<>();
         future.complete((Integer) map.get("rank/"+UId));
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Integer> getNumberOfProfiles() {
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        future.complete((Integer) map.get("numberOfProfiles"));
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
+        CompletableFuture<List<Profile>> future = new CompletableFuture<>();
+        future.complete((List<Profile>) map.get("topNProfiles"));
         return future;
     }
 }

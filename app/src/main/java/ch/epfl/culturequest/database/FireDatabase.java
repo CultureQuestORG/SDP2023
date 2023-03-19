@@ -1,11 +1,12 @@
 package ch.epfl.culturequest.database;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.social.Image;
@@ -36,8 +37,6 @@ public class FireDatabase implements DatabaseInterface {
         });
         return future;
     }
-
-
 
 
     @Override
@@ -71,24 +70,41 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     @Override
+    public void setImage(Image image) {
+        database.getReference("images").child(image.getUid()).setValue(image);
+    }
+
+    @Override
     public CompletableFuture<Integer> getRank(String UId) {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-        Query query = usersRef.orderByChild("score");
         CompletableFuture<Integer> future = new CompletableFuture<>();
-        query.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                int rank = 0;
-                for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                    Profile p = snapshot.getValue(Profile.class);
-                    rank++;
-                    if (p == null) {
-                        continue;
+        getNumberOfProfiles().whenComplete((numberOfProfiles, e) -> {
+            usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    int rank = numberOfProfiles;
+                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                        if (Objects.equals(snapshot.getKey(), UId)) {
+                            future.complete(rank);
+                            return;
+                        }
+                        rank--;
                     }
-                    if (p.getUid().equals(UId)) {
-                        break;
-                    }
+                    future.completeExceptionally(new RuntimeException("User not found"));
+                } else {
+                    future.completeExceptionally(task.getException());
                 }
-                future.complete(rank);
+            });
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Integer> getNumberOfProfiles() {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        usersRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete((int) task.getResult().getChildrenCount());
             } else {
                 future.completeExceptionally(task.getException());
             }
@@ -96,10 +112,25 @@ public class FireDatabase implements DatabaseInterface {
         return future;
     }
 
-
     @Override
-    public void setImage(Image image) {
-        database.getReference("images").child(image.getUid()).setValue(image);
+    public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        CompletableFuture<List<Profile>> future = new CompletableFuture<>();
+        getNumberOfProfiles().whenComplete((numberOfUsers, e) -> {
+            usersRef.orderByChild("score").limitToLast(n).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    List<Profile> profilesList = new ArrayList<>();
+                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                        Profile profile = snapshot.getValue(Profile.class);
+                        profilesList.add(profile);
+                    }
+                    future.complete(profilesList);
+                } else {
+                    future.completeExceptionally(task.getException());
+                }
+            });
+        });
+        return future;
     }
 
 }

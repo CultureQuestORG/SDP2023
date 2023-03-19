@@ -1,6 +1,8 @@
 package ch.epfl.culturequest.database;
 
 import ch.epfl.culturequest.social.Image;
+
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import ch.epfl.culturequest.social.Profile;
 
@@ -17,4 +19,9 @@ public interface DatabaseInterface {
     void setImage(Image picture);
 
     CompletableFuture<Integer> getRank(String UId);
+
+    CompletableFuture<Integer> getNumberOfProfiles();
+
+    CompletableFuture<List<Profile>> getTopNProfiles(int n);
+
 }
