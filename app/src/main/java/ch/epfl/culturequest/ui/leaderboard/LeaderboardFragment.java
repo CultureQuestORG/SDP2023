@@ -10,7 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.squareup.picasso.Picasso;
+
 import ch.epfl.culturequest.databinding.FragmentLeaderboardBinding;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LeaderboardFragment extends Fragment {
 
@@ -24,8 +27,12 @@ public class LeaderboardFragment extends Fragment {
         binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.scoreLeaderboard;
-        leaderboardViewModel.getCurrentUserScore().observe(getViewLifecycleOwner(), textView::setText);
+        final TextView currentUsername = binding.currentUsername;
+        final TextView currentUserScore = binding.currentUserScore;
+        final CircleImageView currentUserProfilePicture = binding.currentUserProfilePicture;
+        leaderboardViewModel.getCurrentUsername().observe(getViewLifecycleOwner(), currentUsername::setText);
+        leaderboardViewModel.getCurrentUserScore().observe(getViewLifecycleOwner(), currentUserScore::setText);
+        leaderboardViewModel.getCurrentUserProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(currentUserProfilePicture));
         return root;
     }
 

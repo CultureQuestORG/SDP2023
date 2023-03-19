@@ -14,12 +14,12 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class LeaderboardViewModel extends ViewModel {
 
-    private final MutableLiveData<String> currentUserName;
+    private final MutableLiveData<String> currentUsername;
     private final MutableLiveData<String> currentUserProfilePictureUri;
     private final MutableLiveData<String> currentUserScore;
 
     public LeaderboardViewModel() {
-        currentUserName = new MutableLiveData<>();
+        currentUsername = new MutableLiveData<>();
         currentUserProfilePictureUri = new MutableLiveData<>();
         currentUserScore = new MutableLiveData<>();
 
@@ -27,22 +27,22 @@ public class LeaderboardViewModel extends ViewModel {
         EspressoIdlingResource.increment();
         String currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         db.getProfile(currentUserUid).whenComplete((p, e) -> {
-            currentUserName.setValue(p.getName());
+            currentUsername.setValue(p.getUsername());
             currentUserProfilePictureUri.setValue(p.getProfilePicture());
-            currentUserScore.setValue(p.getScore().toString());
+            currentUserScore.setValue("Score: " + p.getScore().toString());
 
             p.addObserver((profileObject, arg) -> {
                 Profile profile = (Profile) profileObject;
-                currentUserName.postValue(profile.getName());
+                currentUsername.postValue(profile.getUsername());
                 currentUserProfilePictureUri.postValue(profile.getProfilePicture());
-                currentUserScore.postValue(profile.getScore().toString());
+                currentUserScore.postValue("Score: " + profile.getScore().toString());
             });
         });
         EspressoIdlingResource.decrement();
     }
 
-    public LiveData<String> getCurrentUserName() {
-        return currentUserName;
+    public LiveData<String> getCurrentUsername() {
+        return currentUsername;
     }
 
     public LiveData<String> getCurrentUserProfilePictureUri() {
