@@ -52,5 +52,12 @@ public class MockDatabase implements DatabaseInterface {
     public void setImage(Image image) {
         map.put("pictures/"+image.getUid(), image);
     }
+
+    @Override
+    public CompletableFuture<Integer> getRank(String UId) {
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        future.complete((Integer) map.get("rank/"+UId));
+        return future;
+    }
 }
 

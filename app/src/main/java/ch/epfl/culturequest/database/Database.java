@@ -48,5 +48,8 @@ public class Database  implements DatabaseInterface{
         databaseInstance.setImage(picture);
     }
 
-
+    @Override
+    public CompletableFuture<Integer> getRank(String UId) {
+        return databaseInstance.getRank(UId);
+    }
 }

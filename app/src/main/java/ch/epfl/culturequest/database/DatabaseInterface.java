@@ -15,4 +15,6 @@ public interface DatabaseInterface {
     CompletableFuture<Image> getImage(String UId);
 
     void setImage(Image picture);
+
+    CompletableFuture<Integer> getRank(String UId);
 }

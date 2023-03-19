@@ -29,9 +29,11 @@ public class LeaderboardFragment extends Fragment {
 
         final TextView currentUsername = binding.currentUsername;
         final TextView currentUserScore = binding.currentUserScore;
+        final TextView currentUserRank = binding.currentUserRank;
         final CircleImageView currentUserProfilePicture = binding.currentUserProfilePicture;
         leaderboardViewModel.getCurrentUsername().observe(getViewLifecycleOwner(), currentUsername::setText);
         leaderboardViewModel.getCurrentUserScore().observe(getViewLifecycleOwner(), currentUserScore::setText);
+        leaderboardViewModel.getCurrentUserRank().observe(getViewLifecycleOwner(), currentUserRank::setText);
         leaderboardViewModel.getCurrentUserProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(currentUserProfilePicture));
         return root;
     }

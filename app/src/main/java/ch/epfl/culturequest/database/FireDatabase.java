@@ -1,7 +1,10 @@
 package ch.epfl.culturequest.database;
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -67,6 +70,31 @@ public class FireDatabase implements DatabaseInterface {
         return future;
     }
 
+    @Override
+    public CompletableFuture<Integer> getRank(String UId) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        Query query = usersRef.orderByChild("score");
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                int rank = 0;
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Profile p = snapshot.getValue(Profile.class);
+                    rank++;
+                    if (p == null) {
+                        continue;
+                    }
+                    if (p.getUid().equals(UId)) {
+                        break;
+                    }
+                }
+                future.complete(rank);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
 
 
     @Override
