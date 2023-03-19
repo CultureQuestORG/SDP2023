@@ -1,12 +1,14 @@
 package ch.epfl.culturequest;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,17 +17,28 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.firebase.ui.auth.data.model.User;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.PermissionRequest;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -33,8 +46,6 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
     public static String DEFAULT_PROFILE_PATH = "res/drawable/profile_icon_selector.xml";
-
-    private final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
     private final Profile profile = new Profile(null, null);
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
@@ -43,6 +54,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                     isGranted -> {
                         if (isGranted) openGallery();
                     });
+
+    private final PermissionRequest permissionRequest =
+            new PermissionRequest(this, Manifest.permission.READ_EXTERNAL_STORAGE, requestPermissionLauncher);;
     private ImageView profileView;
     private Drawable initialDrawable;
     private Database db = new Database();
@@ -68,10 +82,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      * @param view
      */
     public void selectProfilePicture(View view) {
-        if (ContextCompat.checkSelfPermission(this, GALLERY_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
+        if (permissionRequest.hasPermission()) {
             openGallery();
         } else {
-            requestPermissionLauncher.launch(GALLERY_PERMISSION);
+            permissionRequest.askPermission();
         }
     }
 
@@ -91,6 +105,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
                 db.setProfile(profile);
             }
+
             Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
             startActivity(successfulProfileCreation);
         } else {
@@ -98,6 +113,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             textView.setHint(INCORRECT_USERNAME_FORMAT);
         }
     }
+
 
     private void openGallery() {
         profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
