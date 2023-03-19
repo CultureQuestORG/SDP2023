@@ -23,14 +23,6 @@
           }
         },
         {
-          "client_id": "296582792540-vs52ip3u2trc84lp7ieag3v5cc6tj9vd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "ch.epfl.culturequest",
-            "certificate_hash": "6c691c45f230d2111f2ebe9db9cbde40eb673d5d"
-          }
-        },
-        {
           "client_id": "296582792540-aebvhljtf5vspef2s1s21017qj27c4hj.apps.googleusercontent.com",
           "client_type": 3
         }
