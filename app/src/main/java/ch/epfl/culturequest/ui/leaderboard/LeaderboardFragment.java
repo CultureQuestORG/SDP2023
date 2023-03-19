@@ -25,7 +25,7 @@ public class LeaderboardFragment extends Fragment {
         View root = binding.getRoot();
 
         final TextView textView = binding.scoreLeaderboard;
-        leaderboardViewModel.getScore().observe(getViewLifecycleOwner(), textView::setText);
+        leaderboardViewModel.getCurrentUserScore().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
