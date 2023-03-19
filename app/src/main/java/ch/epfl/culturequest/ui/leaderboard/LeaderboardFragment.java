@@ -24,8 +24,8 @@ public class LeaderboardFragment extends Fragment {
         binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textLeaderboard;
-        leaderboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        final TextView textView = binding.scoreLeaderboard;
+        leaderboardViewModel.getScore().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
