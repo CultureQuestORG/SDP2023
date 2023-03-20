@@ -48,7 +48,7 @@ public class SignUpActivityTest {
 
     @Test
     public void signInTransitionsToNavActivityForNonNullUser() {
-        auth.signInAnonymously().addOnCompleteListener(task -> {
+        auth.signInWithEmailAndPassword("test@gmail.com", "abcdefg").addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 user = auth.getCurrentUser();
 
