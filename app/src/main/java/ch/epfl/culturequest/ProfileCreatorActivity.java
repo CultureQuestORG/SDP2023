@@ -56,7 +56,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                     });
 
     private final PermissionRequest permissionRequest =
-            new PermissionRequest(this, Manifest.permission.READ_EXTERNAL_STORAGE, requestPermissionLauncher);;
+            new PermissionRequest(Manifest.permission.READ_EXTERNAL_STORAGE);
     private ImageView profileView;
     private Drawable initialDrawable;
     private Database db = new Database();
@@ -82,10 +82,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      * @param view
      */
     public void selectProfilePicture(View view) {
-        if (permissionRequest.hasPermission()) {
+        if (permissionRequest.hasPermission(this)) {
             openGallery();
         } else {
-            permissionRequest.askPermission();
+            permissionRequest.askPermission(requestPermissionLauncher);
         }
     }
 

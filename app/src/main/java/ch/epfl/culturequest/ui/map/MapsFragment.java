@@ -45,7 +45,7 @@ public class MapsFragment extends Fragment {
     private ActivityResultLauncher<String> launcher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(),
                     this::onRequestPermissionsResult);
-    private final PermissionRequest permissionRequest = new PermissionRequest(getContext(), Manifest.permission.ACCESS_FINE_LOCATION, launcher);
+    private final PermissionRequest permissionRequest = new PermissionRequest(Manifest.permission.ACCESS_FINE_LOCATION);
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -114,12 +114,12 @@ public class MapsFragment extends Fragment {
          * device. The result of the permission request is handled by a callback,
          * onRequestPermissionsResult.
          */
-        if (viewModel.isLocationPermissionGranted() || permissionRequest.hasPermission()) {
+        if (viewModel.isLocationPermissionGranted() || permissionRequest.hasPermission(getContext())) {
             viewModel.setIsLocationPermissionGranted(true);
             updateLocationUI();
             getDeviceLocation();
         } else {
-            permissionRequest.askPermission();
+            permissionRequest.askPermission(launcher);
         }
     }
 
