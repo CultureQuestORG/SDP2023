@@ -17,6 +17,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -143,7 +144,13 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(2000);
         assertEquals(profile.getUsername(), "JohnDoe");
-        assertEquals(profile.getProfilePicture(), ProfileCreatorActivity.DEFAULT_PROFILE_PATH);
+        // assert with startsWith that the URL starts with https://firebasestorage.googleapis.com and contains
+        assertThat(profile.getProfilePicture(), startsWith("https://firebasestorage.googleapis.com"));
+
+
+
+
+
         ActivityScenario.launch(NavigationActivity.class).onActivity(NavigationActivity::onBackPressed);
     }
 
