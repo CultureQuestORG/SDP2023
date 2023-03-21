@@ -56,10 +56,7 @@ public class Authenticator implements AuthService {
     @Override
     public void signIn() {
         if (isAnonymous) {
-            FirebaseAuth
-                    .getInstance()
-                    .signInAnonymously()
-                    .addOnCompleteListener(task -> {
+            FirebaseAuth.getInstance().signInAnonymously().addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
                             redirectTo(ProfileCreatorActivity.class);
@@ -68,9 +65,7 @@ public class Authenticator implements AuthService {
         } else if (user == null) {
             signInLauncher.launch(signInIntent());
         } else {
-            System.out.println("User is already signed in");
             Database.getProfile(user.getUid()).handle((profile, throwable) -> {
-                System.out.println("Profile is " + profile);
                 if (profile != null) {
                     Profile.setActiveProfile(profile);
                     redirectTo(NavigationActivity.class);
@@ -79,7 +74,6 @@ public class Authenticator implements AuthService {
                 }
                 return null;
             }).exceptionally(throwable -> {
-                System.out.println("Error while getting profile");
                 throwable.printStackTrace();
                 return null;
             });
