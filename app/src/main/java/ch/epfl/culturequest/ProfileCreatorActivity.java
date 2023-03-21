@@ -34,12 +34,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ProfileCreatorActivity extends AppCompatActivity {
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
-    public static String DEFAULT_PROFILE_PATH = "android.resource://"+ Objects.requireNonNull(R.class.getPackage()).getName()+"/"+R.drawable.profile_icon_selector;
+    public static String DEFAULT_PROFILE_PATH = "android.resource://" + Objects.requireNonNull(R.class.getPackage()).getName() + "/" + R.drawable.profile_icon_selector;
 
     private String profilePicUri;
 
     private final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
-    private final Profile profile = new Profile(null, null);
+    private final Profile profile = new Profile(null, "");
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -84,7 +84,6 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      * First checks if username is valid and if user has selected a profile pic,
      * then registers the Profile in the Database and redirects to the Navigation Intent
      *
-     *
      * @param view
      */
     public void createProfile(View view) {
@@ -99,7 +98,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 // store the drawable in the database
 
-                UploadTask task= storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).putFile(Uri.parse(profilePicUri));
+                UploadTask task = storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).putFile(Uri.parse(profilePicUri));
                 task.addOnSuccessListener(taskSnapshot -> {
                     storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnSuccessListener(uri -> {
                         profile.setProfilePicture(uri.toString());
@@ -162,6 +161,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
     public Profile getProfile() {
         return profile;
+    }
+
+    public String getProfilePicUri() {
+        return profilePicUri;
     }
 
 }
