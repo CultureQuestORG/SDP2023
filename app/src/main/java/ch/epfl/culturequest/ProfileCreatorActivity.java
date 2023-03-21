@@ -88,7 +88,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         String username = textView.getText().toString();
         if (isValid(username)) {
             setDefaultPicIfNoneSelected();
-            db.setProfile(profile);
+            if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
+                db.setProfile(profile);
+            }
             Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
             startActivity(successfulProfileCreation);
         } else {
