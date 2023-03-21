@@ -37,7 +37,8 @@ public class ScanFragment extends Fragment {
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
-            cameraSetup.openCamera();
+            if(isPermissionGranted())
+                cameraSetup.openCamera();
         }
         @Override
         public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {}
@@ -121,18 +122,25 @@ public class ScanFragment extends Fragment {
                 if (!isGranted) {
                     // Permission is not granted. You can ask for the permission again.
                     requestPermissions();
+                } else {
+                    // Permission is granted. You can go ahead and use the camera.
+                    cameraSetup.openCamera();
                 }
             });
 
     // Method to request the permissions
     private void requestPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                getContext(), android.Manifest.permission.CAMERA) !=
-                PackageManager.PERMISSION_GRANTED) {
+        if (!isPermissionGranted()) {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
             requestPermissionLauncher.launch(
                     android.Manifest.permission.CAMERA);
         }
+    }
+
+    private boolean isPermissionGranted() {
+        return ContextCompat.checkSelfPermission(
+                getContext(), android.Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED;
     }
 }
