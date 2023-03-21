@@ -56,7 +56,7 @@ public class Authenticator implements AuthService {
         if (isAnonymous) {
             FirebaseAuth
                     .getInstance()
-                    .signInAnonymously()
+                    .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
