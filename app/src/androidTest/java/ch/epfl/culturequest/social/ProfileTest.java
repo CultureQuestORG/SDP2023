@@ -165,7 +165,7 @@ public class ProfileTest {
                 "email: " + profile.getEmail() + "\n" +
                 "phoneNumber: " + profile.getPhoneNumber() + "\n" +
                 "profilePicture: " + profile.getProfilePicture() + "\n" +
-                "pictures: " + profile.getImages() + "\n"));
+                "pictures: " + profile.getImagesList() + "\n"));
     }
 
 
