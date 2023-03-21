@@ -19,6 +19,8 @@ import java.util.List;
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
+import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Profile;
 
 /**
  * A authenticator to sign in the app using google.
@@ -66,7 +68,23 @@ public class Authenticator implements AuthService {
         } else if (user == null) {
             signInLauncher.launch(signInIntent());
         } else {
-            redirectTo(NavigationActivity.class);
+            System.out.println("User is already signed in");
+            Database.getProfile(user.getUid()).handle((profile, throwable) -> {
+                System.out.println("Profile is " + profile);
+                if (profile != null) {
+                    Profile.setActiveProfile(profile);
+                    redirectTo(NavigationActivity.class);
+                } else {
+                    redirectTo(ProfileCreatorActivity.class);
+                }
+                return null;
+            }).exceptionally(throwable -> {
+                System.out.println("Error while getting profile");
+                throwable.printStackTrace();
+                return null;
+            });
+
+
         }
     }
 
@@ -82,9 +100,11 @@ public class Authenticator implements AuthService {
                 mAuth.signOut();
                 redirectTo(SignUpActivity.class);
             }
-            else AuthUI.getInstance()
+            else {AuthUI.getInstance()
                     .signOut(activity)
                     .addOnCompleteListener(task -> redirectTo(SignUpActivity.class));
+                Profile.setActiveProfile(null);
+            }
         }
     }
 
@@ -116,7 +136,20 @@ public class Authenticator implements AuthService {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         if (result.getResultCode() == RESULT_OK) {
             user = mAuth.getCurrentUser();
-            redirectTo(ProfileCreatorActivity.class);
+            assert user != null;
+            Database.getProfile(user.getUid()).handle((profile, throwable) -> {
+                if (profile != null) {
+                    Profile.setActiveProfile(profile);
+                    redirectTo(NavigationActivity.class);
+                } else {
+                    Profile.setActiveProfile(new Profile("", null));
+                    redirectTo(ProfileCreatorActivity.class);
+                }
+                return null;
+            }).exceptionally(throwable -> {
+                throwable.printStackTrace();
+                return null;
+            });
         } else {
             redirectTo(SignUpActivity.class);
         }

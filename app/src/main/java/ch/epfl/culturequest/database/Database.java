@@ -6,7 +6,7 @@ import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 
 
-public class Database  implements DatabaseInterface{
+public class Database {
     private static DatabaseInterface  databaseInstance = new FireDatabase();
 
     /**
@@ -18,33 +18,30 @@ public class Database  implements DatabaseInterface{
         Database.databaseInstance = database;
     }
 
-    @Override
-    public void set(String key, Object value) {
+
+    public static void set(String key, Object value) {
         databaseInstance.set(key, value);
     }
 
-    @Override
-    public CompletableFuture<Object> get(String key) {
+
+    public static CompletableFuture<Object> get(String key) {
         return databaseInstance.get(key);
     }
 
-    @Override
-    public CompletableFuture<Profile> getProfile(String UId) {
+    public static CompletableFuture<Profile> getProfile(String UId) {
         return databaseInstance.getProfile(UId);
     }
 
-    @Override
-    public void setProfile(Profile profile) {
+    public static void setProfile(Profile profile) {
         databaseInstance.setProfile(profile);
     }
 
-    @Override
-    public CompletableFuture<Image> getImage(String UId) {
+
+    public static CompletableFuture<Image> getImage(String UId) {
         return databaseInstance.getImage(UId);
     }
 
-    @Override
-    public void setImage(Image picture) {
+    public static void setImage(Image picture) {
         databaseInstance.setImage(picture);
     }
 
