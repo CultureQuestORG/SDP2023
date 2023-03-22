@@ -42,26 +42,26 @@ public class LeaderboardViewModel extends ViewModel {
         db.getProfile(currentUserUid).whenComplete((p, e) -> {
             currentUsername.setValue(p.getUsername());
             currentUserProfilePictureUri.setValue(p.getProfilePicture());
-            currentUserScore.setValue("Score: " + p.getScore().toString());
+            currentUserScore.setValue(p.getScore().toString());
 
             p.addObserver((profileObject, arg) -> {
                 Profile profile = (Profile) profileObject;
                 currentUsername.postValue(profile.getUsername());
                 currentUserProfilePictureUri.postValue(profile.getProfilePicture());
-                currentUserScore.postValue("Score: " + profile.getScore().toString());
+                currentUserScore.postValue(profile.getScore().toString());
             });
         });
         db.getRank(currentUserUid).whenComplete((rank, e) -> {
-            currentUserRank.setValue("Rank:" + rank.toString());
+            currentUserRank.setValue(rank.toString());
         });
         db.getTopNProfiles(N).whenComplete((topN, e) -> {
             topNUserNames.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
-            topNUserScores.setValue(topN.stream().map(p -> "Score: " + p.getScore().toString()).collect(toList()));
+            topNUserScores.setValue(topN.stream().map(p -> p.getScore().toString()).collect(toList()));
             topNUserProfilePicturesUri.setValue(topN.stream().map(Profile::getProfilePicture).collect(toList()));
             // create array of string int from 1 to N
             String[] ranks = new String[N];
             for (int i = 0; i < N; i++) {
-                ranks[i] = "Rank: " + (N - i);
+                ranks[i] = Integer.toString(N - i);
             }
             topNUserRanks.setValue(List.of(ranks));
         });

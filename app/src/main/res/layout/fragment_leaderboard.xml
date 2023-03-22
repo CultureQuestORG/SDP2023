@@ -22,7 +22,7 @@
         app:layout_constraintVertical_bias="0.023" />
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/currentUserProfilePicture"
+        android:id="@+id/current_user_profile_picture"
         android:layout_width="127dp"
         android:layout_height="121dp"
         android:src="@drawable/basic_profile_picture"
@@ -33,7 +33,7 @@
         app:layout_constraintVertical_bias="0.15" />
 
     <TextView
-        android:id="@+id/currentUsername"
+        android:id="@+id/current_username"
         android:layout_width="121dp"
         android:layout_height="30dp"
         android:layout_marginTop="8dp"
@@ -62,7 +62,7 @@
         app:layout_constraintVertical_bias="0.234" />
 
     <TextView
-        android:id="@+id/currentUserScore"
+        android:id="@+id/current_user_score"
         android:layout_width="121dp"
         android:layout_height="30dp"
         android:layout_marginTop="8dp"
@@ -91,7 +91,7 @@
         app:layout_constraintVertical_bias="0.234" />
 
     <TextView
-        android:id="@+id/currentUserRank"
+        android:id="@+id/current_user_rank"
         android:layout_width="121dp"
         android:layout_height="30dp"
         android:layout_marginTop="8dp"
@@ -114,5 +114,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.389" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.564" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
