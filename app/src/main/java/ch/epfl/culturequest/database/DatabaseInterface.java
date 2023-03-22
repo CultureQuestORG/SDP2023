@@ -1,6 +1,8 @@
 package ch.epfl.culturequest.database;
 
 import ch.epfl.culturequest.social.Image;
+
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import ch.epfl.culturequest.social.Profile;
 
@@ -9,6 +11,8 @@ public interface DatabaseInterface {
     CompletableFuture<Object> get(String key);
 
     CompletableFuture<Profile> getProfile(String UId);
+
+    CompletableFuture<List<String>> getAllUsernames();
 
     void setProfile(Profile profile);
 

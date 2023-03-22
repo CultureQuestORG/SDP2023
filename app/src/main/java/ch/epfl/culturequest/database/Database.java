@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.database;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.social.Image;
@@ -31,6 +32,11 @@ public class Database  implements DatabaseInterface{
     @Override
     public CompletableFuture<Profile> getProfile(String UId) {
         return databaseInstance.getProfile(UId);
+    }
+
+    @Override
+    public CompletableFuture<List<String>> getAllUsernames() {
+        return databaseInstance.getAllUsernames();
     }
 
     @Override

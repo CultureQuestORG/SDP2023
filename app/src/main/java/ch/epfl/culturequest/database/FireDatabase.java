@@ -1,8 +1,13 @@
 package ch.epfl.culturequest.database;
 
+import android.net.LinkAddress;
+
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.social.Image;
@@ -35,7 +40,28 @@ public class FireDatabase implements DatabaseInterface {
     }
 
 
-
+    @Override
+    public CompletableFuture<List<String>> getAllUsernames() {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        CompletableFuture<List<String>> future = new CompletableFuture<>();
+        System.out.println("going to search");
+        usersRef.orderByChild("username")
+                .get()
+                .addOnCompleteListener(task -> {
+                    System.out.println("Complete");
+                    if (task.isSuccessful()){
+                        List<String> usernames = new ArrayList<>();
+                        for (DataSnapshot snapshot: task.getResult().getChildren()){
+                            String username = snapshot.getValue(String.class);
+                            usernames.add(username);
+                        }
+                        future.complete(usernames);
+                    }else{
+                        future.completeExceptionally(task.getException());
+                    }
+                });
+        return future;
+    }
 
     @Override
     public void setProfile(Profile profile) {
@@ -66,7 +92,6 @@ public class FireDatabase implements DatabaseInterface {
         });
         return future;
     }
-
 
 
     @Override

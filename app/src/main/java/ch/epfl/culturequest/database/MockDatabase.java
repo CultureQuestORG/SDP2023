@@ -1,6 +1,7 @@
 package ch.epfl.culturequest.database;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.social.Image;
@@ -34,6 +35,11 @@ public class MockDatabase implements DatabaseInterface {
         CompletableFuture<Profile> future = new CompletableFuture<>();
         future.complete((Profile) map.get("users/"+UId));
         return future;
+    }
+
+    @Override
+    public CompletableFuture<List<String>> getAllUsernames() {
+        return null;
     }
 
     @Override
