@@ -38,7 +38,7 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
-    public CompletableFuture<List<String>> getAllUsernames() {
+    public CompletableFuture<List<Profile>> getAllProfiles() {
         return null;
     }
 

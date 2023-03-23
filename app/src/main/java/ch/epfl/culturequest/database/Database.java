@@ -35,8 +35,8 @@ public class Database  implements DatabaseInterface{
     }
 
     @Override
-    public CompletableFuture<List<String>> getAllUsernames() {
-        return databaseInstance.getAllUsernames();
+    public CompletableFuture<List<Profile>> getAllProfiles() {
+        return databaseInstance.getAllProfiles();
     }
 
     @Override

@@ -41,26 +41,38 @@ public class FireDatabase implements DatabaseInterface {
 
 
     @Override
-    public CompletableFuture<List<String>> getAllUsernames() {
+    public CompletableFuture<List<Profile>> getAllProfiles() {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-        CompletableFuture<List<String>> future = new CompletableFuture<>();
-        System.out.println("going to search");
+        CompletableFuture<List<Profile>> future = new CompletableFuture<>();
         usersRef.orderByChild("username")
                 .get()
                 .addOnCompleteListener(task -> {
-                    System.out.println("Complete");
-                    if (task.isSuccessful()){
-                        List<String> usernames = new ArrayList<>();
-                        for (DataSnapshot snapshot: task.getResult().getChildren()){
-                            String username = snapshot.child("username").getValue(String.class);
-                            usernames.add(username);
+                    if (task.isSuccessful()) {
+                        List<Profile> profiles = new ArrayList<>();
+                        for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                            profiles.add(extractProfile(snapshot));
                         }
-                        future.complete(usernames);
-                    }else{
+                        future.complete(profiles);
+                    } else {
                         future.completeExceptionally(task.getException());
                     }
                 });
         return future;
+    }
+
+    private Profile extractProfile(DataSnapshot snapshot) {
+        String uid = getAttr(snapshot, "uid");
+        String name = getAttr(snapshot, "name");
+        String username = getAttr(snapshot, "username");
+        String email = getAttr(snapshot, "email");
+        String phoneNumber = null;
+        String profilePic = getAttr(snapshot, "profilePic");
+        List<Image> images = null; //TODO needs changing
+        return new Profile(uid, name, username, email, phoneNumber, profilePic, images);
+    }
+
+    private String getAttr(DataSnapshot snapshot, String key) {
+        return snapshot.child(key).getValue(String.class);
     }
 
     @Override

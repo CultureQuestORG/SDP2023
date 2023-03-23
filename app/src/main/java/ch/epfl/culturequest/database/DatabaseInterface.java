@@ -12,7 +12,7 @@ public interface DatabaseInterface {
 
     CompletableFuture<Profile> getProfile(String UId);
 
-    CompletableFuture<List<String>> getAllUsernames();
+    CompletableFuture<List<Profile>> getAllProfiles();
 
     void setProfile(Profile profile);
 
