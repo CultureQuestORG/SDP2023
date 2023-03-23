@@ -151,7 +151,7 @@ public class ProfileCreatorActivityTest {
     public void notSelectingPicGivesDefaultProfilePicAndCorrectUsername() throws InterruptedException {
         onView(withId(R.id.username)).perform(typeText("JohnDoe"));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
-        Thread.sleep(2000);
+
         assertEquals(profile.getUsername(), "JohnDoe");
         // assert  that the URL contains https://firebasestorage.googleapis.com and contains
         assertEquals(DEFAULT_PROFILE_PATH, activity.getProfilePicUri());

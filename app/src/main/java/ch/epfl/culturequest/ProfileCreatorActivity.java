@@ -95,18 +95,23 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                 profile.setUsername(username);
 
 
-                FirebaseStorage storage = FirebaseStorage.getInstance();
-                // store the drawable in the database
+                if (profilePicUri.equals(DEFAULT_PROFILE_PATH)) {
+                    setDefaultProfile();
+                } else {
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    // store the drawable in the database
 
-                UploadTask task = storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).putFile(Uri.parse(profilePicUri));
-                task.addOnSuccessListener(taskSnapshot -> {
-                    storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnSuccessListener(uri -> {
-                        profile.setProfilePicture(uri.toString());
-                        Profile.setActiveProfile(profile);
-                        Database.setProfile(profile);
+                    UploadTask task = storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).putFile(Uri.parse(profilePicUri));
+                    task.addOnFailureListener(e -> setDefaultProfile()).addOnSuccessListener(taskSnapshot -> {
+                        storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> setDefaultProfile()).addOnSuccessListener(uri -> {
+                            profile.setProfilePicture(uri.toString());
+                            Profile.setActiveProfile(profile);
+                            Database.setProfile(profile);
 
+                        });
                     });
-                });
+                }
+
             }
             Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
             startActivity(successfulProfileCreation);
@@ -114,6 +119,12 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             textView.setText("");
             textView.setHint(INCORRECT_USERNAME_FORMAT);
         }
+    }
+
+    private void setDefaultProfile() {
+        profile.setProfilePicture(DEFAULT_PROFILE_PATH);
+        Profile.setActiveProfile(profile);
+        Database.setProfile(profile);
     }
 
     private void openGallery() {
@@ -131,6 +142,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     private void setDefaultPicIfNoneSelected() {
         if (profileView.getDrawable().equals(initialDrawable)) {
             profilePicUri = DEFAULT_PROFILE_PATH;
+            profile.setProfilePicture(DEFAULT_PROFILE_PATH);
 
         }
     }
