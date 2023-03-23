@@ -52,7 +52,7 @@ public class FireDatabase implements DatabaseInterface {
                     if (task.isSuccessful()){
                         List<String> usernames = new ArrayList<>();
                         for (DataSnapshot snapshot: task.getResult().getChildren()){
-                            String username = snapshot.getValue(String.class);
+                            String username = snapshot.child("username").getValue(String.class);
                             usernames.add(username);
                         }
                         future.complete(usernames);

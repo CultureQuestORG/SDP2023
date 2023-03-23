@@ -1,26 +1,26 @@
 package ch.epfl.culturequest.ui;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentFactory;
-import androidx.fragment.app.FragmentManager;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.ui.home.HomeFragment;
 
 public class SearchUserActivity extends AppCompatActivity {
     Database db = new Database();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,13 +30,22 @@ public class SearchUserActivity extends AppCompatActivity {
     }
 
 
-    public void searchUser(View view) throws ExecutionException, InterruptedException {
-        System.out.println("searching");
-        List<String>usernames = db.getAllUsernames().get();
-        System.out.println(usernames);
+    public void searchUser(View view) {
+        System.out.println(FirebaseAuth.getInstance().getCurrentUser());
+        String query = ((EditText) findViewById(R.id.search_user)).getText().toString();
+        ListView listView = findViewById(R.id.list_view);
+        db.getAllUsernames().whenComplete((usernames, throwable) -> {
+            List<String> matchingUsernames = usernames.stream().filter(username -> username.startsWith(query)).collect(Collectors.toList());
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, matchingUsernames);
+            listView.setForegroundGravity(Gravity.TOP);
+            listView.setAdapter(adapter);
+        });
+        listView.setOnItemClickListener((parent, v, position, id) -> {
+            String selectedItem = (String) parent.getItemAtPosition(position);
+        });
     }
 
-    public void goBack(View view){
+    public void goBack(View view) {
         super.onBackPressed();
     }
 }
