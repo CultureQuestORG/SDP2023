@@ -34,7 +34,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ProfileCreatorActivity extends AppCompatActivity {
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
-    public static String DEFAULT_PROFILE_PATH = "android.resource://" + Objects.requireNonNull(R.class.getPackage()).getName() + "/" + R.drawable.profile_icon_selector;
+    public static String DEFAULT_PROFILE_PATH = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2Fbasic_profile_picture.png?alt=media&token=8e407bd6-ad5f-401a-9b2d-7852ccfb9d62";
 
     private String profilePicUri;
 
@@ -94,14 +94,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
                 profile.setUsername(username);
 
-
                 if (profilePicUri.equals(DEFAULT_PROFILE_PATH)) setProfile(DEFAULT_PROFILE_PATH);
-                else {
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    UploadTask task = storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).putFile(Uri.parse(profilePicUri));
-                    task.addOnFailureListener(e -> setProfile(DEFAULT_PROFILE_PATH))
-                        .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> setProfile(DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> setProfile(uri.toString())));
-                }
+                else storeImageAndProfileInDatabase();
+
             }
             Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
             startActivity(successfulProfileCreation);
@@ -116,6 +111,14 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
     }
+
+    private void storeImageAndProfileInDatabase() {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
+        task.addOnFailureListener(e -> setProfile(DEFAULT_PROFILE_PATH))
+                .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> setProfile(DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> setProfile(uri.toString())));
+    }
+
 
 
     private void openGallery() {
