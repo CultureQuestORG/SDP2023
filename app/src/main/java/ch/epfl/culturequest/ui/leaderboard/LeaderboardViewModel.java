@@ -25,7 +25,7 @@ public class LeaderboardViewModel extends ViewModel {
     private final MutableLiveData<List<String>> topNUserScores;
     private final MutableLiveData<List<String>> topNUserProfilePicturesUri;
     private final MutableLiveData<List<String>> topNUserRanks;
-    private final int N = 3;
+    private final int N = 8;
 
     public LeaderboardViewModel() {
         currentUsername = new MutableLiveData<>();
