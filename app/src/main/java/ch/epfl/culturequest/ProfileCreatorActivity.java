@@ -89,24 +89,33 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     public void createProfile(View view) {
         EditText textView = findViewById(R.id.username);
         String username = textView.getText().toString();
-        if (isValid(username)) {
-            setDefaultPicIfNoneSelected();
-            if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
-                profile.setUsername(username);
 
-                if (profilePicUri.equals(DEFAULT_PROFILE_PATH)) setProfile(DEFAULT_PROFILE_PATH);
-                else storeImageAndProfileInDatabase();
-
-            }
-            Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
-            startActivity(successfulProfileCreation);
-        } else {
+        if (!isValid(username)) {
             textView.setText("");
             textView.setHint(INCORRECT_USERNAME_FORMAT);
+            return;
         }
+
+        setDefaultPicIfNoneSelected();
+
+        if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
+            profile.setUsername(username);
+
+            if ((profilePicUri.equals(DEFAULT_PROFILE_PATH)))
+                storeProfileInDatabase(DEFAULT_PROFILE_PATH);
+             else
+                storeImageAndProfileInDatabase();
+
+
+
+        }
+        Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
+        startActivity(successfulProfileCreation);
+
+
     }
 
-    private void setProfile(String path) {
+    private void storeProfileInDatabase(String path) {
         profile.setProfilePicture(path);
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
@@ -115,10 +124,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     private void storeImageAndProfileInDatabase() {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
-        task.addOnFailureListener(e -> setProfile(DEFAULT_PROFILE_PATH))
-                .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> setProfile(DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> setProfile(uri.toString())));
+        task.addOnFailureListener(e -> storeProfileInDatabase(DEFAULT_PROFILE_PATH))
+                .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> storeProfileInDatabase(DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> storeProfileInDatabase(uri.toString())));
     }
-
 
 
     private void openGallery() {
