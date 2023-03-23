@@ -8,6 +8,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,13 +56,14 @@ public class LeaderboardViewModel extends ViewModel {
             currentUserRank.setValue(rank.toString());
         });
         db.getTopNProfiles(N).whenComplete((topN, e) -> {
+            Collections.reverse(topN);
             topNUserNames.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
             topNUserScores.setValue(topN.stream().map(p -> p.getScore().toString()).collect(toList()));
             topNUserProfilePicturesUri.setValue(topN.stream().map(Profile::getProfilePicture).collect(toList()));
             // create array of string int from 1 to N
             String[] ranks = new String[N];
             for (int i = 0; i < N; i++) {
-                ranks[i] = Integer.toString(N - i);
+                ranks[i] = Integer.toString(i + 1);
             }
             topNUserRanks.setValue(List.of(ranks));
         });

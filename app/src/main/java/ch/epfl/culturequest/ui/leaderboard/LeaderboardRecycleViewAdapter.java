@@ -16,10 +16,10 @@ import ch.epfl.culturequest.R;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<LeaderboardRecycleViewAdapter.LeaderboardViewHolder> {
-    private final List<String> topNUserNames;
-    private final List<String> topNUserScores;
-    private final List<String> topNUserRanks;
-    private final List<String> topNUserProfilePicturesUri;
+    private List<String> topNUserNames;
+    private List<String> topNUserScores;
+    private List<String> topNUserRanks;
+    private List<String> topNUserProfilePicturesUri;
 
     public static class LeaderboardViewHolder extends RecyclerView.ViewHolder {
         private final TextView userName;
@@ -52,11 +52,24 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
         }
     }
 
-    public LeaderboardRecycleViewAdapter(List<String> topNUserNames, List<String> topNUserScores, List<String> topNUserRanks, List<String> topNUserProfilePicturesUri) {
-        this.topNUserNames = topNUserNames;
-        this.topNUserScores = topNUserScores;
-        this.topNUserRanks = topNUserRanks;
-        this.topNUserProfilePicturesUri = topNUserProfilePicturesUri;
+    public LeaderboardRecycleViewAdapter(LeaderboardViewModel leaderboardViewModel) {
+        leaderboardViewModel.getTopNUserNames().observeForever(topNUserNames -> {
+            this.topNUserNames = topNUserNames;
+            notifyItemRangeChanged (0, getItemCount());
+
+        });
+        leaderboardViewModel.getTopNUserScores().observeForever(topNUserScores -> {
+            this.topNUserScores = topNUserScores;
+            notifyItemRangeChanged (0, getItemCount());
+        });
+        leaderboardViewModel.getTopNUserRanks().observeForever(topNUserRanks -> {
+            this.topNUserRanks = topNUserRanks;
+            notifyItemRangeChanged (0, getItemCount());
+        });
+        leaderboardViewModel.getTopNUserProfilePicturesUri().observeForever(topNUserProfilePicturesUri -> {
+            this.topNUserProfilePicturesUri = topNUserProfilePicturesUri;
+            notifyItemRangeChanged (0, getItemCount());
+        });
     }
 
     // Create new views (invoked by the layout manager)
@@ -84,7 +97,13 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
     // Return the number of users displayed in Leaderboard (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return topNUserNames.size();
+        if (topNUserNames == null || topNUserScores == null || topNUserRanks == null || topNUserProfilePicturesUri == null) {
+            return 0;
+        }
+        else{
+            // return the minimum size of the lists
+            return Math.min(topNUserNames.size(), Math.min(topNUserScores.size(), Math.min(topNUserRanks.size(), topNUserProfilePicturesUri.size())));
+        }
     }
 
 }

@@ -105,6 +105,7 @@
         app:layout_constraintVertical_bias="0.3" />
 
     <View
+        android:id="@+id/horizontal_bar"
         android:layout_width="350dp"
         android:layout_height="2dp"
         android:background="#FF5722"
@@ -115,16 +116,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.389" />
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_width="wrap_content"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.564" />
+        app:layout_constraintTop_toTopOf="@+id/horizontal_bar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
