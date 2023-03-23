@@ -95,23 +95,13 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                 profile.setUsername(username);
 
 
-                if (profilePicUri.equals(DEFAULT_PROFILE_PATH)) {
-                    setDefaultProfile();
-                } else {
+                if (profilePicUri.equals(DEFAULT_PROFILE_PATH)) setProfile(DEFAULT_PROFILE_PATH);
+                else {
                     FirebaseStorage storage = FirebaseStorage.getInstance();
-                    // store the drawable in the database
-
                     UploadTask task = storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).putFile(Uri.parse(profilePicUri));
-                    task.addOnFailureListener(e -> setDefaultProfile()).addOnSuccessListener(taskSnapshot -> {
-                        storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> setDefaultProfile()).addOnSuccessListener(uri -> {
-                            profile.setProfilePicture(uri.toString());
-                            Profile.setActiveProfile(profile);
-                            Database.setProfile(profile);
-
-                        });
-                    });
+                    task.addOnFailureListener(e -> setProfile(DEFAULT_PROFILE_PATH))
+                        .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> setProfile(DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> setProfile(uri.toString())));
                 }
-
             }
             Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
             startActivity(successfulProfileCreation);
@@ -121,11 +111,12 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         }
     }
 
-    private void setDefaultProfile() {
-        profile.setProfilePicture(DEFAULT_PROFILE_PATH);
+    private void setProfile(String path) {
+        profile.setProfilePicture(path);
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
     }
+
 
     private void openGallery() {
         profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
