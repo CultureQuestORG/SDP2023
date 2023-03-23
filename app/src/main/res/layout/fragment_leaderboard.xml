@@ -37,7 +37,7 @@
 
         <TextView
             android:id="@+id/current_username"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/current_user_profile_picture"
@@ -101,7 +101,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="410dp"
         app:layout_constraintTop_toBottomOf="@+id/horizontal_bar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
