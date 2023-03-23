@@ -144,8 +144,6 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     private void setDefaultPicIfNoneSelected() {
         if (profileView.getDrawable().equals(initialDrawable)) {
             profilePicUri = DEFAULT_PROFILE_PATH;
-            profile.setProfilePicture(DEFAULT_PROFILE_PATH);
-
         }
     }
 
