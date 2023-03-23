@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import ch.epfl.culturequest.R;
@@ -91,7 +93,8 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
         learderboardViewHolder.getUserName().setText(topNUserNames.get(position));
         learderboardViewHolder.getUserScore().setText(topNUserScores.get(position));
         learderboardViewHolder.getUserRank().setText(topNUserRanks.get(position));
-        learderboardViewHolder.getUserProfilePicture().setImageURI(Uri.parse(topNUserProfilePicturesUri.get(position)));
+        Picasso.get().load(topNUserProfilePicturesUri.get(position)).into(learderboardViewHolder.getUserProfilePicture());
+
     }
 
     // Return the number of users displayed in Leaderboard (invoked by the layout manager)

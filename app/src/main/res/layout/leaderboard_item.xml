@@ -4,52 +4,66 @@
     android:layout_width="match_parent"
     android:layout_height="100dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_profile_picture"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/basic_profile_picture"/>
 
         <TextView
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="@+id/user_profile_picture"
-            app:layout_constraintTop_toBottomOf="@+id/user_profile_picture" />
+            android:layout_below="@+id/user_profile_picture"
+            android:layout_alignStart="@+id/user_profile_picture"
+            android:layout_marginTop="5dp"
+            android:textAlignment="center"
+            android:textSize="18sp" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/user_profile_picture"
-            android:layout_width="50dp"
-            android:layout_height="52dp"
-            android:src="@drawable/basic_profile_picture"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.019"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.135" />
+        <ImageView
+            android:id="@+id/trophy_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/trophy_icon" />
 
         <TextView
             android:id="@+id/user_score"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.35"
-            app:layout_constraintStart_toEndOf="@+id/user_profile_picture"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.129" />
+            android:layout_below="@+id/trophy_icon"
+            android:layout_alignStart="@+id/trophy_icon"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/leaderboard_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/leaderboard_icon_unsel" />
 
         <TextView
             android:id="@+id/user_rank"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/user_score"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.129" />
+            android:layout_below="@+id/leaderboard_icon"
+            android:layout_alignStart="@+id/leaderboard_icon"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center"
+            android:textSize="18sp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 
 </androidx.core.widget.NestedScrollView>
