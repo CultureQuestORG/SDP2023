@@ -17,7 +17,6 @@ public class Redirect {
     public static void toActivity(Activity src, Class<? extends Activity> dest){
         src.startActivity(new Intent(src, dest));
     }
-
     public static void toFragment(View view, int id){
         Navigation.findNavController(view).navigate(id);
     }
