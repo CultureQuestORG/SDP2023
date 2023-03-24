@@ -24,7 +24,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "OPEN_AI_API_KEY", getOpenAiApiKey()
+        buildConfigField "String", "OPEN_AI_API_KEY", "\""+getOpenAiApiKey()+"\""
     }
 
     buildTypes {
