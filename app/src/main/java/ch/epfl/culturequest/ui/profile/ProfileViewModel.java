@@ -19,13 +19,13 @@ public class ProfileViewModel extends ViewModel {
 
     private final MutableLiveData<List<Image>> pictures;
 
-    public ProfileViewModel(Profile pro) {
+    public ProfileViewModel(String uid) {
         name = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
         Database db = new Database();
         EspressoIdlingResource.increment();
-        db.getProfile(pro.getUid()).whenComplete((p, e) -> {
+        db.getProfile(uid).whenComplete((p, e) -> {
             name.setValue(p.getName());
             profilePictureUri.setValue(p.getProfilePicture());
             pictures.setValue(p.getImages());

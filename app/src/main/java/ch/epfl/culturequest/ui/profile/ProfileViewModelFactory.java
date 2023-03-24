@@ -7,17 +7,17 @@ import androidx.lifecycle.ViewModelProvider;
 import ch.epfl.culturequest.social.Profile;
 
 public class ProfileViewModelFactory implements ViewModelProvider.Factory {
-    private final Profile profile;
+    private final String uid;
 
-    public ProfileViewModelFactory(Profile profile) {
-        this.profile = profile;
+    public ProfileViewModelFactory(String uid) {
+        this.uid = uid;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(ProfileViewModel.class)) {
-            return (T) new ProfileViewModel(profile);
+            return (T) new ProfileViewModel(uid);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }
