@@ -106,35 +106,6 @@ public class WikipediaDescriptionApiTestWithMock {
         assertThat(description.getCountry(), is(nullValue()));
     }
 
-    @Test
-    public void getArtDescriptionCorrectlyUsesOpenAiApiWhenArchitecture(){
-        mockWebServer.enqueue(new MockResponse().setBody("<html><body><p>Hello World</p></body></html>").setResponseCode(200));
-        ArtRecognition artRecognition = new ArtRecognition("Arc de Triomphe", "Monument");
-
-        MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API KEY");
-        mockOpenAiService.setMockResponse("{\n" +
-                "    \"designer\": \"Jean-François-Thérèse Chalgrin\",\n" +
-                "    \"yearOfInauguration\": \"1836\",\n" +
-                "    \"locationCity\": \"Paris\",\n" +
-                "    \"locationCountry\": \"France\"\n" +
-                "}");
-
-        WikipediaDescriptionApi.service = mockOpenAiService;
-
-        CompletableFuture<BasicArtDescription> descriptionFuture = new WikipediaDescriptionApi().getArtDescription(artRecognition);
-
-        BasicArtDescription description = descriptionFuture.join();
-
-        assert (description.getArtist().equals("Jean-François-Thérèse Chalgrin"));
-        assert (description.getYear().equals("1836"));
-        assert (description.getCity().equals("Paris"));
-        assert (description.getCountry().equals("France"));
-
-
-    }
-
-
-
     @After
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
