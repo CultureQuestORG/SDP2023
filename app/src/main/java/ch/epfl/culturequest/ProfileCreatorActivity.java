@@ -105,14 +105,14 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                 storeProfileInDatabase(DEFAULT_PROFILE_PATH);
              else
                 storeImageAndProfileInDatabase();
-
-
-
+        } else{
+            profile.setUsername(username);
+            profile.setProfilePicture(profilePicUri);
+            Profile.setActiveProfile(profile);
         }
+
         Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
         startActivity(successfulProfileCreation);
-
-
     }
 
     private void storeProfileInDatabase(String path) {
