@@ -6,6 +6,10 @@ import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 
 
+/**
+ * This class is used to implement the database
+ * It is used to make the code more modular and to make it easier to change the database
+ */
 public class Database {
     private static DatabaseInterface  databaseInstance = new FireDatabase();
 
