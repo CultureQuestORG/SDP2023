@@ -1,8 +1,8 @@
 package ch.epfl.culturequest.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -16,21 +16,18 @@ import android.widget.ListView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 public class SearchUserActivity extends AppCompatActivity {
     Database db = new Database();
+    public static Profile SELECTED_USER;
     TextWatcher watcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -64,7 +61,6 @@ public class SearchUserActivity extends AppCompatActivity {
             db.getAllProfiles().whenComplete((profiles, throwable) -> {
                 Map<String, Profile> usernameToProfileMap = profiles.stream()
                         .collect(Collectors.toMap(Profile::getUsername, profile -> profile));
-
                 List<String> matchingUsernames = usernameToProfileMap
                         .keySet()
                         .stream()
@@ -84,8 +80,8 @@ public class SearchUserActivity extends AppCompatActivity {
     }
     private void searchBarOnClickListener(AdapterView<?> parent, View v, int position, long id, Map<String, Profile> usernameToProfileMap) {
         String selectedUsername = (String) parent.getItemAtPosition(position);
-        Profile profileQuery = usernameToProfileMap.get(selectedUsername);
-
+        SELECTED_USER = usernameToProfileMap.get(selectedUsername);
+        this.startActivity(new Intent(this, DisplayUserProfileActivity.class));
     }
 
     public void goBack(View view) {
