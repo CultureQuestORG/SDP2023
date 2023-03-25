@@ -6,6 +6,9 @@ import java.util.concurrent.CompletableFuture;
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 
+/**
+ * This class is used to mock the database for testing purposes
+ */
 public class MockDatabase implements DatabaseInterface {
     HashMap<String, Object> map;
 
