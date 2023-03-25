@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.map_collectiontest;
+package ch.epfl.culturequest.backend.map_collectiontest;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
