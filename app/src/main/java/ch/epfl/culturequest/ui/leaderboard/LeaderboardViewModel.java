@@ -7,12 +7,14 @@ import androidx.lifecycle.ViewModel;
 import static java.util.stream.Collectors.toList;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.database.FireDatabase;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
@@ -27,7 +29,7 @@ public class LeaderboardViewModel extends ViewModel {
     private final MutableLiveData<List<String>> topNUserRanks;
     private final int N = 10;
 
-    public LeaderboardViewModel() {
+    public LeaderboardViewModel(FirebaseDatabase database) {
         currentUsername = new MutableLiveData<>();
         currentUserProfilePictureUri = new MutableLiveData<>();
         currentUserScore = new MutableLiveData<>();
@@ -37,6 +39,7 @@ public class LeaderboardViewModel extends ViewModel {
         topNUserProfilePicturesUri = new MutableLiveData<>();
         topNUserRanks = new MutableLiveData<>();
 
+        Database.init(new FireDatabase(database));
         Database db = new Database();
         EspressoIdlingResource.increment();
         String currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();

@@ -19,6 +19,9 @@ public class FireDatabase implements DatabaseInterface {
         database = FirebaseDatabase.getInstance();
     }
 
+    public FireDatabase(FirebaseDatabase database) {
+        this.database = database;
+    }
 
     @Override
     public void set(String key, Object value) {

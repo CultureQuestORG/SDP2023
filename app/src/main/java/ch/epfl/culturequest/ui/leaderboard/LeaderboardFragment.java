@@ -13,21 +13,45 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
-import java.util.Objects;
-
 import ch.epfl.culturequest.databinding.FragmentLeaderboardBinding;
+import ch.epfl.culturequest.utils.MockFirebaseDatabase;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LeaderboardFragment extends Fragment {
 
     private FragmentLeaderboardBinding binding;
 
+    public static LeaderboardFragment newInstance(boolean isTestOn) {
+        LeaderboardFragment fragment = new LeaderboardFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("isTestOn", isTestOn);
+        fragment.setArguments(bundle);
+
+        return fragment;
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
+        FirebaseDatabase database;
+        try {
+            boolean isTestOn = (boolean) getArguments().getSerializable("isTestOn");
+            if (isTestOn) {
+                database = FirebaseDatabase.getInstance();
+                database.useEmulator("10.0.2.2", 9000);
+            } else {
+                database = FirebaseDatabase.getInstance();
+            }
+        } catch (NullPointerException e) {
+            database = FirebaseDatabase.getInstance();
+        }
+
         LeaderboardViewModel leaderboardViewModel =
-                new ViewModelProvider(this).get(LeaderboardViewModel.class);
+                new ViewModelProvider(this, new LeaderboardViewModelFactory(database))
+                        .get(LeaderboardViewModel.class);
 
         binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();

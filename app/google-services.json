@@ -23,7 +23,15 @@
           }
         },
         {
-          "client_id": "296582792540-e2lhfko39s0tuo7i1jl65rpp5mtnu01v.apps.googleusercontent.com",
+          "client_id": "296582792540-jgm5p5h92gq7qukoioskhlmfq1dvvm51.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.epfl.culturequest",
+            "certificate_hash": "02cef44e4c6ac01455f5139ed6c335ec54ef3a8b"
+          }
+        },
+        {
+          "client_id": "296582792540-roerntpi2krlt4gnh7c2nfgovhq04me0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "ch.epfl.culturequest",
