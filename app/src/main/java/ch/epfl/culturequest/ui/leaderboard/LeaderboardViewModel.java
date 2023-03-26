@@ -6,12 +6,10 @@ import androidx.lifecycle.ViewModel;
 
 import static java.util.stream.Collectors.toList;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.database.FireDatabase;
@@ -29,7 +27,7 @@ public class LeaderboardViewModel extends ViewModel {
     private final MutableLiveData<List<String>> topNUserRanks;
     private final int N = 10;
 
-    public LeaderboardViewModel(FirebaseDatabase database) {
+    public LeaderboardViewModel(FirebaseDatabase database, String currentUserUid) {
         currentUsername = new MutableLiveData<>();
         currentUserProfilePictureUri = new MutableLiveData<>();
         currentUserScore = new MutableLiveData<>();
@@ -41,19 +39,12 @@ public class LeaderboardViewModel extends ViewModel {
 
         Database.init(new FireDatabase(database));
         Database db = new Database();
+
         EspressoIdlingResource.increment();
-        String currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         db.getProfile(currentUserUid).whenComplete((p, e) -> {
             currentUsername.setValue(p.getUsername());
             currentUserProfilePictureUri.setValue(p.getProfilePicture());
             currentUserScore.setValue(p.getScore().toString());
-
-            p.addObserver((profileObject, arg) -> {
-                Profile profile = (Profile) profileObject;
-                currentUsername.postValue(profile.getUsername());
-                currentUserProfilePictureUri.postValue(profile.getProfilePicture());
-                currentUserScore.postValue(profile.getScore().toString());
-            });
         });
         db.getRank(currentUserUid).whenComplete((rank, e) -> {
             currentUserRank.setValue(rank.toString());

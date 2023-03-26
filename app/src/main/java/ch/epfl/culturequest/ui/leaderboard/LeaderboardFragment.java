@@ -13,21 +13,24 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import java.util.Objects;
+
 import ch.epfl.culturequest.databinding.FragmentLeaderboardBinding;
-import ch.epfl.culturequest.utils.MockFirebaseDatabase;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LeaderboardFragment extends Fragment {
 
     private FragmentLeaderboardBinding binding;
 
-    public static LeaderboardFragment newInstance(boolean isTestOn) {
+    public static LeaderboardFragment newInstance(boolean isTestOn, String currentUserUid) {
         LeaderboardFragment fragment = new LeaderboardFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("isTestOn", isTestOn);
+        bundle.putSerializable("currentUserUid", currentUserUid);
         fragment.setArguments(bundle);
 
         return fragment;
@@ -37,20 +40,23 @@ public class LeaderboardFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         FirebaseDatabase database;
+        String currentUserUid;
         try {
             boolean isTestOn = (boolean) getArguments().getSerializable("isTestOn");
+            database = FirebaseDatabase.getInstance();
             if (isTestOn) {
-                database = FirebaseDatabase.getInstance();
+                currentUserUid = (String) getArguments().getSerializable("currentUserUid");
                 database.useEmulator("10.0.2.2", 9000);
             } else {
-                database = FirebaseDatabase.getInstance();
+                currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
             }
         } catch (NullPointerException e) {
             database = FirebaseDatabase.getInstance();
+            currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         }
 
         LeaderboardViewModel leaderboardViewModel =
-                new ViewModelProvider(this, new LeaderboardViewModelFactory(database))
+                new ViewModelProvider(this, new LeaderboardViewModelFactory(database, currentUserUid))
                         .get(LeaderboardViewModel.class);
 
         binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
