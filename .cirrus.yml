@@ -36,7 +36,7 @@ check_android_task:
   install_firebase_CLI_script: |
     curl -sL https://firebase.tools | bash
   start_firebase_database_emulator_script: |
-    firebase emulators:start
+    firebase emulators:exec  'npm run test'
   prepare_codeclimate_script: |
     curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
     chmod +x ./cc-test-reporter
