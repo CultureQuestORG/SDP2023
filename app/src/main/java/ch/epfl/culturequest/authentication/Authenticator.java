@@ -94,9 +94,14 @@ public class Authenticator implements AuthService {
                 mAuth.signOut();
                 redirectTo(SignUpActivity.class);
             }
-            else {AuthUI.getInstance()
-                    .signOut(activity)
-                    .addOnCompleteListener(task -> redirectTo(SignUpActivity.class));
+            else {
+                mAuth.signOut();
+                AuthUI.getInstance()
+                    .signOut(activity.getApplicationContext())
+                    .addOnCompleteListener(task -> {
+                        redirectTo(SignUpActivity.class);
+                    });
+
                 Profile.setActiveProfile(null);
             }
         }
