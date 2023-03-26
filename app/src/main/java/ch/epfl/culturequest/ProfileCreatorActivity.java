@@ -146,7 +146,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     }
 
 
-    private void displayProfilePic(ActivityResult result) {
+    public void displayProfilePic(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
             Uri profilePicture = result.getData().getData();
             CircleImageView image = findViewById(R.id.profile_picture);

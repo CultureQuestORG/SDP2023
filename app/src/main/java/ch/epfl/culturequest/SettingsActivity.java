@@ -91,31 +91,17 @@ public class SettingsActivity extends AppCompatActivity {
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
             finish();
-            //startActivity(new Intent(this, NavigationActivity.class));
             return;
         }
 
-
         FirebaseStorage storage = FirebaseStorage.getInstance();
         UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
-        task.addOnFailureListener(e -> {
-                    // Handle unsuccessful uploads
-                    System.out.println("Failed to upload profile picture");
-                })
-                .addOnSuccessListener(taskSnapshot -> {
+        task.addOnSuccessListener(taskSnapshot -> {
                     storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().
-                            addOnFailureListener(e -> {
-                                // Handle unsuccessful uploads
-                                System.out.println("Failed to upload profile picture");
-                            }).
                             addOnSuccessListener(uri -> {
-                                // Handle successful uploads on complete
                                 activeProfile.setProfilePicture(uri.toString());
                                 Database.setProfile(activeProfile);
-                                //go back to previous activity
                                 finish();
-
-
                             });
                 });
 
@@ -124,17 +110,21 @@ public class SettingsActivity extends AppCompatActivity {
 
 
     private void displayProfilePic(ActivityResult result) {
-        if (result.getResultCode() == RESULT_OK) {
-            Intent data = result.getData();
-            if (data != null) {
-                Uri selectedImage = data.getData();
-                if (selectedImage != null) {
-                    Picasso.get().load(selectedImage).into(profilePictureView);
-                    profilePicUri = selectedImage.toString();
-                }
-            }
-        }
+        if (result.getResultCode() != RESULT_OK)
+            return;
+
+        Intent data = result.getData();
+        if (data == null)
+            return;
+
+        Uri selectedImage = data.getData();
+        if (selectedImage == null)
+            return;
+
+        Picasso.get().load(selectedImage).into(profilePictureView);
+        profilePicUri = selectedImage.toString();
     }
+
 
     public void selectProfilePicture(View view) {
         if (ContextCompat.checkSelfPermission(this, GALLERY_PERMISSION) == PackageManager.PERMISSION_GRANTED) {

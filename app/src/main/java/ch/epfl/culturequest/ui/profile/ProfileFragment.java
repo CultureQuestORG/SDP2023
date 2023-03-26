@@ -41,7 +41,7 @@ public class ProfileFragment extends Fragment {
         final View settingsButton = binding.settingsButton;
 
 
-        profileViewModel.getName().observe(getViewLifecycleOwner(), textView::setText);
+        profileViewModel.getUsername().observe(getViewLifecycleOwner(), textView::setText);
         profileViewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(profilePicture));
         profileViewModel.getPictures().observe(getViewLifecycleOwner(), images -> {
             // Create a new PictureAdapter and set it as the adapter for the RecyclerView

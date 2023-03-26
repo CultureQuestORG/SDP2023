@@ -14,33 +14,33 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ProfileViewModel extends ViewModel {
 
-    private final MutableLiveData<String> name;
+    private final MutableLiveData<String> username;
     private final MutableLiveData<String> profilePictureUri;
 
     private final MutableLiveData<List<Image>> pictures;
 
     public ProfileViewModel() {
-        name = new MutableLiveData<>();
+        username = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
         EspressoIdlingResource.increment();
         Profile profile = Profile.getActiveProfile();
         if (profile != null) {
-            name.setValue(profile.getName());
+            username.setValue(profile.getUsername());
             profilePictureUri.setValue(profile.getProfilePicture());
             pictures.setValue(profile.getImagesList());
 
 
             profile.addObserver((profileObject, arg) -> {
                 Profile p = (Profile) profileObject;
-                name.postValue(p.getName());
+                username.postValue(p.getUsername());
                 profilePictureUri.postValue(p.getProfilePicture());
                 pictures.postValue(p.getImagesList());
             });
 
         } else {
             Database.getProfile("123").whenComplete((p, e) -> {
-                    name.setValue(p.getName());
+                    username.setValue(p.getUsername());
                     profilePictureUri.setValue(p.getProfilePicture());
                     pictures.setValue(p.getImagesList());
 
@@ -51,8 +51,8 @@ public class ProfileViewModel extends ViewModel {
         EspressoIdlingResource.decrement();
     }
 
-    public LiveData<String> getName() {
-        return name;
+    public LiveData<String> getUsername() {
+        return username;
     }
 
     public LiveData<String> getProfilePictureUri() {
