@@ -34,7 +34,7 @@ check_android_task:
     adb shell settings put global transition_animation_scale 0.0
     adb shell settings put global animator_duration_scale 0.0
   install_firebase_CLI_script: |
-  curl -sL https://firebase.tools | bash
+    curl -sL https://firebase.tools | bash
   start_firebase_database_emulator_script: |
     firebase emulators:exec
   prepare_codeclimate_script: |
