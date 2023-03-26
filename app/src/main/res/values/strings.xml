@@ -25,6 +25,6 @@
     <string name="settings">settings</string>
     <string name="update_profile_picture">Update Profile Picture</string>
     <string name="username">Username</string>
-    <string name="update_account">Update account</string>
     <string name="log_out">Log out</string>
+    <string name="update_profile">Update profile</string>
 </resources>

@@ -31,6 +31,7 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -81,9 +82,11 @@ public class SettingsActivity extends AppCompatActivity {
 
 
     private void UpdateProfile(View v) {
+        EspressoIdlingResource.increment();
         if (!ProfileUtils.isValid(activeProfile, username.getText().toString())) {
             username.setText("");
             username.setHint(INCORRECT_USERNAME_FORMAT);
+            EspressoIdlingResource.decrement();
             return;
         }
 
@@ -91,6 +94,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
             finish();
+            EspressoIdlingResource.decrement();
             return;
         }
 
@@ -102,6 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
                                 activeProfile.setProfilePicture(uri.toString());
                                 Database.setProfile(activeProfile);
                                 finish();
+                                EspressoIdlingResource.decrement();
                             });
                 });
 

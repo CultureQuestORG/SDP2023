@@ -83,8 +83,13 @@ public class ProfileCreatorActivityTest {
     }
 
     @After
-    public void release(){
+    public  void release(){
         Intents.release();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        user.delete();
     }
 
     @Test

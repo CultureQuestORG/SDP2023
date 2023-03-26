@@ -1,13 +1,10 @@
 package ch.epfl.culturequest.ui;
 
 
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
-import android.net.Uri;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -21,8 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import ch.epfl.culturequest.R;
@@ -81,9 +76,9 @@ public class ProfileFragmentTest {
     public void textViewDisplaysCorrectText() {
 
 
-        onView(withId(R.id.profileName)).check(matches(withText("Johnny Doe")));
-        profile.setName("John Doe");
-        onView(withId(R.id.profileName)).check(matches(withText("John Doe")));
+        onView(withId(R.id.profileUsername)).check(matches(withText("Xx_john_xX")));
+        profile.setUsername("johnny");
+        onView(withId(R.id.profileUsername)).check(matches(withText("johnny")));
 
 
 
