@@ -76,7 +76,7 @@ public class FireDatabase implements DatabaseInterface {
 
     @Override
     public CompletableFuture<Integer> getRank(String UId) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<Integer> future = new CompletableFuture<>();
         getNumberOfProfiles().whenComplete((numberOfProfiles, e) -> {
             usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
@@ -100,7 +100,7 @@ public class FireDatabase implements DatabaseInterface {
 
     @Override
     public CompletableFuture<Integer> getNumberOfProfiles() {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<Integer> future = new CompletableFuture<>();
         usersRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -114,7 +114,7 @@ public class FireDatabase implements DatabaseInterface {
 
     @Override
     public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
         getNumberOfProfiles().whenComplete((numberOfUsers, e) -> {
             usersRef.orderByChild("score").limitToLast(n).get().addOnCompleteListener(task -> {

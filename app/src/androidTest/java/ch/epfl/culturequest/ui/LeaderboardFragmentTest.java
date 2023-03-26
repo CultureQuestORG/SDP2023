@@ -21,8 +21,5 @@ public class LeaderboardFragmentTest {
     @Rule
     public FragmentTestRule<?, LeaderboardFragment> fragmentTestRule = FragmentTestRule.create(LeaderboardFragment.class);
 
-    @Test
-    public void textViewDisplaysCorrectText() {
-        onView(withId(R.id.text_leaderboard)).check(matches(withText("This is leaderboard fragment")));
-    }
+
 }

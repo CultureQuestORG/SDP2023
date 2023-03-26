@@ -3,13 +3,8 @@ package ch.epfl.culturequest.social;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-
-import android.net.Uri;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,7 +25,6 @@ public class ProfileTest {
     private FirebaseUser user;
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final String defaultUriString = "res/drawable/logo_compact.png";
-
 
 
     @Before
@@ -65,7 +59,7 @@ public class ProfileTest {
     }
 
     @Test
-    public void nameIsTheSame(){
+    public void nameIsTheSame() {
         assertThat(profile.getName(), is(user.getDisplayName()));
     }
 
@@ -80,49 +74,56 @@ public class ProfileTest {
     }
 
     @Test
-    public void setProfilePicWorks(){
+    public void setProfilePicWorks() {
         String newPic = "res/drawable/logo_plain.png";
         profile.setProfilePicture(newPic);
         assertThat(profile.getProfilePicture(), is(newPic));
     }
 
     @Test
-    public void setPhoneNumberWorks(){
+    public void setPhoneNumberWorks() {
         String newPhone = "123456789";
         profile.setPhoneNumber(newPhone);
         assertThat(profile.getPhoneNumber(), is(newPhone));
     }
 
     @Test
-    public void setEmailWorks(){
+    public void setEmailWorks() {
         String newEmail = "john.doe@gmail.com";
         profile.setEmail(newEmail);
         assertThat(profile.getEmail(), is(newEmail));
     }
 
     @Test
-    public void setUsernameWorks(){
+    public void setUsernameWorks() {
         String newUsername = "johnny";
         profile.setUsername(newUsername);
         assertThat(profile.getUsername(), is(newUsername));
     }
 
     @Test
-    public void setUidWorks(){
+    public void setUidWorks() {
         String newUid = "123456789";
         profile.setUid(newUid);
         assertThat(profile.getUid(), is(newUid));
     }
 
     @Test
-    public void setNameWorks(){
+    public void setNameWorks() {
         String newName = "John Doe Jr.";
         profile.setName(newName);
         assertThat(profile.getName(), is(newName));
     }
 
     @Test
-    public void emptyConstructorWorks(){
+    public void setScoreWorks() {
+        int newScore = 100;
+        profile.setScore(newScore);
+        assertThat(profile.getScore(), is(newScore));
+    }
+
+    @Test
+    public void emptyConstructorWorks() {
         Profile emptyProfile = new Profile();
         assertThat(emptyProfile.getUid(), is(""));
         assertThat(emptyProfile.getName(), is(""));
@@ -132,14 +133,15 @@ public class ProfileTest {
         assertThat(emptyProfile.getProfilePicture(), is(""));
         //users images should be an empty list
         assertThat(emptyProfile.getImages().size(), is(0));
+        assertThat(emptyProfile.getScore(), is(0));
 
     }
 
     @Test
-    public void setImageWorks(){
+    public void setImageWorks() {
         Database.init(new MockDatabase());
         Database db = new Database();
-        Image image = new Image("imageTest","this is an image",defaultUriString, 12345,"myUid");
+        Image image = new Image("imageTest", "this is an image", defaultUriString, 12345, "myUid");
         db.setImage(image);
         HashMap<String, Boolean> images = new HashMap<>();
         images.put(image.getUid(), true);
@@ -150,15 +152,10 @@ public class ProfileTest {
         profile.setImages(images);
 
 
-
-
-
     }
 
-
-
     @Test
-    public void toStringWorks(){
+    public void toStringWorks() {
         assertThat(profile.toString(), is("Profile: \n" +
                 "uid: " + profile.getUid() + "\n" +
                 "name: " + profile.getName() + "\n" +
@@ -166,7 +163,8 @@ public class ProfileTest {
                 "email: " + profile.getEmail() + "\n" +
                 "phoneNumber: " + profile.getPhoneNumber() + "\n" +
                 "profilePicture: " + profile.getProfilePicture() + "\n" +
-                "pictures: " + profile.getImages() + "\n"));
+                "pictures: " + profile.getImages() + "\n" +
+                "score: " + profile.getScore() + "\n"));
     }
 
 
