@@ -13,7 +13,7 @@ import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 
 public class FireDatabase implements DatabaseInterface {
-    FirebaseDatabase database;
+    private final FirebaseDatabase database;
 
     public FireDatabase() {
         database = FirebaseDatabase.getInstance();
@@ -31,7 +31,7 @@ public class FireDatabase implements DatabaseInterface {
     @Override
     public CompletableFuture<Object> get(String key) {
         CompletableFuture<Object> future = new CompletableFuture<>();
-        FirebaseDatabase.getInstance().getReference(key).get().addOnCompleteListener(task -> {
+        database.getReference(key).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 future.complete(task.getResult().getValue());
             } else {
@@ -49,13 +49,13 @@ public class FireDatabase implements DatabaseInterface {
 
     @Override
     public CompletableFuture<Profile> getProfile(String UId) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(UId);
+        DatabaseReference usersRef = database.getReference("users").child(UId);
         return getValue(usersRef, Profile.class);
     }
 
     @Override
     public CompletableFuture<Image> getImage(String UId) {
-        DatabaseReference imagesRef = FirebaseDatabase.getInstance().getReference("images").child(UId);
+        DatabaseReference imagesRef = database.getReference("images").child(UId);
         return getValue(imagesRef, Image.class);
     }
 

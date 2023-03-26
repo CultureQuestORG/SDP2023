@@ -27,7 +27,7 @@ public class LeaderboardViewModel extends ViewModel {
     private final MutableLiveData<List<String>> topNUserRanks;
     private final int N = 10;
 
-    public LeaderboardViewModel(FirebaseDatabase database, String currentUserUid) {
+    public LeaderboardViewModel(String currentUserUid) {
         currentUsername = new MutableLiveData<>();
         currentUserProfilePictureUri = new MutableLiveData<>();
         currentUserScore = new MutableLiveData<>();
@@ -37,7 +37,6 @@ public class LeaderboardViewModel extends ViewModel {
         topNUserProfilePicturesUri = new MutableLiveData<>();
         topNUserRanks = new MutableLiveData<>();
 
-        Database.init(new FireDatabase(database));
         Database db = new Database();
 
         EspressoIdlingResource.increment();

@@ -26,10 +26,9 @@ public class LeaderboardFragment extends Fragment {
 
     private FragmentLeaderboardBinding binding;
 
-    public static LeaderboardFragment newInstance(boolean isTestOn, String currentUserUid) {
+    public static LeaderboardFragment newInstance(String currentUserUid) {
         LeaderboardFragment fragment = new LeaderboardFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable("isTestOn", isTestOn);
         bundle.putSerializable("currentUserUid", currentUserUid);
         fragment.setArguments(bundle);
 
@@ -39,24 +38,15 @@ public class LeaderboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        FirebaseDatabase database;
         String currentUserUid;
         try {
-            boolean isTestOn = (boolean) getArguments().getSerializable("isTestOn");
-            database = FirebaseDatabase.getInstance();
-            if (isTestOn) {
-                currentUserUid = (String) getArguments().getSerializable("currentUserUid");
-                database.useEmulator("10.0.2.2", 9000);
-            } else {
-                currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-            }
+            currentUserUid = (String) getArguments().getSerializable("currentUserUid");
         } catch (NullPointerException e) {
-            database = FirebaseDatabase.getInstance();
             currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         }
 
         LeaderboardViewModel leaderboardViewModel =
-                new ViewModelProvider(this, new LeaderboardViewModelFactory(database, currentUserUid))
+                new ViewModelProvider(this, new LeaderboardViewModelFactory(currentUserUid))
                         .get(LeaderboardViewModel.class);
 
         binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
