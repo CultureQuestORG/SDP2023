@@ -23,6 +23,10 @@ public class Profile extends Observable{
     private String profilePicture;
     private List<Image> images;
 
+    private static Profile activeProfile;
+
+
+
 
 
     /**
@@ -44,7 +48,7 @@ public class Profile extends Observable{
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
-        this.images = null;
+        this.images = List.of();
     }
 
     public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Image> images) {
@@ -65,13 +69,7 @@ public class Profile extends Observable{
      * and sets the values using setters
      */
     public Profile() {
-        this.uid = "";
-        this.name = "";
-        this.username = "";
-        this.email = "";
-        this.phoneNumber = "";
-        this.profilePicture = "";
-        this.images = List.of();
+        this("", "", "", "", "", "", List.of());
     }
 
     public String getUid() {
@@ -136,13 +134,19 @@ public class Profile extends Observable{
         notifyObservers();
     }
 
-    public List<Image> getImages() {
+    public HashMap<String,Boolean> getImages() {
+        HashMap<String,Boolean> images = new HashMap<>();
+        this.images.stream().map(Image::getUid).forEach(id -> images.put(id,true));
+        return images;
+    }
+
+    public List<Image> getImagesList() {
         return images;
     }
 
     public void setImages(HashMap<String,Boolean> pictures) {
         //keep only the keys, which are the image ids and fetch them from the database
-        List<CompletableFuture<Image>> images = pictures.keySet().stream().map(id -> new Database().getImage(id)).collect(Collectors.toList());
+        List<CompletableFuture<Image>> images = pictures.keySet().stream().map(Database::getImage).collect(Collectors.toList());
 
         //wait for all the images to be fetched and then set the list of images
         CompletableFuture.allOf(images.toArray(new CompletableFuture[0])).thenRun(() -> {
@@ -152,11 +156,11 @@ public class Profile extends Observable{
         });
     }
     public static Profile getActiveProfile(){
-        return new Profile();
+        return activeProfile;
     }
 
-    public  Profile setActiveProfile(){
-        return this;
+    public static void setActiveProfile(Profile profile){
+        activeProfile = profile;
     }
     @NonNull
     @Override

@@ -20,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
@@ -32,10 +34,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ProfileCreatorActivity extends AppCompatActivity {
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
-    public static String DEFAULT_PROFILE_PATH = "res/drawable/profile_icon_selector.xml";
+    public static String DEFAULT_PROFILE_PATH = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2Fbasic_profile_picture.png?alt=media&token=8e407bd6-ad5f-401a-9b2d-7852ccfb9d62";
+
+    private String profilePicUri;
 
     private final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
-    private final Profile profile = new Profile(null, null);
+    private final Profile profile = new Profile(null, "");
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -45,7 +49,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                     });
     private ImageView profileView;
     private Drawable initialDrawable;
-    private Database db = new Database();
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,25 +83,51 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      * Function called when user clicks on the buttont "Create my Account"
      * First checks if username is valid and if user has selected a profile pic,
      * then registers the Profile in the Database and redirects to the Navigation Intent
-     * TODO need to store the profile in the Database
      *
      * @param view
      */
     public void createProfile(View view) {
         EditText textView = findViewById(R.id.username);
         String username = textView.getText().toString();
-        if (isValid(username)) {
-            setDefaultPicIfNoneSelected();
-            if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
-                db.setProfile(profile);
-            }
-            Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
-            startActivity(successfulProfileCreation);
-        } else {
+
+        if (!isValid(username)) {
             textView.setText("");
             textView.setHint(INCORRECT_USERNAME_FORMAT);
+            return;
         }
+
+        setDefaultPicIfNoneSelected();
+
+        if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
+            profile.setUsername(username);
+
+            if ((profilePicUri.equals(DEFAULT_PROFILE_PATH)))
+                storeProfileInDatabase(DEFAULT_PROFILE_PATH);
+             else
+                storeImageAndProfileInDatabase();
+        } else{
+            profile.setUsername(username);
+            profile.setProfilePicture(profilePicUri);
+            Profile.setActiveProfile(profile);
+        }
+
+        Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
+        startActivity(successfulProfileCreation);
     }
+
+    private void storeProfileInDatabase(String path) {
+        profile.setProfilePicture(path);
+        Profile.setActiveProfile(profile);
+        Database.setProfile(profile);
+    }
+
+    private void storeImageAndProfileInDatabase() {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
+        task.addOnFailureListener(e -> storeProfileInDatabase(DEFAULT_PROFILE_PATH))
+                .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> storeProfileInDatabase(DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> storeProfileInDatabase(uri.toString())));
+    }
+
 
     private void openGallery() {
         profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
@@ -113,7 +143,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
     private void setDefaultPicIfNoneSelected() {
         if (profileView.getDrawable().equals(initialDrawable)) {
-            profile.setProfilePicture(DEFAULT_PROFILE_PATH);
+            profilePicUri = DEFAULT_PROFILE_PATH;
         }
     }
 
@@ -124,7 +154,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             CircleImageView image = findViewById(R.id.profile_picture);
             Picasso.get().load(profilePicture).into(image);
             ((TextView) findViewById(R.id.profile_pic_text)).setText("");
-            profile.setProfilePicture(profilePicture.getPath());
+            profilePicUri = profilePicture.toString();
+
         }
     }
 
@@ -142,6 +173,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
     public Profile getProfile() {
         return profile;
+    }
+
+    public String getProfilePicUri() {
+        return profilePicUri;
     }
 
 }

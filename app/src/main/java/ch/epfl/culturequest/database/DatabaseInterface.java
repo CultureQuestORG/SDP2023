@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import ch.epfl.culturequest.social.Profile;
 
+/**
+ * This interface is used to abstract the database
+ */
 public interface DatabaseInterface {
     void set(String key, Object value);
     CompletableFuture<Object> get(String key);

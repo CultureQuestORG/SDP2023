@@ -17,9 +17,14 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import static ch.epfl.culturequest.ProfileCreatorActivity.DEFAULT_PROFILE_PATH;
 
 import android.Manifest;
 import android.app.Activity;
@@ -68,6 +73,8 @@ public class ProfileCreatorActivityTest {
 
     private static Profile profile;
 
+    private static ProfileCreatorActivity activity;
+
     @BeforeClass
     public static void setup() throws InterruptedException {
         FirebaseAuth.getInstance()
@@ -75,6 +82,7 @@ public class ProfileCreatorActivityTest {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         user = FirebaseAuth.getInstance().getCurrentUser();
+
                     }
                 });
         Thread.sleep(2000);
@@ -84,8 +92,10 @@ public class ProfileCreatorActivityTest {
     public void init(){
         ActivityScenario
                 .launch(ProfileCreatorActivity.class)
-                .onActivity(activity -> {
-                    profile = activity.getProfile();
+                .onActivity(a -> {
+                    profile = a.getProfile();
+                    activity=a;
+
                 });
         Intents.init();
     }
@@ -142,10 +152,10 @@ public class ProfileCreatorActivityTest {
     public void notSelectingPicGivesDefaultProfilePicAndCorrectUsername() throws InterruptedException {
         onView(withId(R.id.username)).perform(typeText("JohnDoe"));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
-        Thread.sleep(2000);
+
         assertEquals(profile.getUsername(), "JohnDoe");
-        assertEquals(profile.getProfilePicture(), ProfileCreatorActivity.DEFAULT_PROFILE_PATH);
-        ActivityScenario.launch(NavigationActivity.class).onActivity(NavigationActivity::onBackPressed);
+        // assert  that the URL contains https://firebasestorage.googleapis.com and contains
+        assertEquals(DEFAULT_PROFILE_PATH, activity.getProfilePicUri());
     }
 
 

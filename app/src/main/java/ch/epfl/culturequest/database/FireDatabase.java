@@ -13,6 +13,9 @@ import java.util.concurrent.CompletableFuture;
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 
+/**
+ * This class is the implementation of the database using Firebase
+ */
 public class FireDatabase implements DatabaseInterface {
     FirebaseDatabase database;
 
