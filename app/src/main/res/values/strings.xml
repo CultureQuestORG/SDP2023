@@ -4,7 +4,7 @@
 
     <string name="title_activity_navigation">NavigationActivity</string>
     <string name="title_home">Home</string>
-    <string name="title_leaderboard">LeaderBoard</string>
+    <string name="title_leaderboard">Leaderboard</string>
     <string name="title_profile">Profile</string>
     <string name="title_map">Map</string>
     <string name="title_scan">Scan</string>
