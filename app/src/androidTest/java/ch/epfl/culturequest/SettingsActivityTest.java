@@ -69,7 +69,7 @@ public class SettingsActivityTest {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         user = FirebaseAuth.getInstance().getCurrentUser();
-                        Profile.setActiveProfile(new Profile( "userName", DEFAULT_PROFILE_PATH));
+                        Profile.setActiveProfile(new Profile("userName", DEFAULT_PROFILE_PATH));
                     }
                 });
         Thread.sleep(2000);
@@ -85,7 +85,7 @@ public class SettingsActivityTest {
     }
 
     @After
-    public  void release(){
+    public void release() {
         Intents.release();
     }
 

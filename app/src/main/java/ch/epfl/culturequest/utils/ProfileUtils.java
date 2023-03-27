@@ -24,7 +24,6 @@ public class ProfileUtils {
     public static final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
 
 
-
     public static boolean usernameIsValid(String username) {
         int length = username.length();
         return !username.isEmpty()
@@ -35,7 +34,6 @@ public class ProfileUtils {
     }
 
 
-
     public static boolean isValid(Profile profile, String username) {
         if (usernameIsValid(username)) {
             profile.setUsername(username);
@@ -43,9 +41,6 @@ public class ProfileUtils {
         }
         return false;
     }
-
-
-
 
 
 }

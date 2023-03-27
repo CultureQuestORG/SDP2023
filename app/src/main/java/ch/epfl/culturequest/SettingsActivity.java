@@ -106,15 +106,14 @@ public class SettingsActivity extends AppCompatActivity {
         // Upload the new profile picture and update the profile
         FirebaseStorage storage = FirebaseStorage.getInstance();
         UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
-        task.addOnSuccessListener(taskSnapshot -> {
-                    storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().
-                            addOnSuccessListener(uri -> {
-                                activeProfile.setProfilePicture(uri.toString());
-                                Database.setProfile(activeProfile);
-                                finish();
-                                EspressoIdlingResource.decrement();
-                            });
-                });
+        task.addOnSuccessListener(taskSnapshot ->
+                storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().
+                addOnSuccessListener(uri -> {
+                    activeProfile.setProfilePicture(uri.toString());
+                    Database.setProfile(activeProfile);
+                    finish();
+                    EspressoIdlingResource.decrement();
+                }));
 
 
     }

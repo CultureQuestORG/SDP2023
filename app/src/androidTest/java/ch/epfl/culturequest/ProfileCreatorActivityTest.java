@@ -71,19 +71,19 @@ public class ProfileCreatorActivityTest {
     }
 
     @Before
-    public void init(){
+    public void init() {
         ActivityScenario
                 .launch(ProfileCreatorActivity.class)
                 .onActivity(a -> {
                     profile = a.getProfile();
-                    activity=a;
+                    activity = a;
 
                 });
         Intents.init();
     }
 
     @After
-    public  void release(){
+    public void release() {
         Intents.release();
     }
 
@@ -136,7 +136,7 @@ public class ProfileCreatorActivityTest {
     }
 
     @Test
-    public void notSelectingPicGivesDefaultProfilePicAndCorrectUsername() throws InterruptedException {
+    public void notSelectingPicGivesDefaultProfilePicAndCorrectUsername() {
         onView(withId(R.id.username)).perform(typeText("JohnDoe"));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
 
@@ -146,9 +146,8 @@ public class ProfileCreatorActivityTest {
     }
 
 
-
     @Test
-    public void wrongUsernamesFailProfileCreation(){
+    public void wrongUsernamesFailProfileCreation() {
         onView(withId(R.id.username)).perform(typeText(""));
         onView(withId(R.id.create_profile)).perform(click());
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
