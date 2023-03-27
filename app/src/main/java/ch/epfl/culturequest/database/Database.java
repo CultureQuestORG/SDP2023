@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
 
@@ -60,5 +61,55 @@ public class Database {
 
     public static CompletableFuture<List<Profile>> getTopNProfiles(int n) {
         return databaseInstance.getTopNProfiles(n);
+    }
+
+    /**
+     * This method is used to upload a post to the database
+     * @param post the post to be uploaded
+     * @return a CompletableFuture that will be completed when the upload is done
+     */
+    public static CompletableFuture<AtomicBoolean> uploadPost(Post post) {
+        return databaseInstance.uploadPost(post);
+    }
+
+    /**
+     * This method is used to get the posts of a user
+     * @param UId the user's id
+     * @param limit the maximum number of posts to be returned
+     * @param offset the number of posts to be skipped
+     * @return a CompletableFuture that will be completed when the posts are retrieved
+     */
+    public static CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
+        return databaseInstance.getPosts(UId, limit, offset);
+    }
+
+    /**
+     * This method is used to get the posts of a user's followings
+     * @param UIds the user's id
+     * @param limit the maximum number of posts to be returned
+     * @param offset the number of posts to be skipped
+     * @return a CompletableFuture that will be completed when the posts are retrieved
+     */
+    public static CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
+        return databaseInstance.getPostsFeed(UIds, limit, offset);
+    }
+
+    /**
+     * This method is used to get the posts of a user's followings
+     * @param UIds the user's id
+     * @param limit the maximum number of posts to be returned
+     * @return a CompletableFuture that will be completed when the posts are retrieved
+     */
+    public static CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit) {
+        return databaseInstance.getPostsFeed(UIds, limit);
+    }
+
+    /**
+     * This method is used to get the posts of a user's followings
+     * @param UIds the user's id
+     * @return a CompletableFuture that will be completed when the posts are retrieved
+     */
+    public static CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
+        return databaseInstance.getPostsFeed(UIds);
     }
 }

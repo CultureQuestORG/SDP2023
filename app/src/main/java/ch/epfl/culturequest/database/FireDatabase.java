@@ -5,12 +5,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
 /**
@@ -173,5 +176,80 @@ public class FireDatabase implements DatabaseInterface {
         });
         return future;
     }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> uploadPost(Post post) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(String.valueOf(post.getPostid()));
+        usersRef.setValue(post).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(UId);
+        usersRef.orderByChild("date").limitToLast(limit + offset).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Post> posts = new ArrayList<>();
+                int i = 0;
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Post post = snapshot.getValue(Post.class);
+                    posts.add(post);
+                    if(++i == limit) break;
+                }
+                future.complete(posts);
+            } else {
+                future.complete(List.of());
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
+        //List of posts to retrieve from each user
+        CompletableFuture<List<Post>>[] futures = UIds.stream().map((uid) -> getPosts(uid, limit, 0)).toArray(CompletableFuture[]::new);
+
+        //Future to return
+        CompletableFuture<List<Post>> result = new CompletableFuture<>();
+
+        //Wait for all futures to complete
+        CompletableFuture.allOf(futures).whenComplete((v, e) -> {
+
+            //Merge all posts into one list
+            List<Post> posts = new ArrayList<>();
+            for (CompletableFuture<List<Post>> future : futures) {
+                posts.addAll(future.join());
+            }
+
+            posts.sort(Comparator.comparing(Post::getDate).reversed());
+            posts = posts.subList(offset, Math.min(posts.size(), limit + offset));
+            result.complete(posts);
+
+        }).exceptionally(e -> {
+            result.complete(List.of());
+            return null;
+        });
+
+        return result;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit) {
+        return getPostsFeed(UIds, limit, 0);
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
+        return getPostsFeed(UIds, 100, 0);
+    }
+
 
 }

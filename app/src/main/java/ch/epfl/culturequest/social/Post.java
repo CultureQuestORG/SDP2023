@@ -2,6 +2,7 @@ package ch.epfl.culturequest.social;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.Future;
 
 import ch.epfl.culturequest.database.Database;
@@ -12,6 +13,7 @@ public final class Post {
     private final String imageUrl;
     private final String artworkName;
     private final Date date;
+    private final int likes;
 
     public Post(String postid, String uid, String imageUrl, String artworkName, Date date) {
         this.postId = postid;
@@ -19,6 +21,25 @@ public final class Post {
         this.imageUrl = imageUrl;
         this.artworkName = artworkName;
         this.date = date;
+        this.likes = 0;
+    }
+
+    public Post(String postid, String uid, String imageUrl, String artworkName, Date date, int likes) {
+        this.postId = postid;
+        this.uid = uid;
+        this.imageUrl = imageUrl;
+        this.artworkName = artworkName;
+        this.date = date;
+        this.likes = likes;
+    }
+
+    public Post() {
+        this.postId = UUID.randomUUID().toString();
+        this.uid = "";
+        this.imageUrl = "";
+        this.artworkName = "";
+        this.date = new Date();
+        this.likes = 0;
     }
 
     public String getPostid() {
@@ -41,9 +62,8 @@ public final class Post {
         return date;
     }
 
-    public static Future<ArrayList<Post>> getPosts() {
-//        return Database.getPosts();
-        throw new UnsupportedOperationException("Not implemented yet");
+    public int getLikes() {
+        return likes;
     }
 
     @Override
@@ -51,5 +71,4 @@ public final class Post {
         return "Post [artworkName=" + artworkName + ", date=" + date + ", imageUrl=" + imageUrl + ", postid=" + postId
                 + ", uid=" + uid + "]";
     }
-
 }

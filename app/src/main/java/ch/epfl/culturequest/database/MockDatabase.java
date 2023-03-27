@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
 /**
@@ -86,6 +87,32 @@ public class MockDatabase implements DatabaseInterface {
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
         future.complete((List<Profile>) map.get("topNProfiles"));
         return future;
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> uploadPost(Post post) {
+        map.put("posts/" + post.hashCode(), post);
+        return CompletableFuture.completedFuture(new AtomicBoolean(true));
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
+        return null;
     }
 }
 
