@@ -166,10 +166,5 @@ public class ProfileCreatorActivityTest {
     }
 
 
-    @AfterClass
-    public static void destroy() {
-        Intents.release();
-        user.delete();
-    }
 
 }
