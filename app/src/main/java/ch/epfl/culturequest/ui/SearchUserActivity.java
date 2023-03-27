@@ -29,7 +29,6 @@ import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 public class SearchUserActivity extends AppCompatActivity {
-    Database db = new Database();
     public static Profile SELECTED_USER;
     TextWatcher watcher = new TextWatcher() {
         @Override
@@ -65,7 +64,7 @@ public class SearchUserActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.list_view);
         listView.setForegroundGravity(Gravity.TOP);
         if (!query.isEmpty()) {
-            db.getAllProfiles().whenComplete((profiles, throwable) -> {
+            Database.getAllProfiles().whenComplete((profiles, throwable) -> {
                 Map<String, Profile> usernameToProfileMap = profiles.stream()
                         .collect(Collectors.toMap(Profile::getUsername, profile -> profile));
                 List<String> matchingUsernames = usernameToProfileMap

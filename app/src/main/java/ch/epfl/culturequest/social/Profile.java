@@ -17,12 +17,12 @@ import ch.epfl.culturequest.database.Database;
 /**
  * Creates a profile for users
  */
-public class Profile extends Observable{
+public class Profile extends Observable {
 
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
     private List<Image> images;
-
+    private Integer score;
     private static Profile activeProfile;
 
 
@@ -40,7 +40,7 @@ public class Profile extends Observable{
      * @param username       username of user
      * @param profilePicture Profile picture. Can be set to null
      */
-    public Profile(String username, String profilePicture)  {
+    public Profile(String username, String profilePicture) {
         FirebaseUser user = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser());
         this.username = username;
         this.uid = user.getUid();
@@ -49,9 +49,10 @@ public class Profile extends Observable{
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
         this.images = List.of();
+        this.score = 0;
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Image> images) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Image> images, Integer score) {
         this.uid = uid;
         this.name = name;
         this.username = username;
@@ -59,6 +60,7 @@ public class Profile extends Observable{
         this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
         this.images = images;
+        this.score = score;
 
     }
 
@@ -69,7 +71,14 @@ public class Profile extends Observable{
      * and sets the values using setters
      */
     public Profile() {
-        this("", "", "", "", "", "", List.of());
+        this.uid = "";
+        this.name = "";
+        this.username = "";
+        this.email = "";
+        this.phoneNumber = "";
+        this.profilePicture = "";
+        this.images = List.of();
+        this.score = 0;
     }
 
     public String getUid() {
@@ -93,9 +102,10 @@ public class Profile extends Observable{
     }
 
     public String getProfilePicture() {
-        System.out.println(profilePicture);
         return profilePicture;
     }
+
+    public Integer getScore() {return score;}
 
     public void setUid(String uid) {
         this.uid = uid;
@@ -155,6 +165,11 @@ public class Profile extends Observable{
             notifyObservers();
         });
     }
+
+    public Profile setActiveProfile() {
+        return this;
+    }
+
     public static Profile getActiveProfile(){
         return activeProfile;
     }
@@ -162,9 +177,16 @@ public class Profile extends Observable{
     public static void setActiveProfile(Profile profile){
         activeProfile = profile;
     }
+
+    public void setScore(int score) {
+        this.score = score;
+        setChanged();
+        notifyObservers();
+    }
+
     @NonNull
     @Override
-    public String toString(){
+    public String toString() {
         return "Profile: \n" +
                 "uid: " + uid + "\n" +
                 "name: " + name + "\n" +
@@ -172,7 +194,8 @@ public class Profile extends Observable{
                 "email: " + email + "\n" +
                 "phoneNumber: " + phoneNumber + "\n" +
                 "profilePicture: " + profilePicture + "\n" +
-                "pictures: " + images + "\n";
+                "pictures: " + images + "\n" +
+                "score: " + score + "\n";
     }
 
 
