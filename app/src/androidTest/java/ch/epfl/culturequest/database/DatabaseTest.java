@@ -29,7 +29,7 @@ public class DatabaseTest {
 
     @Test
     public void setAndGetProfileWorks() {
-        Profile profile = new Profile("test", "test", "test", "test", "test", "test",null);
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test",null, 0);
         database.setProfile(profile);
         assertThat(database.getProfile("test").join(), is(profile));
     }
