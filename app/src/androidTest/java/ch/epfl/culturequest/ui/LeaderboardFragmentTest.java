@@ -42,7 +42,6 @@ public class LeaderboardFragmentTest {
     public void setUp() {
         // Set up the database to run on the local emulator of Firebase
         firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.useEmulator("10.0.2.2", 9000);
         Database.init(new FireDatabase(firebaseDatabase));
 
         // clear the database before starting the following tests
