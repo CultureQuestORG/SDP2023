@@ -23,22 +23,31 @@ public class ProfileViewModel extends ViewModel {
         name = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
-        Database db = new Database();
         EspressoIdlingResource.increment();
-        db.getProfile("123").whenComplete((p, e) -> {
-            name.setValue(p.getName());
-            profilePictureUri.setValue(p.getProfilePicture());
-            pictures.setValue(p.getImages());
+        Profile profile = Profile.getActiveProfile();
+        if (profile != null) {
+            name.setValue(profile.getName());
+            profilePictureUri.setValue(profile.getProfilePicture());
+            pictures.setValue(profile.getImagesList());
 
-            p.addObserver((profileObject, arg) -> {
-                Profile profile = (Profile) profileObject;
-                name.postValue(profile.getName());
-                profilePictureUri.postValue(profile.getProfilePicture());
-                pictures.postValue(profile.getImages());
 
+            profile.addObserver((profileObject, arg) -> {
+                Profile p = (Profile) profileObject;
+                name.postValue(p.getName());
+                profilePictureUri.postValue(p.getProfilePicture());
+                pictures.postValue(p.getImagesList());
             });
 
-        });
+        } else {
+            Database.getProfile("123").whenComplete((p, e) -> {
+                    name.setValue(p.getName());
+                    profilePictureUri.setValue(p.getProfilePicture());
+                    pictures.setValue(p.getImagesList());
+
+                });
+        }
+
+
         EspressoIdlingResource.decrement();
     }
 
