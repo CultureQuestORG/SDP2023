@@ -35,16 +35,14 @@ check_android_task:
     adb shell settings put global animator_duration_scale 0.0
   install_firebase_CLI_script: |
     curl -sL https://firebase.tools | bash
-  start_firebase_database_emulator_script: |
-    firebase emulators:exec --project culturequest './test.sh'
   prepare_codeclimate_script: |
     curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
     chmod +x ./cc-test-reporter
     ./cc-test-reporter before-build
   screen_record_background_script:
     for n in $(seq 1 20); do adb exec-out screenrecord --time-limit=180 --output-format=h264 - > $n.h264; done
-  check_script:
-    ./gradlew check connectedCheck
+  check_script: |
+    firebase emulators:exec --project culturequest './gradlew check connectedCheck'
   report_codeclimate_script: |
     export JACOCO_SOURCE_PATH=app/src/main/java/
     ./cc-test-reporter format-coverage ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml --input-type jacoco
