@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "users" : {
+          ".indexOn": ["score", "username"]
+    },
+    ".read": "true",  // 2023-3-30
+    ".write": "true",  // 2023-3-30
+  }
+}
