@@ -35,12 +35,14 @@ public class ProfileFragment extends Fragment {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // bind the views
         final TextView textView = binding.profileUsername;
         final CircleImageView profilePicture = binding.profilePicture;
         final RecyclerView pictureGrid = binding.pictureGrid;
         final View settingsButton = binding.settingsButton;
 
 
+        // set the observers for the views so that they are updated when the data changes
         profileViewModel.getUsername().observe(getViewLifecycleOwner(), textView::setText);
         profileViewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(profilePicture));
         profileViewModel.getPictures().observe(getViewLifecycleOwner(), images -> {
@@ -53,6 +55,7 @@ public class ProfileFragment extends Fragment {
             pictureGrid.setLayoutManager(gridLayoutManager);
         });
 
+        // set the onClickListener for the settings button
         settingsButton.setOnClickListener(this::goToSettings);
 
 
@@ -69,6 +72,10 @@ public class ProfileFragment extends Fragment {
 
 
 
+    /**
+     * Starts the SettingsActivity
+     * @param view the view that was clicked
+     */
     public void goToSettings(View view) {
         startActivity(new Intent(this.getContext(), SettingsActivity.class));
     }

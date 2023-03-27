@@ -13,7 +13,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
@@ -22,17 +21,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
-import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
 import android.Manifest;
-import android.app.Instrumentation;
-import android.content.Intent;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -44,10 +42,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.database.MockDatabase;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.ui.profile.ProfileFragment;
 
 @RunWith(AndroidJUnit4.class)
 public class SettingsActivityTest {
@@ -64,15 +65,19 @@ public class SettingsActivityTest {
     @BeforeClass
     public static void setup() throws InterruptedException {
         Database.init(new MockDatabase());
+        CompletableFuture<Task<AuthResult>> future = new CompletableFuture<>();
+
         FirebaseAuth.getInstance()
                 .signInAnonymously()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         user = FirebaseAuth.getInstance().getCurrentUser();
                         Profile.setActiveProfile(new Profile("userName", DEFAULT_PROFILE_PATH));
+                        future.complete(task);
                     }
                 });
-        Thread.sleep(2000);
+
+        future.orTimeout(3, TimeUnit.SECONDS).join();
 
     }
 

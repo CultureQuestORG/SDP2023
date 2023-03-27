@@ -19,18 +19,26 @@ public class ProfileViewModel extends ViewModel {
 
     private final MutableLiveData<List<Image>> pictures;
 
+    /**
+     * Constructor of the ProfileViewModel
+     */
     public ProfileViewModel() {
+        // create the mutable live data
         username = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
+
         EspressoIdlingResource.increment();
         Profile profile = Profile.getActiveProfile();
+
         if (profile != null) {
+            //set the values of the live data
             username.setValue(profile.getUsername());
             profilePictureUri.setValue(profile.getProfilePicture());
             pictures.setValue(profile.getImagesList());
 
 
+            // add an observer to the profile so that the view is updated when the profile is updated
             profile.addObserver((profileObject, arg) -> {
                 Profile p = (Profile) profileObject;
                 username.postValue(p.getUsername());
@@ -38,6 +46,7 @@ public class ProfileViewModel extends ViewModel {
                 pictures.postValue(p.getImagesList());
             });
 
+            // if no profile is active, we load a default profile
         } else {
             Database.getProfile("123").whenComplete((p, e) -> {
                     username.setValue(p.getUsername());
@@ -51,14 +60,23 @@ public class ProfileViewModel extends ViewModel {
         EspressoIdlingResource.decrement();
     }
 
+    /**
+     * @return the username of the profile
+     */
     public LiveData<String> getUsername() {
         return username;
     }
 
+    /**
+     * @return the profile picture uri of the profile
+     */
     public LiveData<String> getProfilePictureUri() {
         return profilePictureUri;
     }
 
+    /**
+     * @return the list of pictures of the profile
+     */
     public LiveData<List<Image>> getPictures() {
         return pictures;
     }

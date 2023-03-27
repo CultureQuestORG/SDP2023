@@ -40,7 +40,6 @@ import ch.epfl.culturequest.utils.ProfileUtils;
  */
 public class SettingsActivity extends AppCompatActivity {
 
-    private final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
     private ImageView profilePictureView;
     private String profilePicUri;
 
@@ -65,6 +64,7 @@ public class SettingsActivity extends AppCompatActivity {
         ch.epfl.culturequest.databinding.ActivitySettingsBinding binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        //handle logout
         Button logoutButton = binding.logOut;
         Authenticator auth= new Authenticator(this, false);
         logoutButton.setOnClickListener(v -> auth.signOut());
@@ -74,12 +74,12 @@ public class SettingsActivity extends AppCompatActivity {
         username = binding.username;
         username.setText(activeProfile.getUsername());
 
+        // load the profile picture
         profilePictureView = binding.profilePicture;
         Picasso.get().load(activeProfile.getProfilePicture()).into(profilePictureView);
-
-
         profilePicUri = activeProfile.getProfilePicture();
 
+        // handle the update profile button
         Button updateProfileButton = binding.updateProfile;
         updateProfileButton.setOnClickListener(this::UpdateProfile);
     }
@@ -119,7 +119,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     * Displays the profile picture selected by the user
+     * @param result the result of the activity launched to select the profile picture
+     */
     private void displayProfilePic(ActivityResult result) {
         if (result.getResultCode() != RESULT_OK)
             return;
@@ -137,11 +140,15 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Opens the gallery to select a profile picture
+     * @param view the view that was clicked
+     */
     public void selectProfilePicture(View view) {
-        if (ContextCompat.checkSelfPermission(this, GALLERY_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, ProfileUtils.GALLERY_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
             openGallery();
         } else {
-            requestPermissionLauncher.launch(GALLERY_PERMISSION);
+            requestPermissionLauncher.launch(ProfileUtils.GALLERY_PERMISSION);
         }
     }
 

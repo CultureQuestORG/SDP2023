@@ -31,8 +31,6 @@ public class SignUpActivity extends AppCompatActivity {
         // If the user is logged in, check if he has a profile
         if (Profile.getActiveProfile() == null) {
             CompletableFuture<Profile> profile = Database.getProfile(currentUser.getUid());
-            System.out.println("UID: "+currentUser.getUid());
-            System.out.println(currentUser.isAnonymous());
             profile.handle((p, e) -> {
                 if (e != null || p == null) {
                     // If the user does not have a profile, display the profile creator activity
