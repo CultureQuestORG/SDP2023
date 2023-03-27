@@ -9,6 +9,85 @@
     tools:visibility="visible">
 
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profilePicture"
+        android:layout_width="123dp"
+        android:layout_height="121dp"
+
+        android:layout_marginTop="55dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/basic_profile_picture"
+        app:layout_constraintBottom_toTopOf="@+id/pictureGrid"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.055"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pictureGrid"
+        android:layout_width="413dp"
+        android:layout_height="500dp"
+        android:padding="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profilePicture"
+        app:layout_constraintVertical_bias="1.0"
+        app:spanCount="3" />
+
+
+    <ImageView
+        android:id="@+id/back_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="14dp"
+        android:src="@drawable/back_button"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/profilePicture"
+        app:layout_constraintRight_toLeftOf="@id/home_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ImageView
+        android:id="@+id/home_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="317dp"
+        android:layout_marginBottom="14dp"
+        android:src="@drawable/home_icon_unsel"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/profilePicture"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.5"
+        app:layout_constraintLeft_toRightOf="@id/back_button"
+        app:layout_constraintStart_toStartOf="@id/back_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/add_friend"
+        android:layout_width="178dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="44dp"
+        android:layout_marginBottom="24dp"
+        android:text="Add Friend"
+        android:textSize="10sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/pictureGrid"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintLeft_toRightOf="@id/profilePicture"
+        app:layout_constraintStart_toEndOf="@+id/profilePicture"
+        app:layout_constraintTop_toBottomOf="@id/profileName"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
     <TextView
         android:id="@+id/profileName"
         android:layout_width="252dp"
@@ -18,86 +97,14 @@
         android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/profilePicture"
+        app:layout_constraintLeft_toRightOf="@id/profilePicture"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintStart_toEndOf="@id/profilePicture"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.101" />
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profilePicture"
-        android:layout_width="111dp"
-        android:layout_height="109dp"
-
-        android:layout_marginTop="55dp"
-        android:layout_marginBottom="8dp"
-        android:src="@drawable/basic_profile_picture"
-        app:layout_constraintBottom_toTopOf="@+id/pictureGrid"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.086"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pictureGrid"
-        android:layout_width="413dp"
-        android:layout_height="550dp"
-        android:padding="5dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePicture"
-        app:layout_constraintVertical_bias="1.0"
-        app:spanCount="3" />
-
-    <ImageView
-        android:id="@+id/back_button"
-        android:layout_width="30dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="14dp"
-        android:src="@drawable/back_button"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/profilePicture"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.833" />
-
-    <ImageView
-        android:id="@+id/home_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="13dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="317dp"
-        android:layout_marginBottom="14dp"
-        android:src="@drawable/home_icon_unsel"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/profilePicture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/back_button"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <Button
-        android:id="@+id/add_friend"
-        android:layout_width="178dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="55dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="68dp"
-        android:layout_marginBottom="22dp"
-        android:text="Add Friend"
-        android:textSize="10sp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/pictureGrid"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.218"
-        app:layout_constraintStart_toEndOf="@+id/profilePicture"
-        app:layout_constraintTop_toBottomOf="@+id/profileName"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.136" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
