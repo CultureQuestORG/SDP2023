@@ -72,8 +72,8 @@ public class SearchUserActivity extends AppCompatActivity {
                         .collect(Collectors.toList());
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, matchingUsernames);
                 listView.setAdapter(adapter);
-                listView.setOnItemClickListener((parent, v, position, id) -> {
-                    searchBarOnClickListener(parent, v, position, id, usernameToProfileMap);
+                listView.setOnItemClickListener((parent, ignored, position, ignored2) -> {
+                    searchBarOnClickListener(parent, position, usernameToProfileMap);
                 });
             });
         } else {
@@ -82,7 +82,7 @@ public class SearchUserActivity extends AppCompatActivity {
         }
     }
 
-    private void searchBarOnClickListener(AdapterView<?> parent, View v, int position, long id, Map<String, Profile> usernameToProfileMap) {
+    private void searchBarOnClickListener(AdapterView<?> parent, int position, Map<String, Profile> usernameToProfileMap) {
         String selectedUsername = (String) parent.getItemAtPosition(position);
         SELECTED_USER = usernameToProfileMap.get(selectedUsername);
         this.startActivity(new Intent(this, DisplayUserProfileActivity.class));

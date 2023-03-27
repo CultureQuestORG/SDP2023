@@ -86,11 +86,6 @@ public class ProfileCreatorActivityTest {
         Intents.release();
     }
 
-    @AfterClass
-    public static void tearDown() {
-        user.delete();
-    }
-
     @Test
     public void correctUsernameTransitionsToNavActivity() {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
