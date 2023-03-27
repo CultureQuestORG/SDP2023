@@ -35,6 +35,11 @@ android {
     buildFeatures {
         viewBinding true
     }
+    signingConfigs {
+        debug {
+            storeFile file("external/debug.keystore")
+        }
+    }
 }
 
 dependencies {
@@ -85,6 +90,8 @@ dependencies {
     debugImplementation "androidx.fragment:fragment-testing:1.5.5"
     debugImplementation "androidx.test:monitor:1.6.1"
     debugImplementation 'com.21buttons:fragment-test-rule-extras:2.0.1'
+
+    testImplementation "org.mockito:mockito-core:5.1.1"
 }
 
 configurations.all {

@@ -18,7 +18,7 @@ import org.junit.runner.RunWith;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.ProfileCreatorActivity;
-import ch.epfl.culturequest.utils.Redirect;
+import ch.epfl.culturequest.utils.AndroidUtils;
 
 @RunWith(AndroidJUnit4.class)
 public class RedirectTest {
@@ -33,7 +33,7 @@ public class RedirectTest {
                 .addMonitor(NavigationActivity.class.getName(), null, false);
 
         ActivityScenario.launch(ProfileCreatorActivity.class).onActivity(activity ->{
-            Redirect.toActivity(activity, NavigationActivity.class);
+            AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
         });
         NavigationActivity secondActivity = (NavigationActivity) activityMonitor
                 .waitForActivityWithTimeout(5000);

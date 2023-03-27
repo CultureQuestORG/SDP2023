@@ -1,14 +1,14 @@
 package ch.epfl.culturequest;
 
+import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
+
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,36 +17,31 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.firebase.ui.auth.data.model.User;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.ProfileUtils;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
+/**
+ * This activity is used to allow the user to create a profile by
+ * selecting a profile picture and a username
+ */
 public class ProfileCreatorActivity extends AppCompatActivity {
-    public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
-    public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
-    public static String DEFAULT_PROFILE_PATH = "res/drawable/profile_icon_selector.xml";
-    private final Profile profile = new Profile(null, null);
+    private String profilePicUri;
+    private final Profile profile = new Profile(null, "");
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -64,6 +59,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidUtils.removeStatusBar(getWindow());
         setContentView(R.layout.activity_profile_creation);
         //the following attributes are used to check whether the user actually selected a profile pic
         profileView = findViewById(R.id.profile_picture);
@@ -100,18 +96,49 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     public void createProfile(View view) {
         EditText textView = findViewById(R.id.username);
         String username = textView.getText().toString();
-        if (isValid(username)) {
-            setDefaultPicIfNoneSelected();
-            if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
-                db.setProfile(profile);
-            }
 
-            Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
-            startActivity(successfulProfileCreation);
-        } else {
+        //check if username is valid
+        if (!ProfileUtils.isValid(profile,username)) {
             textView.setText("");
             textView.setHint(INCORRECT_USERNAME_FORMAT);
+            return;
         }
+
+        setDefaultPicIfNoneSelected();
+
+        if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
+            profile.setUsername(username);
+            //if the profile pic is the default one, we don't have to store it in the database
+            if ((profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PATH)))
+                storeProfileInDatabase(ProfileUtils.DEFAULT_PROFILE_PATH);
+             else
+                storeImageAndProfileInDatabase();
+        } else{
+            //if user is anonymous, we don't want to store the profile in the database
+            profile.setUsername(username);
+            profile.setProfilePicture(profilePicUri);
+            Profile.setActiveProfile(profile);
+        }
+
+        Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
+        startActivity(successfulProfileCreation);
+    }
+
+
+
+    private void storeProfileInDatabase(String path) {
+        profile.setProfilePicture(path);
+        Profile.setActiveProfile(profile);
+        Database.setProfile(profile);
+    }
+
+    private void storeImageAndProfileInDatabase() {
+        //upload image to firebase storage
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
+        // on failure, store profile with default profile pic
+        task.addOnFailureListener(e -> storeProfileInDatabase(ProfileUtils.DEFAULT_PROFILE_PATH))
+                .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> storeProfileInDatabase(ProfileUtils.DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> storeProfileInDatabase(uri.toString())));
     }
 
 
@@ -119,45 +146,41 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
     }
 
-    private boolean isValid(String username) {
-        if (usernameIsValid(username)) {
-            profile.setUsername(username);
-            return true;
-        }
-        return false;
-    }
+
 
     private void setDefaultPicIfNoneSelected() {
         if (profileView.getDrawable().equals(initialDrawable)) {
-            profile.setProfilePicture(DEFAULT_PROFILE_PATH);
+            profilePicUri = ProfileUtils.DEFAULT_PROFILE_PATH;
         }
     }
 
 
-    private void displayProfilePic(ActivityResult result) {
+    /**
+     * Displays the profile picture selected by the user
+     * @param result the result of the activity launched to select the profile picture
+     */
+    public void displayProfilePic(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
             Uri profilePicture = result.getData().getData();
             CircleImageView image = findViewById(R.id.profile_picture);
             Picasso.get().load(profilePicture).into(image);
             ((TextView) findViewById(R.id.profile_pic_text)).setText("");
-            profile.setProfilePicture(profilePicture.getPath());
+            profilePicUri = profilePicture.toString();
+
         }
     }
 
-    private boolean usernameIsValid(String username) {
-        int length = username.length();
-        return !username.isEmpty()
-                && length > 3
-                && length < 20
-                && username.matches(USERNAME_REGEX)
-                && !username.contains(" ");
-    }
 
-    //used for testing purposes
-
-
+    /**
+     * Getter for the profile being created
+     * @return the profile being created
+     */
     public Profile getProfile() {
         return profile;
+    }
+
+    public String getProfilePicUri() {
+        return profilePicUri;
     }
 
 }

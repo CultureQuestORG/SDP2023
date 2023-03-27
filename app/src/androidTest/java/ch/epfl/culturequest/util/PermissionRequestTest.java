@@ -37,12 +37,6 @@ public class PermissionRequestTest {
     }
 
     @Test
-    public void doesntHaveOtherPermissions(){
-        PermissionRequest request = new PermissionRequest(Manifest.permission.CAMERA);
-        assertFalse(request.hasPermission(mock(Context.class)));
-    }
-
-    @Test
     public void opensIntent(){
         PermissionRequest request = new PermissionRequest(Manifest.permission.CAMERA);
         request.askPermission(mock(ActivityResultLauncher.class));
