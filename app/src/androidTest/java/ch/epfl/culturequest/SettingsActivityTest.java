@@ -65,7 +65,6 @@ public class SettingsActivityTest {
     @BeforeClass
     public static void setup() throws InterruptedException {
         Database.init(new MockDatabase());
-        CompletableFuture<Task<AuthResult>> future = new CompletableFuture<>();
 
         FirebaseAuth.getInstance()
                 .signInAnonymously()
@@ -73,11 +72,11 @@ public class SettingsActivityTest {
                     if (task.isSuccessful()) {
                         user = FirebaseAuth.getInstance().getCurrentUser();
                         Profile.setActiveProfile(new Profile("userName", DEFAULT_PROFILE_PATH));
-                        future.complete(task);
+
                     }
                 });
 
-        future.orTimeout(3, TimeUnit.SECONDS).join();
+        Thread.sleep(2000);
 
     }
 
