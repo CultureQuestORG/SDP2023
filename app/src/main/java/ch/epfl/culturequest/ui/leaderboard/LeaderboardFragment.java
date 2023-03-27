@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
@@ -31,23 +30,18 @@ public class LeaderboardFragment extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putSerializable("currentUserUid", currentUserUid);
         fragment.setArguments(bundle);
-
         return fragment;
     }
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         String currentUserUid;
         try {
-            currentUserUid = (String) getArguments().getSerializable("currentUserUid");
-        } catch (NullPointerException e) {
+            currentUserUid = (String) requireArguments().getSerializable("currentUserUid");
+        } catch (IllegalStateException e) {
             currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         }
 
-        LeaderboardViewModel leaderboardViewModel =
-                new ViewModelProvider(this, new LeaderboardViewModelFactory(currentUserUid))
-                        .get(LeaderboardViewModel.class);
+        LeaderboardViewModel leaderboardViewModel = new ViewModelProvider(this, new LeaderboardViewModelFactory(currentUserUid)).get(LeaderboardViewModel.class);
 
         binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();

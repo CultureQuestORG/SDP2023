@@ -2,6 +2,7 @@ package ch.epfl.culturequest.database;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
@@ -21,8 +22,8 @@ public class Database implements DatabaseInterface {
     }
 
     @Override
-    public void set(String key, Object value) {
-        databaseInstance.set(key, value);
+    public CompletableFuture<AtomicBoolean> set(String key, Object value) {
+        return databaseInstance.set(key, value);
     }
 
     @Override
@@ -36,8 +37,8 @@ public class Database implements DatabaseInterface {
     }
 
     @Override
-    public void setProfile(Profile profile) {
-        databaseInstance.setProfile(profile);
+    public CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
+        return databaseInstance.setProfile(profile);
     }
 
     @Override
@@ -46,8 +47,8 @@ public class Database implements DatabaseInterface {
     }
 
     @Override
-    public void setImage(Image picture) {
-        databaseInstance.setImage(picture);
+    public CompletableFuture<AtomicBoolean> setImage(Image picture) {
+        return databaseInstance.setImage(picture);
     }
 
     @Override

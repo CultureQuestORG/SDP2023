@@ -3,6 +3,7 @@ package ch.epfl.culturequest.database;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
@@ -17,10 +18,13 @@ public class MockDatabase implements DatabaseInterface {
     public MockDatabase() {
         this(new HashMap<>());
     }
-    @Override
-    public void set(String key, Object value) {
 
+    @Override
+    public CompletableFuture<AtomicBoolean> set(String key, Object value) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         map.put(key, value);
+        future.complete(new AtomicBoolean(true));
+        return future;
     }
 
     @Override
@@ -38,8 +42,11 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
-    public void setProfile(Profile profile) {
+    public CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         map.put("users/"+profile.getUid(), profile);
+        future.complete(new AtomicBoolean(true));
+        return future;
     }
 
     @Override
@@ -50,8 +57,11 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
-    public void setImage(Image image) {
+    public CompletableFuture<AtomicBoolean> setImage(Image image) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         map.put("pictures/"+image.getUid(), image);
+        future.complete(new AtomicBoolean(true));
+        return future;
     }
 
     @Override

@@ -5,9 +5,8 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
 import static org.hamcrest.Matchers.is;
-
+import static org.junit.Assert.fail;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -23,7 +22,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
@@ -36,30 +38,33 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 public class LeaderboardFragmentTest {
     private LeaderboardFragment fragment;
     private Database database;
-    private FirebaseDatabase firebaseDatabase;
-
+    FirebaseDatabase firebaseDatabase;
 
     @Before
     public void setUp() {
-        // set up the database
+        // Set up the database to run on the local emulator of Firebase
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseDatabase.useEmulator("10.0.2.2", 9000);
-
         Database.init(new FireDatabase(firebaseDatabase));
         database = new Database();
 
-        // Initialize the database with some profiles
-        database.setProfile(new Profile("testUid", "testName", "testUsername", "testEmail","testPhone", "testProfilePicture", null, 400));
-        database.setProfile(new Profile("testUid2", "testName2", "testUsername2", "testEmail2","testPhone2", "testProfilePicture2", null, 300));
-        database.setProfile(new Profile("testUid3", "testName3", "testUsername3", "testEmail3","testPhone3", "testProfilePicture3", null, 200));
-        database.setProfile(new Profile("testUid4", "testName4", "testUsername4", "testEmail4","testPhone4", "testProfilePicture4", null, 100));
+        // clear the database before starting the following tests
+        firebaseDatabase.getReference().setValue(null);
 
-        // add EspressoIdlingResource to the IdlingRegistry
+        // Initialize the database with some test profiles
+        database.setProfile(new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", null, 400));
+        database.setProfile(new Profile("testUid2", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", null, 300));
+        database.setProfile(new Profile("testUid3", "testName3", "testUsername3", "testEmail3", "testPhone3", "testProfilePicture3", null, 200));
+        database.setProfile(new Profile("testUid4", "testName4", "testUsername4", "testEmail4", "testPhone4", "testProfilePicture4", null, 100));
+
+
+        // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
 
+        // Launch the fragment with the current user's uid for testing
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
         activityScenario.onActivity(activity -> {
-            fragment = LeaderboardFragment.newInstance("testUid");
+            fragment = LeaderboardFragment.newInstance("currentUserUid");
             FragmentManager fragmentManager = activity.getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(android.R.id.content, fragment);
@@ -68,16 +73,36 @@ public class LeaderboardFragmentTest {
     }
 
     @Test
-    public void getRankIsCorrect() {
-        assertThat(database.getRank("testUid").join(), is(1));
+    public void databaseContains4Profiles() {
+        int numberOfProfiles = 0;
+        try {
+            numberOfProfiles = database.getNumberOfProfiles().get(5, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+        assertThat(numberOfProfiles, is(4));
+    }
+
+    @Test
+    public void currentUserScoreDisplayedIs400() {
+        onView(withId(R.id.current_user_score)).check(matches(withText("400")));
+    }
+
+    @Test
+    public void currentUserUsernameDisplayedIsCurrentUserUsername() {
+        onView(withId(R.id.current_username)).check(matches(withText("currentUserUsername")));
+    }
+
+    @Test
+    public void currentUserRankDisplayedIs1() {
+        onView(withId(R.id.current_user_rank)).check(matches(withText("1")));
     }
 
     @After
     public void tearDown() {
         // remove EspressoIdlingResource from the IdlingRegistry
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-        // clear the database
-        // firebaseDatabase.getReference().setValue(null);
+        // clear the database after finishing the tests
+        firebaseDatabase.getReference().setValue(null);
     }
-
 }

@@ -57,20 +57,19 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
     public LeaderboardRecycleViewAdapter(LeaderboardViewModel leaderboardViewModel) {
         leaderboardViewModel.getTopNUserNames().observeForever(topNUserNames -> {
             this.topNUserNames = topNUserNames;
-            notifyItemRangeChanged (0, getItemCount());
-
+            notifyItemRangeChanged(0, getItemCount());
         });
         leaderboardViewModel.getTopNUserScores().observeForever(topNUserScores -> {
             this.topNUserScores = topNUserScores;
-            notifyItemRangeChanged (0, getItemCount());
+            notifyItemRangeChanged(0, getItemCount());
         });
         leaderboardViewModel.getTopNUserRanks().observeForever(topNUserRanks -> {
             this.topNUserRanks = topNUserRanks;
-            notifyItemRangeChanged (0, getItemCount());
+            notifyItemRangeChanged(0, getItemCount());
         });
         leaderboardViewModel.getTopNUserProfilePicturesUri().observeForever(topNUserProfilePicturesUri -> {
             this.topNUserProfilePicturesUri = topNUserProfilePicturesUri;
-            notifyItemRangeChanged (0, getItemCount());
+            notifyItemRangeChanged(0, getItemCount());
         });
     }
 
@@ -79,8 +78,7 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
     @Override
     public LeaderboardViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
-        View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.leaderboard_item, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.leaderboard_item, viewGroup, false);
 
         return new LeaderboardViewHolder(view);
     }
@@ -102,8 +100,7 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
     public int getItemCount() {
         if (topNUserNames == null || topNUserScores == null || topNUserRanks == null || topNUserProfilePicturesUri == null) {
             return 0;
-        }
-        else{
+        } else {
             // return the minimum size of the lists
             return Math.min(topNUserNames.size(), Math.min(topNUserScores.size(), Math.min(topNUserRanks.size(), topNUserProfilePicturesUri.size())));
         }

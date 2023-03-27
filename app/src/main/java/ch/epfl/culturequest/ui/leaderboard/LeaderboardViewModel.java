@@ -6,13 +6,10 @@ import androidx.lifecycle.ViewModel;
 
 import static java.util.stream.Collectors.toList;
 
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.Collections;
 import java.util.List;
 
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.database.FireDatabase;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
@@ -44,10 +41,16 @@ public class LeaderboardViewModel extends ViewModel {
             currentUsername.setValue(p.getUsername());
             currentUserProfilePictureUri.setValue(p.getProfilePicture());
             currentUserScore.setValue(p.getScore().toString());
+            EspressoIdlingResource.decrement();
         });
+
+        EspressoIdlingResource.increment();
         db.getRank(currentUserUid).whenComplete((rank, e) -> {
             currentUserRank.setValue(rank.toString());
+            EspressoIdlingResource.decrement();
         });
+
+        EspressoIdlingResource.increment();
         db.getTopNProfiles(N).whenComplete((topN, e) -> {
             Collections.reverse(topN);
             topNUserNames.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
@@ -59,8 +62,9 @@ public class LeaderboardViewModel extends ViewModel {
                 ranks[i] = Integer.toString(i + 1);
             }
             topNUserRanks.setValue(List.of(ranks));
+            EspressoIdlingResource.decrement();
         });
-        EspressoIdlingResource.decrement();
+
     }
 
     public LiveData<String> getCurrentUsername() {

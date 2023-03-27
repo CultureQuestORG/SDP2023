@@ -1,0 +1,73 @@
+[debug] [2023-03-27T09:17:34.607Z] ----------------------------------------------------------------------
+[debug] [2023-03-27T09:17:34.613Z] Command:       C:\Users\hugom\OneDrive\DOCUME~1\Info\Java\SOFTWA~1\App\SDP2023\firebase-tools-instant-win.exe C:\Users\hugom\.cache\firebase\tools\lib\node_modules\firebase-tools\lib\bin\firebase emulators:start
+[debug] [2023-03-27T09:17:34.614Z] CLI Version:   11.25.1
+[debug] [2023-03-27T09:17:34.615Z] Platform:      win32
+[debug] [2023-03-27T09:17:34.615Z] Node Version:  v16.16.0
+[debug] [2023-03-27T09:17:34.617Z] Time:          Mon Mar 27 2023 11:17:34 GMT+0200 (GMT+02:00)
+[debug] [2023-03-27T09:17:34.618Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-03-27T09:17:34.838Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-03-27T09:17:34.839Z] > authorizing via signed-in user (culturequest6@gmail.com)
+[debug] [2023-03-27T09:17:34.956Z] openjdk version "17.0.4.1" 2022-08-12
+OpenJDK Runtime Environment Temurin-17.0.4.1+1 (build 17.0.4.1+1)
+
+[debug] [2023-03-27T09:17:34.957Z] OpenJDK 64-Bit Server VM Temurin-17.0.4.1+1 (build 17.0.4.1+1, mixed mode, sharing)
+
+[debug] [2023-03-27T09:17:34.994Z] Parsed Java major version: 17
+[info] i  emulators: Starting emulators: database {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: database"}}
+[debug] [2023-03-27T09:17:35.023Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2023-03-27T09:17:35.023Z] [database] Database Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2023-03-27T09:17:35.024Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"database":[{"address":"127.0.0.1","family":"IPv4","port":9000}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2023-03-27T09:17:35.047Z] [hub] writing locator at C:\Users\hugom\AppData\Local\Temp\hub-culturequest.json
+[debug] [2023-03-27T09:17:35.068Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/culturequest [none]
+[debug] [2023-03-27T09:17:35.375Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/culturequest 200
+[debug] [2023-03-27T09:17:35.375Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/culturequest {"projectId":"culturequest","projectNumber":"296582792540","displayName":"CultureQuest","name":"projects/culturequest","resources":{"hostingSite":"culturequest","realtimeDatabaseInstance":"culturequest-default-rtdb","storageBucket":"culturequest.appspot.com","locationId":"europe-west"},"state":"ACTIVE","etag":"1_61cf55ba-4e38-4b90-acc9-360d136a6f70"}
+[debug] [2023-03-27T09:17:35.376Z] database rules config:  [{"instance":"culturequest-default-rtdb","rules":"C:\\Users\\hugom\\OneDrive\\Documents\\Info\\Java\\Software_engineering\\App\\SDP2023\\database.rules.json"}]
+[debug] [2023-03-27T09:17:35.389Z] Ignoring unsupported arg: projectId {"metadata":{"emulator":{"name":"database"},"message":"Ignoring unsupported arg: projectId"}}
+[debug] [2023-03-27T09:17:35.389Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"database"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2023-03-27T09:17:35.389Z] Ignoring unsupported arg: rules {"metadata":{"emulator":{"name":"database"},"message":"Ignoring unsupported arg: rules"}}
+[debug] [2023-03-27T09:17:35.389Z] Starting Database Emulator with command {"binary":"java","args":["-Duser.language=en","-jar","C:\\Users\\hugom\\.cache\\firebase\\emulators\\firebase-database-emulator-v4.11.0.jar","--host","127.0.0.1","--port",9000,"--single_project_mode","Warning"],"optionalArgs":["port","host","functions_emulator_port","functions_emulator_host","single_project_mode"],"joinArgs":false} {"metadata":{"emulator":{"name":"database"},"message":"Starting Database Emulator with command {\"binary\":\"java\",\"args\":[\"-Duser.language=en\",\"-jar\",\"C:\\\\Users\\\\hugom\\\\.cache\\\\firebase\\\\emulators\\\\firebase-database-emulator-v4.11.0.jar\",\"--host\",\"127.0.0.1\",\"--port\",9000,\"--single_project_mode\",\"Warning\"],\"optionalArgs\":[\"port\",\"host\",\"functions_emulator_port\",\"functions_emulator_host\",\"single_project_mode\"],\"joinArgs\":false}"}}
+[info] i  database: Database Emulator logging to database-debug.log {"metadata":{"emulator":{"name":"database"},"message":"Database Emulator logging to \u001b[1mdatabase-debug.log\u001b[22m"}}
+[debug] [2023-03-27T09:17:38.983Z] 11:17:38.978 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+ {"metadata":{"emulator":{"name":"database"},"message":"11:17:38.978 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started\r\n"}}
+[debug] [2023-03-27T09:17:39.691Z] 11:17:39.685 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:9000
+ {"metadata":{"emulator":{"name":"database"},"message":"11:17:39.685 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:9000\r\n"}}
+[debug] [2023-03-27T09:17:39.911Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2023-03-27T09:17:39.912Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2023-03-27T09:17:39.912Z] Starting Emulator UI with command {"binary":"node","args":["C:\\Users\\hugom\\.cache\\firebase\\emulators\\ui-v1.11.4\\server\\server.js"],"optionalArgs":[],"joinArgs":false} {"metadata":{"emulator":{"name":"ui"},"message":"Starting Emulator UI with command {\"binary\":\"node\",\"args\":[\"C:\\\\Users\\\\hugom\\\\.cache\\\\firebase\\\\emulators\\\\ui-v1.11.4\\\\server\\\\server.js\"],\"optionalArgs\":[],\"joinArgs\":false}"}}
+[info] i  ui: Emulator UI logging to ui-debug.log {"metadata":{"emulator":{"name":"ui"},"message":"Emulator UI logging to \u001b[1mui-debug.log\u001b[22m"}}
+[debug] [2023-03-27T09:17:41.328Z] Web / API server started at 127.0.0.1:4000
+ {"metadata":{"emulator":{"name":"ui"},"message":"Web / API server started at 127.0.0.1:4000\n"}}
+[debug] [2023-03-27T09:17:41.329Z] Web / API server started at ::1:4000
+ {"metadata":{"emulator":{"name":"ui"},"message":"Web / API server started at ::1:4000\n"}}
+[debug] [2023-03-27T09:17:41.517Z] >>> [apiv2][query] PUT http://127.0.0.1:9000/.settings/rules.json ns=culturequest-default-rtdb
+[debug] [2023-03-27T09:17:41.518Z] >>> [apiv2][body] PUT http://127.0.0.1:9000/.settings/rules.json "{\r\n  \"rules\": {\r\n    \"users\" : {\r\n          \".indexOn\": [\"score\", \"username\"]\r\n    },\r\n    \".read\": \"true\",  // 2023-3-30\r\n    \".write\": \"true\",  // 2023-3-30\r\n  }\r\n}"
+[debug] [2023-03-27T09:17:42.456Z] 11:17:42.456 [NamespaceSystem-akka.actor.default-dispatcher-5] INFO com.firebase.core.namespace.NamespaceActor - culturequest-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 335ms, init: 0ms
+ {"metadata":{"emulator":{"name":"database"},"message":"11:17:42.456 [NamespaceSystem-akka.actor.default-dispatcher-5] INFO com.firebase.core.namespace.NamespaceActor - culturequest-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 335ms, init: 0ms\r\n"}}
+[debug] [2023-03-27T09:17:42.659Z] 11:17:42.658 [NamespaceSystem-blocking-namespace-operation-dispatcher-6] INFO com.firebase.core.namespace.StateManager - Namespace culturequest-default-rtdb status Active to Active
+ {"metadata":{"emulator":{"name":"database"},"message":"11:17:42.658 [NamespaceSystem-blocking-namespace-operation-dispatcher-6] INFO com.firebase.core.namespace.StateManager - Namespace culturequest-default-rtdb status Active to Active\r\n"}}
+[debug] [2023-03-27T09:17:42.757Z] <<< [apiv2][status] PUT http://127.0.0.1:9000/.settings/rules.json 200
+[debug] [2023-03-27T09:17:42.758Z] <<< [apiv2][body] PUT http://127.0.0.1:9000/.settings/rules.json {"status":"ok"}
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌──────────┬────────────────┬────────────────────────────────┐
+│ Emulator │ Host:Port      │ View in Emulator UI            │
+├──────────┼────────────────┼────────────────────────────────┤
+│ Database │ 127.0.0.1:9000 │ http://127.0.0.1:4000/database │
+└──────────┴────────────────┴────────────────────────────────┘
+  Emulator Hub running at 127.0.0.1:4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2023-03-27T09:17:54.942Z] 11:17:54.941 [FirebaseWorkerPool-1-3] WARN com.firebase.core.persistence.backend.dummy.EmulatorMetadataPersistence - Multiple projectIds are not recommended in single project mode. Requested 
+namespace culturequest, but the emulator is configured for culturequest-default-rtdb. To 
+opt-out of single project mode add/set the single_project_mode: false property in 
+the firebase.json emulators config. 
+ {"metadata":{"emulator":{"name":"database"},"message":"11:17:54.941 [FirebaseWorkerPool-1-3] WARN com.firebase.core.persistence.backend.dummy.EmulatorMetadataPersistence - Multiple projectIds are not recommended in single project mode. Requested \nnamespace culturequest, but the emulator is configured for culturequest-default-rtdb. To \nopt-out of single project mode add/set the single_project_mode: false property in \nthe firebase.json emulators config. \r\n"}}
+[debug] [2023-03-27T09:17:54.974Z] 11:17:54.974 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO com.firebase.core.namespace.NamespaceActor - culturequest successfully activated FBKV (SurveyIdle(0)) wait: 12ms, init: 0ms
+ {"metadata":{"emulator":{"name":"database"},"message":"11:17:54.974 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO com.firebase.core.namespace.NamespaceActor - culturequest successfully activated FBKV (SurveyIdle(0)) wait: 12ms, init: 0ms\r\n"}}

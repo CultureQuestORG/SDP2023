@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
@@ -24,8 +25,16 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     @Override
-    public void set(String key, Object value) {
-        database.getReference(key).setValue(value);
+    public CompletableFuture<AtomicBoolean> set(String key, Object value) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        database.getReference(key).setValue(value).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
     }
 
     @Override
@@ -41,10 +50,17 @@ public class FireDatabase implements DatabaseInterface {
         return future;
     }
 
-
     @Override
-    public void setProfile(Profile profile) {
-        database.getReference("users").child(profile.getUid()).setValue(profile);
+    public CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        database.getReference("users").child(profile.getUid()).setValue(profile).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
     }
 
     @Override
@@ -73,8 +89,16 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     @Override
-    public void setImage(Image image) {
-        database.getReference("images").child(image.getUid()).setValue(image);
+    public CompletableFuture<AtomicBoolean> setImage(Image image) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        database.getReference("images").child(image.getUid()).setValue(image).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
     }
 
     @Override
