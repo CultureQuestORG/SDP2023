@@ -2,9 +2,15 @@ package ch.epfl.culturequest.ui;
 
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+
+import static org.junit.Assert.assertEquals;
+
+import android.content.Intent;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -19,8 +25,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
+import java.util.Objects;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.database.MockDatabase;
 import ch.epfl.culturequest.social.Image;
@@ -80,12 +88,12 @@ public class ProfileFragmentTest {
         profile.setUsername("johnny");
         onView(withId(R.id.profileUsername)).check(matches(withText("johnny")));
 
+    }
 
+    @Test
+    public void settingButtonWorks() {
 
-
-
-
-
-
+        onView(withId(R.id.settingsButton)).perform(click());
+        onView(withId(R.id.log_out)).check(matches(isEnabled()));
     }
 }

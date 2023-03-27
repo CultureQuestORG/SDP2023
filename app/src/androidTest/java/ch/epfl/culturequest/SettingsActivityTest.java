@@ -80,9 +80,7 @@ public class SettingsActivityTest {
     public void init() {
         ActivityScenario
                 .launch(SettingsActivity.class)
-                .onActivity(a -> {
-                    activity = a;
-                });
+                .onActivity(a -> activity = a);
         Intents.init();
     }
 
@@ -107,7 +105,7 @@ public class SettingsActivityTest {
 
 
     @Test
-    public void UpdateProfileButtonSendsBackToProfileFragmentWithCorrectUsername() throws InterruptedException {
+    public void UpdateProfileButtonSendsBackToProfileFragmentWithCorrectUsername() {
         onView(withId(R.id.username)).perform(clearText()).perform(typeText("newUserName"));
         // remove the keyboard
         onView(withId(R.id.username)).perform(pressBack());
@@ -120,6 +118,7 @@ public class SettingsActivityTest {
 
         assertEquals("newUserName", Profile.getActiveProfile().getUsername());
     }
+
 
 }
 

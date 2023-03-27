@@ -34,9 +34,12 @@ import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
+
+/**
+ * Activity that allows the user to change his profile picture and username
+ */
 public class SettingsActivity extends AppCompatActivity {
 
-    private ActivitySettingsBinding binding;
     private final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
     private ImageView profilePictureView;
     private String profilePicUri;
@@ -59,7 +62,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        binding = ActivitySettingsBinding.inflate(getLayoutInflater());
+        ch.epfl.culturequest.databinding.ActivitySettingsBinding binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         Button logoutButton = binding.logOut;
@@ -83,6 +86,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void UpdateProfile(View v) {
         EspressoIdlingResource.increment();
+        // Check if the username is valid
         if (!ProfileUtils.isValid(activeProfile, username.getText().toString())) {
             username.setText("");
             username.setHint(INCORRECT_USERNAME_FORMAT);
@@ -91,6 +95,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
 
+        // if the profile picture has not been changed, we don't need to upload it again
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
             finish();
@@ -98,6 +103,7 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
+        // Upload the new profile picture and update the profile
         FirebaseStorage storage = FirebaseStorage.getInstance();
         UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
         task.addOnSuccessListener(taskSnapshot -> {
