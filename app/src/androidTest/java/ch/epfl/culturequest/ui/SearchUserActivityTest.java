@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -48,10 +49,11 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 public class SearchUserActivityTest {
     @Rule
     public ActivityScenarioRule<SearchUserActivity> testRule = new ActivityScenarioRule<>(SearchUserActivity.class);
-    FirebaseDatabase firebaseDatabase;
+    static FirebaseDatabase firebaseDatabase;
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
+        FirebaseAuth.getInstance().signInWithEmailAndPassword("test@gmail.com", "abcdefg");
         firebaseDatabase = FirebaseDatabase.getInstance();
         Database.init(new FireDatabase(firebaseDatabase));
 
@@ -67,12 +69,6 @@ public class SearchUserActivityTest {
         // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
     }
-
-    @Test
-    public void test() {
-
-    }
-
     @Test
     public void typingUsernameAutomaticallyShowsUsers() {
         onView(withId(R.id.search_user)).perform(typeText("alice"));
@@ -108,8 +104,8 @@ public class SearchUserActivityTest {
         assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
     }
 
-    @After
-    public void teardown(){
+    @AfterClass
+    public static void teardown(){
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
         firebaseDatabase.getReference().setValue(null);
     }
