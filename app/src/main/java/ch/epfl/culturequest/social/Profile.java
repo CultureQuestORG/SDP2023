@@ -23,6 +23,7 @@ public class Profile extends Observable {
     private String profilePicture;
     private List<Image> images;
     private Integer score;
+    private static Profile activeProfile;
 
 
     /**
@@ -44,7 +45,7 @@ public class Profile extends Observable {
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
-        this.images = null;
+        this.images = List.of();
         this.score = 0;
     }
 
@@ -97,16 +98,8 @@ public class Profile extends Observable {
         return phoneNumber;
     }
 
-    public List<Image> getImages() {
-        return images;
-    }
-
     public String getProfilePicture() {
         return profilePicture;
-    }
-
-    public static Profile getActiveProfile() {
-        return new Profile();
     }
 
     public Integer getScore() {return score;}
@@ -148,9 +141,19 @@ public class Profile extends Observable {
         notifyObservers();
     }
 
-    public void setImages(HashMap<String, Boolean> pictures) {
+    public HashMap<String,Boolean> getImages() {
+        HashMap<String,Boolean> images = new HashMap<>();
+        this.images.stream().map(Image::getUid).forEach(id -> images.put(id,true));
+        return images;
+    }
+
+    public List<Image> getImagesList() {
+        return images;
+    }
+
+    public void setImages(HashMap<String,Boolean> pictures) {
         //keep only the keys, which are the image ids and fetch them from the database
-        List<CompletableFuture<Image>> images = pictures.keySet().stream().map(id -> new Database().getImage(id)).collect(Collectors.toList());
+        List<CompletableFuture<Image>> images = pictures.keySet().stream().map(Database::getImage).collect(Collectors.toList());
 
         //wait for all the images to be fetched and then set the list of images
         CompletableFuture.allOf(images.toArray(new CompletableFuture[0])).thenRun(() -> {
@@ -162,6 +165,14 @@ public class Profile extends Observable {
 
     public Profile setActiveProfile() {
         return this;
+    }
+
+    public static Profile getActiveProfile(){
+        return activeProfile;
+    }
+
+    public static void setActiveProfile(Profile profile){
+        activeProfile = profile;
     }
 
     public void setScore(int score) {

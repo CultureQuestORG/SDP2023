@@ -8,8 +8,12 @@ import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 
 
-public class Database implements DatabaseInterface {
-    private static DatabaseInterface databaseInstance = new FireDatabase();
+/**
+ * This class is used to implement the database
+ * It is used to make the code more modular and to make it easier to change the database
+ */
+public class Database {
+    private static DatabaseInterface  databaseInstance = new FireDatabase();
 
     /**
      * This method is used to initialize the database instance as something else than the default (FireDatabase)
@@ -21,48 +25,40 @@ public class Database implements DatabaseInterface {
         Database.databaseInstance = database;
     }
 
-    @Override
-    public CompletableFuture<AtomicBoolean> set(String key, Object value) {
+
+    public static CompletableFuture<AtomicBoolean> set(String key, Object value) {
         return databaseInstance.set(key, value);
     }
 
-    @Override
-    public CompletableFuture<Object> get(String key) {
+    public static CompletableFuture<Object> get(String key) {
         return databaseInstance.get(key);
     }
 
-    @Override
-    public CompletableFuture<Profile> getProfile(String UId) {
+    public static CompletableFuture<Profile> getProfile(String UId) {
         return databaseInstance.getProfile(UId);
     }
 
-    @Override
-    public CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
+    public static CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
         return databaseInstance.setProfile(profile);
     }
 
-    @Override
-    public CompletableFuture<Image> getImage(String UId) {
+    public static CompletableFuture<Image> getImage(String UId) {
         return databaseInstance.getImage(UId);
     }
 
-    @Override
-    public CompletableFuture<AtomicBoolean> setImage(Image picture) {
+    public static CompletableFuture<AtomicBoolean> setImage(Image picture) {
         return databaseInstance.setImage(picture);
     }
 
-    @Override
-    public CompletableFuture<Integer> getRank(String UId) {
+    public static CompletableFuture<Integer> getRank(String UId) {
         return databaseInstance.getRank(UId);
     }
 
-    @Override
-    public CompletableFuture<Integer> getNumberOfProfiles() {
+    public static CompletableFuture<Integer> getNumberOfProfiles() {
         return databaseInstance.getNumberOfProfiles();
     }
 
-    @Override
-    public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
+    public static CompletableFuture<List<Profile>> getTopNProfiles(int n) {
         return databaseInstance.getTopNProfiles(n);
     }
 }

@@ -140,18 +140,15 @@ public class ProfileTest {
     @Test
     public void setImageWorks() {
         Database.init(new MockDatabase());
-        Database db = new Database();
-        Image image = new Image("imageTest", "this is an image", defaultUriString, 12345, "myUid");
-        db.setImage(image);
+        Image image = new Image("imageTest","this is an image",defaultUriString, 12345,"myUid");
+        Database.setImage(image);
         HashMap<String, Boolean> images = new HashMap<>();
         images.put(image.getUid(), true);
         profile.addObserver(((o, arg) -> {
-            assertThat(profile.getImages().size(), is(images.size()));
-            assertThat(profile.getImages().get(0).getUid(), is(image.getUid()));
+            assertThat(profile.getImagesList().size(), is(images.size()));
+            assertThat(profile.getImagesList().get(0).getUid(), is(image.getUid()));
         }));
         profile.setImages(images);
-
-
     }
 
     @Test
@@ -163,7 +160,7 @@ public class ProfileTest {
                 "email: " + profile.getEmail() + "\n" +
                 "phoneNumber: " + profile.getPhoneNumber() + "\n" +
                 "profilePicture: " + profile.getProfilePicture() + "\n" +
-                "pictures: " + profile.getImages() + "\n" +
+                        "pictures: " + profile.getImagesList() + "\n" +
                 "score: " + profile.getScore() + "\n"));
     }
 

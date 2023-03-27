@@ -50,15 +50,14 @@ public class ProfileFragmentTest {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
 
         Database.init(new MockDatabase());
-        Database db = new Database();
+
         image = new Image("Piece of Art","bla bla",  "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8"
                 ,123, "123");
-        db.setImage(image);
-
+        Database.setImage(image);
 
         profile=new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com","0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", List.of(image), 10);
-        db.setProfile(profile);
-
+        Profile.setActiveProfile(profile);
+        Database.setProfile(profile);
 
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
         activityScenario.onActivity(activity -> {

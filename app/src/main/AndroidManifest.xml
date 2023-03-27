@@ -52,12 +52,6 @@
             android:name=".ProfileCreatorActivity"
             android:exported="false" />
         <activity
-            android:name=".FirebaseActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="true" />
-        <activity
             android:name=".SignUpActivity"
             android:exported="true">
             <intent-filter>

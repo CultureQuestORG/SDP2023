@@ -8,6 +8,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.social.Profile;
 
+/**
+ * This interface is used to abstract the database
+ */
 public interface DatabaseInterface {
     CompletableFuture<AtomicBoolean> set(String key, Object value);
     CompletableFuture<Object> get(String key);
