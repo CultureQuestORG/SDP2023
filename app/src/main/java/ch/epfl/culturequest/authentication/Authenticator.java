@@ -92,17 +92,26 @@ public class Authenticator implements AuthService {
      */
     @Override
     public void signOut() {
-        if (user != null) {
-            if(isAnonymous){
-                mAuth.signOut();
-                redirectTo(SignUpActivity.class);
-            }
-            else {AuthUI.getInstance()
-                    .signOut(activity)
-                    .addOnCompleteListener(task -> redirectTo(SignUpActivity.class));
-                Profile.setActiveProfile(null);
-            }
+        if (user == null) {
+            return;
         }
+        if (isAnonymous) {
+            mAuth.signOut();
+            redirectTo(SignUpActivity.class);
+            return;
+        }
+
+        // first sign out the user
+        mAuth.signOut();
+        // then sign out of firebase so that the user is not automatically signed in
+        AuthUI.getInstance()
+                .signOut(activity)
+                .addOnCompleteListener(task -> {
+                    redirectTo(SignUpActivity.class);
+                });
+
+        Profile.setActiveProfile(null);
+
     }
 
     /**

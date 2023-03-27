@@ -14,7 +14,6 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ProfileViewModel extends ViewModel {
 
-    private final MutableLiveData<String> name;
     private final MutableLiveData<String> profilePictureUri;
 
     private final MutableLiveData<List<Image>> pictures;
@@ -22,19 +21,16 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<String> username;
 
     public ProfileViewModel(String uid) {
-        name = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
         username = new MutableLiveData<>();
         EspressoIdlingResource.increment();
         Database.getProfile(uid).whenComplete((p, e) -> {
-            name.setValue(p.getName());
             profilePictureUri.setValue(p.getProfilePicture());
             pictures.setValue(p.getImagesList());
             username.setValue(p.getUsername());
             p.addObserver((profileObject, arg) -> {
                 Profile profile = (Profile) profileObject;
-                name.postValue(profile.getName());
                 profilePictureUri.postValue(profile.getProfilePicture());
                 pictures.postValue(profile.getImagesList());
                 username.postValue(profile.getUsername());
@@ -44,18 +40,23 @@ public class ProfileViewModel extends ViewModel {
         EspressoIdlingResource.decrement();
     }
 
-    public LiveData<String> getName() {
-        return name;
-    }
-
-    public LiveData<String> getUsername(){
+    /**
+     * @return the username of the profile
+     */
+    public LiveData<String> getUsername() {
         return username;
     }
 
-    public LiveData<String> getProfilePictureUri() {
+    /**
+     * @return the profile picture uri of the profile
+     */
+        public LiveData<String> getProfilePictureUri() {
         return profilePictureUri;
     }
 
+    /**
+     * @return the list of pictures of the profile
+     */
     public LiveData<List<Image>> getPictures() {
         return pictures;
     }

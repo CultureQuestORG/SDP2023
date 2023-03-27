@@ -6,46 +6,31 @@ import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
-import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
-import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import static ch.epfl.culturequest.ProfileCreatorActivity.DEFAULT_PROFILE_PATH;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
+import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Instrumentation;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.provider.Settings;
-
-import android.app.Instrumentation.ActivityResult;
-import android.widget.ImageView;
 
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.intent.Intents;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -56,9 +41,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Objects;
-import java.util.function.Function;
 
 import ch.epfl.culturequest.social.Profile;
 
@@ -104,6 +86,11 @@ public class ProfileCreatorActivityTest {
         Intents.release();
     }
 
+    @AfterClass
+    public static void tearDown() {
+        user.delete();
+    }
+
     @Test
     public void correctUsernameTransitionsToNavActivity() {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
@@ -138,7 +125,7 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.username)).perform(typeText("  !+ "));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(1000);
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
     }
 
     @Test
@@ -148,22 +135,33 @@ public class ProfileCreatorActivityTest {
     }
 
     @Test
-    public void wrongUsernamesFailProfileCreation(){
+    public void notSelectingPicGivesDefaultProfilePicAndCorrectUsername() {
+        onView(withId(R.id.username)).perform(typeText("JohnDoe"));
+        onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
+
+        assertEquals(profile.getUsername(), "JohnDoe");
+        // assert  that the URL contains https://firebasestorage.googleapis.com and contains
+        assertEquals(DEFAULT_PROFILE_PATH, activity.getProfilePicUri());
+    }
+
+
+    @Test
+    public void wrongUsernamesFailProfileCreation() {
         onView(withId(R.id.username)).perform(typeText(""));
         onView(withId(R.id.create_profile)).perform(click());
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
 
         onView(withId(R.id.username)).perform(typeText("lol"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
 
         onView(withId(R.id.username)).perform(typeText("abcdefghijklmnopqrstuvxyz"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
 
         onView(withId(R.id.username)).perform(typeText("john Doe"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
     }
 
 
