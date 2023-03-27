@@ -1,10 +1,10 @@
 package ch.epfl.culturequest.ui.leaderboard;
 
+import static java.util.stream.Collectors.toList;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
-import static java.util.stream.Collectors.toList;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +36,9 @@ public class LeaderboardViewModel extends ViewModel {
 
         Database db = new Database();
 
+        // EspressoIdlingResource is used to wait for the database to finish loading before
+        // the tests are run
+        // retrieve the current user's information to be displayed in the leaderboard
         EspressoIdlingResource.increment();
         db.getProfile(currentUserUid).whenComplete((p, e) -> {
             currentUsername.setValue(p.getUsername());
@@ -50,13 +53,15 @@ public class LeaderboardViewModel extends ViewModel {
             EspressoIdlingResource.decrement();
         });
 
+        // retrieve the top N users' information to be displayed in the leaderboard
         EspressoIdlingResource.increment();
         db.getTopNProfiles(N).whenComplete((topN, e) -> {
+            // reverse the list so that the top user is at the top of the leaderboard
             Collections.reverse(topN);
             topNUserNames.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
             topNUserScores.setValue(topN.stream().map(p -> p.getScore().toString()).collect(toList()));
             topNUserProfilePicturesUri.setValue(topN.stream().map(Profile::getProfilePicture).collect(toList()));
-            // create array of string int from 1 to N
+            // create array of string int from 1 to N corresponding to the ranks of the top N users
             String[] ranks = new String[N];
             for (int i = 0; i < N; i++) {
                 ranks[i] = Integer.toString(i + 1);
@@ -64,7 +69,6 @@ public class LeaderboardViewModel extends ViewModel {
             topNUserRanks.setValue(List.of(ranks));
             EspressoIdlingResource.decrement();
         });
-
     }
 
     public LiveData<String> getCurrentUsername() {

@@ -1,7 +1,6 @@
 package ch.epfl.culturequest.ui.leaderboard;
 
 
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +16,19 @@ import java.util.List;
 import ch.epfl.culturequest.R;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * Adapter for the Leaderboard RecyclerView that displays the top N users
+ */
 public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<LeaderboardRecycleViewAdapter.LeaderboardViewHolder> {
     private List<String> topNUserNames;
     private List<String> topNUserScores;
     private List<String> topNUserRanks;
     private List<String> topNUserProfilePicturesUri;
 
+    /**
+     * Provide a reference to the type of view we are using for each
+     * leaderboard item
+     */
     public static class LeaderboardViewHolder extends RecyclerView.ViewHolder {
         private final TextView userName;
         private final TextView userScore;
@@ -54,6 +60,12 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
         }
     }
 
+    /**
+     * Initialize the dataset of the Adapter by observing the LiveData of the ViewModel
+     * and updating the dataset when the LiveData is updated.
+     *
+     * @param leaderboardViewModel the ViewModel that contains the data to be displayed
+     */
     public LeaderboardRecycleViewAdapter(LeaderboardViewModel leaderboardViewModel) {
         leaderboardViewModel.getTopNUserNames().observeForever(topNUserNames -> {
             this.topNUserNames = topNUserNames;
@@ -77,13 +89,13 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
     @NonNull
     @Override
     public LeaderboardViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        // Create a new view, which defines the UI of the list item
+        // Create a new view, which defines the UI of the leaderboard items
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.leaderboard_item, viewGroup, false);
 
         return new LeaderboardViewHolder(view);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    // Replace the contents of a view when data changed (invoked by the layout manager)
     @Override
     public void onBindViewHolder(LeaderboardViewHolder learderboardViewHolder, final int position) {
 
@@ -95,7 +107,9 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
 
     }
 
-    // Return the number of users displayed in Leaderboard (invoked by the layout manager)
+    // Return the size of your dataset (invoked by the layout manager)
+    // The size of the dataset is the minimum size of the lists of the top N users
+    // (because the lists are updated asynchronously)
     @Override
     public int getItemCount() {
         if (topNUserNames == null || topNUserScores == null || topNUserRanks == null || topNUserProfilePicturesUri == null) {

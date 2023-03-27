@@ -101,6 +101,10 @@ public class FireDatabase implements DatabaseInterface {
         return future;
     }
 
+    /**
+     * @param UId the user's id
+     * @return the rank of the user in the database with respect to their score
+     */
     @Override
     public CompletableFuture<Integer> getRank(String UId) {
         DatabaseReference usersRef = database.getReference("users");
@@ -125,6 +129,9 @@ public class FireDatabase implements DatabaseInterface {
         return future;
     }
 
+    /**
+     * @return the number of profiles in the database
+     */
     @Override
     public CompletableFuture<Integer> getNumberOfProfiles() {
         DatabaseReference usersRef = database.getReference("users");
@@ -139,6 +146,10 @@ public class FireDatabase implements DatabaseInterface {
         return future;
     }
 
+    /**
+     * @param n the number of profiles to get
+     * @return the top n profiles in the database with respect to their score
+     */
     @Override
     public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
         DatabaseReference usersRef = database.getReference("users");

@@ -25,6 +25,13 @@ public class LeaderboardFragment extends Fragment {
 
     private FragmentLeaderboardBinding binding;
 
+    /**
+     * Creates a new instance of the LeaderboardFragment that is initialized with the current user's uid.
+     * This is particularly useful for testing purposes.
+     *
+     * @param currentUserUid the uid of the current user
+     * @return a new instance of the LeaderboardFragment
+     */
     public static LeaderboardFragment newInstance(String currentUserUid) {
         LeaderboardFragment fragment = new LeaderboardFragment();
         Bundle bundle = new Bundle();
@@ -34,6 +41,8 @@ public class LeaderboardFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        // get the current user's uid depending on whether the fragment was created with newInstance or not
         String currentUserUid;
         try {
             currentUserUid = (String) requireArguments().getSerializable("currentUserUid");
@@ -46,6 +55,7 @@ public class LeaderboardFragment extends Fragment {
         binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // set the current user's information
         final TextView currentUsername = binding.currentUsername;
         final TextView currentUserScore = binding.currentUserScore;
         final TextView currentUserRank = binding.currentUserRank;
