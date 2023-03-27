@@ -32,12 +32,21 @@ public class ProfileFragment extends Fragment {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.profileName;
+        final TextView profileName = binding.profileName;
+        final TextView profilePlace = binding.profilePlace;
+        final TextView profileFollow = binding.profileFollowText;
         final CircleImageView profilePicture = binding.profilePicture;
         final RecyclerView pictureGrid = binding.pictureGrid;
 
+        FollowButton followButton = new FollowButton(binding.profileFollowButton);
+        profileViewModel.getFollowed().observe(getViewLifecycleOwner(), followButton::setFollowed);
+        followButton.setOnClickListener(v -> profileViewModel.changeFollow());
 
-        profileViewModel.getName().observe(getViewLifecycleOwner(), textView::setText);
+        profilePlace.setText("Lausanne");
+        profileFollow.setText("Follow");
+
+
+        profileViewModel.getName().observe(getViewLifecycleOwner(), profileName::setText);
         profileViewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(profilePicture));
         profileViewModel.getPictures().observe(getViewLifecycleOwner(), images -> {
             // Create a new PictureAdapter and set it as the adapter for the RecyclerView
