@@ -24,7 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
 
-import ch.epfl.culturequest.ArtProcessingDemoActivity;
+import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
@@ -62,7 +62,7 @@ public class ScanFragment extends Fragment {
                     localStorage.storeImageLocally(bitmap, isWifiAvailable);
 
                     // launch ArtProcessingDemoActivity with the bitmap as an extra
-                    Intent intent = new Intent(getActivity(), ArtProcessingDemoActivity.class);
+                    Intent intent = new Intent(getActivity(), ArtDescriptionDisplayActivity.class);
                     intent.putExtra("bitmap", bitmap);
                     startActivity(intent);
 
