@@ -38,8 +38,11 @@ public class LeaderboardViewModel extends ViewModel {
 
         // EspressoIdlingResource is used to wait for the database to finish loading before
         // the tests are run
-        // retrieve the current user's information to be displayed in the leaderboard
         EspressoIdlingResource.increment();
+        EspressoIdlingResource.increment();
+        EspressoIdlingResource.increment();
+
+        // retrieve the current user's information to be displayed in the leaderboard
         db.getProfile(currentUserUid).whenComplete((p, e) -> {
             currentUsername.setValue(p.getUsername());
             currentUserProfilePictureUri.setValue(p.getProfilePicture());
@@ -47,14 +50,12 @@ public class LeaderboardViewModel extends ViewModel {
             EspressoIdlingResource.decrement();
         });
 
-        EspressoIdlingResource.increment();
         db.getRank(currentUserUid).whenComplete((rank, e) -> {
             currentUserRank.setValue(rank.toString());
             EspressoIdlingResource.decrement();
         });
 
         // retrieve the top N users' information to be displayed in the leaderboard
-        EspressoIdlingResource.increment();
         db.getTopNProfiles(N).whenComplete((topN, e) -> {
             // reverse the list so that the top user is at the top of the leaderboard
             Collections.reverse(topN);
