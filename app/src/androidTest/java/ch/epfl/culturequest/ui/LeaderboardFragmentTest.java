@@ -43,9 +43,8 @@ public class LeaderboardFragmentTest {
     public void setUp() {
         // set up the database
         firebaseDatabase = FirebaseDatabase.getInstance();
-        try{
-            firebaseDatabase.useEmulator("10.0.2.2", 9000);
-        } catch (Exception e){}
+        firebaseDatabase.useEmulator("10.0.2.2", 9000);
+
         Database.init(new FireDatabase(firebaseDatabase));
         database = new Database();
 
