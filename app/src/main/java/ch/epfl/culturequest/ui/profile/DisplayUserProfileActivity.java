@@ -44,16 +44,14 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
             Window w = getWindow();
             w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         }
-        ProfileViewModelFactory factory = new ProfileViewModelFactory(selectedProfile.getUid());
         ProfileViewModel profileViewModel =
-                new ViewModelProvider(this, factory).get(ProfileViewModel.class);
+                new ViewModelProvider(this, new ProfileViewModelFactory(selectedProfile.getUid())).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(getLayoutInflater());
         View root = binding.getRoot();
         final TextView textView = binding.profileName;
         final CircleImageView profilePicture = binding.profilePicture;
         final RecyclerView pictureGrid = binding.pictureGrid;
-
-        profileViewModel.getName().observe(this, textView::setText);
+        profileViewModel.getUsername().observe(this, textView::setText);
         profileViewModel.getProfilePictureUri().observe(this, uri -> Picasso.get().load(uri).into(profilePicture));
         profileViewModel.getPictures().observe(this, images -> {
             pictureAdapter = new PictureAdapter(images);
@@ -75,6 +73,5 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void sendFriendRequest(Profile visitingProfile) {
         addFriendButton.setText("Friend Request sent");
-
     }
 }
