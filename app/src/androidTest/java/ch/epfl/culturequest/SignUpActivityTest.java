@@ -68,9 +68,4 @@ public class SignUpActivityTest {
             assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
         }
     }
-
-    @AfterClass
-    public static void destroyUser() {
-        user.delete();
-    }
 }

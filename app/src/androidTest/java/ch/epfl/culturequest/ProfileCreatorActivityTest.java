@@ -82,7 +82,6 @@ public class ProfileCreatorActivityTest {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         user = FirebaseAuth.getInstance().getCurrentUser();
-
                     }
                 });
         Thread.sleep(2000);
@@ -171,7 +170,6 @@ public class ProfileCreatorActivityTest {
     @AfterClass
     public static void destroy() {
         Intents.release();
-        user.delete();
     }
 
 }
