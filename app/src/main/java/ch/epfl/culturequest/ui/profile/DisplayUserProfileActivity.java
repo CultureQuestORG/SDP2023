@@ -35,7 +35,6 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
 
     private Profile selectedProfile = SearchUserActivity.SELECTED_USER;
     private ImageView backIcon, homeIcon;
-    private Button addFriendButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,16 +61,9 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         setContentView(root);
         backIcon = findViewById(R.id.back_button);
         homeIcon = findViewById(R.id.home_icon);
-        addFriendButton = findViewById(R.id.add_friend);
-        List.of(backIcon, homeIcon, addFriendButton).forEach(elem -> elem.setVisibility(View.VISIBLE));
+        List.of(backIcon, homeIcon).forEach(elem -> elem.setVisibility(View.VISIBLE));
         backIcon.setOnClickListener(l -> super.onBackPressed());
         homeIcon.setOnClickListener(l -> startActivity(new Intent(this, NavigationActivity.class)));
-        addFriendButton.setOnClickListener(l -> sendFriendRequest(selectedProfile));
 
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void sendFriendRequest(Profile visitingProfile) {
-        addFriendButton.setText("Friend Request sent");
     }
 }

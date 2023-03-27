@@ -46,7 +46,9 @@ public class MockDatabase implements DatabaseInterface {
 
     @Override
     public CompletableFuture<List<Profile>> getAllProfiles() {
-        return null;
+        CompletableFuture<List<Profile>> profiles = new CompletableFuture<>();
+        profiles.complete((List<Profile>) map.get("allProfiles"));
+        return profiles;
     }
 
     @Override

@@ -56,37 +56,7 @@ public class FireDatabase implements DatabaseInterface {
 
     @Override
     public CompletableFuture<List<Profile>> getAllProfiles() {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-        CompletableFuture<List<Profile>> future = new CompletableFuture<>();
-        usersRef.orderByChild("username")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<Profile> profiles = new ArrayList<>();
-                        for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                            profiles.add(extractProfile(snapshot));
-                        }
-                        future.complete(profiles);
-                    } else {
-                        future.completeExceptionally(task.getException());
-                    }
-                });
-        return future;
-    }
-
-    private Profile extractProfile(DataSnapshot snapshot) {
-        String uid = getAttr(snapshot, "uid");
-        String name = getAttr(snapshot, "name");
-        String username = getAttr(snapshot, "username");
-        String email = getAttr(snapshot, "email");
-        String phoneNumber = null;
-        String profilePic = getAttr(snapshot, "profilePic");
-        List<Image> images = null; //TODO needs changing
-        return new Profile(uid, name, username, email, phoneNumber, profilePic, images, 0);
-    }
-
-    private String getAttr(DataSnapshot snapshot, String key) {
-        return snapshot.child(key).getValue(String.class);
+        return getNumberOfProfiles().thenCompose(this::getTopNProfiles);
     }
 
     @Override

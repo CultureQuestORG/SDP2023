@@ -33,6 +33,7 @@ public class SearchUserActivity extends AppCompatActivity {
     TextWatcher watcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (s.length() != 0) {
@@ -41,6 +42,7 @@ public class SearchUserActivity extends AppCompatActivity {
                 searchUserDynamically("");
             }
         }
+
         @Override
         public void afterTextChanged(Editable s) {}
     };
@@ -54,10 +56,6 @@ public class SearchUserActivity extends AppCompatActivity {
         }
         setContentView(R.layout.search_activity);
         ((EditText) findViewById(R.id.search_user)).addTextChangedListener(watcher);
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (inputMethodManager != null) {
-            inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        }
     }
 
     public void searchUserDynamically(String query) {
@@ -78,12 +76,12 @@ public class SearchUserActivity extends AppCompatActivity {
                     searchBarOnClickListener(parent, v, position, id, usernameToProfileMap);
                 });
             });
-        }
-        else {
+        } else {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, List.of());
             listView.setAdapter(adapter);
         }
     }
+
     private void searchBarOnClickListener(AdapterView<?> parent, View v, int position, long id, Map<String, Profile> usernameToProfileMap) {
         String selectedUsername = (String) parent.getItemAtPosition(position);
         SELECTED_USER = usernameToProfileMap.get(selectedUsername);
