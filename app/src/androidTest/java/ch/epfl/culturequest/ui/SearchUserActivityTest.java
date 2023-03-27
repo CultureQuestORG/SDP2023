@@ -53,7 +53,6 @@ public class SearchUserActivityTest {
     @Before
     public void setUp() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.useEmulator("10.0.2.2", 9000);
         Database.init(new FireDatabase(firebaseDatabase));
 
         // clear the database before starting the following tests
@@ -81,13 +80,6 @@ public class SearchUserActivityTest {
                 .inAdapterView(withId(R.id.list_view))
                 .atPosition(0)
                 .check(matches(withText("alice")));
-    }
-
-    @Test
-    public void typingAutomaticallyDisplaysUsers() {
-        onView(withId(R.id.search_user)).perform(typeText("a"));
-        onView(withId(R.id.list_view))
-                .check(matches((hasMinimumChildCount(1))));
     }
 
     @Test

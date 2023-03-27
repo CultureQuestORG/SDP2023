@@ -47,7 +47,7 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
                 new ViewModelProvider(this, new ProfileViewModelFactory(selectedProfile.getUid())).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(getLayoutInflater());
         View root = binding.getRoot();
-        final TextView textView = binding.profileName;
+        final TextView textView = binding.profileUsername;
         final CircleImageView profilePicture = binding.profilePicture;
         final RecyclerView pictureGrid = binding.pictureGrid;
         profileViewModel.getUsername().observe(this, textView::setText);

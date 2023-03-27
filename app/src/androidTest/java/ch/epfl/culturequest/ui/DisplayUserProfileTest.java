@@ -3,6 +3,7 @@ package ch.epfl.culturequest.ui;
 import static androidx.core.view.ViewKt.isVisible;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
@@ -35,7 +36,6 @@ public class DisplayUserProfileTest {
     @Before
     public void setUp() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.useEmulator("10.0.2.2", 9000);
         Database.init(new FireDatabase(firebaseDatabase));
         firebaseDatabase.getReference().setValue(null);
         Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
@@ -47,12 +47,7 @@ public class DisplayUserProfileTest {
         SearchUserActivity.SELECTED_USER =
                 new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0);
         ActivityScenario.launch(DisplayUserProfileActivity.class);
-        onView(withId(R.id.home_icon)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void homeButtonIsVisible(){
-
+        onView(withId(R.id.back_button)).check(matches(isClickable()));
     }
 
     @After

@@ -14,29 +14,49 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ProfileViewModel extends ViewModel {
 
+    private final MutableLiveData<String> username;
     private final MutableLiveData<String> profilePictureUri;
 
     private final MutableLiveData<List<Image>> pictures;
 
-    private final MutableLiveData<String> username;
-
+    /**
+     * Constructor of the ProfileViewModel
+     */
     public ProfileViewModel(String uid) {
+        // create the mutable live data
+        username = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
-        username = new MutableLiveData<>();
+
         EspressoIdlingResource.increment();
-        Database.getProfile(uid).whenComplete((p, e) -> {
-            profilePictureUri.setValue(p.getProfilePicture());
-            pictures.setValue(p.getImagesList());
-            username.setValue(p.getUsername());
-            p.addObserver((profileObject, arg) -> {
-                Profile profile = (Profile) profileObject;
-                profilePictureUri.postValue(profile.getProfilePicture());
-                pictures.postValue(profile.getImagesList());
-                username.postValue(profile.getUsername());
+        Profile profile = Profile.getActiveProfile();
+
+        if (profile != null) {
+            //set the values of the live data
+            username.setValue(profile.getUsername());
+            profilePictureUri.setValue(profile.getProfilePicture());
+            pictures.setValue(profile.getImagesList());
+
+
+            // add an observer to the profile so that the view is updated when the profile is updated
+            profile.addObserver((profileObject, arg) -> {
+                Profile p = (Profile) profileObject;
+                username.postValue(p.getUsername());
+                profilePictureUri.postValue(p.getProfilePicture());
+                pictures.postValue(p.getImagesList());
             });
 
-        });
+            // if no profile is active, we load a default profile
+        } else {
+            Database.getProfile(uid).whenComplete((p, e) -> {
+                username.setValue(p.getUsername());
+                profilePictureUri.setValue(p.getProfilePicture());
+                pictures.setValue(p.getImagesList());
+
+            });
+        }
+
+
         EspressoIdlingResource.decrement();
     }
 
@@ -50,7 +70,7 @@ public class ProfileViewModel extends ViewModel {
     /**
      * @return the profile picture uri of the profile
      */
-        public LiveData<String> getProfilePictureUri() {
+    public LiveData<String> getProfilePictureUri() {
         return profilePictureUri;
     }
 
