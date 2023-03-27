@@ -34,7 +34,6 @@ public class ProfileFragment extends Fragment {
 
         final TextView profileName = binding.profileName;
         final TextView profilePlace = binding.profilePlace;
-        final TextView profileFollow = binding.profileFollowText;
         final CircleImageView profilePicture = binding.profilePicture;
         final RecyclerView pictureGrid = binding.pictureGrid;
 
@@ -43,7 +42,6 @@ public class ProfileFragment extends Fragment {
         followButton.setOnClickListener(v -> profileViewModel.changeFollow());
 
         profilePlace.setText("Lausanne");
-        profileFollow.setText("Follow");
 
 
         profileViewModel.getName().observe(getViewLifecycleOwner(), profileName::setText);

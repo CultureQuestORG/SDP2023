@@ -3,6 +3,20 @@
   <component name="AndroidTestResultsUserPreferences">
     <option name="androidTestResultsTableState">
       <map>
+        <entry key="-1920853133">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="RFCR10T0WQV" value="120" />
+                  <entry key="Tests" value="360" />
+                  <entry key="samsung&#10; SM-G991B" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-893004479">
           <value>
             <AndroidTestResultsTableState>
@@ -23,7 +37,9 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_3a_API_33_arm64-v8a" value="120" />
+                  <entry key="RFCR10T0WQV" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung&#10; SM-G991B" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>

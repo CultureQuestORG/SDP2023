@@ -19,15 +19,8 @@ public final class FollowButton {
     }
 
     public void setFollowed(boolean followed) {
-        if (!followed) {
-            System.out.println("Not followed");
-            text.setText(context.getResources().getString(R.string.followTextButton));
-            button.setBackgroundResource(R.drawable.button_rounded_corner);
-        } else {
-            System.out.println("Followed");
-            text.setText(context.getResources().getString(R.string.unfollowTextButton));
-            button.setBackgroundResource(R.drawable.button_rounded_corner_negative);
-        }
+            text.setText(!followed ? context.getResources().getString(R.string.followTextButton) : context.getResources().getString(R.string.unfollowTextButton));
+            button.setBackgroundResource(!followed ? R.drawable.button_rounded_corner : R.drawable.button_rounded_corner_negative);
     }
 
     public void setOnClickListener(View.OnClickListener listener) {
