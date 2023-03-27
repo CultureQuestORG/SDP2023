@@ -84,9 +84,6 @@ public class BasicOTMProviderTest {
         server.enqueue(new MockResponse().setBody(jsonBody));
         OTMLocation[] locations = provider.getLocations(new LatLng(1., 0.), new LatLng(0., 1.)).orTimeout(5, TimeUnit.SECONDS).join();
 
-        System.out.println(locations[0].getName());
-        System.out.println(locations[0].getCoordinates());
-        System.out.println(locations[0].getKinds());
         assertThat(locations.length, is(2));
         //Check location 1
         assertThat(locations[0].getName(), is("Tombe du silence et du repos sans fin (Facteur Cheval)"));

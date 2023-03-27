@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LastLocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -161,7 +162,6 @@ public class MapsFragment extends Fragment {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 lastKnownLocation = null;
-                //getLocationPermission();
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
@@ -178,27 +178,27 @@ public class MapsFragment extends Fragment {
          */
         try {
             if (viewModel.isLocationPermissionGranted()) {
-                Task<Location> locationResult = fusedLocationClient.getLastLocation();
+                Task<Location> locationResult = fusedLocationClient.getLastLocation(new LastLocationRequest.Builder().setMaxUpdateAgeMillis(10000).build());
                 locationResult.addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {
                         // Set the map's camera position to the current location of the device.
                         lastKnownLocation = task.getResult();
                         if (lastKnownLocation != null) {
                             Log.i("INFORMATION", lastKnownLocation.toString());
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(lastKnownLocation.getLatitude(),
-                                            lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
+                                    lastKnownLocation.getLongitude()));
                         }
                     } else {
                         Log.d("MapsFragment", "Current location is null. Using defaults.");
                         Log.e("MapsFragment", "Exception: %s", task.getException());
                         viewModel.resetCurrentLocation();
-                        mMap.moveCamera(CameraUpdateFactory
-                                .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
                         mMap.getUiSettings().setMyLocationButtonEnabled(false);
                     }
+                    mMap.moveCamera(CameraUpdateFactory
+                            .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
                 });
             }
+
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage(), e);
         }

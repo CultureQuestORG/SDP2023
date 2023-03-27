@@ -16,19 +16,28 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * A basic implementation of the OTMProvider interface
  */
 public class BasicOTMProvider implements OTMProvider {
+
+    // The base url of the OTM API
     private final static String otm_base_url = "https://api.opentripmap.com/0.1/en/";
     private final String base_url;
 
+    /**
+     * Overloaded constructor mainly for testing purposes
+     * @param base_url the base url of the API contacted
+     */
     public BasicOTMProvider(String base_url) {
         this.base_url = base_url;
     }
 
+    /**
+     * Creates a new BasicOTMProvider
+     */
     public BasicOTMProvider() {
         this(otm_base_url);
     }
 
     @Override
-    public CompletableFuture<OTMLocation[]> getLocations(LatLng upperLeft, LatLng lowerRight) {
+    public CompletableFuture<OTMLocation[]> getLocations(LatLng upperLeft, LatLng lowerRight){
         Gson gson = new Gson();
         Retrofit req = new Retrofit.Builder()
                 .baseUrl(base_url)
@@ -48,7 +57,7 @@ public class BasicOTMProvider implements OTMProvider {
 
             @Override
             public void onFailure(Call<OTMLocation[]> call, Throwable t) {
-                future.completeExceptionally(new OTMException("Unexpected Error: " + t.getMessage()));
+                future.completeExceptionally(t);
             }
         });
         return future;
