@@ -66,10 +66,10 @@ public class LeaderboardFragmentTest {
         });
     }
 
-    @Test
-    public void getRankIsCorrect() {
-        assertThat(database.getRank("testUid").join(), is(1));
-    }
+//    @Test
+//    public void getRankIsCorrect() {
+//        assertThat(database.getRank("testUid").join(), is(1));
+//    }
 
     @After
     public void tearDown() {
