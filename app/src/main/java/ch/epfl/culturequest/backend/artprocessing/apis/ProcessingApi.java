@@ -19,7 +19,7 @@ public class ProcessingApi {
     public CompletableFuture<BasicArtDescription> getArtDescriptionFromUrl(String imageUrl){
 
         RecognitionApi recognitionApi = new RecognitionApi();
-        WikipediaDescriptionApi descriptionApi = new WikipediaDescriptionApi();
+        GeneralDescriptionApi descriptionApi = new GeneralDescriptionApi();
 
         return recognitionApi.getArtName(imageUrl)
                 .thenCompose(descriptionApi::getArtDescription);
