@@ -53,28 +53,25 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 public class SearchUserActivityTest {
     @Rule
     public ActivityScenarioRule<SearchUserActivity> testRule = new ActivityScenarioRule<>(SearchUserActivity.class);
-    FirebaseDatabase firebaseDatabase;
+     FirebaseDatabase firebaseDatabase;
 
     @Before
     public void setUp() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        try {
-            firebaseDatabase.useEmulator("10.0.2.2", 9000);
-        } catch (IllegalStateException ex) {
-            ex.printStackTrace();
-        }
+
         Database.init(new FireDatabase(firebaseDatabase));
 
         // clear the database before starting the following tests
-        firebaseDatabase.getReference().setValue(null);
-
         Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
         Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", List.of(), 0));
         Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", List.of(), 0));
         Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", List.of(), 0));
         // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
+
     }
+
+
 
     @Test
     public void typingUsernameAutomaticallyShowsUsers() throws TimeoutException, InterruptedException {
@@ -112,11 +109,10 @@ public class SearchUserActivityTest {
         Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), DisplayUserProfileActivity.class);
         assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
     }
-
     @After
     public void teardown() {
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
         //Database.deleteProfile("testUid1");
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
         Database.deleteProfile("testUid1");
         Database.deleteProfile("testUid2");
         Database.deleteProfile("testUid3");

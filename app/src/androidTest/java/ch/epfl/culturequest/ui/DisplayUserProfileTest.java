@@ -18,7 +18,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.internal.matchers.And;
@@ -37,21 +39,16 @@ import ch.epfl.culturequest.utils.ProfileUtils;
 
 @RunWith(AndroidJUnit4.class)
 public class DisplayUserProfileTest {
-    FirebaseDatabase firebaseDatabase;
+    static FirebaseDatabase firebaseDatabase;
 
     @Before
     public void setUp() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        try {
-            firebaseDatabase.useEmulator("10.0.2.2", 9000);
-        } catch (IllegalStateException ex) {
-            ex.printStackTrace();
-        }
         Database.init(new FireDatabase(firebaseDatabase));
-        firebaseDatabase.getReference().setValue(null);
 
         Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
+
     }
 
     @After
