@@ -134,7 +134,7 @@ public class MapsFragment extends Fragment {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
-        otmProvider = /*new RetryingOTMProvider(*/new BasicOTMProvider()/*)*/;
+        otmProvider = new RetryingOTMProvider(new BasicOTMProvider());
         viewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location -> {
             if (mMap != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
@@ -227,15 +227,17 @@ public class MapsFragment extends Fragment {
                             Log.i("INFORMATION", lastKnownLocation.toString());
                             viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
                                     lastKnownLocation.getLongitude()));
+                            mMap.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
                         }
                     } else {
                         Log.d("MapsFragment", "Current location is null. Using defaults.");
                         Log.e("MapsFragment", "Exception: %s", task.getException());
                         viewModel.resetCurrentLocation();
                         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                        mMap.moveCamera(CameraUpdateFactory
+                                .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
                     }
-                    mMap.moveCamera(CameraUpdateFactory
-                            .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
 
                     getMarkers();
                 });
