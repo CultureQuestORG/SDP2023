@@ -8,6 +8,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 
+import android.provider.ContactsContract;
+
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.matcher.ViewMatchers;
@@ -25,6 +27,7 @@ import java.util.List;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.database.FireDatabase;
+import ch.epfl.culturequest.database.MockDatabase;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
@@ -36,10 +39,20 @@ public class DisplayUserProfileTest {
     @Before
     public void setUp() {
         firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseDatabase.useEmulator("10.0.2.2", 9000);
         Database.init(new FireDatabase(firebaseDatabase));
         firebaseDatabase.getReference().setValue(null);
+
         Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
+    }
+
+    @After
+    public void tearDown() {
+        // remove EspressoIdlingResource from the IdlingRegistry
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
+        // clear the database after finishing the tests
+        firebaseDatabase.getReference().setValue(null);
     }
 
     @Test
@@ -50,9 +63,16 @@ public class DisplayUserProfileTest {
         onView(withId(R.id.back_button)).check(matches(isClickable()));
     }
 
+    @Test
+    public void homeButtonIsVisible(){
+        SearchUserActivity.SELECTED_USER =
+                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0);
+        ActivityScenario.launch(DisplayUserProfileActivity.class);
+        onView(withId(R.id.home_icon)).check(matches(isClickable()));
+    }
+
     @After
     public void teardown(){
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-        firebaseDatabase.getReference().setValue(null);
     }
 }
