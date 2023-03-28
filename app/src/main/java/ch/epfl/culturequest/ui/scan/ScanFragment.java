@@ -57,18 +57,20 @@ public class ScanFragment extends Fragment {
     // ScanButtonListener is used to detect when the scan button is clicked
     private final View.OnClickListener scanButtonListener = view -> {
         loadingAnimation.startLoading();
-        cameraSetup.takePicture().thenAccept(captureTaken -> {
-            if (captureTaken) {
-                cameraSetup.getLatestImage().thenAccept(bitmap -> {
-                    boolean isWifiAvailable = false;
-                    try {
-                        localStorage.storeImageLocally(bitmap, isWifiAvailable);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
-        });
+        if (cameraSetup != null) {
+            cameraSetup.takePicture().thenAccept(captureTaken -> {
+                if (captureTaken) {
+                    cameraSetup.getLatestImage().thenAccept(bitmap -> {
+                        boolean isWifiAvailable = false;
+                        try {
+                            localStorage.storeImageLocally(bitmap, isWifiAvailable);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            });
+        }
     };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -97,12 +99,12 @@ public class ScanFragment extends Fragment {
                 cameraSetup = new CameraSetup(cameraManager, textureView);
 
                 textureView.setSurfaceTextureListener(surfaceTextureListener);
-
-                // Adds a listener to the scan button and performs action
-                binding.scanAction.scanButton.setOnClickListener(scanButtonListener);
             }
         } catch (CameraAccessException ignored) {
         }
+
+        // Adds a listener to the scan button and performs action
+        binding.scanAction.scanButton.setOnClickListener(scanButtonListener);
 
         final ImageButton imageButton = binding.helpButtonScan;
         imageButton.setOnClickListener(view -> helpButtonDialog());
