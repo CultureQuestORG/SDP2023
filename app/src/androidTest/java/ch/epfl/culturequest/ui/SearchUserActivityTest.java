@@ -35,7 +35,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
@@ -49,28 +53,24 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 public class SearchUserActivityTest {
     @Rule
     public ActivityScenarioRule<SearchUserActivity> testRule = new ActivityScenarioRule<>(SearchUserActivity.class);
-    static FirebaseDatabase firebaseDatabase;
+    static MockDatabase firebaseDatabase;
 
     @BeforeClass
     public static void setUp() {
-        FirebaseAuth.getInstance().signInWithEmailAndPassword("test@gmail.com", "abcdefg");
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        Database.init(new FireDatabase(firebaseDatabase));
-
-        // clear the database before starting the following tests
-        firebaseDatabase.getReference().setValue(null);
-        // Set up the database to run on the local emulator of Firebase
-
-        // Initialize the database with some test profiles
-        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
-        Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", List.of(), 0));
-        Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", List.of(), 0));
-        Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", List.of(), 0));
+        firebaseDatabase = new MockDatabase();
+        Database.init((firebaseDatabase));
+        List<Profile> pfs = new ArrayList<>();
+        pfs.add(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
+        pfs.add(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", List.of(), 0));
+        pfs.add(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", List.of(), 0));
+        pfs.add(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", List.of(), 0));
+        firebaseDatabase.set("allProfiles", pfs);
         // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
     }
+
     @Test
-    public void typingUsernameAutomaticallyShowsUsers() {
+    public void typingUsernameAutomaticallyShowsUsers() throws InterruptedException, TimeoutException {
         onView(withId(R.id.search_user)).perform(typeText("alice"));
         onData(hasToString(containsString("alice")))
                 .inAdapterView(withId(R.id.list_view))
@@ -105,9 +105,8 @@ public class SearchUserActivityTest {
     }
 
     @AfterClass
-    public static void teardown(){
+    public static void teardown() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-        firebaseDatabase.getReference().setValue(null);
     }
 
 }
