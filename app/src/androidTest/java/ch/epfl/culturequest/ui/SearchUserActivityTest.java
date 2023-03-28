@@ -75,6 +75,7 @@ public class SearchUserActivityTest {
     @Test
     public void typingUsernameAutomaticallyShowsUsers() throws InterruptedException {
         onView(withId(R.id.search_user)).perform(typeText("alice"));
+        Thread.sleep(1000);
         onData(hasToString(containsString("alice"))).inAdapterView(withId(R.id.list_view));
     }
 
@@ -93,8 +94,8 @@ public class SearchUserActivityTest {
     public void clickingOnUserOpensProfilePage() throws InterruptedException {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
                 .addMonitor(DisplayUserProfileActivity.class.getName(), null, false);
-
         onView(withId(R.id.search_user)).perform(typeText("allen"));
+        Thread.sleep(1000);
         onData(hasToString(containsString("allen")))
                 .inAdapterView(withId(R.id.list_view))
                 .atPosition(0).perform(click());
