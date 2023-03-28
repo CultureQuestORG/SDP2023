@@ -1,13 +1,16 @@
 package ch.epfl.culturequest.ui;
 
 
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import android.net.Uri;
+import static org.junit.Assert.assertEquals;
+
+import android.content.Intent;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -21,11 +24,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.database.MockDatabase;
 import ch.epfl.culturequest.social.Image;
@@ -50,15 +53,14 @@ public class ProfileFragmentTest {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
 
         Database.init(new MockDatabase());
-        Database db = new Database();
+
         image = new Image("Piece of Art","bla bla",  "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8"
                 ,123, "123");
-        db.setImage(image);
+        Database.setImage(image);
 
-
-        profile=new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com","0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", List.of(image));
-        db.setProfile(profile);
-
+        profile=new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com","0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", List.of(image), 10);
+        Profile.setActiveProfile(profile);
+        Database.setProfile(profile);
 
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
         activityScenario.onActivity(activity -> {
@@ -80,16 +82,16 @@ public class ProfileFragmentTest {
     public void textViewDisplaysCorrectText() {
 
 
-        onView(withId(R.id.profileName)).check(matches(withText("Johnny Doe")));
-        profile.setName("John Doe");
-        onView(withId(R.id.profileName)).check(matches(withText("John Doe")));
+        onView(withId(R.id.profileUsername)).check(matches(withText("Xx_john_xX")));
+        profile.setUsername("johnny");
+        onView(withId(R.id.profileUsername)).check(matches(withText("johnny")));
 
+    }
 
+    @Test
+    public void settingButtonWorks() {
 
-
-
-
-
-
+        onView(withId(R.id.settingsButton)).perform(click());
+        onView(withId(R.id.log_out)).check(matches(isEnabled()));
     }
 }
