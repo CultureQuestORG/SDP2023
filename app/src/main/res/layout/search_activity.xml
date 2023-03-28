@@ -20,14 +20,14 @@
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/list_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        app:layout_constraintStart_toEndOf="@+id/back_icon1"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.444" />
 
     <ListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="650dp"
+        android:layout_height="600dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -35,7 +35,7 @@
         app:layout_constraintTop_toBottomOf="@+id/search_user" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/back_icon1"
         android:layout_width="45dp"
         android:layout_height="42dp"
         android:layout_marginBottom="1dp"

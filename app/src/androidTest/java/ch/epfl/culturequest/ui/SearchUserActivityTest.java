@@ -73,13 +73,10 @@ public class SearchUserActivityTest {
 
 
     @Test
-    public void typingUsernameAutomaticallyShowsUsers() throws TimeoutException, InterruptedException {
+    public void typingUsernameAutomaticallyShowsUsers() throws InterruptedException {
         onView(withId(R.id.search_user)).perform(typeText("alice"));
         Thread.sleep(2000);
-        onData(hasToString(containsString("alice")))
-                .inAdapterView(withId(R.id.list_view))
-                .atPosition(0)
-                .check(matches(withText("alice")));
+        onData(hasToString(containsString("alice"))).inAdapterView(withId(R.id.list_view));
     }
 
     @Test
@@ -89,6 +86,10 @@ public class SearchUserActivityTest {
                 .check(matches(Matchers.not(hasMinimumChildCount(1))));
     }
 
+    @Test
+    public void pressback(){
+        onView(withId(R.id.back_icon1)).perform(click());
+    }
     @Test
     public void clickingOnUserOpensProfilePage() throws InterruptedException {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()

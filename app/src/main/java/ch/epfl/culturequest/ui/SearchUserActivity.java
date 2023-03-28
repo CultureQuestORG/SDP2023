@@ -28,7 +28,6 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.AndroidUtils;
-import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
 public class SearchUserActivity extends AppCompatActivity {
@@ -38,7 +37,6 @@ public class SearchUserActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            EspressoIdlingResource.increment();
             if (s.length() != 0) {
                 searchUserDynamically(s.toString());
             } else {
@@ -72,23 +70,19 @@ public class SearchUserActivity extends AppCompatActivity {
                         .collect(Collectors.toList());
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, matchingUsernames);
                 listView.setAdapter(adapter);
-                EspressoIdlingResource.decrement();
                 listView.setOnItemClickListener((parent, ignored, position, ignored2) -> {
-                    EspressoIdlingResource.increment();
                     searchBarOnClickListener(parent, position, usernameToProfileMap);
                 });
             });
         } else {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, List.of());
             listView.setAdapter(adapter);
-            EspressoIdlingResource.decrement();
         }
     }
 
     private void searchBarOnClickListener(AdapterView<?> parent, int position, Map<String, Profile> usernameToProfileMap) {
         String selectedUsername = (String) parent.getItemAtPosition(position);
         ProfileUtils.setSelectedProfile(usernameToProfileMap.get(selectedUsername));
-        EspressoIdlingResource.decrement();
         this.startActivity(new Intent(this, DisplayUserProfileActivity.class));
     }
 
