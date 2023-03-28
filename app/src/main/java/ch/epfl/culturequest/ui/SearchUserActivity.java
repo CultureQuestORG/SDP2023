@@ -27,10 +27,11 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
+import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
+import ch.epfl.culturequest.utils.ProfileUtils;
 
 public class SearchUserActivity extends AppCompatActivity {
-    public static Profile SELECTED_USER;
     TextWatcher watcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -52,10 +53,7 @@ public class SearchUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
+        AndroidUtils.removeStatusBar(getWindow());
         setContentView(R.layout.search_activity);
         ((EditText) findViewById(R.id.search_user)).addTextChangedListener(watcher);
     }
@@ -89,7 +87,7 @@ public class SearchUserActivity extends AppCompatActivity {
 
     private void searchBarOnClickListener(AdapterView<?> parent, int position, Map<String, Profile> usernameToProfileMap) {
         String selectedUsername = (String) parent.getItemAtPosition(position);
-        SELECTED_USER = usernameToProfileMap.get(selectedUsername);
+        ProfileUtils.setSelectedProfile(usernameToProfileMap.get(selectedUsername));
         EspressoIdlingResource.decrement();
         this.startActivity(new Intent(this, DisplayUserProfileActivity.class));
     }

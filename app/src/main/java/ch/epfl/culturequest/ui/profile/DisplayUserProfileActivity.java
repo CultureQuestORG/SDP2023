@@ -1,13 +1,8 @@
 package ch.epfl.culturequest.ui.profile;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,23 +21,35 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.ui.SearchUserActivity;
+import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * This class is used to display the profile of a user we click on.
+ * In the future, we might want to display the profile on a user we click on from our followers,
+ * or from the people in the leaderboard.
+ * Before opening this intent, we should set the selected users:
+ * AndroidUtils.setSelectedProfile(profile)
+ */
 public class DisplayUserProfileActivity extends AppCompatActivity {
     private FragmentProfileBinding binding;
     private PictureAdapter pictureAdapter;
-
-    private Profile selectedProfile = SearchUserActivity.SELECTED_USER;
+    private Profile selectedProfile = ProfileUtils.getSelectedProfile();
     private ImageView backIcon, homeIcon;
 
+    /**
+     * Baiscally we use the viewModel for the profile fragment to display the profile in this activity.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.
+     *
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
+        AndroidUtils.removeStatusBar(getWindow());
         ProfileViewModel profileViewModel =
                 new ViewModelProvider(this, new ProfileViewModelFactory(selectedProfile.getUid())).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(getLayoutInflater());
@@ -64,6 +71,5 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         List.of(backIcon, homeIcon).forEach(elem -> elem.setVisibility(View.VISIBLE));
         backIcon.setOnClickListener(l -> super.onBackPressed());
         homeIcon.setOnClickListener(l -> startActivity(new Intent(this, NavigationActivity.class)));
-
     }
 }

@@ -21,6 +21,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.matchers.And;
 
 import java.util.List;
 
@@ -30,7 +31,9 @@ import ch.epfl.culturequest.database.FireDatabase;
 import ch.epfl.culturequest.database.MockDatabase;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
+import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
+import ch.epfl.culturequest.utils.ProfileUtils;
 
 @RunWith(AndroidJUnit4.class)
 public class DisplayUserProfileTest {
@@ -61,16 +64,16 @@ public class DisplayUserProfileTest {
 
     @Test
     public void backButtonIsVisible(){
-        SearchUserActivity.SELECTED_USER =
-                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0);
+        ProfileUtils.setSelectedProfile(
+                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
         ActivityScenario.launch(DisplayUserProfileActivity.class);
         onView(withId(R.id.back_button)).check(matches(isClickable()));
     }
 
     @Test
     public void homeButtonIsVisible(){
-        SearchUserActivity.SELECTED_USER =
-                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0);
+        ProfileUtils.setSelectedProfile(
+                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
         ActivityScenario.launch(DisplayUserProfileActivity.class);
         onView(withId(R.id.home_icon)).check(matches(isClickable()));
     }

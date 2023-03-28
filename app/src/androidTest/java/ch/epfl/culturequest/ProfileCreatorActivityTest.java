@@ -158,11 +158,4 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.create_profile)).perform(click());
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
     }
-
-
-    @AfterClass
-    public static void destroy() {
-        Intents.release();
-    }
-
 }
