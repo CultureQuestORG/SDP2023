@@ -73,6 +73,20 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     @Override
+    public CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference ref = database.getReference("users").child(uid);
+        ref.removeValue((error, ref1) -> {
+            if (error == null) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
+    @Override
     public CompletableFuture<Profile> getProfile(String UId) {
         DatabaseReference usersRef = database.getReference("users").child(UId);
         return getValue(usersRef, Profile.class);

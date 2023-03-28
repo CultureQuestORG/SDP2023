@@ -67,6 +67,11 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
+    public CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
+        return null;
+    }
+
+    @Override
     public CompletableFuture<AtomicBoolean> setImage(Image image) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         map.put("pictures/"+image.getUid(), image);

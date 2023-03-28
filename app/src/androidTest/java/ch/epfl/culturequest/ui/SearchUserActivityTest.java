@@ -61,7 +61,7 @@ public class SearchUserActivityTest {
         try {
             firebaseDatabase.useEmulator("10.0.2.2", 9000);
         } catch (IllegalStateException ex) {
-
+            ex.printStackTrace();
         }
         Database.init(new FireDatabase(firebaseDatabase));
 
@@ -77,8 +77,9 @@ public class SearchUserActivityTest {
     }
 
     @Test
-    public void typingUsernameAutomaticallyShowsUsers() throws InterruptedException, TimeoutException {
+    public void typingUsernameAutomaticallyShowsUsers() throws TimeoutException, InterruptedException {
         onView(withId(R.id.search_user)).perform(typeText("alice"));
+        Thread.sleep(2000);
         onData(hasToString(containsString("alice")))
                 .inAdapterView(withId(R.id.list_view))
                 .atPosition(0)
@@ -93,11 +94,12 @@ public class SearchUserActivityTest {
     }
 
     @Test
-    public void clickingOnUserOpensProfilePage() {
+    public void clickingOnUserOpensProfilePage() throws InterruptedException {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
                 .addMonitor(DisplayUserProfileActivity.class.getName(), null, false);
 
         onView(withId(R.id.search_user)).perform(typeText("allen"));
+        Thread.sleep(2000);
         onData(hasToString(containsString("allen")))
                 .inAdapterView(withId(R.id.list_view))
                 .atPosition(0).perform(click());
@@ -114,8 +116,11 @@ public class SearchUserActivityTest {
     @After
     public void teardown() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-        firebaseDatabase.getReference().setValue(null);
-
+        //Database.deleteProfile("testUid1");
+        Database.deleteProfile("testUid1");
+        Database.deleteProfile("testUid2");
+        Database.deleteProfile("testUid3");
+        Database.deleteProfile("testUid4");
     }
 
 }

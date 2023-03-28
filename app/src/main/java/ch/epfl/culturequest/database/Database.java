@@ -26,7 +26,11 @@ public class Database {
     }
 
 
-    public static CompletableFuture<AtomicBoolean> set(String key, Object value) {
+    public static CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
+    return databaseInstance.deleteProfile(uid);
+    }
+
+        public static CompletableFuture<AtomicBoolean> set(String key, Object value) {
         return databaseInstance.set(key, value);
     }
 

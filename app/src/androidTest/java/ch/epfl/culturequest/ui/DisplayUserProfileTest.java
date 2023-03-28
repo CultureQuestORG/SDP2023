@@ -45,7 +45,7 @@ public class DisplayUserProfileTest {
         try {
             firebaseDatabase.useEmulator("10.0.2.2", 9000);
         } catch (IllegalStateException ex) {
-
+            ex.printStackTrace();
         }
         Database.init(new FireDatabase(firebaseDatabase));
         firebaseDatabase.getReference().setValue(null);
@@ -59,11 +59,11 @@ public class DisplayUserProfileTest {
         // remove EspressoIdlingResource from the IdlingRegistry
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
         // clear the database after finishing the tests
-        firebaseDatabase.getReference().setValue(null);
+        Database.deleteProfile("testUid1");
     }
 
     @Test
-    public void backButtonIsVisible(){
+    public void backButtonIsVisible() {
         ProfileUtils.setSelectedProfile(
                 new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
         ActivityScenario.launch(DisplayUserProfileActivity.class);
@@ -71,7 +71,7 @@ public class DisplayUserProfileTest {
     }
 
     @Test
-    public void homeButtonIsVisible(){
+    public void homeButtonIsVisible() {
         ProfileUtils.setSelectedProfile(
                 new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
         ActivityScenario.launch(DisplayUserProfileActivity.class);

@@ -13,6 +13,7 @@ import ch.epfl.culturequest.social.Profile;
  */
 public interface DatabaseInterface {
     CompletableFuture<AtomicBoolean> set(String key, Object value);
+
     CompletableFuture<Object> get(String key);
 
     CompletableFuture<Profile> getProfile(String UId);
@@ -22,6 +23,8 @@ public interface DatabaseInterface {
     CompletableFuture<AtomicBoolean> setProfile(Profile profile);
 
     CompletableFuture<Image> getImage(String UId);
+
+    CompletableFuture<AtomicBoolean> deleteProfile(String uid);
 
     CompletableFuture<AtomicBoolean> setImage(Image picture);
 
