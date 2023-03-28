@@ -44,7 +44,7 @@ public class LocalStorageTest {
         try {
             fragmentTestRule.getFragment().localStorage.storeImageLocally(bitmap, false);
         } catch (Exception e) {
-            fail("Should not have thrown any exception");
+            fail("Test failed because of an exception: " + e.getMessage());
         }
 
         int finalPendingImageCount = countSelectedImagesInSharedStorage(selection, selectionArgs);
@@ -61,7 +61,7 @@ public class LocalStorageTest {
         try {
             fragmentTestRule.getFragment().localStorage.storeImageLocally(bitmap, true);
         } catch (Exception e) {
-            fail("Should not have thrown any exception");
+            fail("Test failed because of an exception: " + e.getMessage());
         }
 
         int finalReadyImageCount = countSelectedImagesInSharedStorage(selection, selectionArgs);
