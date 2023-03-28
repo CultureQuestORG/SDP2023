@@ -3,10 +3,17 @@ package ch.epfl.culturequest;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.utils.ArtImageUpload;
 
@@ -16,18 +23,19 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
 
         findViewById(R.id.back_button).setOnClickListener(view -> finish());
 
-        // get the image from the extra
-        scannedImage = getIntent().getParcelableExtra("bitmap");
+        scannedImage = null;
 
         ImageView imageView = findViewById(R.id.artImage);
         imageView.setImageBitmap(scannedImage);
 
         processImageAndDisplayInformation();
+
     }
 
     private void processImageAndDisplayInformation() {

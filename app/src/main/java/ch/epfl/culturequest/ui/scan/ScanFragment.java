@@ -1,9 +1,14 @@
 package ch.epfl.culturequest.ui.scan;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -22,11 +27,15 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
+import ch.epfl.culturequest.backend.artprocessing.utils.ArtImageUpload;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
 
 public class ScanFragment extends Fragment {
@@ -61,9 +70,7 @@ public class ScanFragment extends Fragment {
                 try {
                     localStorage.storeImageLocally(bitmap, isWifiAvailable);
 
-                    // launch ArtProcessingDemoActivity with the bitmap as an extra
-                    Intent intent = new Intent(getActivity(), ArtDescriptionDisplayActivity.class);
-                    intent.putExtra("bitmap", bitmap);
+                    Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
                     startActivity(intent);
 
                 } catch (IOException e) {
