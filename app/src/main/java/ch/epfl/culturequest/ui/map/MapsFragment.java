@@ -227,17 +227,15 @@ public class MapsFragment extends Fragment {
                             Log.i("INFORMATION", lastKnownLocation.toString());
                             viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
                                     lastKnownLocation.getLongitude()));
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
                         }
                     } else {
                         Log.d("MapsFragment", "Current location is null. Using defaults.");
                         Log.e("MapsFragment", "Exception: %s", task.getException());
                         viewModel.resetCurrentLocation();
                         mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                        mMap.moveCamera(CameraUpdateFactory
-                                .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
                     }
+                    mMap.moveCamera(CameraUpdateFactory
+                            .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
 
                     getMarkers();
                 });
