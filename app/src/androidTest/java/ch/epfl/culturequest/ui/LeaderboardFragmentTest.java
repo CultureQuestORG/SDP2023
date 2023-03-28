@@ -3,11 +3,9 @@ package ch.epfl.culturequest.ui;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
-import static androidx.test.espresso.matcher.ViewMatchers.hasMinimumChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import androidx.fragment.app.FragmentActivity;
@@ -44,10 +42,15 @@ public class LeaderboardFragmentTest {
     public void setUp() {
         // Set up the database to run on the local emulator of Firebase
         firebaseDatabase = FirebaseDatabase.getInstance();
+        try {
+            firebaseDatabase.useEmulator("10.0.2.2", 9000);
+        } catch (IllegalStateException e) {
 
+        }
         Database.init(new FireDatabase(firebaseDatabase));
 
         // clear the database before starting the following tests
+        firebaseDatabase.getReference().setValue(null);
 
         // Initialize the database with some test profiles
         Database.setProfile(new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 400));
@@ -77,7 +80,7 @@ public class LeaderboardFragmentTest {
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
-        assertTrue(numberOfProfiles > 4);
+        assertThat(numberOfProfiles, is(4));
     }
 
     @Test
@@ -100,9 +103,6 @@ public class LeaderboardFragmentTest {
         // remove EspressoIdlingResource from the IdlingRegistry
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
         // clear the database after finishing the tests
-        Database.deleteProfile("currentUserUid")                  ;
-        Database.deleteProfile("testUid2");
-        Database.deleteProfile("testUid3");
-        Database.deleteProfile("testUid4");
+        firebaseDatabase.getReference().setValue(null);
     }
 }
