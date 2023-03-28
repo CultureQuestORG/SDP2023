@@ -57,8 +57,7 @@ public class Authenticator implements AuthService {
     @Override
     public void signIn() {
         if (isAnonymous) {
-            FirebaseAuth
-                    .getInstance()
+            FirebaseAuth.getInstance()
                     .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -81,8 +80,6 @@ public class Authenticator implements AuthService {
                 throwable.printStackTrace();
                 return null;
             });
-
-
         }
     }
 
