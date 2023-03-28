@@ -30,6 +30,7 @@ import java.util.Map;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.FragmentMapsBinding;
+import ch.epfl.culturequest.utils.PermissionRequest;
 
 public class MapsFragment extends Fragment {
 
@@ -41,8 +42,10 @@ public class MapsFragment extends Fragment {
 
     private Location lastKnownLocation;
 
-    private ActivityResultLauncher<String[]> launcher;
-
+    private ActivityResultLauncher<String> launcher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                    this::onRequestPermissionsResult);
+    private final PermissionRequest permissionRequest = new PermissionRequest(Manifest.permission.ACCESS_FINE_LOCATION);
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -66,7 +69,7 @@ public class MapsFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        if (mMap != null){
+        if (mMap != null) {
             outState.putParcelable("location", lastKnownLocation);
         }
         super.onSaveInstanceState(outState);
@@ -99,9 +102,6 @@ public class MapsFragment extends Fragment {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
             }
         });
-        launcher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
-                (granted) -> onRequestPermissionsResult(granted));
-
         return mapView;
     }
 
@@ -114,24 +114,22 @@ public class MapsFragment extends Fragment {
          * device. The result of the permission request is handled by a callback,
          * onRequestPermissionsResult.
          */
-        if (viewModel.isLocationPermissionGranted() || ContextCompat.checkSelfPermission(getContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        if (viewModel.isLocationPermissionGranted() || permissionRequest.hasPermission(getContext())) {
             viewModel.setIsLocationPermissionGranted(true);
             updateLocationUI();
             getDeviceLocation();
         } else {
-            launcher.launch(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION});
+            permissionRequest.askPermission(launcher);
         }
     }
 
 
-    public void onRequestPermissionsResult(Map<String, Boolean> grantResults) {
+    public void onRequestPermissionsResult(boolean grantResults) {
         viewModel.setIsLocationPermissionGranted(false);
-        if (grantResults.size() > 0
-                && Boolean.TRUE.equals(grantResults.get(Manifest.permission.ACCESS_FINE_LOCATION))) { // If request is cancelled, the result arrays are empty.
-                viewModel.setIsLocationPermissionGranted(true);
-            }
+        if (grantResults) {
+            // If request is cancelled, the result arrays are empty.
+            viewModel.setIsLocationPermissionGranted(true);
+        }
         updateLocationUI();
         getDeviceLocation();
     }
@@ -163,7 +161,7 @@ public class MapsFragment extends Fragment {
                 lastKnownLocation = null;
                 //getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -199,7 +197,7 @@ public class MapsFragment extends Fragment {
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }

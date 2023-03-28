@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class SignUpActivity extends AppCompatActivity {
     private final Authenticator auth = new Authenticator(this, false);
@@ -23,6 +24,7 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // If the user is not logged in, display the sign in activity
+        AndroidUtils.removeStatusBar(getWindow());
         if (currentUser == null) {
             setContentView(R.layout.activity_signin);
             findViewById(R.id.sign_in_button).setOnClickListener(k -> auth.signIn());

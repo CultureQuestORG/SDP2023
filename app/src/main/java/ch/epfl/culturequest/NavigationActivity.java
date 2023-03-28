@@ -13,6 +13,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import ch.epfl.culturequest.databinding.ActivityNavigationBinding;
+import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class NavigationActivity extends AppCompatActivity {
 
@@ -23,10 +24,7 @@ public class NavigationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // To make the status bar transparent
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
+        AndroidUtils.removeStatusBar(getWindow());
 
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

@@ -51,7 +51,6 @@ public class SignUpActivityTest {
         auth.signInWithEmailAndPassword("test@gmail.com", "abcdefg").addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 user = auth.getCurrentUser();
-
             }
         });
         if (user != null) {
