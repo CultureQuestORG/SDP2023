@@ -38,9 +38,13 @@ public class SearchUserActivity extends AppCompatActivity {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (s.length() != 0) {
-                searchUserDynamically(s.toString());
-            } else {
-                searchUserDynamically("");
+                String query = s.toString();
+                if (ProfileUtils.usernameIsValid(query)) {
+                    searchUserDynamically(s.toString());
+                }
+                else {
+                    searchUserDynamically("");
+                }
             }
         }
 

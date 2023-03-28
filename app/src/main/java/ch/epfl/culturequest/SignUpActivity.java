@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.mockito.internal.matchers.And;
+
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.authentication.Authenticator;
@@ -36,11 +38,11 @@ public class SignUpActivity extends AppCompatActivity {
             profile.handle((p, e) -> {
                 if (e != null || p == null) {
                     // If the user does not have a profile, display the profile creator activity
-                    startActivity(new Intent(this, ProfileCreatorActivity.class));
+                    AndroidUtils.redirectToActivity(this, ProfileCreatorActivity.class);
                 } else {
                     // If the user has a profile, display the navigation activity
                     Profile.setActiveProfile(p);
-                    startActivity(new Intent(this, NavigationActivity.class));
+                    AndroidUtils.redirectToActivity(this, NavigationActivity.class);
                 }
                 return null;
             }
@@ -48,9 +50,8 @@ public class SignUpActivity extends AppCompatActivity {
             );
             return;
         }
-
         // If the user is logged in and has a profile, display the navigation activity
-        startActivity(new Intent(this, NavigationActivity.class));
+        AndroidUtils.redirectToActivity(this, NavigationActivity.class);
 
     }
 }

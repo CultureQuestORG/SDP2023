@@ -75,7 +75,6 @@ public class SearchUserActivityTest {
     @Test
     public void typingUsernameAutomaticallyShowsUsers() throws InterruptedException {
         onView(withId(R.id.search_user)).perform(typeText("alice"));
-        Thread.sleep(2000);
         onData(hasToString(containsString("alice"))).inAdapterView(withId(R.id.list_view));
     }
 
@@ -96,7 +95,6 @@ public class SearchUserActivityTest {
                 .addMonitor(DisplayUserProfileActivity.class.getName(), null, false);
 
         onView(withId(R.id.search_user)).perform(typeText("allen"));
-        Thread.sleep(2000);
         onData(hasToString(containsString("allen")))
                 .inAdapterView(withId(R.id.list_view))
                 .atPosition(0).perform(click());
@@ -108,6 +106,13 @@ public class SearchUserActivityTest {
 
         Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), DisplayUserProfileActivity.class);
         assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
+    }
+
+    @Test
+    public void wrongUsernameFormatDoesntDisplayAnything(){
+        onView(withId(R.id.search_user)).perform(typeText("Username is wrong"));
+        onView(withId(R.id.list_view))
+                .check(matches(Matchers.not(hasMinimumChildCount(1))));
     }
     @After
     public void teardown() {
