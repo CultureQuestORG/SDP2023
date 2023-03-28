@@ -68,7 +68,6 @@ public class SearchUserActivityTest {
         Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", List.of(), 0));
         // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
-
     }
 
 
