@@ -39,7 +39,11 @@ public class DisplayUserProfileTest {
     @Before
     public void setUp() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.useEmulator("10.0.2.2", 9000);
+        try {
+            firebaseDatabase.useEmulator("10.0.2.2", 9000);
+        } catch (IllegalStateException ex) {
+
+        }
         Database.init(new FireDatabase(firebaseDatabase));
         firebaseDatabase.getReference().setValue(null);
 
@@ -69,10 +73,5 @@ public class DisplayUserProfileTest {
                 new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0);
         ActivityScenario.launch(DisplayUserProfileActivity.class);
         onView(withId(R.id.home_icon)).check(matches(isClickable()));
-    }
-
-    @After
-    public void teardown(){
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
     }
 }

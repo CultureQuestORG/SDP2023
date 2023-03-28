@@ -58,7 +58,11 @@ public class SearchUserActivityTest {
     @Before
     public void setUp() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.useEmulator("10.0.2.2", 9000);
+        try {
+            firebaseDatabase.useEmulator("10.0.2.2", 9000);
+        } catch (IllegalStateException ex) {
+
+        }
         Database.init(new FireDatabase(firebaseDatabase));
 
         // clear the database before starting the following tests
