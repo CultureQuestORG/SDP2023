@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +57,7 @@ public class RetryingOTMProviderTest {
     @Test
     public void testProviderRetriesIfServerIsNotReachable() throws IOException {
         //Make request before response is available, which should force a retry
-        CompletableFuture<OTMLocation[]> results = provider.getLocations(new LatLng(1., 0.), new LatLng(0., 1.));
+        CompletableFuture<List<OTMLocation>> results = provider.getLocations(new LatLng(1., 0.), new LatLng(0., 1.));
         String jsonBody = "[\n" +
                 "  {\n" +
                 "    \"xid\": \"R10699460\",\n" +
@@ -72,13 +73,13 @@ public class RetryingOTMProviderTest {
                 "  }\n" +
                 "]";
         server.enqueue(new MockResponse().setBody(jsonBody));
-        OTMLocation[] locations = results.orTimeout(5, TimeUnit.SECONDS).join();
+        List<OTMLocation> locations = results.orTimeout(5, TimeUnit.SECONDS).join();
 
-        assertThat(locations.length, is(1));
-        assertThat(locations[0].getName(), is("Château de La Côte-Saint-André"));
-        assertThat(locations[0].getCoordinates().longitude(), is(20.23));
-        assertThat(locations[0].getCoordinates().latitude(), is(47.39));
-        assertThat(locations[0].getKinds(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
+        assertThat(locations.size(), is(1));
+        assertThat(locations.get(0).getName(), is("Château de La Côte-Saint-André"));
+        assertThat(locations.get(0).getCoordinates().longitude(), is(20.23));
+        assertThat(locations.get(0).getCoordinates().latitude(), is(47.39));
+        assertThat(locations.get(0).getKinds(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
     }
 
     @After

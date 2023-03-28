@@ -23,7 +23,7 @@ public final class OTMLocation {
         if(kinds.length() == 0){
             throw new IllegalArgumentException("Tags cannot be empty");
         }
-        this.name = name;
+        this.name = name.isEmpty()? kinds : name;
         this.point = point;
         this.kinds = kinds;
     }

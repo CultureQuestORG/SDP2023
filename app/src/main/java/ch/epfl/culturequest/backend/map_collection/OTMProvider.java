@@ -2,6 +2,7 @@ package ch.epfl.culturequest.backend.map_collection;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -17,5 +18,5 @@ public interface OTMProvider {
      * @param lowerRight the lower right corner of the bounding box
      * @return an array of locations in the bounding box
      */
-    CompletableFuture<OTMLocation[]> getLocations(LatLng upperLeft, LatLng lowerRight);
+    CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight);
 }

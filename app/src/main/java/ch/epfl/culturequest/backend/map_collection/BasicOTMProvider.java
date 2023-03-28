@@ -1,11 +1,11 @@
 package ch.epfl.culturequest.backend.map_collection;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.gson.Gson;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.BuildConfig;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,17 +37,16 @@ public class BasicOTMProvider implements OTMProvider {
     }
 
     @Override
-    public CompletableFuture<OTMLocation[]> getLocations(LatLng upperLeft, LatLng lowerRight){
-        Gson gson = new Gson();
+    public CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight){
         Retrofit req = new Retrofit.Builder()
                 .baseUrl(base_url)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         OTMFetchInterface service = req.create(OTMFetchInterface.class);
-        CompletableFuture<OTMLocation[]> future = new CompletableFuture<>();
-        service.fetchOTMPlaces("${OTM_API_KEY}", upperLeft.longitude, lowerRight.longitude, lowerRight.latitude, upperLeft.latitude).enqueue(new Callback<>() {
+        CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
+        service.fetchOTMPlaces(BuildConfig.OTM_API_KEY, upperLeft.longitude, lowerRight.longitude, lowerRight.latitude, upperLeft.latitude).enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<OTMLocation[]> call, Response<OTMLocation[]> response) {
+            public void onResponse(Call<List<OTMLocation>> call, Response<List<OTMLocation>> response) {
                 if (response.isSuccessful()) {
                     future.complete(response.body());
                 } else {
@@ -56,7 +55,7 @@ public class BasicOTMProvider implements OTMProvider {
             }
 
             @Override
-            public void onFailure(Call<OTMLocation[]> call, Throwable t) {
+            public void onFailure(Call<List<OTMLocation>> call, Throwable t) {
                 future.completeExceptionally(t);
             }
         });

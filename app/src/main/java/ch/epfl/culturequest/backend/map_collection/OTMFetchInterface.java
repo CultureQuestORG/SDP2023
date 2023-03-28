@@ -2,6 +2,8 @@ package ch.epfl.culturequest.backend.map_collection;
 
 
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -20,6 +22,6 @@ public interface OTMFetchInterface {
      * @return an array of locations in the bounding box
      */
     @GET("places/bbox?kinds=museums,urban_environment,monuments_and_memorials&format=json&limit=50")
-    Call<OTMLocation[]> fetchOTMPlaces(@Query("api_key") String key, @Query("lo_min") double lo_min, @Query("lo_max") double lo_max, @Query("la_min") double la_min, @Query("la_max") double la_max);
+    Call<List<OTMLocation>> fetchOTMPlaces(@Query("apikey") String key, @Query("lon_min") double lo_min, @Query("lon_max") double lo_max, @Query("lat_min") double la_min, @Query("lat_max") double la_max);
 
 }

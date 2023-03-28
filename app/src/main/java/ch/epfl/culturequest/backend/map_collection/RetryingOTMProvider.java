@@ -2,6 +2,7 @@ package ch.epfl.culturequest.backend.map_collection;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,9 +36,9 @@ public class RetryingOTMProvider implements OTMProvider{
 
 
     @Override
-    public CompletableFuture<OTMLocation[]> getLocations(LatLng upperLeft, LatLng lowerRight) {
+    public CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight) {
        return  wrapped.getLocations(upperLeft, lowerRight).handle((result, throwable) -> {
-           CompletableFuture<OTMLocation[]> future = new CompletableFuture<>();
+           CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
             if (throwable == null){
                 future.complete(result);
                 return future;

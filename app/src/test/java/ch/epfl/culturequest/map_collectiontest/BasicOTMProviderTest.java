@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 
@@ -82,19 +83,19 @@ public class BasicOTMProviderTest {
                 "  }\n" +
                 "]";
         server.enqueue(new MockResponse().setBody(jsonBody));
-        OTMLocation[] locations = provider.getLocations(new LatLng(1., 0.), new LatLng(0., 1.)).orTimeout(5, TimeUnit.SECONDS).join();
+        List<OTMLocation> locations = provider.getLocations(new LatLng(1., 0.), new LatLng(0., 1.)).orTimeout(5, TimeUnit.SECONDS).join();
 
-        assertThat(locations.length, is(2));
+        assertThat(locations.size(), is(2));
         //Check location 1
-        assertThat(locations[0].getName(), is("Tombe du silence et du repos sans fin (Facteur Cheval)"));
-        assertThat(locations[0].getCoordinates().longitude(), is(5.));
-        assertThat(locations[0].getCoordinates().latitude(), is(45.250064849853516));
-        assertThat(locations[0].getKinds(), containsInAnyOrder("historic", "monuments_and_memorials"));
+        assertThat(locations.get(0).getName(), is("Tombe du silence et du repos sans fin (Facteur Cheval)"));
+        assertThat(locations.get(0).getCoordinates().longitude(), is(5.));
+        assertThat(locations.get(0).getCoordinates().latitude(), is(45.250064849853516));
+        assertThat(locations.get(0).getKinds(), containsInAnyOrder("historic", "monuments_and_memorials"));
         //Check location 2
-        assertThat(locations[1].getName(), is("Château de La Côte-Saint-André"));
-        assertThat(locations[1].getCoordinates().longitude(), is(20.23));
-        assertThat(locations[1].getCoordinates().latitude(), is(47.39));
-        assertThat(locations[1].getKinds(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
+        assertThat(locations.get(1).getName(), is("Château de La Côte-Saint-André"));
+        assertThat(locations.get(1).getCoordinates().longitude(), is(20.23));
+        assertThat(locations.get(1).getCoordinates().latitude(), is(47.39));
+        assertThat(locations.get(1).getKinds(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
     }
 
     @After

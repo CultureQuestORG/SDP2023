@@ -5,6 +5,18 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+String getOTMApiKey() {
+
+    def api_key = System.getenv("OTM_API_KEY")
+
+    if (api_key != null) {
+        return api_key;
+    }
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("OTM_API_KEY");
+}
+
 android {
     namespace 'ch.epfl.culturequest'
     compileSdk 33
@@ -17,6 +29,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "OTM_API_KEY", "\""+getOTMApiKey()+"\""
     }
 
     buildTypes {
