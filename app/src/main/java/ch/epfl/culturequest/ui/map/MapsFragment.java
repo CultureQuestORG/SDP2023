@@ -83,9 +83,6 @@ public class MapsFragment extends Fragment {
         LatLng lowerLeft = mMap.getProjection().getVisibleRegion().latLngBounds.southwest;
         LatLng upperLeft = new LatLng(upperRight.latitude, lowerLeft.longitude);
         LatLng lowerRight = new LatLng(lowerLeft.latitude, upperRight.longitude);
-        Log.d("MapsFragment", "getMarkers: " + upperLeft + " " + lowerRight);
-        Log.d("MapsFragment", "getMarkers: viewModel " + viewModel.getLocations());
-
         if(viewModel.getLocations() != null){
             places = CompletableFuture.completedFuture(viewModel.getLocations());
         }
