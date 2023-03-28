@@ -24,7 +24,7 @@ import ch.epfl.culturequest.social.Profile;
 
 /**
  * A authenticator to sign in the app using google.
- * <p>
+ *
  * To launch from an activity simply:
  * Instantiate an attribute with new Authenticator(this) and call sign in and sign out methods
  */
@@ -57,12 +57,14 @@ public class Authenticator implements AuthService {
     @Override
     public void signIn() {
         if (isAnonymous) {
-            FirebaseAuth.getInstance().signInAnonymously().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    user = mAuth.getCurrentUser();
-                    redirectTo(ProfileCreatorActivity.class);
-                }
-            });
+            FirebaseAuth.getInstance()
+                    .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            user = mAuth.getCurrentUser();
+                            redirectTo(ProfileCreatorActivity.class);
+                        }
+                    });
         } else if (user == null) {
             signInLauncher.launch(signInIntent());
         } else {
@@ -78,8 +80,6 @@ public class Authenticator implements AuthService {
                 throwable.printStackTrace();
                 return null;
             });
-
-
         }
     }
 

@@ -31,6 +31,7 @@ import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -60,7 +61,7 @@ public class ProfileCreatorActivityTest {
     @BeforeClass
     public static void setup() throws InterruptedException {
         FirebaseAuth.getInstance()
-                .signInAnonymously()
+                .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         user = FirebaseAuth.getInstance().getCurrentUser();
