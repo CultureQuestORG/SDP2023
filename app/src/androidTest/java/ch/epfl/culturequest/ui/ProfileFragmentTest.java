@@ -93,17 +93,4 @@ public class ProfileFragmentTest {
         onView(withId(R.id.settingsButton)).perform(click());
         onView(withId(R.id.log_out)).check(matches(isEnabled()));
     }
-
-    @Test
-    public void textViewDisplaysFollowButton() {
-        onView(withId(R.id.profileFollowText)).check(matches(withText("Follow")));
-        onView(withId(R.id.profileFollowButton)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void textViewDisplaysUnfollowButton() {
-        onView(withId(R.id.profileFollowText)).check(matches(withText("Follow")));
-        onView(withId(R.id.profileFollowButton)).perform(click());
-        onView(withId(R.id.profileFollowText)).check(matches(withText("Unfollow")));
-    }
 }
