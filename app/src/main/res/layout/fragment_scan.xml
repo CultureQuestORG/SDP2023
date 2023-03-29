@@ -23,12 +23,21 @@
         android:id="@+id/helpButtonScan"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="15dp"
         android:background="#00DC5252"
         android:src="@drawable/help"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="@string/help_button_for_scan" />
+    
+    <ch.epfl.culturequest.ui.commons.LoadingAnimation
+        android:id="@+id/scanLoadingAnimation"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -45,6 +45,13 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
+    public CompletableFuture<List<Profile>> getAllProfiles() {
+        CompletableFuture<List<Profile>> profiles = new CompletableFuture<>();
+        profiles.complete((List<Profile>) map.get("allProfiles"));
+        return profiles;
+    }
+
+    @Override
     public CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         map.put("users/"+profile.getUid(), profile);
@@ -57,6 +64,11 @@ public class MockDatabase implements DatabaseInterface {
         CompletableFuture<Image> future = new CompletableFuture<>();
         future.complete((Image) map.get("pictures/"+UId));
         return future;
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
+        return null;
     }
 
     @Override
