@@ -18,15 +18,17 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<String> profilePictureUri;
 
     private final MutableLiveData<List<Image>> pictures;
+    private final MutableLiveData<Boolean> followed;
 
     /**
      * Constructor of the ProfileViewModel
      */
-    public ProfileViewModel() {
+    public ProfileViewModel(String uid) {
         // create the mutable live data
         username = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
+        followed = new MutableLiveData<>(false);
 
         EspressoIdlingResource.increment();
         Profile profile = Profile.getActiveProfile();
@@ -48,12 +50,12 @@ public class ProfileViewModel extends ViewModel {
 
             // if no profile is active, we load a default profile
         } else {
-            Database.getProfile("123").whenComplete((p, e) -> {
-                    username.setValue(p.getUsername());
-                    profilePictureUri.setValue(p.getProfilePicture());
-                    pictures.setValue(p.getImagesList());
+            Database.getProfile(uid).whenComplete((p, e) -> {
+                username.setValue(p.getUsername());
+                profilePictureUri.setValue(p.getProfilePicture());
+                pictures.setValue(p.getImagesList());
 
-                });
+            });
         }
 
 
@@ -79,5 +81,13 @@ public class ProfileViewModel extends ViewModel {
      */
     public LiveData<List<Image>> getPictures() {
         return pictures;
+    }
+
+    public LiveData<Boolean> getFollowed() {
+        return followed;
+    }
+
+    public void changeFollow() {
+        this.followed.setValue(Boolean.FALSE.equals(followed.getValue()));
     }
 }

@@ -31,7 +31,7 @@ public class ProfileTest {
     public void setup() throws InterruptedException {
         FirebaseAuth
                 .getInstance()
-                .signInAnonymously()
+                .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) user = mAuth.getCurrentUser();
                 });

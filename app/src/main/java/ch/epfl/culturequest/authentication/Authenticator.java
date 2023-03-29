@@ -21,6 +21,7 @@ import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.AndroidUtils;
 
 /**
  * A authenticator to sign in the app using google.
@@ -57,29 +58,29 @@ public class Authenticator implements AuthService {
     @Override
     public void signIn() {
         if (isAnonymous) {
-            FirebaseAuth.getInstance().signInAnonymously().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    user = mAuth.getCurrentUser();
-                    redirectTo(ProfileCreatorActivity.class);
-                }
-            });
+            FirebaseAuth.getInstance()
+                    .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            user = mAuth.getCurrentUser();
+                            AndroidUtils.redirectToActivity(activity, ProfileCreatorActivity.class);
+                        }
+                    });
         } else if (user == null) {
             signInLauncher.launch(signInIntent());
         } else {
             Database.getProfile(user.getUid()).handle((profile, throwable) -> {
                 if (profile != null) {
                     Profile.setActiveProfile(profile);
-                    redirectTo(NavigationActivity.class);
+                    AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
                 } else {
-                    redirectTo(ProfileCreatorActivity.class);
+                    AndroidUtils.redirectToActivity(activity, ProfileCreatorActivity.class);
                 }
                 return null;
             }).exceptionally(throwable -> {
                 throwable.printStackTrace();
                 return null;
             });
-
-
         }
     }
 
@@ -95,7 +96,7 @@ public class Authenticator implements AuthService {
         }
         if (isAnonymous) {
             mAuth.signOut();
-            redirectTo(SignUpActivity.class);
+            AndroidUtils.redirectToActivity(activity, SignUpActivity.class);
             return;
         }
 
@@ -105,7 +106,7 @@ public class Authenticator implements AuthService {
         AuthUI.getInstance()
                 .signOut(activity)
                 .addOnCompleteListener(task -> {
-                    redirectTo(SignUpActivity.class);
+                    AndroidUtils.redirectToActivity(activity, SignUpActivity.class);
                 });
 
         Profile.setActiveProfile(null);
@@ -144,10 +145,10 @@ public class Authenticator implements AuthService {
             Database.getProfile(user.getUid()).handle((profile, throwable) -> {
                 if (profile != null) {
                     Profile.setActiveProfile(profile);
-                    redirectTo(NavigationActivity.class);
+                    AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
                 } else {
                     Profile.setActiveProfile(new Profile("", null));
-                    redirectTo(ProfileCreatorActivity.class);
+                    AndroidUtils.redirectToActivity(activity, ProfileCreatorActivity.class);
                 }
                 return null;
             }).exceptionally(throwable -> {
@@ -155,12 +156,8 @@ public class Authenticator implements AuthService {
                 return null;
             });
         } else {
-            redirectTo(SignUpActivity.class);
+            AndroidUtils.redirectToActivity(activity, SignUpActivity.class);
         }
-    }
-
-    private void redirectTo(Class<? extends Activity> cls) {
-        activity.startActivity(new Intent(activity, cls));
     }
 
     public FirebaseUser getUser() {
