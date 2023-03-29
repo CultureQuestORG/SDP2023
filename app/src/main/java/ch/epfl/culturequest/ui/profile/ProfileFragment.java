@@ -37,14 +37,16 @@ public class ProfileFragment extends Fragment {
         View root = binding.getRoot();
 
         // bind the views
-        final TextView textView = binding.profileUsername;
+        final TextView profileName = binding.profileUsername;
+        final TextView profilePlace = binding.profilePlace;
         final CircleImageView profilePicture = binding.profilePicture;
         final RecyclerView pictureGrid = binding.pictureGrid;
         final View settingsButton = binding.settingsButton;
 
+        profilePlace.setText("Lausanne");
 
         // set the observers for the views so that they are updated when the data changes
-        profileViewModel.getUsername().observe(getViewLifecycleOwner(), textView::setText);
+        profileViewModel.getUsername().observe(getViewLifecycleOwner(), profileName::setText);
         profileViewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(profilePicture));
         profileViewModel.getPictures().observe(getViewLifecycleOwner(), images -> {
             // Create a new PictureAdapter and set it as the adapter for the RecyclerView
