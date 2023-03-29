@@ -51,8 +51,7 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidUtils.removeStatusBar(getWindow());
-        ProfileViewModel profileViewModel =
-                new ViewModelProvider(this, new ProfileViewModelFactory(selectedProfile.getUid())).get(ProfileViewModel.class);
+        ProfileViewModel profileViewModel = new ViewModelProvider(this, new ProfileViewModelFactory(selectedProfile.getUid())).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(getLayoutInflater());
         View root = binding.getRoot();
         final TextView textView = binding.profileUsername;

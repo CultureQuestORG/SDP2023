@@ -70,6 +70,8 @@ public class DisplayUserProfileTest {
     public void tearDown() {
         // remove EspressoIdlingResource from the IdlingRegistry
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
+        //firebaseDatabase.getReference().setValue(null);
+
         // clear the database after finishing the tests
         Database.deleteProfile("testUid1");
     }

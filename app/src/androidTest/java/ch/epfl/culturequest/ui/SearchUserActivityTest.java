@@ -138,6 +138,8 @@ public class SearchUserActivityTest {
         Database.deleteProfile("testUid2");
         Database.deleteProfile("testUid3");
         Database.deleteProfile("testUid4");
+        //firebaseDatabase.getReference().setValue(null);
+
     }
 
 }
