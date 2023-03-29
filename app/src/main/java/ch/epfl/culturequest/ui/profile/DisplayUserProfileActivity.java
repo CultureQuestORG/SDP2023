@@ -40,6 +40,7 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
 
     /**
      * Baiscally we use the viewModel for the profile fragment to display the profile in this activity.
+     * Use ProfileUtils to upddate the the profile that this class will use
      *
      * @param savedInstanceState If the activity is being re-initialized after
      *     previously being shut down then this Bundle contains the data it most
