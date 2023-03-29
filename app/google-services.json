@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "296582792540-ckebd29nm4hkes5a1jo9feqlf2hi1tlm.apps.googleusercontent.com",
+          "client_id": "296582792540-bk4gln5kbeum82kdnb62eonfeildj15g.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "ch.epfl.culturequest",
-            "certificate_hash": "6c691c45f230d2111f2ebe9db9cbde40eb673d5d"
+            "certificate_hash": "5965c273d29540ec3b6a2c3be4b85e259b29c995"
           }
         },
         {

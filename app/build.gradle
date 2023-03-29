@@ -5,16 +5,29 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+
 String getOTMApiKey() {
 
     def api_key = System.getenv("OTM_API_KEY")
-
     if (api_key != null) {
         return api_key;
     }
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    
     return properties.getProperty("OTM_API_KEY");
+}
+    
+String getOpenAiApiKey() {
+
+    def api_key = System.getenv("OPENAI_API_KEY")
+    if (api_key != null) {
+        return api_key;
+    }
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    
+    return properties.getProperty("OPEN_AI_API_KEY");
 }
 
 android {
@@ -31,6 +44,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "OTM_API_KEY", "\""+getOTMApiKey()+"\""
+        buildConfigField "String", "OPEN_AI_API_KEY", "\""+getOpenAiApiKey()+"\""
     }
 
     buildTypes {
@@ -48,6 +62,11 @@ android {
     }
     buildFeatures {
         viewBinding true
+    }
+    signingConfigs {
+        debug {
+            storeFile file("external/debug.keystore")
+        }
     }
 }
 
@@ -100,6 +119,8 @@ dependencies {
     debugImplementation "androidx.fragment:fragment-testing:1.5.5"
     debugImplementation "androidx.test:monitor:1.6.1"
     debugImplementation 'com.21buttons:fragment-test-rule-extras:2.0.1'
+
+    testImplementation "org.mockito:mockito-core:5.1.1"
 }
 
 configurations.all {
