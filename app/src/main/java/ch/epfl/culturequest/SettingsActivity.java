@@ -24,6 +24,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import org.mockito.internal.matchers.And;
+
 import java.util.Objects;
 
 import ch.epfl.culturequest.authentication.Authenticator;
@@ -31,6 +33,7 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
@@ -61,6 +64,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        AndroidUtils.removeStatusBar(getWindow());
         ch.epfl.culturequest.databinding.ActivitySettingsBinding binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

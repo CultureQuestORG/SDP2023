@@ -22,7 +22,7 @@ public class ProfileViewModel extends ViewModel {
     /**
      * Constructor of the ProfileViewModel
      */
-    public ProfileViewModel() {
+    public ProfileViewModel(String uid) {
         // create the mutable live data
         username = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
@@ -48,12 +48,12 @@ public class ProfileViewModel extends ViewModel {
 
             // if no profile is active, we load a default profile
         } else {
-            Database.getProfile("123").whenComplete((p, e) -> {
-                    username.setValue(p.getUsername());
-                    profilePictureUri.setValue(p.getProfilePicture());
-                    pictures.setValue(p.getImagesList());
+            Database.getProfile(uid).whenComplete((p, e) -> {
+                username.setValue(p.getUsername());
+                profilePictureUri.setValue(p.getProfilePicture());
+                pictures.setValue(p.getImagesList());
 
-                });
+            });
         }
 
 

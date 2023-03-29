@@ -22,21 +22,19 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/profilePicture"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.07" />
+        app:layout_constraintVertical_bias="0.095" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profilePicture"
         android:layout_width="126dp"
         android:layout_height="123dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="56dp"
         android:src="@drawable/basic_profile_picture"
-        app:layout_constraintBottom_toTopOf="@+id/profileUsername"
         app:layout_constraintEnd_toEndOf="parent"
 
-        app:layout_constraintHorizontal_bias="0.055"
+        app:layout_constraintHorizontal_bias="0.056"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pictureGrid"
@@ -60,6 +58,38 @@
         app:layout_constraintEnd_toEndOf="@+id/profileUsername"
         app:layout_constraintStart_toStartOf="@+id/profileUsername"
         app:layout_constraintTop_toBottomOf="@+id/profileUsername" />
+
+    <ImageView
+        android:id="@+id/back_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:src="@drawable/back_button"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/profilePicture"
+        app:layout_constraintRight_toLeftOf="@id/home_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/home_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="317dp"
+        android:layout_marginBottom="14dp"
+        android:src="@drawable/home_icon_unsel"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/profilePicture"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.5"
+        app:layout_constraintLeft_toRightOf="@id/back_button"
+        app:layout_constraintStart_toStartOf="@id/back_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

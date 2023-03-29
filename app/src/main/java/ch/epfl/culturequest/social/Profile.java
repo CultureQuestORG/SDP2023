@@ -26,6 +26,9 @@ public class Profile extends Observable {
     private static Profile activeProfile;
 
 
+
+
+
     /**
      * Creates a Profile for a user.
      * <p>
