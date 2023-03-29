@@ -147,5 +147,32 @@ public class MockDatabase implements DatabaseInterface {
     public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
         return getPostsFeed(UIds, 10, 0);
     }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> addLike(Post post, String UId) {
+        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
+        if(map1 != null) {
+            Post post1 = map1.get(post.getPostid());
+            if (post1 == null)  return CompletableFuture.completedFuture(new AtomicBoolean(false));
+            post1.addLike(UId);
+        }
+        return CompletableFuture.completedFuture(new AtomicBoolean(true));
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> removeLike(Post post, String UId) {
+        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
+        if(map1 != null) {
+            Post post1 = map1.get(post.getPostid());
+            if (post1 == null)  return CompletableFuture.completedFuture(new AtomicBoolean(false));
+            post1.removeLike(UId);
+        }
+        return CompletableFuture.completedFuture(new AtomicBoolean(true));
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> updateLiker(Post post, String UId, boolean update) {
+        return CompletableFuture.completedFuture(new AtomicBoolean(true));
+    }
 }
 

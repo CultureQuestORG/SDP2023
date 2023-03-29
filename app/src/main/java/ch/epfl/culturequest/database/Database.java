@@ -122,4 +122,32 @@ public class Database {
     public static CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
         return databaseInstance.getPostsFeed(UIds);
     }
+
+    /**
+     * This method is used to get the posts of a user's followings
+     * @param post the post to be liked
+     * @param UId the user's id
+     * @return a CompletableFuture that will be completed when the posts are retrieved
+     */
+    public static CompletableFuture<AtomicBoolean> addLike(Post post, String UId) {
+        return databaseInstance.addLike(post, UId).whenComplete((b, e) -> {
+            if (!b.get()) {
+                post.addLike(UId);
+            }
+        });
+    }
+
+    /**
+     * This method is used to get the posts of a user's followings
+     * @param post the post to be liked
+     * @param uid the user's id
+     * @return a CompletableFuture that will be completed when the posts are retrieved
+     */
+    public static CompletableFuture<AtomicBoolean> removeLike(Post post, String uid) {
+        return databaseInstance.removeLike(post, uid).whenComplete((b, e) -> {
+            if (b.get()) {
+                post.removeLike(uid);
+            }
+        });
+    }
 }

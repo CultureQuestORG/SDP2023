@@ -1,8 +1,14 @@
 package ch.epfl.culturequest.database;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -269,6 +275,91 @@ public class FireDatabase implements DatabaseInterface {
     @Override
     public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
         return getPostsFeed(UIds, 100, 0);
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> addLike(Post post, String UId) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid()).child("likes");
+        usersRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                if (mutableData.getValue() == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue((Long) mutableData.getValue() + 1);
+                }
+                boolean update = updateLiker(post, UId, true).join().get();
+                return update ? Transaction.success(mutableData) : Transaction.abort();
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    future.complete(new AtomicBoolean(false));
+                } else {
+                    future.complete(new AtomicBoolean(true));
+                }
+            }
+        });
+
+        return future;
+    }
+
+    /**
+     * @param post   the post to remove the like from
+     * @param UId    the id of the user who liked the post
+     * @return a future that will return true if the like was removed successfully, false otherwise
+     */
+    @Override
+    public CompletableFuture<AtomicBoolean> removeLike(Post post, String UId) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid()).child("likes");
+        usersRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                if (mutableData.getValue() == null) {
+                    mutableData.setValue(0);
+                } else {
+                    mutableData.setValue((Long) mutableData.getValue() - 1);
+                }
+                boolean update = updateLiker(post, UId, false).join().get();
+                return update ? Transaction.success(mutableData) : Transaction.abort();
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    future.complete(new AtomicBoolean(false));
+                } else {
+                    future.complete(new AtomicBoolean(true));
+                }
+            }
+        }
+        );
+        return future;
+    }
+
+    /**
+     * Updates the likers of a post. * Already implemented in the addLike and removeLike methods *
+     * @param post   the post to update the likers of
+     * @param UId    the id of the user
+     * @param update true if the user liked the post, false otherwise
+     * @return true if the user liked the post, false otherwise
+     */
+    public CompletableFuture<AtomicBoolean> updateLiker(Post post, String UId, boolean update) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid()).child("likers");
+        usersRef.child(UId).setValue(update).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+               future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
     }
 
 

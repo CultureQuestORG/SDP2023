@@ -53,4 +53,13 @@ public interface DatabaseInterface {
     // Get the posts of a user followings
     CompletableFuture<List<Post>> getPostsFeed(List<String> UIds);
 
+    // Add a like to a post
+    CompletableFuture<AtomicBoolean> addLike(Post post, String UId);
+
+    // Remove a like from a post
+    CompletableFuture<AtomicBoolean> removeLike(Post post, String UId);
+
+    // Update the liker list of a post
+    CompletableFuture<AtomicBoolean> updateLiker(Post post, String UId, boolean update);
+
 }

@@ -54,15 +54,15 @@ public class DatabaseTest {
 
     @Test
     public void uploadPostWorks() {
-        Post post = new Post("test", "user1", "test", "test", new Date());
+        Post post = new Post("test", "user1", "test", "test", new Date(), 0, List.of());
         boolean result = Database.uploadPost(post).join().get();
         assertThat(result, is(true));
     }
 
     @Test
     public void getPostsWorks() {
-        Post post = new Post("test2", "user1", "test", "test", new Date());
-        Post post2 = new Post("test3", "user1", "test", "test", new Date());
+        Post post = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
+        Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
         Database.uploadPost(post).join();
         Database.uploadPost(post2).join();
         assertThat(Database.getPosts("user1", 10, 0).join().get(0), is(post));
@@ -72,8 +72,8 @@ public class DatabaseTest {
 
     @Test
     public void getPostsFeedWorks() {
-        Post post = new Post("test1", "user2", "test", "test", new Date(2023, 03, 28));
-        Post post2 = new Post("test2", "user2", "test", "test", new Date(2023, 03, 29));
+        Post post = new Post("test1", "user2", "test", "test", new Date(2023, 03, 28), 0, List.of());
+        Post post2 = new Post("test2", "user2", "test", "test", new Date(2023, 03, 29), 0, List.of());
         Database.uploadPost(post).join();
         Database.uploadPost(post2).join();
         assertThat(Database.getPostsFeed(List.of("user2"), 10, 0).join().get(0), is(post2));
