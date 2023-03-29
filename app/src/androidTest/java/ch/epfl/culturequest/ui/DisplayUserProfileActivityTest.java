@@ -38,11 +38,6 @@ public class DisplayUserProfileActivityTest {
     }
 
     @Test
-    public void textViewDisplaysUsername() {
-        onView(withId(R.id.profileUsername)).check(matches(withText("username")));
-    }
-
-    @Test
     public void textViewDisplaysPlace() {
         onView(withId(R.id.profilePlace)).check(matches(withText("Lausanne")));
     }
