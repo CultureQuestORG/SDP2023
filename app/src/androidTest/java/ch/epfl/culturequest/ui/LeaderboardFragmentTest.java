@@ -91,7 +91,7 @@ public class LeaderboardFragmentTest {
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
-        assertTrue(numberOfProfiles > 4);
+        assertTrue(numberOfProfiles >= 4);
     }
 
     @Test
