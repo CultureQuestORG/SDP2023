@@ -37,6 +37,7 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
     private PictureAdapter pictureAdapter;
     private Profile selectedProfile = ProfileUtils.getSelectedProfile();
     private ImageView backIcon, homeIcon;
+    private FollowButton followButton;
 
     /**
      * Baiscally we use the viewModel for the profile fragment to display the profile in this activity.
@@ -68,6 +69,16 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         setContentView(root);
         backIcon = findViewById(R.id.back_button);
         homeIcon = findViewById(R.id.home_icon);
+
+        final TextView profilePlace = binding.profilePlace;
+        profilePlace.setText("Lausanne");
+
+        followButton = new FollowButton(binding.profileFollowButton);
+        profileViewModel.getFollowed().observe(this, followButton::setFollowed);
+        followButton.setOnClickListener(v -> profileViewModel.changeFollow());
+
+        binding.settingsButton.setVisibility(View.INVISIBLE);
+
         List.of(backIcon, homeIcon).forEach(elem -> elem.setVisibility(View.VISIBLE));
         backIcon.setOnClickListener(l -> super.onBackPressed());
         homeIcon.setOnClickListener(l -> {

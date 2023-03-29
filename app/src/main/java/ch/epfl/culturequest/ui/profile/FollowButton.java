@@ -14,6 +14,7 @@ public final class FollowButton {
 
     public FollowButton(RelativeLayout button) {
         this.button = button;
+        button.setVisibility(View.VISIBLE);
         this.text = button.findViewById(R.id.profileFollowText);
         this.context = button.getContext();
     }

@@ -9,59 +9,89 @@
     tools:context=".ui.profile.ProfileFragment"
     tools:visibility="visible">
 
+    <ImageView
+        android:id="@+id/back_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="45dp"
+        android:src="@drawable/back_button"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/profilePicture"
+        app:layout_constraintRight_toLeftOf="@id/home_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profilePicture"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="64dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="44dp"
         android:src="@drawable/basic_profile_picture"
-        app:layout_constraintEnd_toEndOf="parent"
 
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <RelativeLayout
+        android:id="@+id/settingsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="45dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/button_rounded_corner"
+        android:elevation="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <ImageView
+            android:id="@+id/settingsButtonText"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/settings_button"
+            android:padding="4dp"/>
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/profileUsername"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:shadowColor="#80000000"
         android:shadowDx="0"
         android:shadowDy="4"
         android:shadowRadius="20"
-        android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="30sp"
+        android:textSize="25sp"
         android:fontFamily="@font/poppins_bold"
-        android:padding="7sp"
         app:drawableTint="@color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.75"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/profilePicture"
-        app:layout_constraintVertical_bias="0.20" />
+        app:layout_constraintVertical_bias="0" />
 
     <TextView
         android:id="@+id/profilePlace"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:padding="7sp"
         android:shadowColor="#80000000"
         android:shadowDx="0"
         android:shadowDy="4"
         android:shadowRadius="20"
-        android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:fontFamily="@font/poppins"
         app:drawableTint="@color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.75"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/profilePicture"
-        app:layout_constraintVertical_bias="0.255" />
+        app:layout_constraintVertical_bias="0.05" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pictureGrid"
@@ -76,37 +106,12 @@
         app:layout_constraintVertical_bias="0.0"
         app:spanCount="3" />
 
-    <Button
-        android:id="@+id/settingsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/settings"
-
-        app:layout_constraintEnd_toEndOf="@+id/profileUsername"
-        app:layout_constraintStart_toStartOf="@+id/profileUsername"
-        app:layout_constraintTop_toBottomOf="@+id/profileUsername" />
-
-    <ImageView
-        android:id="@+id/back_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:src="@drawable/back_button"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/profilePicture"
-        app:layout_constraintRight_toLeftOf="@id/home_icon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
     <ImageView
         android:id="@+id/home_icon"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="13dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="45dp"
         android:layout_marginEnd="317dp"
         android:layout_marginBottom="14dp"
         android:src="@drawable/home_icon_unsel"
@@ -123,19 +128,21 @@
         android:id="@+id/profileFollowButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="30dp"
         android:background="@drawable/button_rounded_corner"
         android:elevation="8dp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profilePicture">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="4dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="2dp"
             android:layout_marginBottom="4dp"
             android:contentDescription="@string/followTextButton"
             android:src="@drawable/profile_icon_follow" />
@@ -144,14 +151,14 @@
             android:id="@+id/profileFollowText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="30dp"
             android:layout_marginRight="10dp"
             android:fontFamily="@font/poppins_semibold"
             android:padding="5sp"
             android:text="Follow"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             app:drawableTint="@color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
