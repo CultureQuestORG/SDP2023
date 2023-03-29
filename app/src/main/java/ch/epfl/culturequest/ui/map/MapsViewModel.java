@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
 import java.util.Objects;
+
+import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 
 public class MapsViewModel extends ViewModel{
 
@@ -15,12 +18,15 @@ public class MapsViewModel extends ViewModel{
 
     private final MutableLiveData<LatLng> currentLocation;
 
+    private final MutableLiveData<List<OTMLocation>> locations;
+
     /**
      * Constructor for the MapsViewModel
      */
     public MapsViewModel() {
         isLocationPermissionGranted = new MutableLiveData<>(false);
         currentLocation = new MutableLiveData<>(DEFAULT);
+        locations = new MutableLiveData<>(null);
     }
 
     /**
@@ -61,4 +67,20 @@ public class MapsViewModel extends ViewModel{
         currentLocation.setValue(DEFAULT);
     }
 
+    /**
+     * Method to set the list of locations to display on the map
+     * @param newLocations the list of locations to display
+     */
+    public void setLocations(List<OTMLocation> newLocations){
+        Objects.requireNonNull(newLocations, "List of locations cannot be null");
+        locations.setValue(newLocations);
+    }
+
+    /**
+     * Method to get the list of locations to display on the map
+     * @return the list of locations to display
+     */
+    public List<OTMLocation> getLocations(){
+        return locations.getValue();
+    }
 }
