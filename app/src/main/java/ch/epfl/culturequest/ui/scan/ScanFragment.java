@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.ui.scan;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
+import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.ui.commons.LoadingAnimation;
 
 public class ScanFragment extends Fragment {
@@ -39,7 +41,7 @@ public class ScanFragment extends Fragment {
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
-            if(isPermissionGranted())
+            if(permissionRequest.hasPermission(getContext()))
                 cameraSetup.openCamera();
         }
         @Override
@@ -137,20 +139,14 @@ public class ScanFragment extends Fragment {
                     cameraSetup.openCamera();
                 }
             });
+    PermissionRequest permissionRequest = new PermissionRequest(Manifest.permission.CAMERA);
 
     // Method to request the permissions
     private void requestPermissions() {
-        if (!isPermissionGranted()) {
+        if (!permissionRequest.hasPermission(getContext())) {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
-            requestPermissionLauncher.launch(
-                    android.Manifest.permission.CAMERA);
+           permissionRequest.askPermission(requestPermissionLauncher);
         }
-    }
-
-    private boolean isPermissionGranted() {
-        return ContextCompat.checkSelfPermission(
-                getContext(), android.Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED;
     }
 }

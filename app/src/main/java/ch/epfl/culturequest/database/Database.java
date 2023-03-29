@@ -27,9 +27,14 @@ public class Database {
     }
 
 
-    public static CompletableFuture<AtomicBoolean> set(String key, Object value) {
+    public static CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
+    return databaseInstance.deleteProfile(uid);
+    }
+
+        public static CompletableFuture<AtomicBoolean> set(String key, Object value) {
         return databaseInstance.set(key, value);
     }
+
 
     public static CompletableFuture<Object> get(String key) {
         return databaseInstance.get(key);
@@ -42,6 +47,11 @@ public class Database {
     public static CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
         return databaseInstance.setProfile(profile);
     }
+
+    public static CompletableFuture<List<Profile>> getAllProfiles() {
+        return databaseInstance.getAllProfiles();
+    }
+
 
     public static CompletableFuture<Image> getImage(String UId) {
         return databaseInstance.getImage(UId);
