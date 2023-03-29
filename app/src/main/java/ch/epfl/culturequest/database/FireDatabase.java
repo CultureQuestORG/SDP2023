@@ -281,17 +281,30 @@ public class FireDatabase implements DatabaseInterface {
     public CompletableFuture<AtomicBoolean> addLike(Post post, String UId) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid()).child("likes");
-        usersRef.runTransaction(new Transaction.Handler() {
+
+        updateLiker(post, UId, true).whenComplete((v, e) -> {
+            if (e != null) {
+                future.complete(new AtomicBoolean(false));
+            } else {
+                usersRef.runTransaction(handler(future, post, UId, true));
+            }
+        });
+
+        return future;
+    }
+
+    private Transaction.Handler handler(CompletableFuture<AtomicBoolean> future, Post post, String UId, boolean add) {
+        return new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
                 if (mutableData.getValue() == null) {
-                    mutableData.setValue(1);
+                    mutableData.setValue(add ? 1 : 0);
                 } else {
-                    mutableData.setValue((Long) mutableData.getValue() + 1);
+                    mutableData.setValue(add ? (Long) mutableData.getValue() + 1 : (Long) mutableData.getValue() - 1);
                 }
-                boolean update = updateLiker(post, UId, true).join().get();
-                return update ? Transaction.success(mutableData) : Transaction.abort();
+
+                return Transaction.success(mutableData);
             }
 
             @Override
@@ -302,9 +315,7 @@ public class FireDatabase implements DatabaseInterface {
                     future.complete(new AtomicBoolean(true));
                 }
             }
-        });
-
-        return future;
+        };
     }
 
     /**
@@ -316,29 +327,15 @@ public class FireDatabase implements DatabaseInterface {
     public CompletableFuture<AtomicBoolean> removeLike(Post post, String UId) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid()).child("likes");
-        usersRef.runTransaction(new Transaction.Handler() {
-            @NonNull
-            @Override
-            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                if (mutableData.getValue() == null) {
-                    mutableData.setValue(0);
-                } else {
-                    mutableData.setValue((Long) mutableData.getValue() - 1);
-                }
-                boolean update = updateLiker(post, UId, false).join().get();
-                return update ? Transaction.success(mutableData) : Transaction.abort();
-            }
 
-            @Override
-            public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
-                if (databaseError != null) {
-                    future.complete(new AtomicBoolean(false));
-                } else {
-                    future.complete(new AtomicBoolean(true));
-                }
+        updateLiker(post, UId, false).whenComplete((v, e) -> {
+            if (e != null) {
+                future.complete(new AtomicBoolean(false));
+            } else {
+                usersRef.runTransaction(handler(future, post, UId, false));
             }
-        }
-        );
+        });
+
         return future;
     }
 
@@ -352,13 +349,25 @@ public class FireDatabase implements DatabaseInterface {
     public CompletableFuture<AtomicBoolean> updateLiker(Post post, String UId, boolean update) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid()).child("likers");
-        usersRef.child(UId).setValue(update).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-               future.complete(new AtomicBoolean(true));
-            } else {
-                future.complete(new AtomicBoolean(false));
-            }
-        });
+
+        if(update) {
+            usersRef.child(String.valueOf(post.getLikers().size())).setValue(UId).addOnCompleteListener(task -> {
+                System.out.println("task: " + task.isSuccessful());
+                if (task.isSuccessful()) {
+                    future.complete(new AtomicBoolean(true));
+                } else {
+                    future.complete(new AtomicBoolean(false));
+                }
+            });
+        } else {
+            usersRef.child(String.valueOf(post.getLikers().indexOf(UId))).removeValue().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    future.complete(new AtomicBoolean(true));
+                } else {
+                    future.complete(new AtomicBoolean(false));
+                }
+            });
+        }
         return future;
     }
 
