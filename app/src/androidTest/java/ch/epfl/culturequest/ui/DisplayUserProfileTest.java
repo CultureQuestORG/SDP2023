@@ -47,7 +47,22 @@ public class DisplayUserProfileTest {
         Database.init(new FireDatabase(firebaseDatabase));
 
         Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
+        //The comments below is what is used to test on the main but weirdly,
+        //it accesses the real database and overwrites its content...
+        //TODO resolve issuee
+        //firebaseDatabase = FirebaseDatabase.getInstance();
+        //try {
+        //    firebaseDatabase.useEmulator("10.0.2.2", 9000);
+        //} catch (IllegalStateException e) {
+
+        //}
+        //Database.init(new FireDatabase(firebaseDatabase));
+
+        // clear the database before starting the following tests
+        //firebaseDatabase.getReference().setValue(null);
+
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
+
 
     }
 

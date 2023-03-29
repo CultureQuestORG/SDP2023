@@ -61,11 +61,26 @@ public class SearchUserActivityTest {
 
         Database.init(new FireDatabase(firebaseDatabase));
 
-        // clear the database before starting the following tests
         Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
         Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", List.of(), 0));
         Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", List.of(), 0));
         Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", List.of(), 0));
+
+        //The comments below is what is used to test on the main but weirdly,
+        //it accesses the real database and overwrites its content...
+        //TODO resolve issuee
+        //firebaseDatabase = FirebaseDatabase.getInstance();
+        //try {
+        //    firebaseDatabase.useEmulator("10.0.2.2", 9000);
+        //} catch (IllegalStateException e) {
+
+        //}
+        //Database.init(new FireDatabase(firebaseDatabase));
+
+        // clear the database before starting the following tests
+        //firebaseDatabase.getReference().setValue(null);
+
+
         // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
     }

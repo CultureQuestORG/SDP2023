@@ -47,7 +47,21 @@ public class LeaderboardFragmentTest {
 
         Database.init(new FireDatabase(firebaseDatabase));
 
+
+        //The comments below is what is used to test on the main but weirdly,
+        //it accesses the real database and overwrites its content...
+        //TODO resolve issuee
+        //firebaseDatabase = FirebaseDatabase.getInstance();
+        //try {
+        //    firebaseDatabase.useEmulator("10.0.2.2", 9000);
+        //} catch (IllegalStateException e) {
+
+        //}
+        //Database.init(new FireDatabase(firebaseDatabase));
+
         // clear the database before starting the following tests
+        //firebaseDatabase.getReference().setValue(null);
+
 
         // Initialize the database with some test profiles
         Database.setProfile(new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 400));
@@ -104,5 +118,8 @@ public class LeaderboardFragmentTest {
         Database.deleteProfile("testUid2");
         Database.deleteProfile("testUid3");
         Database.deleteProfile("testUid4");
+
+        //firebaseDatabase.getReference().setValue(null);
+
     }
 }
