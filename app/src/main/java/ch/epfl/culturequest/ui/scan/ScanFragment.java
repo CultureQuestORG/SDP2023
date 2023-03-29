@@ -3,10 +3,12 @@ package ch.epfl.culturequest.ui.scan;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.TextureView;
@@ -24,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
 
+import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
@@ -66,6 +69,12 @@ public class ScanFragment extends Fragment {
                         boolean isWifiAvailable = false;
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
+                            Uri imageUri = localStorage.lastlyStoredImageUri;
+                            Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
+                            intent.putExtra("imageUri", imageUri.toString());
+                            startActivity(intent);
+
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

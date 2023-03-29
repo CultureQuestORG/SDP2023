@@ -2,8 +2,10 @@ package ch.epfl.culturequest;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.OutputStream;
 
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
@@ -29,13 +32,23 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
         findViewById(R.id.back_button).setOnClickListener(view -> finish());
 
-        scannedImage = null;
+        String imageUriExtra = getIntent().getStringExtra("imageUri");
+        Uri imageUri = Uri.parse(imageUriExtra);
 
-        ImageView imageView = findViewById(R.id.artImage);
-        imageView.setImageBitmap(scannedImage);
+        // get bitmap from imageUri with the ContentResolver
+        OutputStream os = new ByteArrayOutputStream();
+        try {
+            // get bitmap from imageUri with the ContentResolver
+            Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+            scannedImage = bitmap;
+            ImageView imageView = findViewById(R.id.artImage);
+            imageView.setImageBitmap(scannedImage);
+            processImageAndDisplayInformation();
 
-        processImageAndDisplayInformation();
-
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            finish();
+        }
     }
 
     private void processImageAndDisplayInformation() {

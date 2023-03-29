@@ -16,6 +16,8 @@ public class LocalStorage {
     public final ContentResolver resolver;
     public final Uri contentUri;
 
+    public Uri lastlyStoredImageUri;
+
     public LocalStorage(ContentResolver resolver) {
         this.resolver = resolver;
 
@@ -54,7 +56,7 @@ public class LocalStorage {
 
         // Inserts the new entry in the MediaStore and returns its uri
         Uri uri = resolver.insert(contentUri, values);
-
+        lastlyStoredImageUri = uri;
         // Opens the output stream to store the image
         try {
             writeImageToStream(uri, bitmap);
@@ -83,4 +85,5 @@ public class LocalStorage {
             }
         }
     }
+
 }
