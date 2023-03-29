@@ -68,7 +68,7 @@ public final class Post {
 
     @Override
     public String toString() {
-        return "Post [artworkName=" + artworkName + ", date=" + date + ", imageUrl=" + imageUrl + ", postid=" + postId
-                + ", uid=" + uid + "]";
+        return "Post of artwork " + artworkName + ", at date" + date + ", imageUrl=" + imageUrl + ", postid=" + postId
+                + ", from user:" + uid + ".";
     }
 }
