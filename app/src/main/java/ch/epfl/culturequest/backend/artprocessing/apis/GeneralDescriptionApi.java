@@ -24,22 +24,37 @@ public class GeneralDescriptionApi {
         return new WikipediaDescriptionApi().getArtDescription(recognizedArt)
                 .thenCompose(basicArtDescription -> {
                     BasicArtDescription.ArtType artType = basicArtDescription.getType();
+
+                    OpenAIDescriptionApi openAIDescriptionApi = new OpenAIDescriptionApi(service);
+
+                    CompletableFuture<Integer> score = openAIDescriptionApi.getScore(recognizedArt);
+
                     if (artType == BasicArtDescription.ArtType.PAINTING || artType == BasicArtDescription.ArtType.SCULPTURE) {
-                        return CompletableFuture.completedFuture(basicArtDescription);
+                        return score.thenApply(s -> {
+                            basicArtDescription.setScore(s);
+                            return basicArtDescription;
+                        });
                     }
                     else {
                         // If the art type is architecture or monument, we use the OpenAI API to get the missing data (artist, year, city, country)
 
-                        CompletableFuture<ArrayList<String>> missingData = new OpenAIDescriptionApi(service).getMissingData(recognizedArt);
-                        return missingData.thenApply(d -> {
-                            String artist = d.get(0);
-                            String year = d.get(1);
-                            String city = d.get(2);
-                            String country = d.get(3);
-                            return new BasicArtDescription(basicArtDescription.getName(), artist, basicArtDescription.getSummary(), artType, year, city, country, null);
+                        CompletableFuture<ArrayList<String>> missingData = openAIDescriptionApi.getMissingData(recognizedArt);
+                        return missingData.thenCombine(score, (data, s) -> {
+
+                            String artist = data.get(0);
+                            String year = data.get(1);
+                            String city = data.get(2);
+                            String country = data.get(3);
+
+                            basicArtDescription.setArtist(artist);
+                            basicArtDescription.setYear(year);
+                            basicArtDescription.setCity(city);
+                            basicArtDescription.setCountry(country);
+                            basicArtDescription.setScore(s);
+
+                            return basicArtDescription;
                         });
                     }
-
                 }
         );
     }
