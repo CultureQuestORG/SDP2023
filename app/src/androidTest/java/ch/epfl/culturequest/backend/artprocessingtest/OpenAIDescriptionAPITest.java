@@ -20,10 +20,12 @@ public class OpenAIDescriptionAPITest {
         OpenAiService openAiService = new OpenAiService(BuildConfig.OPEN_AI_API_KEY);
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(openAiService);
         ArrayList<String> missingData = openAPI.getMissingData(arcDeTriompheRecognition).join();
+        Integer score = openAPI.getScore(arcDeTriompheRecognition).join();
 
         assert (missingData.get(0).equals("Jean-François-Thérèse Chalgrin"));
         assert (missingData.get(1).equals("1836"));
         assert (missingData.get(2).equals("Paris"));
         assert (missingData.get(3).equals("France"));
+        assert (score == 80);
     }
 }

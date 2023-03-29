@@ -20,16 +20,6 @@ public class GeneralDescriptionApiTest {
 
         ArtRecognition artRecognition = new ArtRecognition("Arc de Triomphe", "Monument");
 
-        MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API KEY");
-        mockOpenAiService.setMockResponse("{\n" +
-                "    \"designer\": \"Jean-François-Thérèse Chalgrin\",\n" +
-                "    \"yearOfInauguration\": \"1836\",\n" +
-                "    \"locationCity\": \"Paris\",\n" +
-                "    \"locationCountry\": \"France\"\n" +
-                "}");
-
-        WikipediaDescriptionApi.service = mockOpenAiService;
-
         CompletableFuture<BasicArtDescription> descriptionFuture = new GeneralDescriptionApi().getArtDescription(artRecognition);
 
         BasicArtDescription description = descriptionFuture.join();
@@ -39,8 +29,6 @@ public class GeneralDescriptionApiTest {
         assertThat(description.getYear(), is("1836"));
         assertThat(description.getCity(), is("Paris"));
         assertThat(description.getCountry(), is("France"));
-
-
     }
 
     @Test
@@ -57,6 +45,8 @@ public class GeneralDescriptionApiTest {
         assertThat(artDescription.getCity(), is("Paris"));
         assertThat(artDescription.getCountry(), is(nullValue()));
         assertThat(artDescription.getMuseum(), is("Louvre"));
+        assertThat(artDescription.getType(), is(BasicArtDescription.ArtType.PAINTING));
+        assertThat(artDescription.getScore(), is(100));
     }
 
 }

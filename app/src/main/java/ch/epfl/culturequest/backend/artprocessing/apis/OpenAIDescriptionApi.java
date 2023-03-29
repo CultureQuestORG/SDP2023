@@ -20,7 +20,10 @@ import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecogniti
  * The missing data are: artist, year, city, country
  */
 public class OpenAIDescriptionApi {
-    private final String openAiPromptTemplate = "Given the input \"%s (%s)\", fill following fields: designer, yearOfInauguration, locationCity, locationCountry. Return your response as a JSON object.";
+    private final String missingDataPrompt = "Given the input \"%s (%s)\", fill following fields: designer, yearOfInauguration, locationCity, locationCountry. Return your response as a JSON object.";
+
+    private final String scorePrompt = "On a scale from 1 to 100 (ceil round to 10), evaluate the popularity of \"%s (%s)\". Fill the field \"artPopularity\", as JSON.";
+
 
     private OpenAiService service;
 
@@ -31,9 +34,14 @@ public class OpenAIDescriptionApi {
     // make a function that returns a completable future of an array containing the artistName, yearOfCreation, locationCity, locationCountry, given the artRecognition object
 
     public CompletableFuture<ArrayList<String>> getMissingData(ArtRecognition recognizedArchitecture) {
-        return getJsonData(recognizedArchitecture).thenApply(this::parseDescription);
+        return getJsonApiResponse(recognizedArchitecture, missingDataPrompt).thenApply(this::parseMissingData);
     }
-    private CompletableFuture<String> getJsonData(ArtRecognition recognizedArchitecture) {
+
+    public CompletableFuture<Integer> getScore(ArtRecognition recognizedArchitecture) {
+        return getJsonApiResponse(recognizedArchitecture, scorePrompt).thenApply(this::parseScore);
+    }
+
+    private CompletableFuture<String> getJsonApiResponse(ArtRecognition recognizedArchitecture, String openAiPromptTemplate) {
 
         String prompt = String.format(openAiPromptTemplate, recognizedArchitecture.getArtName(), recognizedArchitecture.getAdditionalInfo());
         ChatMessage message = new ChatMessage("user", prompt);
@@ -53,7 +61,7 @@ public class OpenAIDescriptionApi {
         String value = obj.optString(key, null);
         return "null".equals(value) ? null : value;
     }
-    private ArrayList<String> parseDescription(String jsonData){
+    private ArrayList<String> parseMissingData(String jsonData){
 
         try {
             JSONObject obj = new JSONObject(extractJson(jsonData));
@@ -67,6 +75,17 @@ public class OpenAIDescriptionApi {
             return data;
         }
 
+        catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Integer parseScore (String jsonData) {
+        try {
+            JSONObject obj = new JSONObject(extractJson(jsonData));
+
+            return obj.getInt("artPopularity");
+        }
         catch (JSONException e) {
             throw new RuntimeException(e);
         }
