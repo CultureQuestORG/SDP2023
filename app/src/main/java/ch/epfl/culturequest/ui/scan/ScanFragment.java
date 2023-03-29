@@ -26,18 +26,21 @@ import java.io.IOException;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
+import ch.epfl.culturequest.ui.commons.LoadingAnimation;
 
 public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
     private CameraSetup cameraSetup;
+    private LoadingAnimation loadingAnimation;
 
     //SurfaceTextureListener is used to detect when the TextureView is ready to be used
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
-            cameraSetup.openCamera();
+            if(isPermissionGranted())
+                cameraSetup.openCamera();
         }
         @Override
         public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {}
@@ -52,18 +55,23 @@ public class ScanFragment extends Fragment {
         }};
 
     // ScanButtonListener is used to detect when the scan button is clicked
-    private final View.OnClickListener scanButtonListener = view -> cameraSetup.takePicture().thenAccept(captureTaken -> {
-        if(captureTaken) {
-            cameraSetup.getLatestImage().thenAccept(bitmap -> {
-                boolean isWifiAvailable = false;
-                try {
-                    localStorage.storeImageLocally(bitmap, isWifiAvailable);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+    private final View.OnClickListener scanButtonListener = view -> {
+        loadingAnimation.startLoading();
+        if (cameraSetup != null) {
+            cameraSetup.takePicture().thenAccept(captureTaken -> {
+                if (captureTaken) {
+                    cameraSetup.getLatestImage().thenAccept(bitmap -> {
+                        boolean isWifiAvailable = false;
+                        try {
+                            localStorage.storeImageLocally(bitmap, isWifiAvailable);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
                 }
             });
         }
-    });
+    };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -72,6 +80,9 @@ public class ScanFragment extends Fragment {
 
         binding = FragmentScanBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Creates the loading animation
+        loadingAnimation = root.findViewById(R.id.scanLoadingAnimation);
 
         // Creates the LocalStorage to store the images locally
         ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
@@ -88,12 +99,12 @@ public class ScanFragment extends Fragment {
                 cameraSetup = new CameraSetup(cameraManager, textureView);
 
                 textureView.setSurfaceTextureListener(surfaceTextureListener);
-
-                // Adds a listener to the scan button and performs action
-                binding.scanAction.scanButton.setOnClickListener(scanButtonListener);
             }
         } catch (CameraAccessException ignored) {
         }
+
+        // Adds a listener to the scan button and performs action
+        binding.scanAction.scanButton.setOnClickListener(scanButtonListener);
 
         final ImageButton imageButton = binding.helpButtonScan;
         imageButton.setOnClickListener(view -> helpButtonDialog());
@@ -121,18 +132,25 @@ public class ScanFragment extends Fragment {
                 if (!isGranted) {
                     // Permission is not granted. You can ask for the permission again.
                     requestPermissions();
+                } else {
+                    // Permission is granted. You can go ahead and use the camera.
+                    cameraSetup.openCamera();
                 }
             });
 
     // Method to request the permissions
     private void requestPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                getContext(), android.Manifest.permission.CAMERA) !=
-                PackageManager.PERMISSION_GRANTED) {
+        if (!isPermissionGranted()) {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
             requestPermissionLauncher.launch(
                     android.Manifest.permission.CAMERA);
         }
+    }
+
+    private boolean isPermissionGranted() {
+        return ContextCompat.checkSelfPermission(
+                getContext(), android.Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED;
     }
 }

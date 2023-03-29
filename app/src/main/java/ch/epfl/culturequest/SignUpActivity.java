@@ -32,7 +32,7 @@ public class SignUpActivity extends AppCompatActivity {
         if (Profile.getActiveProfile() == null) {
             CompletableFuture<Profile> profile = Database.getProfile(currentUser.getUid());
             profile.handle((p, e) -> {
-                if (e != null) {
+                if (e != null || p == null) {
                     // If the user does not have a profile, display the profile creator activity
                     startActivity(new Intent(this, ProfileCreatorActivity.class));
                 } else {

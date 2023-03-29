@@ -17,18 +17,28 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LastLocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.backend.map_collection.BasicOTMProvider;
+import ch.epfl.culturequest.backend.map_collection.OTMLocation;
+import ch.epfl.culturequest.backend.map_collection.OTMProvider;
+import ch.epfl.culturequest.backend.map_collection.RetryingOTMProvider;
 import ch.epfl.culturequest.databinding.FragmentMapsBinding;
 
 public class MapsFragment extends Fragment {
@@ -37,6 +47,9 @@ public class MapsFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
     private FragmentMapsBinding binding;
     private MapsViewModel viewModel;
+
+    private OTMProvider otmProvider;
+
     private GoogleMap mMap;
 
     private Location lastKnownLocation;
@@ -63,6 +76,33 @@ public class MapsFragment extends Fragment {
                     .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM)); // Set to Default location anyway
         }
     };
+
+    public void getMarkers(){
+        CompletableFuture<List<OTMLocation>> places;
+        LatLng upperRight = mMap.getProjection().getVisibleRegion().latLngBounds.northeast;
+        LatLng lowerLeft = mMap.getProjection().getVisibleRegion().latLngBounds.southwest;
+        LatLng upperLeft = new LatLng(upperRight.latitude, lowerLeft.longitude);
+        LatLng lowerRight = new LatLng(lowerLeft.latitude, upperRight.longitude);
+        if(viewModel.getLocations() != null){
+            places = CompletableFuture.completedFuture(viewModel.getLocations());
+        }
+        else {
+            places = otmProvider.getLocations(upperLeft, lowerRight).thenApply(x -> {
+                viewModel.setLocations(x);
+                return x;
+            });
+        }
+        places.thenAccept(x -> {
+            for (OTMLocation location : x) {
+                if(location.getName().isEmpty()){
+                    continue;
+                }
+                LatLng latLng = new LatLng(location.getCoordinates().latitude(), location.getCoordinates().longitude());
+                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(location.getName()).snippet(String.join(", ", location.getKinds())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                marker.setTag(location);
+            }
+        });
+    }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
@@ -94,6 +134,7 @@ public class MapsFragment extends Fragment {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
+        otmProvider = new RetryingOTMProvider(new BasicOTMProvider());
         viewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location -> {
             if (mMap != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
@@ -161,7 +202,6 @@ public class MapsFragment extends Fragment {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 lastKnownLocation = null;
-                //getLocationPermission();
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
@@ -178,27 +218,29 @@ public class MapsFragment extends Fragment {
          */
         try {
             if (viewModel.isLocationPermissionGranted()) {
-                Task<Location> locationResult = fusedLocationClient.getLastLocation();
+                Task<Location> locationResult = fusedLocationClient.getLastLocation(new LastLocationRequest.Builder().setMaxUpdateAgeMillis(10000).build());
                 locationResult.addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {
                         // Set the map's camera position to the current location of the device.
                         lastKnownLocation = task.getResult();
                         if (lastKnownLocation != null) {
                             Log.i("INFORMATION", lastKnownLocation.toString());
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(lastKnownLocation.getLatitude(),
-                                            lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
+                                    lastKnownLocation.getLongitude()));
                         }
                     } else {
                         Log.d("MapsFragment", "Current location is null. Using defaults.");
                         Log.e("MapsFragment", "Exception: %s", task.getException());
                         viewModel.resetCurrentLocation();
-                        mMap.moveCamera(CameraUpdateFactory
-                                .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
                         mMap.getUiSettings().setMyLocationButtonEnabled(false);
                     }
+                    mMap.moveCamera(CameraUpdateFactory
+                            .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
+
+                    getMarkers();
                 });
             }
+
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage(), e);
         }

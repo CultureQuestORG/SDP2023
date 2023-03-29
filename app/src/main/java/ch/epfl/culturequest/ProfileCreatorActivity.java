@@ -1,5 +1,7 @@
 package ch.epfl.culturequest;
 
+import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,17 +30,18 @@ import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
+/**
+ * This activity is used to allow the user to create a profile by
+ * selecting a profile picture and a username
+ */
 public class ProfileCreatorActivity extends AppCompatActivity {
-    public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
-    public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
-    public static String DEFAULT_PROFILE_PATH = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2Fbasic_profile_picture.png?alt=media&token=8e407bd6-ad5f-401a-9b2d-7852ccfb9d62";
+
+
 
     private String profilePicUri;
-
-    private final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
     private final Profile profile = new Profile(null, "");
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
@@ -72,10 +75,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      * @param view
      */
     public void selectProfilePicture(View view) {
-        if (ContextCompat.checkSelfPermission(this, GALLERY_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, ProfileUtils.GALLERY_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
             openGallery();
         } else {
-            requestPermissionLauncher.launch(GALLERY_PERMISSION);
+            requestPermissionLauncher.launch(ProfileUtils.GALLERY_PERMISSION);
         }
     }
 
@@ -90,7 +93,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         EditText textView = findViewById(R.id.username);
         String username = textView.getText().toString();
 
-        if (!isValid(username)) {
+        //check if username is valid
+        if (!ProfileUtils.isValid(profile,username)) {
             textView.setText("");
             textView.setHint(INCORRECT_USERNAME_FORMAT);
             return;
@@ -100,12 +104,13 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
         if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
             profile.setUsername(username);
-
-            if ((profilePicUri.equals(DEFAULT_PROFILE_PATH)))
-                storeProfileInDatabase(DEFAULT_PROFILE_PATH);
+            //if the profile pic is the default one, we don't have to store it in the database
+            if ((profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PATH)))
+                storeProfileInDatabase(ProfileUtils.DEFAULT_PROFILE_PATH);
              else
                 storeImageAndProfileInDatabase();
         } else{
+            //if user is anonymous, we don't want to store the profile in the database
             profile.setUsername(username);
             profile.setProfilePicture(profilePicUri);
             Profile.setActiveProfile(profile);
@@ -115,6 +120,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         startActivity(successfulProfileCreation);
     }
 
+
+
     private void storeProfileInDatabase(String path) {
         profile.setProfilePicture(path);
         Profile.setActiveProfile(profile);
@@ -122,10 +129,12 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     }
 
     private void storeImageAndProfileInDatabase() {
+        //upload image to firebase storage
         FirebaseStorage storage = FirebaseStorage.getInstance();
         UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
-        task.addOnFailureListener(e -> storeProfileInDatabase(DEFAULT_PROFILE_PATH))
-                .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> storeProfileInDatabase(DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> storeProfileInDatabase(uri.toString())));
+        // on failure, store profile with default profile pic
+        task.addOnFailureListener(e -> storeProfileInDatabase(ProfileUtils.DEFAULT_PROFILE_PATH))
+                .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> storeProfileInDatabase(ProfileUtils.DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> storeProfileInDatabase(uri.toString())));
     }
 
 
@@ -133,22 +142,20 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
     }
 
-    private boolean isValid(String username) {
-        if (usernameIsValid(username)) {
-            profile.setUsername(username);
-            return true;
-        }
-        return false;
-    }
+
 
     private void setDefaultPicIfNoneSelected() {
         if (profileView.getDrawable().equals(initialDrawable)) {
-            profilePicUri = DEFAULT_PROFILE_PATH;
+            profilePicUri = ProfileUtils.DEFAULT_PROFILE_PATH;
         }
     }
 
 
-    private void displayProfilePic(ActivityResult result) {
+    /**
+     * Displays the profile picture selected by the user
+     * @param result the result of the activity launched to select the profile picture
+     */
+    public void displayProfilePic(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
             Uri profilePicture = result.getData().getData();
             CircleImageView image = findViewById(R.id.profile_picture);
@@ -159,18 +166,11 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         }
     }
 
-    private boolean usernameIsValid(String username) {
-        int length = username.length();
-        return !username.isEmpty()
-                && length > 3
-                && length < 20
-                && username.matches(USERNAME_REGEX)
-                && !username.contains(" ");
-    }
 
-    //used for testing purposes
-
-
+    /**
+     * Getter for the profile being created
+     * @return the profile being created
+     */
     public Profile getProfile() {
         return profile;
     }

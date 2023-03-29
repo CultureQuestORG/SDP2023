@@ -38,7 +38,8 @@ public class Authenticator implements AuthService {
 
     /**
      * Authenticator for the login part of the app.
-     * @param activity Activity from which we create an authenticator
+     *
+     * @param activity    Activity from which we create an authenticator
      * @param isAnonymous This is used for testing. We login anonymously when testing so that
      *                    we dont need a user to physically login with google
      */
@@ -56,7 +57,9 @@ public class Authenticator implements AuthService {
     @Override
     public void signIn() {
         if (isAnonymous) {
-            FirebaseAuth.getInstance().signInAnonymously().addOnCompleteListener(task -> {
+            FirebaseAuth.getInstance()
+                    .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
+                    .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
                             redirectTo(ProfileCreatorActivity.class);
@@ -77,8 +80,6 @@ public class Authenticator implements AuthService {
                 throwable.printStackTrace();
                 return null;
             });
-
-
         }
     }
 
@@ -89,17 +90,26 @@ public class Authenticator implements AuthService {
      */
     @Override
     public void signOut() {
-        if (user != null) {
-            if(isAnonymous){
-                mAuth.signOut();
-                redirectTo(SignUpActivity.class);
-            }
-            else {AuthUI.getInstance()
-                    .signOut(activity)
-                    .addOnCompleteListener(task -> redirectTo(SignUpActivity.class));
-                Profile.setActiveProfile(null);
-            }
+        if (user == null) {
+            return;
         }
+        if (isAnonymous) {
+            mAuth.signOut();
+            redirectTo(SignUpActivity.class);
+            return;
+        }
+
+        // first sign out the user
+        mAuth.signOut();
+        // then sign out of firebase so that the user is not automatically signed in
+        AuthUI.getInstance()
+                .signOut(activity)
+                .addOnCompleteListener(task -> {
+                    redirectTo(SignUpActivity.class);
+                });
+
+        Profile.setActiveProfile(null);
+
     }
 
     /**

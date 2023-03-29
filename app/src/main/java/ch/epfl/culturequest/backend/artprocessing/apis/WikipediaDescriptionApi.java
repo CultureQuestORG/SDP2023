@@ -2,6 +2,8 @@ package ch.epfl.culturequest.backend.artprocessing.apis;
 
 import androidx.annotation.NonNull;
 
+import com.theokanning.openai.service.OpenAiService;
+
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
@@ -9,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import okhttp3.Call;
@@ -25,19 +28,22 @@ import okhttp3.Response;
 
 public class WikipediaDescriptionApi {
 
+    public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY);
+
     public static String wikipediaBaseUrl = "https://en.wikipedia.org/wiki/Special:Search?search=";
 
     /** Returns an art description object (as a future) given a recognized piece of art (represented by ArtRecognition) */
     public CompletableFuture<BasicArtDescription> getArtDescription(ArtRecognition recognizedArt) {
 
         return getWikipediaPageHtml(recognizedArt)
+
                 .thenApply(pageHtml -> {
 
                     String artName = recognizedArt.getArtName();
                     String artSummary = getArtSummary(pageHtml);
                     BasicArtDescription.ArtType artType = getArtType(recognizedArt);
 
-                    if(artType == BasicArtDescription.ArtType.PAINTING || artType == BasicArtDescription.ArtType.SCULPTURE){
+                    if (artType == BasicArtDescription.ArtType.PAINTING || artType == BasicArtDescription.ArtType.SCULPTURE) {
 
                         String parsedLocation = parseLocation(pageHtml);
 
@@ -51,8 +57,11 @@ public class WikipediaDescriptionApi {
                     }
 
                     return new BasicArtDescription(artName, null, artSummary, artType, null, null, null, null);
-
                 });
+
+        // If the art type is architecture or monument, we use the OpenAI API to get the missing data (artist, year, city, country)
+
+        //return new BasicArtDescription(artName, null, artSummary, artType, null, null, null, null);
     }
 
     private CompletableFuture<String> getWikipediaPageHtml(ArtRecognition recognizedArt) {
