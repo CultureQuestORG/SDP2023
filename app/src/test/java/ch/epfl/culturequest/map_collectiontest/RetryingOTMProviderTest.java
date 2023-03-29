@@ -56,7 +56,7 @@ public class RetryingOTMProviderTest {
     // Test the the provider indeed retries if the server is not reachable at first
     @Test
     public void testProviderRetriesIfServerIsNotReachable() throws IOException {
-        //Make request before response is available, which should force a retry
+        // Make request before response is available, which should force a retry
         CompletableFuture<List<OTMLocation>> results = provider.getLocations(new LatLng(1., 0.), new LatLng(0., 1.));
         String jsonBody = "[\n" +
                 "  {\n" +
@@ -72,7 +72,7 @@ public class RetryingOTMProviderTest {
                 "    }\n" +
                 "  }\n" +
                 "]";
-        server.enqueue(new MockResponse().setBody(jsonBody));
+        server.enqueue(new MockResponse().setBody(jsonBody).setBodyDelay(2, TimeUnit.SECONDS)); // Delay response to force a retry further
         List<OTMLocation> locations = results.orTimeout(5, TimeUnit.SECONDS).join();
 
         assertThat(locations.size(), is(1));

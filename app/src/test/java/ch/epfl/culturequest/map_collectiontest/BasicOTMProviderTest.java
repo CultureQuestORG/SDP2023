@@ -24,6 +24,7 @@ import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMProvider;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
 
 public class BasicOTMProviderTest {
     MockWebServer server = new MockWebServer();
@@ -37,7 +38,7 @@ public class BasicOTMProviderTest {
     // Test if the provider returns a failure if the server is not reachable
     @Test
     public void testProviderReturnsFailureIfServerIsNotReachable() throws IOException {
-        server.shutdown(); // make the server unavailable
+        server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));; // make the server unavailable
         assertThrows(CompletionException.class, () -> provider.getLocations(new LatLng(1., 0.), new LatLng(0.,1.)).orTimeout(5, TimeUnit.SECONDS).join());
     }
 
