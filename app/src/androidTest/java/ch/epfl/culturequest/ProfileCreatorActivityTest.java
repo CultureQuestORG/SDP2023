@@ -42,6 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
@@ -83,6 +84,7 @@ public class ProfileCreatorActivityTest {
 
     @After
     public void release(){
+        Database.deleteProfile(profile.getUid());
         Intents.release();
     }
 
@@ -101,7 +103,6 @@ public class ProfileCreatorActivityTest {
         Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), NavigationActivity.class);
         assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
         ActivityScenario.launch(NavigationActivity.class).onActivity(NavigationActivity::onBackPressed);
-
     }
 
     @Test
