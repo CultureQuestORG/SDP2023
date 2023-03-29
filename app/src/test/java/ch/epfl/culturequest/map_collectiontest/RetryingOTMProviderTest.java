@@ -41,6 +41,13 @@ public class RetryingOTMProviderTest {
         assertThrows(NullPointerException.class, () -> new RetryingOTMProvider(null));
     }
 
+    // Test that the constructor throws an IllegalArgumentException if the number of retries is negative
+    @Test
+    public void testConstructorThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> new RetryingOTMProvider(new BasicOTMProvider("http://localhost:8080/"), 0));
+        assertThrows(IllegalArgumentException.class, () -> new RetryingOTMProvider(new BasicOTMProvider("http://localhost:8080/"), -1));
+    }
+
     // Test if the provider returns a failure if there is a query issue
     @Test
     public void testProviderReturnsFailureIfQueryIssue() {
