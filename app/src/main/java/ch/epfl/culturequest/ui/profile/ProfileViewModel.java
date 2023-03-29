@@ -14,54 +14,71 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ProfileViewModel extends ViewModel {
 
-    private final MutableLiveData<String> name;
+    private final MutableLiveData<String> username;
     private final MutableLiveData<String> profilePictureUri;
 
     private final MutableLiveData<List<Image>> pictures;
-
     private final MutableLiveData<Boolean> followed;
 
-    public ProfileViewModel() {
-        name = new MutableLiveData<>();
+    /**
+     * Constructor of the ProfileViewModel
+     */
+    public ProfileViewModel(String uid) {
+        // create the mutable live data
+        username = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
         followed = new MutableLiveData<>(false);
+
         EspressoIdlingResource.increment();
         Profile profile = Profile.getActiveProfile();
+
         if (profile != null) {
-            name.setValue(profile.getName());
+            //set the values of the live data
+            username.setValue(profile.getUsername());
             profilePictureUri.setValue(profile.getProfilePicture());
             pictures.setValue(profile.getImagesList());
 
 
+            // add an observer to the profile so that the view is updated when the profile is updated
             profile.addObserver((profileObject, arg) -> {
                 Profile p = (Profile) profileObject;
-                name.postValue(p.getName());
+                username.postValue(p.getUsername());
                 profilePictureUri.postValue(p.getProfilePicture());
                 pictures.postValue(p.getImagesList());
             });
 
+            // if no profile is active, we load a default profile
         } else {
-            Database.getProfile("123").whenComplete((p, e) -> {
-                    name.setValue(p.getName());
-                    profilePictureUri.setValue(p.getProfilePicture());
-                    pictures.setValue(p.getImagesList());
+            Database.getProfile(uid).whenComplete((p, e) -> {
+                username.setValue(p.getUsername());
+                profilePictureUri.setValue(p.getProfilePicture());
+                pictures.setValue(p.getImagesList());
 
-                });
+            });
         }
 
 
         EspressoIdlingResource.decrement();
     }
 
-    public LiveData<String> getName() {
-        return name;
+    /**
+     * @return the username of the profile
+     */
+    public LiveData<String> getUsername() {
+        return username;
     }
 
+    /**
+     * @return the profile picture uri of the profile
+     */
     public LiveData<String> getProfilePictureUri() {
         return profilePictureUri;
     }
 
+    /**
+     * @return the list of pictures of the profile
+     */
     public LiveData<List<Image>> getPictures() {
         return pictures;
     }

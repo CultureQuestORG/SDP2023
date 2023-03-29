@@ -1,6 +1,8 @@
 package ch.epfl.culturequest.database;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
@@ -16,6 +18,7 @@ public class Database {
     /**
      * This method is used to initialize the database instance as something else than the default (FireDatabase)
      * This is useful for testing purposes
+     *
      * @param database the database instance to be used
      */
     public static void init(DatabaseInterface database) {
@@ -23,8 +26,12 @@ public class Database {
     }
 
 
-    public static void set(String key, Object value) {
-        databaseInstance.set(key, value);
+    public static CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
+    return databaseInstance.deleteProfile(uid);
+    }
+
+        public static CompletableFuture<AtomicBoolean> set(String key, Object value) {
+        return databaseInstance.set(key, value);
     }
 
 
@@ -36,8 +43,12 @@ public class Database {
         return databaseInstance.getProfile(UId);
     }
 
-    public static void setProfile(Profile profile) {
-        databaseInstance.setProfile(profile);
+    public static CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
+        return databaseInstance.setProfile(profile);
+    }
+
+    public static CompletableFuture<List<Profile>> getAllProfiles() {
+        return databaseInstance.getAllProfiles();
     }
 
 
@@ -45,9 +56,19 @@ public class Database {
         return databaseInstance.getImage(UId);
     }
 
-    public static void setImage(Image picture) {
-        databaseInstance.setImage(picture);
+    public static CompletableFuture<AtomicBoolean> setImage(Image picture) {
+        return databaseInstance.setImage(picture);
     }
 
+    public static CompletableFuture<Integer> getRank(String UId) {
+        return databaseInstance.getRank(UId);
+    }
 
+    public static CompletableFuture<Integer> getNumberOfProfiles() {
+        return databaseInstance.getNumberOfProfiles();
+    }
+
+    public static CompletableFuture<List<Profile>> getTopNProfiles(int n) {
+        return databaseInstance.getTopNProfiles(n);
+    }
 }

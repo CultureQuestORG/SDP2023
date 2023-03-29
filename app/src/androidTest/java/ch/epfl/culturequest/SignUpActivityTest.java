@@ -48,10 +48,9 @@ public class SignUpActivityTest {
 
     @Test
     public void signInTransitionsToNavActivityForNonNullUser() {
-        auth.signInAnonymously().addOnCompleteListener(task -> {
+        auth.signInWithEmailAndPassword("test@gmail.com", "abcdefg").addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 user = auth.getCurrentUser();
-
             }
         });
         if (user != null) {
@@ -67,10 +66,5 @@ public class SignUpActivityTest {
             Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), NavigationActivity.class);
             assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
         }
-    }
-
-    @AfterClass
-    public static void destroyUser() {
-        user.delete();
     }
 }

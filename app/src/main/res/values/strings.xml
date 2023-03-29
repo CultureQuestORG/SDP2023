@@ -4,7 +4,7 @@
 
     <string name="title_activity_navigation">NavigationActivity</string>
     <string name="title_home">Home</string>
-    <string name="title_leaderboard">LeaderBoard</string>
+    <string name="title_leaderboard">Leaderboard</string>
     <string name="title_profile">Profile</string>
     <string name="title_map">Map</string>
     <string name="title_scan">Scan</string>
@@ -24,4 +24,9 @@
     <string name="understood">Understood</string>
     <string name="followTextButton">Follow</string>
     <string name="unfollowTextButton">Unfollow</string>
+    <string name="settings">settings</string>
+    <string name="update_profile_picture">Update Profile Picture</string>
+    <string name="username">Username</string>
+    <string name="log_out">Log out</string>
+    <string name="update_profile">Update profile</string>
 </resources>

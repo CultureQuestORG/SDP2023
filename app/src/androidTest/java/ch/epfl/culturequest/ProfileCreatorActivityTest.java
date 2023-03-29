@@ -6,42 +6,28 @@ import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
-import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
-import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import static ch.epfl.culturequest.ProfileCreatorActivity.DEFAULT_PROFILE_PATH;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
+import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Instrumentation;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.provider.Settings;
-
-import android.app.Instrumentation.ActivityResult;
-import android.widget.ImageView;
 
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.intent.Intents;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
@@ -56,9 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Objects;
-import java.util.function.Function;
-
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
@@ -77,11 +61,10 @@ public class ProfileCreatorActivityTest {
     @BeforeClass
     public static void setup() throws InterruptedException {
         FirebaseAuth.getInstance()
-                .signInAnonymously()
+                .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         user = FirebaseAuth.getInstance().getCurrentUser();
-
                     }
                 });
         Thread.sleep(2000);
@@ -101,6 +84,7 @@ public class ProfileCreatorActivityTest {
 
     @After
     public void release(){
+        Database.deleteProfile(profile.getUid());
         Intents.release();
     }
 
@@ -119,7 +103,6 @@ public class ProfileCreatorActivityTest {
         Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), NavigationActivity.class);
         assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
         ActivityScenario.launch(NavigationActivity.class).onActivity(NavigationActivity::onBackPressed);
-
     }
 
     @Test
@@ -138,7 +121,7 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.username)).perform(typeText("  !+ "));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(1000);
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
     }
 
     @Test
@@ -148,7 +131,7 @@ public class ProfileCreatorActivityTest {
     }
 
     @Test
-    public void notSelectingPicGivesDefaultProfilePicAndCorrectUsername() throws InterruptedException {
+    public void notSelectingPicGivesDefaultProfilePicAndCorrectUsername() {
         onView(withId(R.id.username)).perform(typeText("JohnDoe"));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
 
@@ -158,31 +141,22 @@ public class ProfileCreatorActivityTest {
     }
 
 
-
     @Test
-    public void wrongUsernamesFailProfileCreation(){
+    public void wrongUsernamesFailProfileCreation() {
         onView(withId(R.id.username)).perform(typeText(""));
         onView(withId(R.id.create_profile)).perform(click());
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
 
         onView(withId(R.id.username)).perform(typeText("lol"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
 
         onView(withId(R.id.username)).perform(typeText("abcdefghijklmnopqrstuvxyz"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
 
         onView(withId(R.id.username)).perform(typeText("john Doe"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
-        onView(withId(R.id.username)).check(matches(withHint(ProfileCreatorActivity.INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
     }
-
-
-    @AfterClass
-    public static void destroy() {
-        Intents.release();
-        user.delete();
-    }
-
 }
