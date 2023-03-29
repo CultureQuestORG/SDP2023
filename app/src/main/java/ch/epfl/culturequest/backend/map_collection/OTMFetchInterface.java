@@ -10,11 +10,13 @@ import retrofit2.http.Query;
 
 /**
  * Interface for the Open Trip Map API
+ * @link <a href="https://opentripmap.io/docs/">the doc of OTM is available here</a>
  */
 public interface OTMFetchInterface {
 
     /**
      * Returns an array of locations in the bounding box
+     *
      * @param lo_min the longitude of the upper left corner of the bounding box
      * @param lo_max the longitude of the lower right corner of the bounding box
      * @param la_min the latitude of the upper left corner of the bounding box
