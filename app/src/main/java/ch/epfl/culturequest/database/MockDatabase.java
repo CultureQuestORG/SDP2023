@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.database;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -91,28 +93,47 @@ public class MockDatabase implements DatabaseInterface {
 
     @Override
     public CompletableFuture<AtomicBoolean> uploadPost(Post post) {
-        map.put("posts/" + post.hashCode(), post);
+        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
+        if(map1 == null) {
+            map1 = new HashMap<>();
+            map.put("posts/"+post.getUid(), map1);
+        }
+        map1.put(post.getPostid(), post);
         return CompletableFuture.completedFuture(new AtomicBoolean(true));
     }
 
     @Override
     public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
-        return null;
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        List<Post> posts = new ArrayList<>(((HashMap<String, Post>) map.getOrDefault("posts/"+ UId, new HashMap<String, Post>())).values());
+        future.complete(posts.subList(offset, Math.min(offset+limit, posts.size())));
+        return future;
     }
 
     @Override
     public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
-        return null;
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+
+        List<Post> posts = new ArrayList<>();
+        for(String UId : UIds) {
+            posts.addAll(((HashMap<String, Post>) map.getOrDefault("posts/"+ UId, new HashMap<String, Post>())).values());
+        }
+
+        posts.sort(Comparator.comparing(Post::getDate).reversed());
+        posts = posts.subList(offset, Math.min(offset+limit, posts.size()));
+
+        future.complete(posts);
+        return future;
     }
 
     @Override
     public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit) {
-        return null;
+        return getPostsFeed(UIds, limit, 0);
     }
 
     @Override
     public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
-        return null;
+        return getPostsFeed(UIds, 10, 0);
     }
 }
 
