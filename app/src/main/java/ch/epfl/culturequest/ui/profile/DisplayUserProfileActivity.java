@@ -71,6 +71,9 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         homeIcon = findViewById(R.id.home_icon);
         List.of(backIcon, homeIcon).forEach(elem -> elem.setVisibility(View.VISIBLE));
         backIcon.setOnClickListener(l -> super.onBackPressed());
-        homeIcon.setOnClickListener(l -> startActivity(new Intent(this, NavigationActivity.class)));
+        homeIcon.setOnClickListener(l -> {
+            setResult(RESULT_OK);
+            finish();
+        });
     }
 }

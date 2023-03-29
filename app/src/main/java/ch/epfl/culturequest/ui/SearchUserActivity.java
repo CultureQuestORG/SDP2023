@@ -83,7 +83,18 @@ public class SearchUserActivity extends AppCompatActivity {
     private void searchBarOnClickListener(AdapterView<?> parent, int position, Map<String, Profile> usernameToProfileMap) {
         String selectedUsername = (String) parent.getItemAtPosition(position);
         ProfileUtils.setSelectedProfile(usernameToProfileMap.get(selectedUsername));
-        this.startActivity(new Intent(this, DisplayUserProfileActivity.class));
+        //we put finish() to close the intent and open the display user activity. On that activity, if a user
+        //presses on the back button, it will open a new intent for searching
+        Intent intent = new Intent(this, DisplayUserProfileActivity.class);
+        startActivityForResult(intent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            finish();
+        }
     }
 
     public void goBack(View view) {
