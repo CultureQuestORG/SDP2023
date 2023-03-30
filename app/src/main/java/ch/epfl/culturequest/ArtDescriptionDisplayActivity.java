@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +20,9 @@ import java.io.OutputStream;
 
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.artprocessing.utils.ArtImageUpload;
+import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
@@ -32,46 +36,44 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
         findViewById(R.id.back_button).setOnClickListener(view -> finish());
 
+        String serializedArtDescription = getIntent().getStringExtra("artDescription");
         String imageUriExtra = getIntent().getStringExtra("imageUri");
         Uri imageUri = Uri.parse(imageUriExtra);
 
+        BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
+
         // get bitmap from imageUri with the ContentResolver
-        OutputStream os = new ByteArrayOutputStream();
         try {
             // get bitmap from imageUri with the ContentResolver
             Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
             scannedImage = bitmap;
             ImageView imageView = findViewById(R.id.artImage);
             imageView.setImageBitmap(scannedImage);
-            processImageAndDisplayInformation();
+            displayArtInformation(artDescription);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             finish();
         }
     }
+    private void displayArtInformation(BasicArtDescription artDescription){
 
-    private void processImageAndDisplayInformation() {
-        ArtImageUpload artImageUpload = new ArtImageUpload();
-        artImageUpload.uploadAndGetUrlFromImage(scannedImage).thenAccept(url -> {
-            new ProcessingApi().getArtDescriptionFromUrl(url).thenAccept(artDescription -> {
-                // do something with the artDescription object
+        TextView artNameView = findViewById(R.id.artName);
+        setTextOrFallback(artNameView, artDescription.getName(), "No name found");
 
-                TextView artNameView = findViewById(R.id.artName);
-                setTextOrFallback(artNameView, artDescription.getName(), "No name found");
+        TextView artistNameView = findViewById(R.id.artistName);
+        setTextOrFallback(artistNameView, artDescription.getArtist(), "No artist found");
 
-                TextView artistNameView = findViewById(R.id.artistName);
-                setTextOrFallback(artistNameView, artDescription.getArtist(), "No artist found");
+        TextView artYearView = findViewById(R.id.artYear);
+        setTextOrFallback(artYearView, artDescription.getYear(), "No year found");
 
-                TextView artYearView = findViewById(R.id.artYear);
-                setTextOrFallback(artYearView, artDescription.getYear(), "No year found");
+        TextView artSummaryView = findViewById(R.id.artSummary);
+        setTextOrFallback(artSummaryView, artDescription.getSummary(), "No description found");
 
-                TextView artSummaryView = findViewById(R.id.artSummary);
-                setTextOrFallback(artSummaryView, artDescription.getSummary(), "No description found");
-
-            });
-        });
+        TextView artScoreView = findViewById(R.id.artScore);
+        artScoreView.setText(artDescription.getScore() != null ? artDescription.getScore().toString() : "50");
     }
+
     private void setTextOrFallback(TextView textView, String text, String fallbackText) {
         textView.setText(text != null ? text : fallbackText);
     }

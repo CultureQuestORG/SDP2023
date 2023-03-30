@@ -15,6 +15,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -29,6 +30,8 @@ import java.io.IOException;
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
+import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
+import ch.epfl.culturequest.backend.artprocessing.utils.UploadAndProcess;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.ui.commons.LoadingAnimation;
@@ -69,11 +72,17 @@ public class ScanFragment extends Fragment {
                         boolean isWifiAvailable = false;
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
-                            Uri imageUri = localStorage.lastlyStoredImageUri;
-                            Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
-                            intent.putExtra("imageUri", imageUri.toString());
-                            startActivity(intent);
 
+                            UploadAndProcess.uploadAndProcess(bitmap).thenAccept(artDescription -> {
+                                Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
+
+                                Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
+                                String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
+                                intent.putExtra("artDescription", serializedArtDescription);
+                                intent.putExtra("imageUri", lastlyStoredImageUri.toString());
+                                startActivity(intent);
+                                loadingAnimation.stopLoading();
+                            });
 
                         } catch (IOException e) {
                             throw new RuntimeException(e);
