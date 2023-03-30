@@ -50,11 +50,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                         if (isGranted) openGallery();
                     });
 
-    private final PermissionRequest permissionRequest =
-            new PermissionRequest(Manifest.permission.READ_EXTERNAL_STORAGE);
+    private final PermissionRequest permissionRequest = new PermissionRequest(ProfileUtils.GALLERY_PERMISSION);
     private ImageView profileView;
     private Drawable initialDrawable;
-    private Database db = new Database();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

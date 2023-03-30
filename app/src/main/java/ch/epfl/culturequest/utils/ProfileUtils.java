@@ -3,6 +3,7 @@ package ch.epfl.culturequest.utils;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.view.View;
 
@@ -25,7 +26,11 @@ public class ProfileUtils {
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
 
-    public static final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
+    public static final String GALLERY_PERMISSION =
+            //Version code R is android 11.
+            Build.VERSION.SDK_INT > Build.VERSION_CODES.R ?
+                    Manifest.permission.READ_MEDIA_IMAGES :
+                    Manifest.permission.READ_EXTERNAL_STORAGE;
 
 
     /**
