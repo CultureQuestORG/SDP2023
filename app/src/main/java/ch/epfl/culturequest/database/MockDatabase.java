@@ -115,6 +115,16 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
+    public CompletableFuture<AtomicBoolean> removePost(Post post) {
+        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
+        if(map1 != null) {
+            map1.remove(post.getPostid());
+            return CompletableFuture.completedFuture(new AtomicBoolean(true));
+        }
+        return CompletableFuture.completedFuture(new AtomicBoolean(false));
+    }
+
+    @Override
     public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
         List<Post> posts = new ArrayList<>(((HashMap<String, Post>) map.getOrDefault("posts/"+ UId, new HashMap<String, Post>())).values());

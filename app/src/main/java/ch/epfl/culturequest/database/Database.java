@@ -83,6 +83,15 @@ public class Database {
     }
 
     /**
+     * This method is used to remove a post from the database
+     * @param post the post to be removed
+     * @return a CompletableFuture that will be completed when the removal is done
+     */
+    public static CompletableFuture<AtomicBoolean> removePost(Post post) {
+        return databaseInstance.removePost(post);
+    }
+
+    /**
      * This method is used to get the posts of a user
      * @param UId the user's id
      * @param limit the maximum number of posts to be returned

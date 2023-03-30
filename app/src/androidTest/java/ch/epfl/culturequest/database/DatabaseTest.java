@@ -60,6 +60,16 @@ public class DatabaseTest {
     }
 
     @Test
+    public void removePostWorks() {
+        Post post = new Post("test6", "user1", "test", "test", new Date(), 0, List.of());
+        boolean result = Database.uploadPost(post).join().get();
+        assertThat(result, is(true));
+        boolean result2 = Database.removePost(post).join().get();
+        assertThat(result2, is(true));
+        assertThat(Database.getPosts("user1", 10, 0).join().contains(post), is(false));
+    }
+
+    @Test
     public void getPostsWorks() {
         Post post = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
         Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
@@ -72,8 +82,8 @@ public class DatabaseTest {
 
     @Test
     public void getPostsFeedWorks() {
-        Post post = new Post("test1", "user2", "test", "test", new Date(2023, 03, 28), 0, List.of());
-        Post post2 = new Post("test2", "user2", "test", "test", new Date(2023, 03, 29), 0, List.of());
+        Post post = new Post("test4", "user2", "test", "test", new Date(2023, 03, 28), 0, List.of());
+        Post post2 = new Post("test5", "user2", "test", "test", new Date(2023, 03, 29), 0, List.of());
         Database.uploadPost(post).join();
         Database.uploadPost(post2).join();
         assertThat(Database.getPostsFeed(List.of("user2"), 10, 0).join().get(0), is(post2));
@@ -81,6 +91,28 @@ public class DatabaseTest {
         assertThat(Database.getPostsFeed(List.of("user2"), 10).join().get(0), is(post2));
         assertThat(Database.getPostsFeed(List.of("user2"), 10, 1).join().get(0), is(post));
         assertThat(Database.getPostsFeed(List.of("user2"), 1, 0).join().size(), is(1));
+    }
+
+    @Test
+    public void addLikeWorks() {
+        Post post = new Post("test7", "user1", "test", "test", new Date(), 0, List.of());
+        Database.uploadPost(post).join();
+        Database.addLike(post, "user3").join();
+        assertThat(Database.getPosts("user1", 10, 0).join().get(0).getLikes(), is(1));
+        assertThat(Database.getPosts("user1", 10, 0).join().get(0).isLikedBy("user3"), is(true));
+    }
+
+    @Test
+    public void removeLikeWorks() {
+        Post post = new Post("test7", "user1", "test", "test", new Date(), 0, List.of());
+        Database.uploadPost(post).join();
+        Database.addLike(post, "user3").join();
+        assertThat(Database.getPosts("user1", 10, 0).join().get(0).getLikes(), is(1));
+        assertThat(Database.getPosts("user1", 10, 0).join().get(0).isLikedBy("user3"), is(true));
+
+        Database.removeLike(post, "user3").join();
+        assertThat(Database.getPosts("user1", 10, 0).join().get(0).getLikes(), is(0));
+        assertThat(Database.getPosts("user1", 10, 0).join().get(0).isLikedBy("user3"), is(false));
     }
 
 }

@@ -41,6 +41,9 @@ public interface DatabaseInterface {
     // Upload a post
     CompletableFuture<AtomicBoolean> uploadPost(Post post);
 
+    // Remove a post
+    CompletableFuture<AtomicBoolean> removePost(Post post);
+
     // Get the posts of a user with a limit and an offset
     CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset);
 

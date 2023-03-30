@@ -87,12 +87,23 @@ public class FireDatabase implements DatabaseInterface {
         DatabaseReference ref = database.getReference("users").child(uid);
         ref.removeValue((error, ref1) -> {
             if (error == null) {
-                future.complete(new AtomicBoolean(true));
+                removeAllPosts(uid, future);
             } else {
                 future.complete(new AtomicBoolean(false));
             }
         });
         return future;
+    }
+
+    private void removeAllPosts(String uid, CompletableFuture<AtomicBoolean> future) {
+        DatabaseReference ref = database.getReference("posts").child(uid);
+        ref.removeValue((error, ref1) -> {
+            if (error == null) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
     }
 
     @Override
@@ -209,6 +220,20 @@ public class FireDatabase implements DatabaseInterface {
         DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(String.valueOf(post.getPostid()));
         usersRef.setValue(post).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> removePost(Post post) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid());
+        usersRef.removeValue((error, ref1) -> {
+            if (error == null) {
                 future.complete(new AtomicBoolean(true));
             } else {
                 future.complete(new AtomicBoolean(false));
