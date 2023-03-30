@@ -53,6 +53,11 @@ public class PostTest {
     }
 
     @Test
+    public void getLikers() {
+        assertEquals(List.of(), post.getLikers());
+    }
+
+    @Test
     public void addLike() {
         post.addLike("uid2");
         assertEquals(11, post.getLikes());
