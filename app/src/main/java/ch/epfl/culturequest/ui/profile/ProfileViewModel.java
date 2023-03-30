@@ -34,13 +34,10 @@ public class ProfileViewModel extends ViewModel {
         Profile selectedProfile = ProfileUtils.getSelectedProfile();
 
         if (profile != null) {
-            if (selectedProfile != null
-                    && selectedProfile.getUid().equals(uid)) {
-                Database.getProfile(uid).whenComplete((p, e) -> {
-                    username.setValue(p.getUsername());
-                    profilePictureUri.setValue(p.getProfilePicture());
-                    pictures.setValue(p.getImagesList());
-                });
+            if (selectedProfile != null && selectedProfile.getUid().equals(uid)) {
+                    username.setValue(selectedProfile.getUsername());
+                    profilePictureUri.setValue(selectedProfile.getProfilePicture());
+                    pictures.setValue(selectedProfile.getImagesList());
             } else {
                 //set the values of the live data
                 username.setValue(profile.getUsername());
