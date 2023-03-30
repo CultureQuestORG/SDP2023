@@ -149,30 +149,27 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
-    public CompletableFuture<AtomicBoolean> addLike(Post post, String UId) {
-        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
-        if(map1 != null) {
-            Post post1 = map1.get(post.getPostid());
-            if (post1 == null)  return CompletableFuture.completedFuture(new AtomicBoolean(false));
-            post1.addLike(UId);
-        }
-        return CompletableFuture.completedFuture(new AtomicBoolean(true));
+    public CompletableFuture<Post> addLike(Post post, String UId) {
+        return changeLike(post, UId, true);
     }
 
     @Override
-    public CompletableFuture<AtomicBoolean> removeLike(Post post, String UId) {
-        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
-        if(map1 != null) {
-            Post post1 = map1.get(post.getPostid());
-            if (post1 == null)  return CompletableFuture.completedFuture(new AtomicBoolean(false));
-            post1.removeLike(UId);
-        }
-        return CompletableFuture.completedFuture(new AtomicBoolean(true));
+    public CompletableFuture<Post> removeLike(Post post, String UId) {
+        return changeLike(post, UId, false);
     }
 
-    @Override
-    public CompletableFuture<AtomicBoolean> updateLiker(Post post, String UId, boolean update) {
-        return CompletableFuture.completedFuture(new AtomicBoolean(true));
+    private CompletableFuture<Post> changeLike(Post post, String UId, boolean add) {
+        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
+
+        if(map1 != null) {
+            Post post1 = map1.get(post.getPostid());
+            if (post1 == null)  return CompletableFuture.completedFuture(null);
+            if(add) post1.addLike(UId);
+            else post1.removeLike(UId);
+            return CompletableFuture.completedFuture(post1);
+        }
+
+        return CompletableFuture.completedFuture(null);
     }
 }
 

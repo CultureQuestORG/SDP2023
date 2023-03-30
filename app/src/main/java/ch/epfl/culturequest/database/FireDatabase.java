@@ -278,44 +278,8 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     @Override
-    public CompletableFuture<AtomicBoolean> addLike(Post post, String UId) {
-        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid()).child("likes");
-
-        updateLiker(post, UId, true).whenComplete((v, e) -> {
-            if (e != null) {
-                future.complete(new AtomicBoolean(false));
-            } else {
-                usersRef.runTransaction(handler(future, post, UId, true));
-            }
-        });
-
-        return future;
-    }
-
-    private Transaction.Handler handler(CompletableFuture<AtomicBoolean> future, Post post, String UId, boolean add) {
-        return new Transaction.Handler() {
-            @NonNull
-            @Override
-            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                if (mutableData.getValue() == null) {
-                    mutableData.setValue(add ? 1 : 0);
-                } else {
-                    mutableData.setValue(add ? (Long) mutableData.getValue() + 1 : (Long) mutableData.getValue() - 1);
-                }
-
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
-                if (databaseError != null) {
-                    future.complete(new AtomicBoolean(false));
-                } else {
-                    future.complete(new AtomicBoolean(true));
-                }
-            }
-        };
+    public CompletableFuture<Post> addLike(Post post, String UId) {
+        return changeLike(post, UId, true);
     }
 
     /**
@@ -324,52 +288,49 @@ public class FireDatabase implements DatabaseInterface {
      * @return a future that will return true if the like was removed successfully, false otherwise
      */
     @Override
-    public CompletableFuture<AtomicBoolean> removeLike(Post post, String UId) {
-        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid()).child("likes");
+    public CompletableFuture<Post> removeLike(Post post, String UId) {
+        return changeLike(post, UId, false);
+    }
 
-        updateLiker(post, UId, false).whenComplete((v, e) -> {
-            if (e != null) {
-                future.complete(new AtomicBoolean(false));
-            } else {
-                usersRef.runTransaction(handler(future, post, UId, false));
+    private CompletableFuture<Post> changeLike(Post post, String UId, boolean add) {
+        CompletableFuture<Post> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid());
+
+        usersRef.runTransaction(handler(future, UId, add));
+
+        return future;
+    }
+
+    private Transaction.Handler handler(CompletableFuture<Post> future, String UId, boolean add) {
+        return new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                Post dbPost = mutableData.getValue(Post.class);
+
+                if (dbPost == null) {
+                    future.completeExceptionally(new RuntimeException("Post not found"));
+                    return Transaction.abort();
+                }
+
+                if (add) {
+                    dbPost.addLike(UId);
+                } else {
+                    dbPost.removeLike(UId);
+                }
+
+                mutableData.setValue(dbPost);
+                return Transaction.success(mutableData);
             }
-        });
 
-        return future;
-    }
-
-    /**
-     * Updates the likers of a post. * Already implemented in the addLike and removeLike methods *
-     * @param post   the post to update the likers of
-     * @param UId    the id of the user
-     * @param update true if the user liked the post, false otherwise
-     * @return true if the user liked the post, false otherwise
-     */
-    public CompletableFuture<AtomicBoolean> updateLiker(Post post, String UId, boolean update) {
-        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid()).child("likers");
-
-        if(update) {
-            usersRef.child(String.valueOf(post.getLikers().size())).setValue(UId).addOnCompleteListener(task -> {
-                System.out.println("task: " + task.isSuccessful());
-                if (task.isSuccessful()) {
-                    future.complete(new AtomicBoolean(true));
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                if (databaseError != null || dataSnapshot == null) {
+                    future.complete(null);
                 } else {
-                    future.complete(new AtomicBoolean(false));
+                    future.complete(dataSnapshot.getValue(Post.class));
                 }
-            });
-        } else {
-            usersRef.child(String.valueOf(post.getLikers().indexOf(UId))).removeValue().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    future.complete(new AtomicBoolean(true));
-                } else {
-                    future.complete(new AtomicBoolean(false));
-                }
-            });
-        }
-        return future;
+            }
+        };
     }
-
-
 }

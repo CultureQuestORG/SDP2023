@@ -129,12 +129,8 @@ public class Database {
      * @param UId the user's id
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
-    public static CompletableFuture<AtomicBoolean> addLike(Post post, String UId) {
-        return databaseInstance.addLike(post, UId).whenComplete((b, e) -> {
-            if (!b.get()) {
-                post.addLike(UId);
-            }
-        });
+    public static CompletableFuture<Post> addLike(Post post, String UId) {
+        return databaseInstance.addLike(post, UId);
     }
 
     /**
@@ -143,11 +139,7 @@ public class Database {
      * @param uid the user's id
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
-    public static CompletableFuture<AtomicBoolean> removeLike(Post post, String uid) {
-        return databaseInstance.removeLike(post, uid).whenComplete((b, e) -> {
-            if (b.get()) {
-                post.removeLike(uid);
-            }
-        });
+    public static CompletableFuture<Post> removeLike(Post post, String uid) {
+        return databaseInstance.removeLike(post, uid);
     }
 }
