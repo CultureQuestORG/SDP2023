@@ -10,6 +10,7 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
+import ch.epfl.culturequest.utils.ProfileUtils;
 
 
 public class ProfileViewModel extends ViewModel {
@@ -32,33 +33,30 @@ public class ProfileViewModel extends ViewModel {
 
         EspressoIdlingResource.increment();
         Profile profile = Profile.getActiveProfile();
+        Profile selectedProfile = ProfileUtils.getSelectedProfile();
 
         if (profile != null) {
-            //set the values of the live data
-            username.setValue(profile.getUsername());
-            profilePictureUri.setValue(profile.getProfilePicture());
-            pictures.setValue(profile.getImagesList());
+            if (selectedProfile != null && selectedProfile.getUid().equals(uid)) {
+                    username.setValue(selectedProfile.getUsername());
+                    profilePictureUri.setValue(selectedProfile.getProfilePicture());
+                    pictures.setValue(selectedProfile.getImagesList());
+            } else {
+                //set the values of the live data
+                username.setValue(profile.getUsername());
+                profilePictureUri.setValue(profile.getProfilePicture());
+                pictures.setValue(profile.getImagesList());
 
 
-            // add an observer to the profile so that the view is updated when the profile is updated
-            profile.addObserver((profileObject, arg) -> {
-                Profile p = (Profile) profileObject;
-                username.postValue(p.getUsername());
-                profilePictureUri.postValue(p.getProfilePicture());
-                pictures.postValue(p.getImagesList());
-            });
-
+                // add an observer to the profile so that the view is updated when the profile is updated
+                profile.addObserver((profileObject, arg) -> {
+                    Profile p = (Profile) profileObject;
+                    username.postValue(p.getUsername());
+                    profilePictureUri.postValue(p.getProfilePicture());
+                    pictures.postValue(p.getImagesList());
+                });
+            }
             // if no profile is active, we load a default profile
-        } else {
-            Database.getProfile(uid).whenComplete((p, e) -> {
-                username.setValue(p.getUsername());
-                profilePictureUri.setValue(p.getProfilePicture());
-                pictures.setValue(p.getImagesList());
-
-            });
         }
-
-
         EspressoIdlingResource.decrement();
     }
 
