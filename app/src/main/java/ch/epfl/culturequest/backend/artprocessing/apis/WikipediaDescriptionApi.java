@@ -27,9 +27,6 @@ import okhttp3.Response;
  */
 
 public class WikipediaDescriptionApi {
-
-    public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY);
-
     public static String wikipediaBaseUrl = "https://en.wikipedia.org/wiki/Special:Search?search=";
 
     /** Returns an art description object (as a future) given a recognized piece of art (represented by ArtRecognition) */
@@ -53,10 +50,10 @@ public class WikipediaDescriptionApi {
                         String year = getYear(pageHtml);
                         String artist = getArtist(pageHtml);
 
-                        return new BasicArtDescription(artName, artist, artSummary, artType, year, city, country, museumName);
+                        return new BasicArtDescription(artName, artist, artSummary, artType, year, city, country, museumName, null);
                     }
 
-                    return new BasicArtDescription(artName, null, artSummary, artType, null, null, null, null);
+                    return new BasicArtDescription(artName, null, artSummary, artType, null, null, null, null, null);
                 });
 
         // If the art type is architecture or monument, we use the OpenAI API to get the missing data (artist, year, city, country)

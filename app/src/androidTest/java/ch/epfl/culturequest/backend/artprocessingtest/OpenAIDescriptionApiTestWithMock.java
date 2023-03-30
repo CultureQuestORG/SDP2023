@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.backend.artprocessingtest;
 
+import static net.bytebuddy.matcher.ElementMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
@@ -90,7 +92,27 @@ public class OpenAIDescriptionApiTestWithMock {
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
         List<String> missingData = openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information")).join();
         assert (missingData.get(0) == null);
+    }
 
+    @Test
+    public void getScoreReturnsCorrectScore(){
+        MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API Key");
+        mockOpenAiService.setMockResponse("{\n" +
+                "    \"artPopularity\": 100\n" +
+                "}");
+        OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
+
+        int score = openAPI.getScore(new ArtRecognition("Mock Art Name", "Mock additional information")).join();
+        assert (score == 100);
+
+    }
+
+    @Test
+    public void getScoreThrowsExceptionWhenInvalidJson(){
+        MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API Key");
+        mockOpenAiService.setMockResponse("This is not a JSON response");
+        OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
+        assertThrows(RuntimeException.class, () -> openAPI.getScore(new ArtRecognition("Mock Art Name", "Mock additional information")).join());
     }
 
 }

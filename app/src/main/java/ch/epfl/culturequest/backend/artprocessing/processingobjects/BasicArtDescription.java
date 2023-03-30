@@ -9,8 +9,9 @@ public class BasicArtDescription {
     public enum ArtType {
         PAINTING, SCULPTURE, ARCHITECTURE, OTHER
     }
-
     private String summary;
+
+    private Integer score;
     private String city;
     private String country;
     private String museum;
@@ -22,7 +23,7 @@ public class BasicArtDescription {
 
     private String artist;
 
-    public BasicArtDescription(String name, String artist, String summary, ArtType type, String year, String city, String country, String museum) {
+    public BasicArtDescription(String name, String artist, String summary, ArtType type, String year, String city, String country, String museum, Integer score) {
         this.artist = artist;
         this.name = name;
         this.summary = summary;
@@ -31,6 +32,7 @@ public class BasicArtDescription {
         this.museum = museum;
         this.type = type;
         this.year = year;
+        this.score = score;
     }
 
     public String getName() {
@@ -62,6 +64,30 @@ public class BasicArtDescription {
     }
 
     public String getArtist() { return artist;}
+
+    public Integer getScore() {
+        return this.score;
+
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+    public void setYear(String year) {
+        this.year = year;
+    }
 
 
 
