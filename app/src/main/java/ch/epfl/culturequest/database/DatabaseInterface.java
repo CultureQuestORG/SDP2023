@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.database;
 
+import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
 
 import java.util.List;
@@ -28,5 +29,9 @@ public interface DatabaseInterface {
     CompletableFuture<Integer> getNumberOfProfiles();
 
     CompletableFuture<List<Profile>> getTopNProfiles(int n);
+
+    CompletableFuture<Follows> addFollow(String follower, String followed);
+
+    CompletableFuture<Follows> removeFollow(String follower, String followed);
 
 }

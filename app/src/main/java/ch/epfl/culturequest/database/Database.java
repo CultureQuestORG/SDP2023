@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 
@@ -60,5 +61,13 @@ public class Database {
 
     public static CompletableFuture<List<Profile>> getTopNProfiles(int n) {
         return databaseInstance.getTopNProfiles(n);
+    }
+
+    public static CompletableFuture<Follows> addFollow(String follower, String followed) {
+        return databaseInstance.addFollow(follower, followed);
+    }
+
+    public static CompletableFuture<Follows> removeFollow(String follower, String followed) {
+        return databaseInstance.removeFollow(follower, followed);
     }
 }
