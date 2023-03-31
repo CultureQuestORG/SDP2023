@@ -26,6 +26,7 @@ public class RecognitionApiTestWithMock {
     @After
     public void tearDown() throws Exception {
         mockWebServer.shutdown();
+        RecognitionApi.baseGoogleLensAPIURL = "https://lens.google.com/uploadbyurl";
     }
 
     @Test

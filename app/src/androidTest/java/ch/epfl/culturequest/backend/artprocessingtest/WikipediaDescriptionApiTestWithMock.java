@@ -109,6 +109,7 @@ public class WikipediaDescriptionApiTestWithMock {
     @After
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
+        WikipediaDescriptionApi.wikipediaBaseUrl = "https://en.wikipedia.org/wiki/Special:Search?search=";
     }
 
 
