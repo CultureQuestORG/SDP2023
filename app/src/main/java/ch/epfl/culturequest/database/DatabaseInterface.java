@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.database;
 
+import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
 
 import java.util.List;
@@ -61,4 +62,11 @@ public interface DatabaseInterface {
 
     // Remove a like from a post
     CompletableFuture<Post> removeLike(Post post, String UId);
+
+    /////////////////////////// FOLLOWS ///////////////////////////
+
+    CompletableFuture<Follows> addFollow(String follower, String followed);
+
+    CompletableFuture<Follows> removeFollow(String follower, String followed);
+
 }

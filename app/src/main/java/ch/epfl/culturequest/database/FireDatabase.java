@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
@@ -358,4 +359,48 @@ public class FireDatabase implements DatabaseInterface {
             }
         };
     }
+
+    @Override
+    public CompletableFuture<Follows> addFollow(String follower, String followed) {
+        return changeFollow(follower, followed, true);
+    }
+
+    @Override
+    public CompletableFuture<Follows> removeFollow(String follower, String followed) {
+        return changeFollow(follower, followed, false);
+    }
+
+    private CompletableFuture<Follows> changeFollow(String follower, String followed, boolean follow) {
+        CompletableFuture<Follows> future = new CompletableFuture<>();
+        DatabaseReference followsRef = database.getReference("follows").child(follower);
+
+        followsRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData currentData) {
+                Follows follows = currentData.getValue(Follows.class);
+                if (follows == null) {
+                    follows = new Follows(List.of());
+                }
+                if (follow) {
+                    follows.addFollowed(followed);
+                } else {
+                    follows.removeFollowed(followed);
+                }
+                currentData.setValue(follows);
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                if (error != null) {
+                    future.completeExceptionally(error.toException());
+                } else {
+                    future.complete(currentData.getValue(Follows.class));
+                }
+            }
+        });
+
+        return future;
+    }
+
 }

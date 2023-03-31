@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
@@ -180,6 +181,34 @@ public class MockDatabase implements DatabaseInterface {
         }
 
         return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public CompletableFuture<Follows> addFollow(String follower, String followed) {
+        return changeFollow(follower, followed, true);
+    }
+
+    @Override
+    public CompletableFuture<Follows> removeFollow(String follower, String followed) {
+        return changeFollow(follower, followed, false);
+    }
+
+    private CompletableFuture<Follows> changeFollow(String follower, String followed, boolean add) {
+        CompletableFuture<Follows> future = new CompletableFuture<>();
+        Follows follow = (Follows) map.get("follows/"+follower);
+        if (follow == null) {
+            follow = new Follows(List.of());
+        }
+        List<String> followedList = follow.getFollowed();
+        if (add) {
+            followedList.add(followed);
+        } else {
+            followedList.remove(followed);
+        }
+
+        follow.setFollowed(followedList);
+        map.put("follows/" + follower, follow);
+        return future;
     }
 }
 

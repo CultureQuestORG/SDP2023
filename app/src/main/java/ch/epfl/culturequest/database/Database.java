@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
@@ -31,10 +32,9 @@ public class Database {
     return databaseInstance.deleteProfile(uid);
     }
 
-        public static CompletableFuture<AtomicBoolean> set(String key, Object value) {
+    public static CompletableFuture<AtomicBoolean> set(String key, Object value) {
         return databaseInstance.set(key, value);
     }
-
 
     public static CompletableFuture<Object> get(String key) {
         return databaseInstance.get(key);
@@ -150,5 +150,13 @@ public class Database {
      */
     public static CompletableFuture<Post> removeLike(Post post, String uid) {
         return databaseInstance.removeLike(post, uid);
+    }
+
+    public static CompletableFuture<Follows> addFollow(String follower, String followed) {
+        return databaseInstance.addFollow(follower, followed);
+    }
+
+    public static CompletableFuture<Follows> removeFollow(String follower, String followed) {
+        return databaseInstance.removeFollow(follower, followed);
     }
 }
