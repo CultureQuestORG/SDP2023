@@ -30,7 +30,9 @@ import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.ProfileUtils;
+import ch.epfl.culturequest.utils.PermissionRequest;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -38,9 +40,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * selecting a profile picture and a username
  */
 public class ProfileCreatorActivity extends AppCompatActivity {
-
-
-
     private String profilePicUri;
     private final Profile profile = new Profile(null, "");
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
@@ -50,13 +49,15 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                     isGranted -> {
                         if (isGranted) openGallery();
                     });
+
+    private final PermissionRequest permissionRequest = new PermissionRequest(ProfileUtils.GALLERY_PERMISSION);
     private ImageView profileView;
     private Drawable initialDrawable;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidUtils.removeStatusBar(getWindow());
         setContentView(R.layout.activity_profile_creation);
         //the following attributes are used to check whether the user actually selected a profile pic
         profileView = findViewById(R.id.profile_picture);
@@ -75,10 +76,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      * @param view
      */
     public void selectProfilePicture(View view) {
-        if (ContextCompat.checkSelfPermission(this, ProfileUtils.GALLERY_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
+        if (permissionRequest.hasPermission(this)) {
             openGallery();
         } else {
-            requestPermissionLauncher.launch(ProfileUtils.GALLERY_PERMISSION);
+            permissionRequest.askPermission(requestPermissionLauncher);
         }
     }
 
@@ -86,6 +87,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      * Function called when user clicks on the buttont "Create my Account"
      * First checks if username is valid and if user has selected a profile pic,
      * then registers the Profile in the Database and redirects to the Navigation Intent
+     * TODO need to store the profile in the Database
      *
      * @param view
      */

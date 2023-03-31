@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.apis.WikipediaDescriptionApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import ch.epfl.culturequest.backend.artprocessing.apis.RecognitionApi;
@@ -19,12 +20,7 @@ public class ArtProcessingTest {
     @Test
     public void artProcessingOutputsCorrectDescription(){
 
-        CompletableFuture<ArtRecognition> artRecognitionCompletableFuture = new RecognitionApi().getArtName(imageUrl);
-        CompletableFuture<BasicArtDescription> artDescriptionCompletableFuture = artRecognitionCompletableFuture.thenCompose(a -> {
-            WikipediaDescriptionApi wikipediaDescriptionApi = new WikipediaDescriptionApi();
-            return wikipediaDescriptionApi.getArtDescription(a);
-        });
-        BasicArtDescription artDescription = artDescriptionCompletableFuture.join();
+        BasicArtDescription artDescription = new ProcessingApi().getArtDescriptionFromUrl(imageUrl).join();
 
         assertThat(artDescription.getName(), is("David of Michelangelo"));
         assertThat(artDescription.getType(), is(BasicArtDescription.ArtType.SCULPTURE));

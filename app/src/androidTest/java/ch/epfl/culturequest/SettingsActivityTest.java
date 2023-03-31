@@ -67,7 +67,7 @@ public class SettingsActivityTest {
         Database.init(new MockDatabase());
 
         FirebaseAuth.getInstance()
-                .signInAnonymously()
+                .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -92,12 +92,6 @@ public class SettingsActivityTest {
     public void release() {
         Intents.release();
     }
-
-    @AfterClass
-    public static void tearDown() {
-        user.delete();
-    }
-
 
     @Test
     public void SettingsActivity() {

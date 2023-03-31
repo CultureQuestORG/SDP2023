@@ -31,7 +31,6 @@ import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -43,6 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
@@ -65,32 +65,27 @@ public class ProfileCreatorActivityTest {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         user = FirebaseAuth.getInstance().getCurrentUser();
-
                     }
                 });
         Thread.sleep(2000);
     }
 
     @Before
-    public void init() {
+    public void init(){
         ActivityScenario
                 .launch(ProfileCreatorActivity.class)
                 .onActivity(a -> {
                     profile = a.getProfile();
-                    activity = a;
+                    activity=a;
 
                 });
         Intents.init();
     }
 
     @After
-    public void release() {
+    public void release(){
+        Database.deleteProfile(profile.getUid());
         Intents.release();
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        user.delete();
     }
 
     @Test
@@ -108,7 +103,6 @@ public class ProfileCreatorActivityTest {
         Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), NavigationActivity.class);
         assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
         ActivityScenario.launch(NavigationActivity.class).onActivity(NavigationActivity::onBackPressed);
-
     }
 
     @Test
@@ -165,7 +159,4 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.create_profile)).perform(click());
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
     }
-
-
-
 }

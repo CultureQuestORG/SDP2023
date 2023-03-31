@@ -3,6 +3,7 @@ package ch.epfl.culturequest.utils;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.view.View;
 
@@ -21,11 +22,15 @@ public class ProfileUtils {
 
     public static String DEFAULT_PROFILE_PATH = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2Fbasic_profile_picture.png?alt=media&token=8e407bd6-ad5f-401a-9b2d-7852ccfb9d62";
 
-
+    private static Profile SELECTED_PROFILE = null;
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
 
-    public static final String GALLERY_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
+    public static final String GALLERY_PERMISSION =
+            //Version code R is android 11.
+            Build.VERSION.SDK_INT > Build.VERSION_CODES.R ?
+                    Manifest.permission.READ_MEDIA_IMAGES :
+                    Manifest.permission.READ_EXTERNAL_STORAGE;
 
 
     /**
@@ -57,6 +62,14 @@ public class ProfileUtils {
             return true;
         }
         return false;
+    }
+
+    public static void setSelectedProfile(Profile profile){
+        SELECTED_PROFILE = profile;
+    }
+
+    public static Profile getSelectedProfile(){
+        return SELECTED_PROFILE;
     }
 
 

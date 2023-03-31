@@ -1,8 +1,12 @@
 package ch.epfl.culturequest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
@@ -14,6 +18,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.List;
+
+import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
+import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.ui.map.MapsViewModel;
 import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.schedulers.Schedulers;
@@ -67,6 +75,26 @@ public class MapsViewModelTest {
         MapsViewModel mapsViewModel = new MapsViewModel();
         mapsViewModel.setIsLocationPermissionGranted(true);
         assertTrue(mapsViewModel.isLocationPermissionGranted());
+    }
+
+    // Test if the default locations are correct
+    @Test
+    public void defaultLocationsAreCorrect() {
+        MapsViewModel mapsViewModel = new MapsViewModel();
+        assertNull(mapsViewModel.getLocations());
+    }
+
+    // Test if the locations are correctly set
+    @Test
+    public void locationsAreCorrectlySet() {
+        MapsViewModel mapsViewModel = new MapsViewModel();
+        mapsViewModel.setLocations(List.of(new OTMLocation("test", new OTMLatLng(0.0, 0.0), "kind1,kind2")));
+        assertThat(mapsViewModel.getLocations().size(), is(1));
+        assertThat(mapsViewModel.getLocations().get(0).getName(), is("test"));
+        assertThat(mapsViewModel.getLocations().get(0).getCoordinates().latitude(), is(0.0));
+        assertThat(mapsViewModel.getLocations().get(0).getCoordinates().longitude(), is(0.0));
+        assertThat(mapsViewModel.getLocations().get(0).getKinds().size(), is(2));
+        assertThat(mapsViewModel.getLocations().get(0).getKinds(), containsInAnyOrder("kind1", "kind2"));
     }
 
     @After
