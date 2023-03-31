@@ -19,7 +19,6 @@ public class Image implements Comparable<Image> {
         this.src = src;
         this.time = time;
         this.Uid = Uid;
-
     }
 
     public Image(){

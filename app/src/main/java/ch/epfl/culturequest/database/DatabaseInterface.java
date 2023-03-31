@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
 /**
@@ -34,4 +35,30 @@ public interface DatabaseInterface {
 
     CompletableFuture<List<Profile>> getTopNProfiles(int n);
 
+
+    /////////////////////////// POSTS ///////////////////////////
+
+    // Upload a post
+    CompletableFuture<AtomicBoolean> uploadPost(Post post);
+
+    // Remove a post
+    CompletableFuture<AtomicBoolean> removePost(Post post);
+
+    // Get the posts of a user with a limit and an offset
+    CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset);
+
+    // Get the posts of a user followings with a limit and an offset
+    CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset);
+
+    // Get the posts of a user followings with a limit
+    CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit);
+
+    // Get the posts of a user followings
+    CompletableFuture<List<Post>> getPostsFeed(List<String> UIds);
+
+    // Add a like to a post
+    CompletableFuture<Post> addLike(Post post, String UId);
+
+    // Remove a like from a post
+    CompletableFuture<Post> removeLike(Post post, String UId);
 }

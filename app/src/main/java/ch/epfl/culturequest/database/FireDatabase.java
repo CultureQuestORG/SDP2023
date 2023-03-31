@@ -1,16 +1,25 @@
 package ch.epfl.culturequest.database;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
 /**
@@ -78,12 +87,23 @@ public class FireDatabase implements DatabaseInterface {
         DatabaseReference ref = database.getReference("users").child(uid);
         ref.removeValue((error, ref1) -> {
             if (error == null) {
-                future.complete(new AtomicBoolean(true));
+                removeAllPosts(uid, future);
             } else {
                 future.complete(new AtomicBoolean(false));
             }
         });
         return future;
+    }
+
+    private void removeAllPosts(String uid, CompletableFuture<AtomicBoolean> future) {
+        DatabaseReference ref = database.getReference("posts").child(uid);
+        ref.removeValue((error, ref1) -> {
+            if (error == null) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
     }
 
     @Override
@@ -194,4 +214,148 @@ public class FireDatabase implements DatabaseInterface {
         return future;
     }
 
+    @Override
+    public CompletableFuture<AtomicBoolean> uploadPost(Post post) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(String.valueOf(post.getPostid()));
+        usersRef.setValue(post).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> removePost(Post post) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid());
+        usersRef.removeValue((error, ref1) -> {
+            if (error == null) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(UId);
+        usersRef.orderByChild("date").limitToLast(limit + offset).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Post> posts = new ArrayList<>();
+                int i = 0;
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Post post = snapshot.getValue(Post.class);
+                    posts.add(post);
+                    if(++i == limit) break;
+                }
+                future.complete(posts);
+            } else {
+                future.complete(List.of());
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
+        //List of posts to retrieve from each user
+        CompletableFuture<List<Post>>[] futures = UIds.stream().map((uid) -> getPosts(uid, limit, 0)).toArray(CompletableFuture[]::new);
+
+        //Future to return
+        CompletableFuture<List<Post>> result = new CompletableFuture<>();
+
+        //Wait for all futures to complete
+        CompletableFuture.allOf(futures).whenComplete((v, e) -> {
+
+            //Merge all posts into one list
+            List<Post> posts = new ArrayList<>();
+            for (CompletableFuture<List<Post>> future : futures) {
+                posts.addAll(future.join());
+            }
+
+            posts.sort(Comparator.comparing(Post::getDate).reversed());
+            posts = posts.subList(offset, Math.min(posts.size(), limit + offset));
+            result.complete(posts);
+
+        }).exceptionally(e -> {
+            result.complete(List.of());
+            return null;
+        });
+
+        return result;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit) {
+        return getPostsFeed(UIds, limit, 0);
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
+        return getPostsFeed(UIds, 100, 0);
+    }
+
+    @Override
+    public CompletableFuture<Post> addLike(Post post, String UId) {
+        return changeLike(post, UId, true);
+    }
+
+    /**
+     * @param post   the post to remove the like from
+     * @param UId    the id of the user who liked the post
+     * @return a future that will return true if the like was removed successfully, false otherwise
+     */
+    @Override
+    public CompletableFuture<Post> removeLike(Post post, String UId) {
+        return changeLike(post, UId, false);
+    }
+
+    private CompletableFuture<Post> changeLike(Post post, String UId, boolean add) {
+        CompletableFuture<Post> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(post.getUid()).child(post.getPostid());
+
+        usersRef.runTransaction(handler(future, UId, add));
+
+        return future;
+    }
+
+    private Transaction.Handler handler(CompletableFuture<Post> future, String UId, boolean add) {
+        return new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                Post dbPost = mutableData.getValue(Post.class);
+
+                if (dbPost == null) {
+                    future.completeExceptionally(new RuntimeException("Post not found"));
+                    return Transaction.abort();
+                }
+
+                if (add) {
+                    dbPost.addLike(UId);
+                } else {
+                    dbPost.removeLike(UId);
+                }
+
+                mutableData.setValue(dbPost);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                if (databaseError != null || dataSnapshot == null) {
+                    future.complete(null);
+                } else {
+                    future.complete(dataSnapshot.getValue(Post.class));
+                }
+            }
+        };
+    }
 }

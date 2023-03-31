@@ -1,11 +1,14 @@
 package ch.epfl.culturequest.database;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
 /**
@@ -98,6 +101,85 @@ public class MockDatabase implements DatabaseInterface {
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
         future.complete((List<Profile>) map.get("topNProfiles"));
         return future;
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> uploadPost(Post post) {
+        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
+        if(map1 == null) {
+            map1 = new HashMap<>();
+            map.put("posts/"+post.getUid(), map1);
+        }
+        map1.put(post.getPostid(), post);
+        return CompletableFuture.completedFuture(new AtomicBoolean(true));
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> removePost(Post post) {
+        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
+        if(map1 != null) {
+            map1.remove(post.getPostid());
+            return CompletableFuture.completedFuture(new AtomicBoolean(true));
+        }
+        return CompletableFuture.completedFuture(new AtomicBoolean(false));
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        List<Post> posts = new ArrayList<>(((HashMap<String, Post>) map.getOrDefault("posts/"+ UId, new HashMap<String, Post>())).values());
+        future.complete(posts.subList(offset, Math.min(offset+limit, posts.size())));
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+
+        List<Post> posts = new ArrayList<>();
+        for(String UId : UIds) {
+            posts.addAll(((HashMap<String, Post>) map.getOrDefault("posts/"+ UId, new HashMap<String, Post>())).values());
+        }
+
+        posts.sort(Comparator.comparing(Post::getDate).reversed());
+        posts = posts.subList(offset, Math.min(offset+limit, posts.size()));
+
+        future.complete(posts);
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit) {
+        return getPostsFeed(UIds, limit, 0);
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
+        return getPostsFeed(UIds, 10, 0);
+    }
+
+    @Override
+    public CompletableFuture<Post> addLike(Post post, String UId) {
+        return changeLike(post, UId, true);
+    }
+
+    @Override
+    public CompletableFuture<Post> removeLike(Post post, String UId) {
+        return changeLike(post, UId, false);
+    }
+
+    private CompletableFuture<Post> changeLike(Post post, String UId, boolean add) {
+        HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
+
+        if(map1 != null) {
+            Post post1 = map1.get(post.getPostid());
+            if (post1 == null)  return CompletableFuture.completedFuture(null);
+            if(add) post1.addLike(UId);
+            else post1.removeLike(UId);
+            return CompletableFuture.completedFuture(post1);
+        }
+
+        return CompletableFuture.completedFuture(null);
     }
 }
 
