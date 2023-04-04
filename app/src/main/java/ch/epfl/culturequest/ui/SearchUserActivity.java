@@ -34,6 +34,8 @@ import ch.epfl.culturequest.utils.AutoComplete;
 public class SearchUserActivity extends AppCompatActivity {
     //the following watcher allows us to search for users dynamically without having to enter
     //the whole username to search for users
+
+    public static final int NUMBER_USERS_TO_DISPLAY = 5;
     TextWatcher watcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -64,9 +66,6 @@ public class SearchUserActivity extends AppCompatActivity {
      * in a list view. When clicking on a profile in the list view, it opens the activity
      * DisplayUserProfileActivity.
      *
-     * In the future, to improve the search algorithm, we can implement the Levenshtein distance
-     * instead of startsWith(..).
-     *
      * @param query username to look for.
      */
     public void searchUserDynamically(String query) {
@@ -77,7 +76,7 @@ public class SearchUserActivity extends AppCompatActivity {
                 Map<String, Profile> usernameToProfileMap = profiles.stream()
                         .collect(Collectors.toMap(Profile::getUsername, profile -> profile));
 
-                List<String> matchingUsernames = AutoComplete.top5matches(query,usernameToProfileMap.keySet());
+                List<String> matchingUsernames = AutoComplete.topNMatches(query,usernameToProfileMap.keySet(),NUMBER_USERS_TO_DISPLAY);
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, matchingUsernames);
                 listView.setAdapter(adapter);

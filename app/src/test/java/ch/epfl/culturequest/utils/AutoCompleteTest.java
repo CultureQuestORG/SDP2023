@@ -27,9 +27,7 @@ public class AutoCompleteTest {
     @Test
     public void autoCompleteIsCorrect() {
         Set<String> dictionary = Set.of("Albert","Alberto","Albertan","Al","alI","Luca","Ugo","Hugo","Thomas","John","Jack");
-        List<String> result = AutoComplete.top5matches("Al", dictionary);
+        List<String> result = AutoComplete.topNMatches("Al", dictionary,5);
         assertEquals(result, List.of("Al","alI","Albert","Alberto","Albertan"));
-
-
     }
 }
