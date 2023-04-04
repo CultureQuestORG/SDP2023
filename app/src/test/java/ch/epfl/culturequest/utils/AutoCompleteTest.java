@@ -9,6 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.schedulers.Schedulers;
@@ -25,9 +26,9 @@ public class AutoCompleteTest {
 
     @Test
     public void autoCompleteIsCorrect() {
-        List<String> dictionnary = List.of("Albert","Alberto","Albertin","Al","alI","Luca","Ugo","Hugo","Thomas","John","Jack");
-        List<String> result = autoCompletion.top5matches("Al", dictionnary);
-        assertEquals(result, List.of("Al","alI","Albert","Alberto","Albertin"));
+        Set<String> dictionary = Set.of("Albert","Alberto","Albertan","Al","alI","Luca","Ugo","Hugo","Thomas","John","Jack");
+        List<String> result = AutoComplete.top5matches("Al", dictionary);
+        assertEquals(result, List.of("Al","alI","Albert","Alberto","Albertan"));
 
 
     }

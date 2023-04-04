@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -24,6 +25,7 @@ import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.ProfileUtils;
+import ch.epfl.culturequest.utils.AutoComplete;
 
 /**
  * This class represents the activity that is opened from the home fragment when we
@@ -74,16 +76,12 @@ public class SearchUserActivity extends AppCompatActivity {
             Database.getAllProfiles().whenComplete((profiles, throwable) -> {
                 Map<String, Profile> usernameToProfileMap = profiles.stream()
                         .collect(Collectors.toMap(Profile::getUsername, profile -> profile));
-                List<String> matchingUsernames = usernameToProfileMap
-                        .keySet()
-                        .stream()
-                        .filter(username -> username.startsWith(query))
-                        .collect(Collectors.toList());
+
+                List<String> matchingUsernames = AutoComplete.top5matches(query,usernameToProfileMap.keySet());
+
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, matchingUsernames);
                 listView.setAdapter(adapter);
-                listView.setOnItemClickListener((parent, ignored, position, ignored2) -> {
-                    searchBarOnClickListener(parent, position, usernameToProfileMap);
-                });
+                listView.setOnItemClickListener((parent, ignored, position, ignored2) -> searchBarOnClickListener(parent, position, usernameToProfileMap));
             });
         } else {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, List.of());
