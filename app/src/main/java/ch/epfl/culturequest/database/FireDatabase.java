@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
@@ -173,6 +172,38 @@ public class FireDatabase implements DatabaseInterface {
         return future;
     }
 
+
+    @Override
+    public CompletableFuture<Integer> getRankFriends(String UId) {
+        DatabaseReference usersRef = database.getReference("users");
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        getProfile(UId).whenComplete((profile, e) -> {
+            if (profile != null) {
+                    usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            List<String> friends= profile.getFriends();
+                            int rank = friends.size();
+                            for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                                if (Objects.equals(snapshot.getKey(), UId)) {
+                                    future.complete(rank);
+                                    return;
+                                }
+                                if (friends.contains(snapshot.getKey()))
+                                    rank--;
+                            }
+                            future.completeExceptionally(new RuntimeException("User not found"));
+                        } else {
+                            future.completeExceptionally(task.getException());
+                        }
+                    });
+
+            } else {
+                future.completeExceptionally(new RuntimeException("User not found"));
+            }
+        });
+        return future;
+    }
+
     /**
      * @return the number of profiles in the database
      */
@@ -198,7 +229,7 @@ public class FireDatabase implements DatabaseInterface {
     public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
         DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
-        getNumberOfProfiles().whenComplete((numberOfUsers, e) -> {
+        getNumberOfProfiles().whenComplete((a,b) -> {
             usersRef.orderByChild("score").limitToLast(n).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     List<Profile> profilesList = new ArrayList<>();
@@ -207,6 +238,30 @@ public class FireDatabase implements DatabaseInterface {
                         profilesList.add(profile);
                     }
                     future.complete(profilesList);
+                } else {
+                    future.completeExceptionally(task.getException());
+                }
+            });
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n){
+        DatabaseReference usersRef = database.getReference("users");
+        CompletableFuture<List<Profile>> future = new CompletableFuture<>();
+        getNumberOfProfiles().whenComplete((numberOfUsers, e) -> {
+            List<String> friends = Profile.getActiveProfile().getFriends();
+            usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    List<Profile> profilesList = new ArrayList<>();
+                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                        Profile profile = snapshot.getValue(Profile.class);
+                        if (profile!=null && (friends.contains(profile.getUid()) || profile.getUid().equals(Profile.getActiveProfile().getUid()))){
+                            profilesList.add(profile);
+                        }
+                    }
+                    future.complete(profilesList.subList(0, Math.min(n, profilesList.size())));
                 } else {
                     future.completeExceptionally(task.getException());
                 }

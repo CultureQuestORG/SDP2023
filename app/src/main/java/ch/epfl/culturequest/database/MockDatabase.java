@@ -91,6 +91,13 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
+    public CompletableFuture<Integer> getRankFriends(String UId) {
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        future.complete((Integer) map.get("rank/"+UId));
+        return future;
+    }
+
+    @Override
     public CompletableFuture<Integer> getNumberOfProfiles() {
         CompletableFuture<Integer> future = new CompletableFuture<>();
         future.complete((Integer) map.get("numberOfProfiles"));
@@ -99,6 +106,13 @@ public class MockDatabase implements DatabaseInterface {
 
     @Override
     public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
+        CompletableFuture<List<Profile>> future = new CompletableFuture<>();
+        future.complete((List<Profile>) map.get("topNProfiles"));
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
         future.complete((List<Profile>) map.get("topNProfiles"));
         return future;

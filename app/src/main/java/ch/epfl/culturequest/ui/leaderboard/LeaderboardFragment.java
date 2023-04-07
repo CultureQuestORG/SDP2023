@@ -1,13 +1,17 @@
 package ch.epfl.culturequest.ui.leaderboard;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,12 +22,15 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
+import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.FragmentLeaderboardBinding;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LeaderboardFragment extends Fragment {
 
     private FragmentLeaderboardBinding binding;
+
+    private final MutableLiveData<Integer> selectedMode = new MutableLiveData<>(R.id.globalLeaderboardButton);
 
     /**
      * Creates a new instance of the LeaderboardFragment that is initialized with the current user's uid.
@@ -62,7 +69,27 @@ public class LeaderboardFragment extends Fragment {
         final CircleImageView currentUserProfilePicture = binding.currentUserProfilePicture;
         leaderboardViewModel.getCurrentUsername().observe(getViewLifecycleOwner(), currentUsername::setText);
         leaderboardViewModel.getCurrentUserScore().observe(getViewLifecycleOwner(), currentUserScore::setText);
-        leaderboardViewModel.getCurrentUserRank().observe(getViewLifecycleOwner(), currentUserRank::setText);
+
+        leaderboardViewModel.getCurrentUserRank().observe(getViewLifecycleOwner(), rank ->{
+            if (selectedMode.getValue()==R.id.globalLeaderboardButton) {
+                currentUserRank.setText(rank);
+            }
+        });
+        leaderboardViewModel.getCurrentUserRankFriends().observe(getViewLifecycleOwner(), rank ->{
+            if (selectedMode.getValue()==R.id.friendsLeaderboardButton) {
+                currentUserRank.setText(rank);
+            }
+        });
+
+        selectedMode.observe(getViewLifecycleOwner(), mode -> {
+            if (mode == R.id.globalLeaderboardButton) {
+                currentUserRank.setText(leaderboardViewModel.getCurrentUserRank().getValue());
+            } else {
+                currentUserRank.setText(leaderboardViewModel.getCurrentUserRankFriends().getValue());
+            }
+        });
+
+
         leaderboardViewModel.getCurrentUserProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(currentUserProfilePicture));
 
         // define the RecyclerView's adapter
@@ -81,4 +108,20 @@ public class LeaderboardFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    @SuppressLint("NonConstantResourceId")
+    public void chooseLeaderboard(View view) {
+
+        switch(view.getId()) {
+            case R.id.globalLeaderboardButton:
+                selectedMode.setValue(R.id.globalLeaderboardButton);
+                break;
+
+            case R.id.friendsLeaderboardButton:
+                selectedMode.setValue(R.id.friendsLeaderboardButton);
+                    break;
+        }
+
+    }
+
 }

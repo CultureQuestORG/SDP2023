@@ -65,11 +65,19 @@ public class Database {
         return databaseInstance.getRank(UId);
     }
 
+    public static CompletableFuture<Integer> getRankFriends(String UId) {
+        return databaseInstance.getRankFriends(UId);
+    }
+
     public static CompletableFuture<Integer> getNumberOfProfiles() {
         return databaseInstance.getNumberOfProfiles();
     }
 
     public static CompletableFuture<List<Profile>> getTopNProfiles(int n) {
+        return databaseInstance.getTopNProfiles(n);
+    }
+
+    public static CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
         return databaseInstance.getTopNProfiles(n);
     }
 

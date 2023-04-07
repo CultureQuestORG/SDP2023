@@ -32,9 +32,13 @@ public interface DatabaseInterface {
 
     CompletableFuture<Integer> getRank(String UId);
 
+    CompletableFuture<Integer> getRankFriends(String UId);
+
     CompletableFuture<Integer> getNumberOfProfiles();
 
     CompletableFuture<List<Profile>> getTopNProfiles(int n);
+
+    CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n);
 
 
     /////////////////////////// POSTS ///////////////////////////
