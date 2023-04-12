@@ -1,6 +1,5 @@
 package ch.epfl.culturequest;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -9,12 +8,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import org.mockito.internal.matchers.And;
-
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
@@ -41,6 +40,13 @@ public class SignUpActivity extends AppCompatActivity {
                     AndroidUtils.redirectToActivity(this, ProfileCreatorActivity.class);
                 } else {
                     // If the user has a profile, display the navigation activity
+                    CompletableFuture<List<Post>> postsFuture = Database.getPosts(p.getUid());
+                    postsFuture.handle((posts, throwable) -> {
+                       if (throwable == null){
+                           p.setPosts(posts);
+                       }
+                        return null;
+                    });
                     Profile.setActiveProfile(p);
                     AndroidUtils.redirectToActivity(this, NavigationActivity.class);
                 }

@@ -2,6 +2,7 @@ package ch.epfl.culturequest.authentication;
 
 import static android.app.Activity.RESULT_OK;
 
+
 import android.app.Activity;
 import android.content.Intent;
 
@@ -15,11 +16,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
@@ -71,6 +74,16 @@ public class Authenticator implements AuthService {
         } else {
             Database.getProfile(user.getUid()).handle((profile, throwable) -> {
                 if (profile != null) {
+                    // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
+                    // a time, but it is computationally more efficient to do 1 big query:
+                    //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
+                    CompletableFuture<List<Post>> profilePosts = Database.getPosts(user.getUid());
+                    profilePosts.handle((posts, t) -> {
+                        if (posts != null && t == null){
+                            profile.setPosts(posts);
+                        }
+                        return null;
+                    });
                     Profile.setActiveProfile(profile);
                     AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
                 } else {
@@ -144,6 +157,13 @@ public class Authenticator implements AuthService {
             assert user != null;
             Database.getProfile(user.getUid()).handle((profile, throwable) -> {
                 if (profile != null) {
+                    CompletableFuture<List<Post>> profilePosts = Database.getPosts(user.getUid());
+                    profilePosts.handle((posts, t) -> {
+                        if (posts != null && t == null){
+                            profile.setPosts(posts);
+                        }
+                        return null;
+                    });
                     Profile.setActiveProfile(profile);
                     AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
                 } else {
