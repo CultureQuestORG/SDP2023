@@ -132,7 +132,7 @@ public class ProfileTest {
         assertThat(emptyProfile.getPhoneNumber(), is(""));
         assertThat(emptyProfile.getProfilePicture(), is(""));
         //users images should be an empty list
-        assertThat(emptyProfile.getImages().size(), is(0));
+        assertThat(emptyProfile.getPosts().size(), is(0));
         assertThat(emptyProfile.getScore(), is(0));
 
     }
@@ -145,8 +145,8 @@ public class ProfileTest {
         HashMap<String, Boolean> images = new HashMap<>();
         images.put(image.getUid(), true);
         profile.addObserver(((o, arg) -> {
-            assertThat(profile.getImagesList().size(), is(images.size()));
-            assertThat(profile.getImagesList().get(0).getUid(), is(image.getUid()));
+            assertThat(profile.getPosts().size(), is(images.size()));
+            assertThat(profile.getPosts().get(0).getUid(), is(image.getUid()));
         }));
         profile.setImages(images);
     }
@@ -160,7 +160,7 @@ public class ProfileTest {
                 "email: " + profile.getEmail() + "\n" +
                 "phoneNumber: " + profile.getPhoneNumber() + "\n" +
                 "profilePicture: " + profile.getProfilePicture() + "\n" +
-                        "pictures: " + profile.getImagesList() + "\n" +
+                        "pictures: " + profile.getPosts() + "\n" +
                 "score: " + profile.getScore() + "\n"));
     }
 
