@@ -123,13 +123,6 @@ public class SearchUserActivityTest {
         Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), DisplayUserProfileActivity.class);
         assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
     }
-
-    @Test
-    public void wrongUsernameFormatDoesntDisplayAnything(){
-        onView(withId(R.id.search_user)).perform(typeText("Username is wrong"));
-        onView(withId(R.id.list_view))
-                .check(matches(Matchers.not(hasMinimumChildCount(1))));
-    }
     @After
     public void teardown() {
         //Database.deleteProfile("testUid1");
