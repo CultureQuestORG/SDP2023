@@ -171,16 +171,11 @@ public class Profile extends Observable {
      * @return the latest posts of a user
      */
     public List<Post> getPosts(int limit, int offset) {
-        List<Post> orderedPosts = images;
-        if (orderedPosts == null) {
-            throw new IllegalStateException("Images list is null");
-        }
-        //sort by date. Unfortunately, the DB cant sort by date bc it doesnt know the postId unless given
-        //as parameter, but it is easier to sort by date here.
-        orderedPosts.sort((post1, post2) -> post2.getDate().compareTo(post1.getDate()));
+        List<Post> orderedPosts = new ArrayList<>(images);
         if (orderedPosts.isEmpty()){
             return new ArrayList<>();
         }
+        orderedPosts.sort((post1, post2) -> post2.getDate().compareTo(post1.getDate()));
         int size = orderedPosts.size();
         if (offset < 0 || limit < 0){
             throw new IllegalArgumentException("Limit/Offset is < 0");
@@ -197,7 +192,7 @@ public class Profile extends Observable {
      */
     public List<Post> getPosts(){
         //sort by date to be safe
-        List<Post> orderedPosts = images;
+        List<Post> orderedPosts = new ArrayList<>(images);
         orderedPosts.sort((post1, post2) -> post2.getDate().compareTo(post1.getDate()));
         return orderedPosts;
     }
