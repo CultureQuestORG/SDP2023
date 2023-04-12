@@ -26,6 +26,10 @@ public class ProfileUtils {
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
 
+    public static int DEFAULT_POST_LIMIT = 4, DEFAULT_POST_OFFSET = 0;
+
+
+
     public static final String GALLERY_PERMISSION =
             //Version code R is android 11.
             Build.VERSION.SDK_INT > Build.VERSION_CODES.R ?

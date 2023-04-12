@@ -38,12 +38,10 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     public void onBindViewHolder(@NonNull PictureViewHolder holder, int position) {
         String pictureUrl = pictures.get(position).getImageUrl();
         // Load the picture into the ImageView using a library like Glide or Picasso
-        holder.username.setText(Profile.getActiveProfile().getUsername());
         Picasso.get()
                 .load(pictureUrl)
                 .placeholder(android.R.drawable.progress_horizontal)
                 .into(holder.pictureImageView);
-
     }
 
     @Override
@@ -54,12 +52,10 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     public class PictureViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView pictureImageView;
-        public TextView username;
 
         public PictureViewHolder(@NonNull View itemView) {
             super(itemView);
             pictureImageView = itemView.findViewById(R.id.post_view);
-            username = itemView.findViewById(R.id.username);
         }
     }
 }
