@@ -34,7 +34,8 @@ public class SearchUserActivity extends AppCompatActivity {
     //the whole username to search for users
     TextWatcher watcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -46,7 +47,8 @@ public class SearchUserActivity extends AppCompatActivity {
         }
 
         @Override
-        public void afterTextChanged(Editable s) {}
+        public void afterTextChanged(Editable s) {
+        }
     };
 
     @Override
@@ -61,7 +63,7 @@ public class SearchUserActivity extends AppCompatActivity {
      * parses all the profiles in the DB and shows the usernames matching the query
      * in a list view. When clicking on a profile in the list view, it opens the activity
      * DisplayUserProfileActivity.
-     *
+     * <p>
      * In the future, to improve the search algorithm, we can implement the Levenshtein distance
      * instead of startsWith(..).
      *
@@ -95,20 +97,25 @@ public class SearchUserActivity extends AppCompatActivity {
      * This is the listener for the profile we click on. It opens the DisplayUserProfileActivity intent
      * and waits for a result. The result is used when the user on the DisplayUserProfileActivity clicks
      * on the home button, so that they are directly redirected to the home fragment.
-     *
      */
     private void searchBarOnClickListener(AdapterView<?> parent, int position, Map<String, Profile> usernameToProfileMap) {
         String selectedUsername = (String) parent.getItemAtPosition(position);
-        ProfileUtils.setSelectedProfile(usernameToProfileMap.get(selectedUsername));
-        //we put finish() to close the intent and open the display user activity. On that activity, if a user
-        //presses on the back button, it will open a new intent for searching
-        Intent intent = new Intent(this, DisplayUserProfileActivity.class);
-        startActivityForResult(intent, 1);
+        Profile selected = usernameToProfileMap.get(selectedUsername);
+        // we fetch the user we are querying here and set the posts of the selected user.
+        Database.getPosts(selected.getUid()).whenComplete((posts, throwable) -> {
+            if (posts != null && throwable == null) {
+                selected.setPosts(posts);
+                ProfileUtils.setSelectedProfile(selected);
+            }
+            //we put finish() to close the intent and open the display user activity. On that activity, if a user
+            //presses on the back button, it will open a new intent for searching
+            Intent intent = new Intent(this, DisplayUserProfileActivity.class);
+            startActivityForResult(intent, 1);
+        });
     }
 
     /**
      * When hearing back from the DisplayUserProfileActivity, we close this activity.
-     *
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
@@ -18,8 +18,11 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<String> username;
     private final MutableLiveData<String> profilePictureUri;
 
-    private final MutableLiveData<List<Image>> pictures;
+    private final MutableLiveData<List<Post>> pictures;
     private final MutableLiveData<Boolean> followed;
+
+    Profile profile = Profile.getActiveProfile();
+    Profile selectedProfile = ProfileUtils.getSelectedProfile();
 
     /**
      * Constructor of the ProfileViewModel
@@ -32,27 +35,23 @@ public class ProfileViewModel extends ViewModel {
         followed = new MutableLiveData<>(false);
 
         EspressoIdlingResource.increment();
-        Profile profile = Profile.getActiveProfile();
-        Profile selectedProfile = ProfileUtils.getSelectedProfile();
-
         if (profile != null) {
             if (selectedProfile != null && selectedProfile.getUid().equals(uid)) {
-                    username.setValue(selectedProfile.getUsername());
-                    profilePictureUri.setValue(selectedProfile.getProfilePicture());
-                    pictures.setValue(selectedProfile.getImagesList());
+                username.setValue(selectedProfile.getUsername());
+                profilePictureUri.setValue(selectedProfile.getProfilePicture());
+                pictures.setValue(selectedProfile.getPosts());
             } else {
-                //set the values of the live data
+                 //set the values of the live data
                 username.setValue(profile.getUsername());
                 profilePictureUri.setValue(profile.getProfilePicture());
-                pictures.setValue(profile.getImagesList());
-
+                pictures.setValue(profile.getPosts());
 
                 // add an observer to the profile so that the view is updated when the profile is updated
                 profile.addObserver((profileObject, arg) -> {
                     Profile p = (Profile) profileObject;
                     username.postValue(p.getUsername());
                     profilePictureUri.postValue(p.getProfilePicture());
-                    pictures.postValue(p.getImagesList());
+                    pictures.postValue(p.getPosts());
                 });
             }
             // if no profile is active, we load a default profile
@@ -77,7 +76,7 @@ public class ProfileViewModel extends ViewModel {
     /**
      * @return the list of pictures of the profile
      */
-    public LiveData<List<Image>> getPictures() {
+    public LiveData<List<Post>> getPosts() {
         return pictures;
     }
 
