@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
@@ -256,6 +255,27 @@ public class FireDatabase implements DatabaseInterface {
                     posts.add(post);
                     if(++i == limit) break;
                 }
+                future.complete(posts);
+            } else {
+                future.complete(List.of());
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPosts(String UId){
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(UId);
+        usersRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Post> posts = new ArrayList<>();
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Post post = snapshot.getValue(Post.class);
+                    posts.add(post);
+                }
+                // sort by date such that we get the latest posts first
+                posts.sort((p1, p2) -> p2.getDate().compareTo(p1.getDate()));
                 future.complete(posts);
             } else {
                 future.complete(List.of());
