@@ -7,6 +7,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -230,6 +231,11 @@ public class ProfileTest {
         assertThrows(IllegalArgumentException.class, () ->{
             profile.getPosts(1, -1);
         });
+    }
+
+    @Test
+    public void noPostsGivesEmptyListWithListAndOffset(){
+        assertTrue(profile.getPosts(1,0).isEmpty());
     }
 
     @Test
