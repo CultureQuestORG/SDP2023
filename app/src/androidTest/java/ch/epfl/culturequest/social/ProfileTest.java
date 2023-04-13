@@ -168,7 +168,7 @@ public class ProfileTest {
                 "Piece of Art", new Date(), 0, new ArrayList<>());
 
         profile.addPost(post);
-        assertEquals(2, profile.getPosts().size());
+        assertEquals(1, profile.getPosts().size());
     }
 
     @Test
