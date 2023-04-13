@@ -49,7 +49,7 @@ public class Profile extends Observable {
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
-        this.images = List.of();
+        this.images = new ArrayList<>();
         this.score = 0;
     }
 

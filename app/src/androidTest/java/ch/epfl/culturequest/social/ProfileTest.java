@@ -5,6 +5,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -13,7 +15,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.database.MockDatabase;
@@ -149,6 +159,77 @@ public class ProfileTest {
             assertThat(profile.getPosts().get(0).getUid(), is(image.getUid()));
         }));
         profile.setImages(images);
+    }
+
+    @Test
+    public void addingPostIncrementsAllPostsSize() {
+        Post post = new Post("def", "123",
+                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                "Piece of Art", new Date(), 0, new ArrayList<>());
+
+        profile.addPost(post);
+        assertEquals(2, profile.getPosts().size());
+    }
+
+    @Test
+    public void postsAreSortedByDate() {
+        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+        List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
+            try {
+                return new Post(String.valueOf(i), "123",
+                        "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                        "Piece of Art", DateFor.parse("0" + i + "/01/2000"), 0, new ArrayList<>());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
+
+        profile.setPosts(posts);
+        Collections.reverse(posts);
+        assertEquals(posts, profile.getPosts());
+    }
+
+    @Test
+    public void retrievingPostsWithLimitAndOffsetReturnsLatestPosts(){
+        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+        List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
+            try {
+                return new Post(String.valueOf(i), "123",
+                        "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                        "Piece of Art", DateFor.parse("0" + i + "/01/2000"), 0, new ArrayList<>());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
+        profile.setPosts(posts);
+        Collections.reverse(posts);
+        assertEquals(posts.subList(0,3), profile.getPosts(3,0));
+        assertEquals(posts.subList(3,7), profile.getPosts(4,3));
+    }
+
+    @Test
+    public void givingInvalidLimitsAndOffsetThrowsException(){
+        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+        List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
+            try {
+                return new Post(String.valueOf(i), "123",
+                        "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                        "Piece of Art", DateFor.parse("0" + i + "/01/2000"), 0, new ArrayList<>());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
+        profile.setPosts(posts);
+        assertThrows(IllegalArgumentException.class, () -> {
+            profile.getPosts(1, 11);//offset is larger than the total number of posts;
+        });
+
+        assertThrows(IllegalArgumentException.class, () ->{
+            profile.getPosts(-1, 0);
+        });
+        assertThrows(IllegalArgumentException.class, () ->{
+            profile.getPosts(1, -1);
+        });
     }
 
     @Test
