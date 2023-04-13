@@ -7,9 +7,7 @@ import static org.hamcrest.Matchers.is;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -70,7 +68,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void getPostsWorks() {
+    public void getPostsWorksWithLimitsAndOffsets() {
         Post post = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
         Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
         Database.uploadPost(post).join();
@@ -78,6 +76,15 @@ public class DatabaseTest {
         assertThat(Database.getPosts("user1", 10, 0).join().get(0), is(post));
         assertThat(Database.getPosts("user1", 10, 1).join().get(0), is(post2));
         assertThat(Database.getPosts("user1", 1, 0).join().size(), is(1));
+    }
+
+    @Test
+    public void getPostsWorks(){
+        Post post = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
+        Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
+        Database.uploadPost(post).join();
+        Database.uploadPost(post2).join();
+        assertThat(Database.getPosts("user1").join(), is(List.of(post, post2)));
     }
 
     @Test
