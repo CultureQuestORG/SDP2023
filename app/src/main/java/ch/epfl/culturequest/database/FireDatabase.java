@@ -182,7 +182,7 @@ public class FireDatabase implements DatabaseInterface {
                     usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             List<String> friends= profile.getFriends();
-                            int rank = friends.size();
+                            int rank = friends.size()+1;
                             for (DataSnapshot snapshot : task.getResult().getChildren()) {
                                 if (Objects.equals(snapshot.getKey(), UId)) {
                                     future.complete(rank);
@@ -250,7 +250,6 @@ public class FireDatabase implements DatabaseInterface {
     public CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n){
         DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
-        getNumberOfProfiles().whenComplete((numberOfUsers, e) -> {
             List<String> friends = Profile.getActiveProfile().getFriends();
             usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -266,7 +265,6 @@ public class FireDatabase implements DatabaseInterface {
                     future.completeExceptionally(task.getException());
                 }
             });
-        });
         return future;
     }
 

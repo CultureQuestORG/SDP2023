@@ -28,9 +28,17 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LeaderboardFragment extends Fragment {
 
+    enum Mode {
+        GLOBAL,
+        FRIENDS
+    }
+
     private FragmentLeaderboardBinding binding;
 
-    private final MutableLiveData<Integer> selectedMode = new MutableLiveData<>(R.id.globalLeaderboardButton);
+     RadioButton globalLeaderboardButton ;
+     RadioButton friendsLeaderboardButton ;
+
+    private static final MutableLiveData<Integer> selectedMode = new MutableLiveData<>(R.id.globalLeaderboardButton);
 
     /**
      * Creates a new instance of the LeaderboardFragment that is initialized with the current user's uid.
@@ -67,6 +75,11 @@ public class LeaderboardFragment extends Fragment {
         final TextView currentUserScore = binding.currentUserScore;
         final TextView currentUserRank = binding.currentUserRank;
         final CircleImageView currentUserProfilePicture = binding.currentUserProfilePicture;
+        globalLeaderboardButton = binding.globalLeaderboardButton;
+        friendsLeaderboardButton = binding.friendsLeaderboardButton;
+
+        globalLeaderboardButton.setOnClickListener(this::chooseLeaderboard);
+        friendsLeaderboardButton.setOnClickListener(this::chooseLeaderboard);
         leaderboardViewModel.getCurrentUsername().observe(getViewLifecycleOwner(), currentUsername::setText);
         leaderboardViewModel.getCurrentUserScore().observe(getViewLifecycleOwner(), currentUserScore::setText);
 
@@ -81,25 +94,41 @@ public class LeaderboardFragment extends Fragment {
             }
         });
 
-        selectedMode.observe(getViewLifecycleOwner(), mode -> {
-            if (mode == R.id.globalLeaderboardButton) {
-                currentUserRank.setText(leaderboardViewModel.getCurrentUserRank().getValue());
-            } else {
-                currentUserRank.setText(leaderboardViewModel.getCurrentUserRankFriends().getValue());
-            }
-        });
+
 
 
         leaderboardViewModel.getCurrentUserProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(currentUserProfilePicture));
 
         // define the RecyclerView's adapter
-        LeaderboardRecycleViewAdapter adapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel);
+        LeaderboardRecycleViewAdapter globalAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel,Mode.GLOBAL);
         // set the RecyclerView
         final RecyclerView leaderboardRecyclerView = binding.recyclerView;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
         leaderboardRecyclerView.setLayoutManager(layoutManager);
-        leaderboardRecyclerView.setAdapter(adapter);
+        leaderboardRecyclerView.setAdapter(globalAdapter);
         leaderboardRecyclerView.addItemDecoration(new DividerItemDecoration(this.requireActivity(), DividerItemDecoration.VERTICAL));
+
+
+        LeaderboardRecycleViewAdapter friendsAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel,Mode.FRIENDS);
+
+        final RecyclerView friendsLeaderboardRecyclerView = binding.friendsRecyclerView;
+        RecyclerView.LayoutManager friendsLayoutManager = new LinearLayoutManager(this.getActivity());
+        friendsLeaderboardRecyclerView.setLayoutManager(friendsLayoutManager);
+        friendsLeaderboardRecyclerView.setAdapter(friendsAdapter);
+        friendsLeaderboardRecyclerView.addItemDecoration(new DividerItemDecoration(this.requireActivity(), DividerItemDecoration.VERTICAL));
+
+
+        selectedMode.observe(getViewLifecycleOwner(), mode -> {
+            if (mode == R.id.friendsLeaderboardButton) {
+                currentUserRank.setText(leaderboardViewModel.getCurrentUserRankFriends().getValue());
+                leaderboardRecyclerView.setVisibility(View.GONE);
+                friendsLeaderboardRecyclerView.setVisibility(View.VISIBLE);
+            } else {
+                currentUserRank.setText(leaderboardViewModel.getCurrentUserRank().getValue());
+                leaderboardRecyclerView.setVisibility(View.VISIBLE);
+                friendsLeaderboardRecyclerView.setVisibility(View.GONE);
+            }
+        });
         return root;
     }
 
@@ -115,13 +144,21 @@ public class LeaderboardFragment extends Fragment {
         switch(view.getId()) {
             case R.id.globalLeaderboardButton:
                 selectedMode.setValue(R.id.globalLeaderboardButton);
+                globalLeaderboardButton.setChecked(true);
+                friendsLeaderboardButton.setChecked(false);
                 break;
 
             case R.id.friendsLeaderboardButton:
                 selectedMode.setValue(R.id.friendsLeaderboardButton);
+                globalLeaderboardButton.setChecked(false);
+                friendsLeaderboardButton.setChecked(true);
                     break;
         }
 
+    }
+
+    public static LiveData<Integer> getSelectedMode() {
+        return selectedMode.getValue() == null ? new MutableLiveData<>(R.id.globalLeaderboardButton) : selectedMode;
     }
 
 }

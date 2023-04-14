@@ -78,7 +78,7 @@ public class Database {
     }
 
     public static CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
-        return databaseInstance.getTopNProfiles(n);
+        return databaseInstance.getTopNFriendsProfiles(n);
     }
 
     /**
