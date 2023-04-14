@@ -1,9 +1,0 @@
-11:17:14.329 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
-11:17:14.546 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:9000
-11:17:15.857 [NamespaceSystem-akka.actor.default-dispatcher-6] INFO com.firebase.core.namespace.NamespaceActor - culturequest-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 207ms, init: 0ms
-11:17:16.013 [NamespaceSystem-blocking-namespace-operation-dispatcher-7] INFO com.firebase.core.namespace.StateManager - Namespace culturequest-default-rtdb status Active to Active
-11:31:22.730 [FirebaseWorkerPool-1-1] WARN com.firebase.core.persistence.backend.dummy.EmulatorMetadataPersistence - Multiple projectIds are not recommended in single project mode. Requested 
-namespace culturequest, but the emulator is configured for culturequest-default-rtdb. To 
-opt-out of single project mode add/set the single_project_mode: false property in 
-the firebase.json emulators config. 
-11:31:22.749 [NamespaceSystem-akka.actor.default-dispatcher-13] INFO com.firebase.core.namespace.NamespaceActor - culturequest successfully activated FBKV (SurveyIdle(0)) wait: 8ms, init: 0ms
