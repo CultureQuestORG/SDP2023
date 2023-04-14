@@ -2,11 +2,8 @@ package ch.epfl.culturequest.ui;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
-import static androidx.test.espresso.matcher.ViewMatchers.hasMinimumChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -44,23 +41,11 @@ public class LeaderboardFragmentTest {
     public void setUp() {
         // Set up the database to run on the local emulator of Firebase
         firebaseDatabase = FirebaseDatabase.getInstance();
-
+        firebaseDatabase.useEmulator("10.0.2.2", 9000);
         Database.init(new FireDatabase(firebaseDatabase));
 
-
-        //The comments below is what is used to test on the main but weirdly,
-        //it accesses the real database and overwrites its content...
-        //TODO resolve issuee
-        //firebaseDatabase = FirebaseDatabase.getInstance();
-        //try {
-        //    firebaseDatabase.useEmulator("10.0.2.2", 9000);
-        //} catch (IllegalStateException e) {
-
-        //}
-        //Database.init(new FireDatabase(firebaseDatabase));
-
         // clear the database before starting the following tests
-        //firebaseDatabase.getReference().setValue(null);
+        firebaseDatabase.getReference().setValue(null);
 
 
         // Initialize the database with some test profiles
@@ -114,7 +99,7 @@ public class LeaderboardFragmentTest {
         // remove EspressoIdlingResource from the IdlingRegistry
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
         // clear the database after finishing the tests
-        Database.deleteProfile("currentUserUid")                  ;
+        Database.deleteProfile("currentUserUid");
         Database.deleteProfile("testUid2");
         Database.deleteProfile("testUid3");
         Database.deleteProfile("testUid4");

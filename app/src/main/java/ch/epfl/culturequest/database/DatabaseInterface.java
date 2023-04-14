@@ -14,6 +14,8 @@ import ch.epfl.culturequest.social.Profile;
  * This interface is used to abstract the database
  */
 public interface DatabaseInterface {
+
+    void clearDatabase();
     CompletableFuture<AtomicBoolean> set(String key, Object value);
 
     CompletableFuture<Object> get(String key);
