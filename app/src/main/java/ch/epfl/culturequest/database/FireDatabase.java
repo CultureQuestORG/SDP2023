@@ -29,7 +29,7 @@ public class FireDatabase implements DatabaseInterface {
     private final FirebaseDatabase database;
 
     public FireDatabase() {
-        database = FirebaseDatabase.getInstance();
+        this.database = FirebaseDatabase.getInstance();
     }
 
     public FireDatabase(FirebaseDatabase database) {

@@ -29,7 +29,7 @@ import ch.epfl.culturequest.utils.ProfileUtils;
 @RunWith(AndroidJUnit4.class)
 public class DisplayUserProfileTest {
 
-   /* @Before
+   @Before
     public void setUp() {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
@@ -65,9 +65,5 @@ public class DisplayUserProfileTest {
                 new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
         ActivityScenario.launch(DisplayUserProfileActivity.class);
         onView(withId(R.id.home_icon)).check(matches(isClickable()));
-    }*/
-
-    @Test
-    public void test1equal1() {
     }
 }

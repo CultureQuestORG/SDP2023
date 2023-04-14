@@ -20,8 +20,6 @@ import androidx.test.espresso.IdlingRegistry;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.database.FirebaseDatabase;
-
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
@@ -33,7 +31,6 @@ import java.util.List;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.database.FireDatabase;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
@@ -43,7 +40,7 @@ public class SearchUserActivityTest {
     @Rule
     public ActivityScenarioRule<SearchUserActivity> testRule = new ActivityScenarioRule<>(SearchUserActivity.class);
 
-    /*@Before
+    @Before
     public void setUp() {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
@@ -107,10 +104,5 @@ public class SearchUserActivityTest {
 
         // clear the database after finishing the tests
         Database.clearDatabase();
-    }*/
-
-    @Test
-    public void test1equal1() {
     }
-
 }

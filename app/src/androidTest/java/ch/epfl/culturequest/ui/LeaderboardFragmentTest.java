@@ -35,17 +35,14 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 @RunWith(AndroidJUnit4.class)
 public class LeaderboardFragmentTest {
     private LeaderboardFragment fragment;
-    FirebaseDatabase firebaseDatabase;
 
     @Before
     public void setUp() {
         // Set up the database to run on the local emulator of Firebase
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.useEmulator("10.0.2.2", 9000);
-        Database.init(new FireDatabase(firebaseDatabase));
+        Database.setEmulatorOn();
 
         // clear the database before starting the following tests
-        firebaseDatabase.getReference().setValue(null);
+        Database.clearDatabase();
 
 
         // Initialize the database with some test profiles
@@ -99,12 +96,7 @@ public class LeaderboardFragmentTest {
         // remove EspressoIdlingResource from the IdlingRegistry
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
         // clear the database after finishing the tests
-        Database.deleteProfile("currentUserUid");
-        Database.deleteProfile("testUid2");
-        Database.deleteProfile("testUid3");
-        Database.deleteProfile("testUid4");
-
-        //firebaseDatabase.getReference().setValue(null);
+        Database.clearDatabase();
 
     }
 }
