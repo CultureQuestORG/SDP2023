@@ -32,10 +32,11 @@ import ch.epfl.culturequest.utils.ProfileUtils;
 public class SearchUserActivity extends AppCompatActivity {
     //the following watcher allows us to search for users dynamically without having to enter
     //the whole username to search for users
+
+    public static final int NUMBER_USERS_TO_DISPLAY = 5;
     TextWatcher watcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -47,8 +48,7 @@ public class SearchUserActivity extends AppCompatActivity {
         }
 
         @Override
-        public void afterTextChanged(Editable s) {
-        }
+        public void afterTextChanged(Editable s) {}
     };
 
     @Override
@@ -63,9 +63,6 @@ public class SearchUserActivity extends AppCompatActivity {
      * parses all the profiles in the DB and shows the usernames matching the query
      * in a list view. When clicking on a profile in the list view, it opens the activity
      * DisplayUserProfileActivity.
-     * <p>
-     * In the future, to improve the search algorithm, we can implement the Levenshtein distance
-     * instead of startsWith(..).
      *
      * @param query username to look for.
      */
@@ -76,16 +73,12 @@ public class SearchUserActivity extends AppCompatActivity {
             Database.getAllProfiles().whenComplete((profiles, throwable) -> {
                 Map<String, Profile> usernameToProfileMap = profiles.stream()
                         .collect(Collectors.toMap(Profile::getUsername, profile -> profile));
-                List<String> matchingUsernames = usernameToProfileMap
-                        .keySet()
-                        .stream()
-                        .filter(username -> username.startsWith(query))
-                        .collect(Collectors.toList());
+
+                List<String> matchingUsernames = AutoComplete.topNMatches(query,usernameToProfileMap.keySet(),NUMBER_USERS_TO_DISPLAY);
+
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, matchingUsernames);
                 listView.setAdapter(adapter);
-                listView.setOnItemClickListener((parent, ignored, position, ignored2) -> {
-                    searchBarOnClickListener(parent, position, usernameToProfileMap);
-                });
+                listView.setOnItemClickListener((parent, ignored, position, ignored2) -> searchBarOnClickListener(parent, position, usernameToProfileMap));
             });
         } else {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, List.of());
