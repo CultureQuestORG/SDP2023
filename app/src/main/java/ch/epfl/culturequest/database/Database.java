@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.database;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,7 +17,8 @@ import ch.epfl.culturequest.social.Profile;
  * It is used to make the code more modular and to make it easier to change the database
  */
 public class Database {
-    private static DatabaseInterface  databaseInstance = new FireDatabase();
+    private static DatabaseInterface databaseInstance = new FireDatabase();
+    private static DatabaseInterface emulatorInstance = null;
 
     /**
      * This method is used to initialize the database instance as something else than the default (FireDatabase)
@@ -27,9 +30,24 @@ public class Database {
         Database.databaseInstance = database;
     }
 
+    public static void setEmulatorOn() {
+        if (emulatorInstance == null) {
+            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+            firebaseDatabase.useEmulator("10.0.2.2", 9000);
+            databaseInstance = new FireDatabase(firebaseDatabase);
+            emulatorInstance = databaseInstance;
+        } else {
+            databaseInstance = emulatorInstance;
+        }
+    }
+
+    public static void clearDatabase() {
+        databaseInstance.clearDatabase();
+    }
+
 
     public static CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
-    return databaseInstance.deleteProfile(uid);
+        return databaseInstance.deleteProfile(uid);
     }
 
     public static CompletableFuture<AtomicBoolean> set(String key, Object value) {
@@ -83,6 +101,7 @@ public class Database {
 
     /**
      * This method is used to upload a post to the database
+     *
      * @param post the post to be uploaded
      * @return a CompletableFuture that will be completed when the upload is done
      */
@@ -92,6 +111,7 @@ public class Database {
 
     /**
      * This method is used to remove a post from the database
+     *
      * @param post the post to be removed
      * @return a CompletableFuture that will be completed when the removal is done
      */
@@ -101,8 +121,9 @@ public class Database {
 
     /**
      * This method is used to get the posts of a user
-     * @param UId the user's id
-     * @param limit the maximum number of posts to be returned
+     *
+     * @param UId    the user's id
+     * @param limit  the maximum number of posts to be returned
      * @param offset the number of posts to be skipped
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
@@ -112,8 +133,9 @@ public class Database {
 
     /**
      * This method is used to get the posts of a user's followings
-     * @param UIds the user's id
-     * @param limit the maximum number of posts to be returned
+     *
+     * @param UIds   the user's id
+     * @param limit  the maximum number of posts to be returned
      * @param offset the number of posts to be skipped
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
@@ -123,7 +145,8 @@ public class Database {
 
     /**
      * This method is used to get the posts of a user's followings
-     * @param UIds the user's id
+     *
+     * @param UIds  the user's id
      * @param limit the maximum number of posts to be returned
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
@@ -133,6 +156,7 @@ public class Database {
 
     /**
      * This method is used to get the posts of a user's followings
+     *
      * @param UIds the user's id
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
@@ -142,8 +166,9 @@ public class Database {
 
     /**
      * This method is used to get the posts of a user's followings
+     *
      * @param post the post to be liked
-     * @param UId the user's id
+     * @param UId  the user's id
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
     public static CompletableFuture<Post> addLike(Post post, String UId) {
@@ -152,8 +177,9 @@ public class Database {
 
     /**
      * This method is used to get the posts of a user's followings
+     *
      * @param post the post to be liked
-     * @param uid the user's id
+     * @param uid  the user's id
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
     public static CompletableFuture<Post> removeLike(Post post, String uid) {

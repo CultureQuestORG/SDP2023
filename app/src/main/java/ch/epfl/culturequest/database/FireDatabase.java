@@ -29,11 +29,16 @@ public class FireDatabase implements DatabaseInterface {
     private final FirebaseDatabase database;
 
     public FireDatabase() {
-        database = FirebaseDatabase.getInstance();
+        this.database = FirebaseDatabase.getInstance();
     }
 
     public FireDatabase(FirebaseDatabase database) {
         this.database = database;
+    }
+
+    @Override
+    public void clearDatabase() {
+        database.getReference().setValue(null);
     }
 
     @Override

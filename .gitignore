@@ -16,3 +16,6 @@
 .cxx
 local.properties
 firebase-tools-instant-win.exe
+ui-debug.log
+firebase-debug.log
+database-debug.log

@@ -1,4 +1,0 @@
-14:12:48.127 [NamespaceSystem-akka.actor.default-dispatcher-5] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
-14:12:48.690 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:9000
-14:12:50.567 [NamespaceSystem-akka.actor.default-dispatcher-6] INFO com.firebase.core.namespace.NamespaceActor - culturequest-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 316ms, init: 0ms
-14:12:50.742 [NamespaceSystem-blocking-namespace-operation-dispatcher-7] INFO com.firebase.core.namespace.StateManager - Namespace culturequest-default-rtdb status Active to Active

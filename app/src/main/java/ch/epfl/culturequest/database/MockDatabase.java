@@ -27,6 +27,11 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
+    public void clearDatabase() {
+        map.clear();
+    }
+
+    @Override
     public CompletableFuture<AtomicBoolean> set(String key, Object value) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         map.put(key, value);
