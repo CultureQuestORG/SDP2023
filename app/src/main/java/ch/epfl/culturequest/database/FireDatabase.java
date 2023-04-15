@@ -159,14 +159,12 @@ public class FireDatabase implements DatabaseInterface {
 
         CompletableFuture<Integer> future = new CompletableFuture<>();
         getAllProfiles().whenComplete((allProfiles, e) -> {
-                    int rank = 1;
-                    for (Profile p :allProfiles){
-                        if (Objects.equals(p.getUid(), UId)) {
-                            future.complete(rank);
-                            return;
-                        }
-                        rank++;
-                    }
+            int rank = findRank(UId,allProfiles);
+            if (rank != -1) {
+                future.complete(rank);
+            } else {
+                future.completeExceptionally(new RuntimeException("User not found"));
+            }
         });
         return future;
     }
@@ -190,19 +188,30 @@ public class FireDatabase implements DatabaseInterface {
                     future.completeExceptionally(new RuntimeException("User not found"));
                     return;
                 }
-                int rank = 1;
-                for (Profile friendProfile : friendsProfiles) {
-                    if (Objects.equals(friendProfile.getUid(), UId)) {
-                        future.complete(rank);
-                        return;
-                    }
-                    rank++;
+
+                int rank = findRank(UId,friendsProfiles);
+                if (rank != -1) {
+                    future.complete(rank);
+                } else {
+                    future.completeExceptionally(new RuntimeException("User not found"));
                 }
-                future.completeExceptionally(new RuntimeException("User not found"));
+
             });
         });
 
         return future;
+    }
+
+
+    private int findRank(String UId,List<Profile> profiles){
+        int rank = 1;
+        for (Profile p :profiles){
+            if (Objects.equals(p.getUid(), UId)) {
+                return rank;
+            }
+            rank++;
+        }
+        return -1;
     }
 
     /**
