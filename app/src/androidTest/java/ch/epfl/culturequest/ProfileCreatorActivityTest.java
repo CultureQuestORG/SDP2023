@@ -60,6 +60,12 @@ public class ProfileCreatorActivityTest {
 
     @BeforeClass
     public static void setup() throws InterruptedException {
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+
         FirebaseAuth.getInstance()
                 .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
                 .addOnCompleteListener(task -> {
@@ -84,7 +90,8 @@ public class ProfileCreatorActivityTest {
 
     @After
     public void release(){
-        Database.deleteProfile(profile.getUid());
+        // clear the database after finishing the tests
+        Database.clearDatabase();
         Intents.release();
     }
 

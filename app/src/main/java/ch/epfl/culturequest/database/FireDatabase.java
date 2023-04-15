@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
@@ -30,11 +29,16 @@ public class FireDatabase implements DatabaseInterface {
     private final FirebaseDatabase database;
 
     public FireDatabase() {
-        database = FirebaseDatabase.getInstance();
+        this.database = FirebaseDatabase.getInstance();
     }
 
     public FireDatabase(FirebaseDatabase database) {
         this.database = database;
+    }
+
+    @Override
+    public void clearDatabase() {
+        database.getReference().setValue(null);
     }
 
     @Override
@@ -254,7 +258,7 @@ public class FireDatabase implements DatabaseInterface {
                 for (DataSnapshot snapshot : task.getResult().getChildren()) {
                     Post post = snapshot.getValue(Post.class);
                     posts.add(post);
-                    if(++i == limit) break;
+                    if (++i == limit) break;
                 }
                 future.complete(posts);
             } else {
@@ -309,8 +313,8 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     /**
-     * @param post   the post to remove the like from
-     * @param UId    the id of the user who liked the post
+     * @param post the post to remove the like from
+     * @param UId  the id of the user who liked the post
      * @return a future that will return true if the like was removed successfully, false otherwise
      */
     @Override
