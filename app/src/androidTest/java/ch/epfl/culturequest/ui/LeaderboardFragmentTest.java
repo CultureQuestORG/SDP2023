@@ -1,10 +1,12 @@
 package ch.epfl.culturequest.ui;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.hasMinimumChildCount;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -113,7 +115,7 @@ public class LeaderboardFragmentTest {
         onView(withId(R.id.friends_recycler_view)).check(matches(hasChildCount(3)));
 
         //R.id.recycler_view should not be visible
-        onView(withId(R.id.recycler_view)).check(matches(not(isEnabled())));
+        onView(withId(R.id.recycler_view)).check(matches(not(isDisplayed())));
 
         // should be first among my friends
         onView(withId(R.id.current_user_rank)).check(matches(withText("1")));

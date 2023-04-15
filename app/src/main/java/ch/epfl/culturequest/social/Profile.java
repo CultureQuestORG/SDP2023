@@ -65,6 +65,7 @@ public class Profile extends Observable {
         this.profilePicture = profilePicture;
         this.score = score;
         this.Friends = friends;
+        this.images= List.of();
 
     }
 

@@ -19,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.culturequest.R;
@@ -34,7 +35,7 @@ public class DisplayUserProfileActivityTest {
 
     @BeforeClass
     public static void setUp() {
-        ProfileUtils.setSelectedProfile(new Profile("uid", "name", "username", "email", "phone", "photo", List.of(), 3));
+        ProfileUtils.setSelectedProfile(new Profile("uid", "name", "username", "email", "phone", "photo", new ArrayList<>(), 3));
     }
 
     @Test

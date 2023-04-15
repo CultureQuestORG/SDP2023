@@ -160,13 +160,13 @@ public class FireDatabase implements DatabaseInterface {
         getNumberOfProfiles().whenComplete((numberOfProfiles, e) -> {
             usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    int rank = numberOfProfiles;
+                    int rank = 1;
                     for (DataSnapshot snapshot : task.getResult().getChildren()) {
                         if (Objects.equals(snapshot.getKey(), UId)) {
                             future.complete(rank);
                             return;
                         }
-                        rank--;
+                        rank++;
                     }
                     future.completeExceptionally(new RuntimeException("User not found"));
                 } else {
@@ -194,14 +194,14 @@ public class FireDatabase implements DatabaseInterface {
             usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     List<String> friends = profile.getFriends();
-                    int rank = friends.size() + 1;
+                    int rank = 1;
                     for (DataSnapshot snapshot : task.getResult().getChildren()) {
                         if (Objects.equals(snapshot.getKey(), UId)) {
                             future.complete(rank);
                             return;
                         }
                         if (friends.contains(snapshot.getKey()))
-                            rank--;
+                            rank++;
                     }
                     future.completeExceptionally(new RuntimeException("User not found"));
                 } else {
