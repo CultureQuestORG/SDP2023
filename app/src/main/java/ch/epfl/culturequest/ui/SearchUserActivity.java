@@ -23,6 +23,7 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.AutoComplete;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
 /**
