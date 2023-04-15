@@ -178,28 +178,27 @@ public class FireDatabase implements DatabaseInterface {
         DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<Integer> future = new CompletableFuture<>();
         getProfile(UId).whenComplete((profile, e) -> {
-            if (profile != null) {
-                    usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            List<String> friends= profile.getFriends();
-                            int rank = friends.size()+1;
-                            for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                                if (Objects.equals(snapshot.getKey(), UId)) {
-                                    future.complete(rank);
-                                    return;
-                                }
-                                if (friends.contains(snapshot.getKey()))
-                                    rank--;
-                            }
-                            future.completeExceptionally(new RuntimeException("User not found"));
-                        } else {
-                            future.completeExceptionally(task.getException());
-                        }
-                    });
-
-            } else {
+            if (profile == null) {
                 future.completeExceptionally(new RuntimeException("User not found"));
+                return;
             }
+            usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    List<String> friends = profile.getFriends();
+                    int rank = friends.size() + 1;
+                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                        if (Objects.equals(snapshot.getKey(), UId)) {
+                            future.complete(rank);
+                            return;
+                        }
+                        if (friends.contains(snapshot.getKey()))
+                            rank--;
+                    }
+                    future.completeExceptionally(new RuntimeException("User not found"));
+                } else {
+                    future.completeExceptionally(task.getException());
+                }
+            });
         });
         return future;
     }
@@ -229,7 +228,7 @@ public class FireDatabase implements DatabaseInterface {
     public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
         DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
-        getNumberOfProfiles().whenComplete((a,b) -> {
+        getNumberOfProfiles().whenComplete((a, b) -> {
             usersRef.orderByChild("score").limitToLast(n).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     List<Profile> profilesList = new ArrayList<>();
@@ -247,24 +246,33 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     @Override
-    public CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n){
+    public CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
         DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
-            List<String> friends = Profile.getActiveProfile().getFriends();
-            usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    List<Profile> profilesList = new ArrayList<>();
-                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                        Profile profile = snapshot.getValue(Profile.class);
-                        if (profile!=null && (friends.contains(profile.getUid()) || profile.getUid().equals(Profile.getActiveProfile().getUid()))){
-                            profilesList.add(profile);
-                        }
+        List<String> friends = Profile.getActiveProfile().getFriends();
+        List<Profile> profilesList = new ArrayList<>();
+
+        //if the user does not have any friends, no need to fetch the database
+        if (friends == null || friends.isEmpty()) {
+            profilesList.add(Profile.getActiveProfile());
+            future.complete(profilesList);
+            return future;
+        }
+
+        usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Profile profile = snapshot.getValue(Profile.class);
+                    if (profile != null && (friends.contains(profile.getUid()) || profile.getUid().equals(Profile.getActiveProfile().getUid()))) {
+                        profilesList.add(profile);
                     }
-                    future.complete(profilesList.subList(0, Math.min(n, profilesList.size())));
-                } else {
-                    future.completeExceptionally(task.getException());
                 }
-            });
+                future.complete(profilesList.subList(0, Math.min(n, profilesList.size())));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
         return future;
     }
 
@@ -307,7 +315,7 @@ public class FireDatabase implements DatabaseInterface {
                 for (DataSnapshot snapshot : task.getResult().getChildren()) {
                     Post post = snapshot.getValue(Post.class);
                     posts.add(post);
-                    if(++i == limit) break;
+                    if (++i == limit) break;
                 }
                 future.complete(posts);
             } else {
@@ -362,8 +370,8 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     /**
-     * @param post   the post to remove the like from
-     * @param UId    the id of the user who liked the post
+     * @param post the post to remove the like from
+     * @param UId  the id of the user who liked the post
      * @return a future that will return true if the like was removed successfully, false otherwise
      */
     @Override

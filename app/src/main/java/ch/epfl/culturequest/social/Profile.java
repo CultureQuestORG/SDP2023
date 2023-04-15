@@ -56,16 +56,15 @@ public class Profile extends Observable {
         this.Friends = new ArrayList<>();
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Image> images, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, ArrayList<String> friends, Integer score) {
         this.uid = uid;
         this.name = name;
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
-        this.images = images;
         this.score = score;
-        this.Friends = new ArrayList<>();
+        this.Friends = friends;
 
     }
 

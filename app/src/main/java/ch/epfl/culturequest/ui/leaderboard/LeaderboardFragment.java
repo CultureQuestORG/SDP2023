@@ -38,6 +38,17 @@ public class LeaderboardFragment extends Fragment {
      RadioButton globalLeaderboardButton ;
      RadioButton friendsLeaderboardButton ;
 
+    private TextView currentUsername;
+    private TextView currentUserScore ;
+    private TextView currentUserRank;
+    private CircleImageView currentUserProfilePicture;
+
+    private RecyclerView leaderboardRecyclerView;
+    private RecyclerView friendsLeaderboardRecyclerView;
+    private LeaderboardViewModel leaderboardViewModel;
+
+
+
     private static final MutableLiveData<Integer> selectedMode = new MutableLiveData<>(R.id.globalLeaderboardButton);
 
     /**
@@ -65,18 +76,13 @@ public class LeaderboardFragment extends Fragment {
             currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         }
 
-        LeaderboardViewModel leaderboardViewModel = new ViewModelProvider(this, new LeaderboardViewModelFactory(currentUserUid)).get(LeaderboardViewModel.class);
+        leaderboardViewModel = new ViewModelProvider(this, new LeaderboardViewModelFactory(currentUserUid)).get(LeaderboardViewModel.class);
 
         binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // set the current user's information
-        final TextView currentUsername = binding.currentUsername;
-        final TextView currentUserScore = binding.currentUserScore;
-        final TextView currentUserRank = binding.currentUserRank;
-        final CircleImageView currentUserProfilePicture = binding.currentUserProfilePicture;
-        globalLeaderboardButton = binding.globalLeaderboardButton;
-        friendsLeaderboardButton = binding.friendsLeaderboardButton;
+        // bind the ui element with the respective variables
+        bind();
 
         globalLeaderboardButton.setOnClickListener(this::chooseLeaderboard);
         friendsLeaderboardButton.setOnClickListener(this::chooseLeaderboard);
@@ -95,41 +101,49 @@ public class LeaderboardFragment extends Fragment {
         });
 
 
-
-
         leaderboardViewModel.getCurrentUserProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(currentUserProfilePicture));
 
         // define the RecyclerView's adapter
         LeaderboardRecycleViewAdapter globalAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel,Mode.GLOBAL);
-        // set the RecyclerView
-        final RecyclerView leaderboardRecyclerView = binding.recyclerView;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
         leaderboardRecyclerView.setLayoutManager(layoutManager);
         leaderboardRecyclerView.setAdapter(globalAdapter);
         leaderboardRecyclerView.addItemDecoration(new DividerItemDecoration(this.requireActivity(), DividerItemDecoration.VERTICAL));
 
-
         LeaderboardRecycleViewAdapter friendsAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel,Mode.FRIENDS);
-
-        final RecyclerView friendsLeaderboardRecyclerView = binding.friendsRecyclerView;
         RecyclerView.LayoutManager friendsLayoutManager = new LinearLayoutManager(this.getActivity());
         friendsLeaderboardRecyclerView.setLayoutManager(friendsLayoutManager);
         friendsLeaderboardRecyclerView.setAdapter(friendsAdapter);
         friendsLeaderboardRecyclerView.addItemDecoration(new DividerItemDecoration(this.requireActivity(), DividerItemDecoration.VERTICAL));
 
+        selectedMode.observe(getViewLifecycleOwner(), this::handleModeSelection);
 
-        selectedMode.observe(getViewLifecycleOwner(), mode -> {
-            if (mode == R.id.friendsLeaderboardButton) {
-                currentUserRank.setText(leaderboardViewModel.getCurrentUserRankFriends().getValue());
-                leaderboardRecyclerView.setVisibility(View.GONE);
-                friendsLeaderboardRecyclerView.setVisibility(View.VISIBLE);
-            } else {
-                currentUserRank.setText(leaderboardViewModel.getCurrentUserRank().getValue());
-                leaderboardRecyclerView.setVisibility(View.VISIBLE);
-                friendsLeaderboardRecyclerView.setVisibility(View.GONE);
-            }
-        });
         return root;
+    }
+
+
+    private void handleModeSelection(Integer mode){
+        if (mode == R.id.friendsLeaderboardButton) {
+            currentUserRank.setText(leaderboardViewModel.getCurrentUserRankFriends().getValue());
+            leaderboardRecyclerView.setVisibility(View.GONE);
+            friendsLeaderboardRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            currentUserRank.setText(leaderboardViewModel.getCurrentUserRank().getValue());
+            leaderboardRecyclerView.setVisibility(View.VISIBLE);
+            friendsLeaderboardRecyclerView.setVisibility(View.GONE);
+        }
+    }
+
+
+    private void bind(){
+        currentUsername = binding.currentUsername;
+        currentUserScore = binding.currentUserScore;
+        currentUserRank = binding.currentUserRank;
+        currentUserProfilePicture = binding.currentUserProfilePicture;
+        globalLeaderboardButton = binding.globalLeaderboardButton;
+        friendsLeaderboardButton = binding.friendsLeaderboardButton;
+        leaderboardRecyclerView = binding.recyclerView;
+        friendsLeaderboardRecyclerView = binding.friendsRecyclerView;
     }
 
     @Override
