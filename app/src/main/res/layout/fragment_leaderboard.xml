@@ -105,6 +105,8 @@
         android:layout_height="413dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontal_bar"
+        app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintVertical_bias="0.559"
         tools:layout_editor_absoluteX="-2dp" />
 
@@ -115,9 +117,9 @@
         android:visibility="invisible"
 
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontal_bar"
-        app:layout_constraintVertical_bias="0.559"
-        tools:layout_editor_absoluteX="-2dp" />
+        app:layout_constraintVertical_bias="0.559" />
 
     <RadioButton
         android:id="@+id/globalLeaderboardButton"
