@@ -84,7 +84,6 @@ public class LeaderboardViewModel extends ViewModel {
         // retrieve the top N users' information to be displayed in the leaderboard
         Database.getTopNProfiles(N).whenComplete((topN, e) -> {
             // reverse the list so that the top user is at the top of the leaderboard
-            //Collections.reverse(topN);
             topNUserNames.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
             topNUserScores.setValue(topN.stream().map(p -> p.getScore().toString()).collect(toList()));
             topNUserProfilePicturesUri.setValue(topN.stream().map(Profile::getProfilePicture).collect(toList()));
@@ -99,7 +98,6 @@ public class LeaderboardViewModel extends ViewModel {
 
         Database.getTopNFriendsProfiles(N).whenComplete((topN, e) -> {
             // reverse the list so that the top user is at the top of the leaderboard
-            //Collections.reverse(topN);
             topNUserNamesFriends.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
             topNUserScoresFriends.setValue(topN.stream().map(p -> p.getScore().toString()).collect(toList()));
             topNUserProfilePicturesUriFriends.setValue(topN.stream().map(Profile::getProfilePicture).collect(toList()));

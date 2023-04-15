@@ -107,7 +107,7 @@ public class LeaderboardFragmentTest {
     }*/
 
     @Test
-    public void friendlyRankingWorks(){
+    public void friendlyRankingWorks() throws InterruptedException {
         onView(withId(R.id.friendsLeaderboardButton)).perform(click());
         //R.id.friends_recycler_view should be visible
         onView(withId(R.id.friends_recycler_view)).check(matches(isEnabled()));
@@ -116,6 +116,7 @@ public class LeaderboardFragmentTest {
 
         //R.id.recycler_view should not be visible
         onView(withId(R.id.recycler_view)).check(matches(not(isDisplayed())));
+
 
         // should be first among my friends
         onView(withId(R.id.current_user_rank)).check(matches(withText("1")));

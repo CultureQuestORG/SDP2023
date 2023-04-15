@@ -11,6 +11,7 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -155,24 +156,17 @@ public class FireDatabase implements DatabaseInterface {
      */
     @Override
     public CompletableFuture<Integer> getRank(String UId) {
-        DatabaseReference usersRef = database.getReference("users");
+
         CompletableFuture<Integer> future = new CompletableFuture<>();
-        getNumberOfProfiles().whenComplete((numberOfProfiles, e) -> {
-            usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
+        getAllProfiles().whenComplete((allProfiles, e) -> {
                     int rank = 1;
-                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                        if (Objects.equals(snapshot.getKey(), UId)) {
+                    for (Profile p :allProfiles){
+                        if (Objects.equals(p.getUid(), UId)) {
                             future.complete(rank);
                             return;
                         }
                         rank++;
                     }
-                    future.completeExceptionally(new RuntimeException("User not found"));
-                } else {
-                    future.completeExceptionally(task.getException());
-                }
-            });
         });
         return future;
     }
@@ -184,31 +178,30 @@ public class FireDatabase implements DatabaseInterface {
      */
     @Override
     public CompletableFuture<Integer> getRankFriends(String UId) {
-        DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<Integer> future = new CompletableFuture<>();
         getProfile(UId).whenComplete((profile, e) -> {
             if (profile == null) {
                 future.completeExceptionally(new RuntimeException("User not found"));
                 return;
             }
-            usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    List<String> friends = profile.getFriends();
-                    int rank = 1;
-                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                        if (Objects.equals(snapshot.getKey(), UId)) {
-                            future.complete(rank);
-                            return;
-                        }
-                        if (friends.contains(snapshot.getKey()))
-                            rank++;
-                    }
+
+            getTopNFriendsProfiles(profile.getFriends().size()+1).whenComplete((friendsProfiles, e2) -> {
+                if (friendsProfiles == null) {
                     future.completeExceptionally(new RuntimeException("User not found"));
-                } else {
-                    future.completeExceptionally(task.getException());
+                    return;
                 }
+                int rank = 1;
+                for (Profile friendProfile : friendsProfiles) {
+                    if (Objects.equals(friendProfile.getUid(), UId)) {
+                        future.complete(rank);
+                        return;
+                    }
+                    rank++;
+                }
+                future.completeExceptionally(new RuntimeException("User not found"));
             });
         });
+
         return future;
     }
 
@@ -244,6 +237,7 @@ public class FireDatabase implements DatabaseInterface {
                     Profile profile = snapshot.getValue(Profile.class);
                     profilesList.add(profile);
                 }
+                profilesList.sort((p1,p2)-> p2.getScore().compareTo(p1.getScore()));
                 future.complete(profilesList);
             } else {
                 future.completeExceptionally(task.getException());
@@ -279,7 +273,9 @@ public class FireDatabase implements DatabaseInterface {
                         profilesList.add(profile);
                     }
                 }
-                future.complete(profilesList.subList(0, Math.min(n, profilesList.size())));
+                List<Profile> topNProfiles = profilesList.subList(0, Math.min(n, profilesList.size()));
+                topNProfiles.sort((p1,p2)-> p2.getScore().compareTo(p1.getScore()));
+                future.complete(topNProfiles);
             } else {
                 future.completeExceptionally(task.getException());
             }

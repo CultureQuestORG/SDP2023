@@ -42,7 +42,8 @@ public class Database {
     }
 
     public static void clearDatabase() {
-        databaseInstance.clearDatabase();
+        if (emulatorInstance!=null)
+            emulatorInstance.clearDatabase();
     }
 
 
