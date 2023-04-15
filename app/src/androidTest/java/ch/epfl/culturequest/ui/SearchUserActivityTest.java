@@ -61,10 +61,10 @@ public class SearchUserActivityTest {
 
         Database.init(new FireDatabase(firebaseDatabase));
 
-        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
-        Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", List.of(), 0));
-        Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", List.of(), 0));
-        Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", List.of(), 0));
+        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", new ArrayList<>(), 0));
+        Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", new ArrayList<>(), 0));
+        Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", new ArrayList<>(), 0));
+        Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", new ArrayList<>(), 0));
 
         //The comments below is what is used to test on the main but weirdly,
         //it accesses the real database and overwrites its content...

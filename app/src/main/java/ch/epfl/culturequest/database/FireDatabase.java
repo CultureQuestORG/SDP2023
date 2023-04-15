@@ -173,6 +173,10 @@ public class FireDatabase implements DatabaseInterface {
     }
 
 
+    /**
+     * @param UId the user's id
+     * @return the rank of the user in the database with respect to their score among his friends
+     */
     @Override
     public CompletableFuture<Integer> getRankFriends(String UId) {
         DatabaseReference usersRef = database.getReference("users");
@@ -228,23 +232,25 @@ public class FireDatabase implements DatabaseInterface {
     public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
         DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
-        getNumberOfProfiles().whenComplete((a, b) -> {
-            usersRef.orderByChild("score").limitToLast(n).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    List<Profile> profilesList = new ArrayList<>();
-                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                        Profile profile = snapshot.getValue(Profile.class);
-                        profilesList.add(profile);
-                    }
-                    future.complete(profilesList);
-                } else {
-                    future.completeExceptionally(task.getException());
+        usersRef.orderByChild("score").limitToLast(n).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Profile> profilesList = new ArrayList<>();
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Profile profile = snapshot.getValue(Profile.class);
+                    profilesList.add(profile);
                 }
-            });
+                future.complete(profilesList);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
         });
         return future;
     }
 
+    /**
+     * @param n the number of profiles to get
+     * @return the top n profiles in the database with respect to their score among the active user friends
+     */
     @Override
     public CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
         DatabaseReference usersRef = database.getReference("users");
