@@ -59,12 +59,12 @@ public class LeaderboardFragmentTest {
         ArrayList<String> myFriendsIds = new ArrayList<>();
         myFriendsIds.add("testUid2");
         myFriendsIds.add("testUid3");
-        Profile activeProfile =new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", myFriendsIds , 400);
+        Profile activeProfile =new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture",  new ArrayList<>(), myFriendsIds , 400);
         Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
-        Database.setProfile(new Profile("testUid2", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", new ArrayList<>(), 300));
-        Database.setProfile(new Profile("testUid3", "testName3", "testUsername3", "testEmail3", "testPhone3", "testProfilePicture3", new ArrayList<>(), 200));
-        Database.setProfile(new Profile("testUid4", "testName4", "testUsername4", "testEmail4", "testPhone4", "testProfilePicture4", new ArrayList<>(), 100));
+        Database.setProfile(new Profile("testUid2", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", new ArrayList<>(), new ArrayList<>(), 300));
+        Database.setProfile(new Profile("testUid3", "testName3", "testUsername3", "testEmail3", "testPhone3", "testProfilePicture3", new ArrayList<>(), new ArrayList<>(), 200));
+        Database.setProfile(new Profile("testUid4", "testName4", "testUsername4", "testEmail4", "testPhone4", "testProfilePicture4", new ArrayList<>(), new ArrayList<>(), 100));
 
         // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);

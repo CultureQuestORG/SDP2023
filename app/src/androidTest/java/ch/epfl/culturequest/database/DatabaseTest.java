@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,7 @@ public class DatabaseTest {
 
     @Test
     public void setAndGetProfileWorks() {
-        Profile profile = new Profile("test", "test", "test", "test", "test", "test",null, 0);
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test",null, new ArrayList<>(),0);
         Database.setProfile(profile);
         assertThat(Database.getProfile("test").join(), is(profile));
     }

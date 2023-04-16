@@ -35,7 +35,7 @@ public class DisplayUserProfileActivityTest {
 
     @BeforeClass
     public static void setUp() {
-        ProfileUtils.setSelectedProfile(new Profile("uid", "name", "username", "email", "phone", "photo", new ArrayList<>(), 3));
+        ProfileUtils.setSelectedProfile(new Profile("uid", "name", "username", "email", "phone", "photo", new ArrayList<>(), new ArrayList<>(), 3));
     }
 
     @Test
