@@ -26,6 +26,8 @@ public class Profile extends Observable {
     private Integer score;
     private static Profile activeProfile;
 
+    private ArrayList<String> Friends;
+
 
 
 
@@ -51,9 +53,10 @@ public class Profile extends Observable {
         this.profilePicture = profilePicture;
         this.images = new ArrayList<>();
         this.score = 0;
+        this.Friends = new ArrayList<>();
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> images, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> images, ArrayList<String> friends, Integer score) {
         this.uid = uid;
         this.name = name;
         this.username = username;
@@ -62,7 +65,7 @@ public class Profile extends Observable {
         this.profilePicture = profilePicture;
         this.images = images;
         this.score = score;
-
+        this.Friends = friends;
     }
 
 
@@ -80,6 +83,7 @@ public class Profile extends Observable {
         this.profilePicture = "";
         this.images = List.of();
         this.score = 0;
+        this.Friends = new ArrayList<>();
     }
 
     public String getUid() {
@@ -211,6 +215,7 @@ public class Profile extends Observable {
     }
 
     public Profile setActiveProfile() {
+        Profile.activeProfile = this;
         return this;
     }
 
@@ -226,6 +231,14 @@ public class Profile extends Observable {
         this.score = score;
         setChanged();
         notifyObservers();
+    }
+
+    public ArrayList<String> getFriends() {
+        return Friends;
+    }
+
+    public void setFriends(ArrayList<String> friends) {
+        Friends = friends;
     }
 
     @NonNull

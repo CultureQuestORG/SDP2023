@@ -25,22 +25,22 @@
         android:id="@+id/current_user_relative_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/tittle_leaderboard">
+        app:layout_constraintTop_toBottomOf="@+id/tittle_leaderboard"
+        tools:layout_editor_absoluteX="0dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/current_user_profile_picture"
             android:layout_width="110dp"
             android:layout_height="110dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"
             android:src="@drawable/basic_profile_picture" />
 
         <TextView
             android:id="@+id/current_username"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:layout_below="@+id/current_user_profile_picture"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
             android:textAlignment="center"
             android:textSize="23sp"
@@ -92,18 +92,57 @@
         android:id="@+id/horizontal_bar"
         android:layout_width="350dp"
         android:layout_height="2dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
         android:background="#FF5722"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/current_user_relative_layout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="415dp"
+        android:layout_height="413dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontal_bar"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintVertical_bias="0.559"
+        tools:layout_editor_absoluteX="-2dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/friends_recycler_view"
+        android:layout_width="415dp"
+        android:layout_height="413dp"
+        android:visibility="invisible"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/horizontal_bar"
+        app:layout_constraintVertical_bias="0.559" />
+
+    <RadioButton
+        android:id="@+id/globalLeaderboardButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="4dp"
+        android:checked="true"
+
+        android:text="Global"
+        app:layout_constraintEnd_toStartOf="@+id/friendsLeaderboardButton"
+        app:layout_constraintHorizontal_bias="0.324"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/horizontal_bar" />
+
+    <RadioButton
+        android:id="@+id/friendsLeaderboardButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="104dp"
+        android:text="Friends"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/horizontal_bar" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
