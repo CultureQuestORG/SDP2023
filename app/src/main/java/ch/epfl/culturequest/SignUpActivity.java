@@ -40,13 +40,6 @@ public class SignUpActivity extends AppCompatActivity {
                     AndroidUtils.redirectToActivity(this, ProfileCreatorActivity.class);
                 } else {
                     // If the user has a profile, display the navigation activity
-                    CompletableFuture<List<Post>> postsFuture = Database.getPosts(p.getUid());
-                    postsFuture.handle((posts, throwable) -> {
-                       if (throwable == null){
-                           p.setPosts(posts);
-                       }
-                        return null;
-                    });
                     Profile.setActiveProfile(p);
                     AndroidUtils.redirectToActivity(this, NavigationActivity.class);
                 }
