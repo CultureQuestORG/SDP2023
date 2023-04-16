@@ -153,6 +153,14 @@ public class MockDatabase implements DatabaseInterface {
     }
 
     @Override
+    public CompletableFuture<List<Post>> getPosts(String UId) {
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        List<Post> posts = new ArrayList<>(((HashMap<String, Post>) map.getOrDefault("posts/"+ UId, new HashMap<String, Post>())).values());
+        future.complete(posts);
+        return future;
+    }
+
+    @Override
     public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
 

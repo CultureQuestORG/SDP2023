@@ -342,6 +342,27 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     @Override
+    public CompletableFuture<List<Post>> getPosts(String UId){
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        DatabaseReference usersRef = database.getReference("posts").child(UId);
+        usersRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Post> posts = new ArrayList<>();
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Post post = snapshot.getValue(Post.class);
+                    posts.add(post);
+                }
+                // sort by date such that we get the latest posts first
+                posts.sort((p1, p2) -> p2.getDate().compareTo(p1.getDate()));
+                future.complete(posts);
+            } else {
+                future.complete(List.of());
+            }
+        });
+        return future;
+    }
+
+    @Override
     public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
         //List of posts to retrieve from each user
         CompletableFuture<List<Post>>[] futures = UIds.stream().map((uid) -> getPosts(uid, limit, 0)).toArray(CompletableFuture[]::new);

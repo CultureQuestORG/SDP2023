@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,9 +17,9 @@ import ch.epfl.culturequest.R;
 
 public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureViewHolder> {
 
-    private final List<Image> pictures;
+    private final List<Post> pictures;
 
-    public PictureAdapter(List<Image> pictures) {
+    public PictureAdapter(List<Post> pictures) {
         if (pictures == null) {
             throw new IllegalArgumentException("pictures cannot be null");
         }
@@ -29,19 +30,18 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     @Override
     public PictureViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_picture, parent, false);
+                .inflate(R.layout.item_post, parent, false);
         return new PictureViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PictureViewHolder holder, int position) {
-        String pictureUrl = pictures.get(position).getSrc();
+        String pictureUrl = pictures.get(position).getImageUrl();
         // Load the picture into the ImageView using a library like Glide or Picasso
         Picasso.get()
                 .load(pictureUrl)
                 .placeholder(android.R.drawable.progress_horizontal)
                 .into(holder.pictureImageView);
-
     }
 
     @Override
@@ -55,7 +55,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
         public PictureViewHolder(@NonNull View itemView) {
             super(itemView);
-            pictureImageView = itemView.findViewById(R.id.pictureImageView);
+            pictureImageView = itemView.findViewById(R.id.post_view);
         }
     }
 }

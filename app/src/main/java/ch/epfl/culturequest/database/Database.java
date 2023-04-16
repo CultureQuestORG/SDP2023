@@ -133,6 +133,14 @@ public class Database {
     }
 
     /**
+     * This method is used to get the posts of a user
+     * @param UId the user's id
+     */
+    public static CompletableFuture<List<Post>> getPosts(String UId) {
+        return databaseInstance.getPosts(UId);
+    }
+
+    /**
      * This method is used to get the posts of a user's followings
      *
      * @param UIds   the user's id

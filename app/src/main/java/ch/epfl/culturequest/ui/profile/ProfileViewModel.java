@@ -5,9 +5,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
@@ -18,8 +19,11 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<String> username;
     private final MutableLiveData<String> profilePictureUri;
 
-    private final MutableLiveData<List<Image>> pictures;
+    private final MutableLiveData<List<Post>> pictures;
     private final MutableLiveData<Boolean> followed;
+
+    Profile profile = Profile.getActiveProfile();
+    Profile selectedProfile = ProfileUtils.getSelectedProfile();
 
     /**
      * Constructor of the ProfileViewModel
@@ -32,27 +36,37 @@ public class ProfileViewModel extends ViewModel {
         followed = new MutableLiveData<>(false);
 
         EspressoIdlingResource.increment();
-        Profile profile = Profile.getActiveProfile();
-        Profile selectedProfile = ProfileUtils.getSelectedProfile();
-
         if (profile != null) {
             if (selectedProfile != null && selectedProfile.getUid().equals(uid)) {
-                    username.setValue(selectedProfile.getUsername());
-                    profilePictureUri.setValue(selectedProfile.getProfilePicture());
-                    pictures.setValue(selectedProfile.getImagesList());
+                username.setValue(selectedProfile.getUsername());
+                profilePictureUri.setValue(selectedProfile.getProfilePicture());
+                // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
+                // a time, but it is computationally more efficient to do 1 big query:
+                //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
+                CompletableFuture<List<Post>> profilePosts = Database.getPosts(selectedProfile.getUid());
+                profilePosts.handle((posts, t) -> {
+                    if (posts != null && t == null){
+                        pictures.setValue(posts);
+                    }
+                    return null;
+                });
             } else {
-                //set the values of the live data
-                username.setValue(profile.getUsername());
-                profilePictureUri.setValue(profile.getProfilePicture());
-                pictures.setValue(profile.getImagesList());
-
-
+                CompletableFuture<List<Post>> profilePosts = Database.getPosts(profile.getUid());
+                profilePosts.whenComplete((posts, t) -> {
+                    if (posts != null && t == null){
+                        profile.setPosts(posts);
+                        //set the values of the live data
+                        username.setValue(profile.getUsername());
+                        profilePictureUri.setValue(profile.getProfilePicture());
+                        pictures.setValue(profile.getPosts());
+                    }
+                });
                 // add an observer to the profile so that the view is updated when the profile is updated
                 profile.addObserver((profileObject, arg) -> {
                     Profile p = (Profile) profileObject;
                     username.postValue(p.getUsername());
                     profilePictureUri.postValue(p.getProfilePicture());
-                    pictures.postValue(p.getImagesList());
+                    pictures.postValue(p.getPosts());
                 });
             }
             // if no profile is active, we load a default profile
@@ -77,7 +91,7 @@ public class ProfileViewModel extends ViewModel {
     /**
      * @return the list of pictures of the profile
      */
-    public LiveData<List<Image>> getPictures() {
+    public LiveData<List<Post>> getPosts() {
         return pictures;
     }
 

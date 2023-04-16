@@ -22,7 +22,7 @@ public class Profile extends Observable {
 
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
-    private List<Image> images;
+    private List<Post> images;
     private Integer score;
     private static Profile activeProfile;
 
@@ -51,22 +51,21 @@ public class Profile extends Observable {
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
-        this.images = List.of();
+        this.images = new ArrayList<>();
         this.score = 0;
         this.Friends = new ArrayList<>();
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, ArrayList<String> friends, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> images, ArrayList<String> friends, Integer score) {
         this.uid = uid;
         this.name = name;
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
+        this.images = images;
         this.score = score;
         this.Friends = friends;
-        this.images= List.of();
-
     }
 
 
@@ -151,25 +150,68 @@ public class Profile extends Observable {
     }
 
     public HashMap<String,Boolean> getImages() {
-        HashMap<String,Boolean> images = new HashMap<>();
-        this.images.stream().map(Image::getUid).forEach(id -> images.put(id,true));
-        return images;
+        //HashMap<String,Boolean> images = new HashMap<>();
+        //this.images.stream().map(Image::getUid).forEach(id -> images.put(id,true));
+        //return images;
+        return new HashMap<>();
     }
 
-    public List<Image> getImagesList() {
-        return images;
+    public void setPosts(List<Post> posts){
+        images = posts;
+        setChanged();
+        notifyObservers();
     }
 
-    public void setImages(HashMap<String,Boolean> pictures) {
+    public void addPost(Post post) {
+        images.add(0, post);
+        setChanged();
+        notifyObservers();
+    }
+
+    /**
+     * Retrieve a set of posts of a user using a limit and offset
+     * @param limit the number of posts to retrieve
+     * @param offset the number of posts to skip
+     * @return the latest posts of a user
+     */
+    public List<Post> getPosts(int limit, int offset) {
+        List<Post> orderedPosts = new ArrayList<>(images);
+        if (orderedPosts.isEmpty()){
+            return new ArrayList<>();
+        }
+        orderedPosts.sort((post1, post2) -> post2.getDate().compareTo(post1.getDate()));
+        int size = orderedPosts.size();
+        if (offset < 0 || limit < 0){
+            throw new IllegalArgumentException("Limit/Offset is < 0");
+        }
+        if(offset > size) {
+            throw new IllegalArgumentException("Offset surpasses images list size");
+        }
+        return orderedPosts.subList(offset, Math.min(offset + limit, orderedPosts.size()));
+    }
+
+    /**
+     * The difference from above is that we retrieve all the posts for a user, sorted by date
+     * @return all the posts of a user
+     */
+    public List<Post> getPosts(){
+        //sort by date to be safe
+        List<Post> orderedPosts = new ArrayList<>(images);
+        orderedPosts.sort((post1, post2) -> post2.getDate().compareTo(post1.getDate()));
+        return orderedPosts;
+    }
+
+
+    public void setImages(HashMap<String, Boolean> pictures) {
         //keep only the keys, which are the image ids and fetch them from the database
-        List<CompletableFuture<Image>> images = pictures.keySet().stream().map(Database::getImage).collect(Collectors.toList());
+        //List<CompletableFuture<Image>> images = pictures.keySet().stream().map(Database::getImage).collect(Collectors.toList());
 
         //wait for all the images to be fetched and then set the list of images
-        CompletableFuture.allOf(images.toArray(new CompletableFuture[0])).thenRun(() -> {
-            this.images = images.stream().map(CompletableFuture::join).sorted().collect(Collectors.toList());
-            setChanged();
-            notifyObservers();
-        });
+        //CompletableFuture.allOf(images.toArray(new CompletableFuture[0])).thenRun(() -> {
+          //  this.images = images.stream().map(CompletableFuture::join).sorted().collect(Collectors.toList());
+            //setChanged();
+            //notifyObservers();
+        //});
     }
 
     public Profile setActiveProfile() {

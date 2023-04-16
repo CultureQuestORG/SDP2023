@@ -54,6 +54,9 @@ public interface DatabaseInterface {
     // Get the posts of a user with a limit and an offset
     CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset);
 
+    // Get all the posts of a user
+    CompletableFuture<List<Post>> getPosts(String UId);
+
     // Get the posts of a user followings with a limit and an offset
     CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset);
 
