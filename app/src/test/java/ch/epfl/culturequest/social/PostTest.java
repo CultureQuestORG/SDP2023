@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.OrderWith;
 import org.junit.runners.MethodSorters;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class PostTest {
 
     @Before
     public void setUp() throws Exception {
-        post = new Post("postid", "uid", "imageUrl", "artworkName", new Date(2023, 03, 29), 10, List.of());
+        post = new Post("postid", "uid", "imageUrl", "artworkName", new Date(2023, 3, 29), 10, List.of());
     }
 
     @Test
@@ -28,13 +29,35 @@ public class PostTest {
     }
 
     @Test
+    public void setPostid() {
+        post.setPostid("newPostid");
+        assertEquals("newPostid", post.getPostid());
+        post.setPostid("postid");
+    }
+
+    @Test
     public void getUid() {
         assertEquals("uid", post.getUid());
     }
 
     @Test
+    public void setUid() {
+        post.setUid("newUid");
+        assertEquals("newUid", post.getUid());
+        post.setUid("uid");
+    }
+
+
+    @Test
     public void getImageUrl() {
         assertEquals("imageUrl", post.getImageUrl());
+    }
+
+    @Test
+    public void setImageUrl() {
+        post.setImageUrl("newImageUrl");
+        assertEquals("newImageUrl", post.getImageUrl());
+        post.setImageUrl("imageUrl");
     }
 
     @Test
@@ -43,8 +66,22 @@ public class PostTest {
     }
 
     @Test
+    public void setArtworkName() {
+        post.setArtworkName("newArtworkName");
+        assertEquals("newArtworkName", post.getArtworkName());
+        post.setArtworkName("artworkName");
+    }
+
+    @Test
     public void getDate() {
-        assertEquals(new Date(2023, 03, 29), post.getDate());
+        assertEquals(new Date(2023, 3, 29), post.getDate());
+    }
+
+    @Test
+    public void setDate() {
+        post.setDate(new Date(2024, 4, 30));
+        assertEquals(new Date(2024, 4, 30), post.getDate());
+        post.setDate(new Date(2023, 3, 29));
     }
 
     @Test
@@ -53,8 +90,25 @@ public class PostTest {
     }
 
     @Test
+    public void setLikes() {
+        post.setLikes(11);
+        assertEquals(11, post.getLikes());
+        post.setLikes(10);
+    }
+
+    @Test
     public void getLikers() {
         assertEquals(List.of(), post.getLikers());
+    }
+
+    @Test
+    public void setLikers() {
+        ArrayList<String> likers = new ArrayList<>();
+        likers.add("uid1");
+        likers.add("uid2");
+        post.setLikers(likers);
+        assertEquals(List.of("uid1", "uid2"), post.getLikers());
+        post.setLikers(new ArrayList<>());
     }
 
     @Test
@@ -66,8 +120,20 @@ public class PostTest {
 
     @Test
     public void removeLike() {
+        post.addLike("uid");
+        assertEquals(11, post.getLikes());
         post.removeLike("uid");
-        assertEquals(9, post.getLikes());
+        assertEquals(10, post.getLikes());
+    }
+
+    @Test
+    public void cannotRemoveLikeTwice() {
+        post.addLike("uid");
+        assertEquals(11, post.getLikes());
+        post.removeLike("uid");
+        assertEquals(10, post.getLikes());
+        post.removeLike("uid");
+        assertEquals(10, post.getLikes());
     }
 
     @Test

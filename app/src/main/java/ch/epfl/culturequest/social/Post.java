@@ -11,11 +11,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ch.epfl.culturequest.database.Database;
 
 public final class Post {
-    private final String postId;
-    private final String uid;
-    private final String imageUrl;
-    private final String artworkName;
-    private final Date date;
+    private String postId;
+    private String uid;
+    private String imageUrl;
+    private String artworkName;
+    private Date date;
     private int likes;
     private final ArrayList<String> likers;
 
@@ -60,12 +60,20 @@ public final class Post {
         return postId;
     }
 
+    public void setPostid(String postid) {
+        postId = postid;
+    }
+
     /**
      * Get the user id
      * @return  the user id
      */
     public String getUid() {
         return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     /**
@@ -76,12 +84,20 @@ public final class Post {
         return imageUrl;
     }
 
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     /**
      * Get the artwork name
      * @return  the artwork name
      */
     public String getArtworkName() {
         return artworkName;
+    }
+
+    public void setArtworkName(String artworkName) {
+        this.artworkName = artworkName;
     }
 
     /**
@@ -92,12 +108,20 @@ public final class Post {
         return date;
     }
 
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     /**
      * Get the number of likes
      * @return  the number of likes
      */
     public int getLikes() {
         return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 
     /**
@@ -108,13 +132,21 @@ public final class Post {
         return likers;
     }
 
+    public void setLikers(ArrayList<String> likers) {
+        this.likers.clear();
+        this.likers.addAll(likers);
+    }
+
     /**
      * Add a like to the post
      * @param uid   the user id of the user who liked the post
      */
     public void addLike(String uid) {
-        likers.add(uid);
-        likes++;
+        if (!likers.contains(uid)) {
+            likers.add(uid);
+            likes++;
+        }
+
     }
 
     /**
@@ -122,8 +154,10 @@ public final class Post {
      * @param uid   the user id of the user who unliked the post
      */
     public void removeLike(String uid) {
-        likers.remove(uid);
-        likes--;
+        if (likers.contains(uid)){
+            likers.remove(uid);
+            likes--;
+        }
     }
 
     /**

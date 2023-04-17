@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.R;
@@ -55,6 +56,7 @@ public class SearchUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         AndroidUtils.removeStatusBar(getWindow());
         setContentView(R.layout.search_activity);
         ((EditText) findViewById(R.id.search_user)).addTextChangedListener(watcher);
@@ -71,12 +73,17 @@ public class SearchUserActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.list_view);
         listView.setForegroundGravity(Gravity.TOP);
         if (!query.isEmpty()) {
-            Database.getAllProfiles().whenComplete((profiles, throwable) -> {
-                Map<String, Profile> usernameToProfileMap = profiles.stream()
-                        .collect(Collectors.toMap(Profile::getUsername, profile -> profile));
+
+            CompletableFuture<List<Profile>> futureProfiles = Database.getAllProfiles();
+            futureProfiles.thenAccept(profiles -> {
+
+                Map<String, Profile> usernameToProfileMap = profiles.stream().collect(Collectors.toMap(
+                        Profile::getUsername,
+                        p -> p,
+                        (existing, replacement) -> existing // in case of duplicates, use the existing value
+                ));
 
                 List<String> matchingUsernames = AutoComplete.topNMatches(query,usernameToProfileMap.keySet(),NUMBER_USERS_TO_DISPLAY);
-
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, matchingUsernames);
                 listView.setAdapter(adapter);
                 listView.setOnItemClickListener((parent, ignored, position, ignored2) -> searchBarOnClickListener(parent, position, usernameToProfileMap));

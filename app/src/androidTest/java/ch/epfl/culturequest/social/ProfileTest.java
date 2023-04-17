@@ -240,15 +240,7 @@ public class ProfileTest {
 
     @Test
     public void toStringWorks() {
-        assertThat(profile.toString(), is("Profile: \n" +
-                "uid: " + profile.getUid() + "\n" +
-                "name: " + profile.getName() + "\n" +
-                "username: " + profile.getUsername() + "\n" +
-                "email: " + profile.getEmail() + "\n" +
-                "phoneNumber: " + profile.getPhoneNumber() + "\n" +
-                "profilePicture: " + profile.getProfilePicture() + "\n" +
-                        "pictures: " + profile.getPosts() + "\n" +
-                "score: " + profile.getScore() + "\n"));
+        assertThat(profile.toString(), is("Profile: {uid: " + profile.getUid() + ", username: " + profile.getUsername() + ", score: " + profile.getScore() + "}"));
     }
 
 
