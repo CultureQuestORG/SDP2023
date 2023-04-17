@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#EDECED"
     android:id="@+id/homeFragment"
     tools:context=".ui.home.HomeFragment">
 
@@ -31,5 +32,20 @@
         android:src="?android:attr/actionModeWebSearchDrawable"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/feed"
+        android:layout_width="395dp"
+        android:layout_height="645dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="80dp"
+        android:padding="5dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_icon"
+        app:layout_constraintVertical_bias="0.0"
+        app:spanCount="3" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

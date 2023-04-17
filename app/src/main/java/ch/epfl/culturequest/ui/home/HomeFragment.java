@@ -14,9 +14,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.databinding.FragmentHomeBinding;
+import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.SearchUserActivity;
 
@@ -32,10 +35,21 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textHome;
+
         final ImageView searchIcon = binding.searchIcon;
+        final RecyclerView feed = binding.feed;
         searchIcon.setOnClickListener(view -> startActivity(new Intent(getActivity(), SearchUserActivity.class)));
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+        homeViewModel.getPosts().observe(getViewLifecycleOwner(), images -> {
+            // Create a new PictureAdapter and set it as the adapter for the RecyclerView
+            PictureAdapter pictureAdapter = new PictureAdapter(images);
+            feed.setAdapter(pictureAdapter);
+
+            // Set the layout manager for the RecyclerView
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
+            feed.setLayoutManager(gridLayoutManager);
+        });
+
         return root;
     }
 

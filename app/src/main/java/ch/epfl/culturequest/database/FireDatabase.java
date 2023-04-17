@@ -8,7 +8,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -323,19 +325,32 @@ public class FireDatabase implements DatabaseInterface {
     @Override
     public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
-        DatabaseReference usersRef = database.getReference("posts").child(UId);
-        usersRef.orderByChild("date").limitToLast(limit + offset).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+        DatabaseReference postsRef = database.getReference("posts").child(UId);
+        Query query = postsRef.orderByChild("date/time").limitToLast(limit + offset);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Post> posts = new ArrayList<>();
-                int i = 0;
-                for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                    Post post = snapshot.getValue(Post.class);
-                    posts.add(post);
-                    if (++i == limit) break;
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Post post = postSnapshot.getValue(Post.class);
+                    if (post != null) {
+                        posts.add(post);
+                    }
+                }
+                // Order posts by date descending
+                Collections.reverse(posts);
+                // Return only the requested number of posts
+                if (posts.size() > offset) {
+                    posts = posts.subList(offset, posts.size());
+                } else {
+                    posts = Collections.emptyList();
                 }
                 future.complete(posts);
-            } else {
-                future.complete(List.of());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                future.completeExceptionally(databaseError.toException());
             }
         });
         return future;
@@ -365,7 +380,9 @@ public class FireDatabase implements DatabaseInterface {
     @Override
     public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
         //List of posts to retrieve from each user
-        CompletableFuture<List<Post>>[] futures = UIds.stream().map((uid) -> getPosts(uid, limit, 0)).toArray(CompletableFuture[]::new);
+        CompletableFuture<List<Post>>[] futures = UIds.stream().map((uid) -> {
+            return getPosts(uid, limit, 0);
+        }).toArray(CompletableFuture[]::new);
 
         //Future to return
         CompletableFuture<List<Post>> result = new CompletableFuture<>();

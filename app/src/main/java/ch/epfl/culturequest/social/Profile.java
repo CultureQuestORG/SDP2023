@@ -244,15 +244,7 @@ public class Profile extends Observable {
     @NonNull
     @Override
     public String toString() {
-        return "Profile: \n" +
-                "uid: " + uid + "\n" +
-                "name: " + name + "\n" +
-                "username: " + username + "\n" +
-                "email: " + email + "\n" +
-                "phoneNumber: " + phoneNumber + "\n" +
-                "profilePicture: " + profilePicture + "\n" +
-                "pictures: " + images + "\n" +
-                "score: " + score + "\n";
+        return "Profile: {uid: " + uid + ", username: " + username + ", score: " + score + "}";
     }
 
 
