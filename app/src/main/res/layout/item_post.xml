@@ -34,7 +34,7 @@
                 android:layout_height="30dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
-                android:src="@drawable/ic_launcher_background" />
+                android:src="@drawable/basic_profile_picture" />
 
             <TextView
                 android:id="@+id/username"
@@ -61,10 +61,10 @@
         <ImageView
             android:id="@+id/image_view"
             android:layout_width="match_parent"
-            android:layout_height="230dp"
+            android:layout_height="400dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background" />
+            android:src="@drawable/joconde" />
 
         <!-- Third section -->
         <RelativeLayout
