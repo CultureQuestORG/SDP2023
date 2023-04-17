@@ -326,16 +326,14 @@ public class FireDatabase implements DatabaseInterface {
     public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
         DatabaseReference postsRef = database.getReference("posts").child(UId);
-        Query query = postsRef.orderByChild("date/time").limitToLast(limit + offset);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        postsRef.orderByChild("date/time").limitToLast(limit + offset).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Post> posts = new ArrayList<>();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Post post = postSnapshot.getValue(Post.class);
-                    if (post != null) {
+                    if (post != null)
                         posts.add(post);
-                    }
                 }
                 // Order posts by date descending
                 Collections.reverse(posts);

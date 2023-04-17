@@ -120,12 +120,21 @@ public final class Post {
         return likes;
     }
 
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
     /**
      * Get the list of users who liked the post
      * @return  the list of users who liked the post
      */
     public ArrayList<String> getLikers() {
         return likers;
+    }
+
+    public void setLikers(ArrayList<String> likers) {
+        this.likers.clear();
+        this.likers.addAll(likers);
     }
 
     /**
@@ -136,7 +145,6 @@ public final class Post {
         if (!likers.contains(uid)) {
             likers.add(uid);
             likes++;
-            Database.addLike(this, uid);
         }
 
     }
@@ -149,7 +157,6 @@ public final class Post {
         if (likers.contains(uid)){
             likers.remove(uid);
             likes--;
-            Database.removeLike(this, uid);
         }
     }
 
