@@ -64,7 +64,7 @@ public class SettingsActivityTest {
 
     @BeforeClass
     public static void setup() throws InterruptedException {
-        Database.init(new MockDatabase());
+//        Database.init(new MockDatabase());
 
         FirebaseAuth.getInstance()
                 .signInWithEmailAndPassword("test@gmail.com", "abcdefg")

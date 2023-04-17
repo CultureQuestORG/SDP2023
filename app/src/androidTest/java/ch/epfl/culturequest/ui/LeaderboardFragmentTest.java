@@ -14,8 +14,6 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.database.FirebaseDatabase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +25,6 @@ import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.database.FireDatabase;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.leaderboard.LeaderboardFragment;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
@@ -43,7 +40,6 @@ public class LeaderboardFragmentTest {
 
         // clear the database before starting the following tests
         Database.clearDatabase();
-
 
         // Initialize the database with some test profiles
         Database.setProfile(new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 400));
@@ -95,8 +91,8 @@ public class LeaderboardFragmentTest {
     public void tearDown() {
         // remove EspressoIdlingResource from the IdlingRegistry
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
+
         // clear the database after finishing the tests
         Database.clearDatabase();
-
     }
 }

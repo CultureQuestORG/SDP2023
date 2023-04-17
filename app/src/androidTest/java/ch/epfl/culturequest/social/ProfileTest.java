@@ -139,7 +139,7 @@ public class ProfileTest {
 
     @Test
     public void setImageWorks() {
-        Database.init(new MockDatabase());
+//        Database.init(new MockDatabase());
         Image image = new Image("imageTest","this is an image",defaultUriString, 12345,"myUid");
         Database.setImage(image);
         HashMap<String, Boolean> images = new HashMap<>();

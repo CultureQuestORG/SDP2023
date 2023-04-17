@@ -26,9 +26,6 @@ public class Profile extends Observable {
     private static Profile activeProfile;
 
 
-
-
-
     /**
      * Creates a Profile for a user.
      * <p>
@@ -105,7 +102,9 @@ public class Profile extends Observable {
         return profilePicture;
     }
 
-    public Integer getScore() {return score;}
+    public Integer getScore() {
+        return score;
+    }
 
     public void setUid(String uid) {
         this.uid = uid;
@@ -144,7 +143,7 @@ public class Profile extends Observable {
         notifyObservers();
     }
 
-    public HashMap<String,Boolean> getImages() {
+    public HashMap<String, Boolean> getImages() {
         HashMap<String,Boolean> images = new HashMap<>();
         this.images.stream().map(Image::getUid).forEach(id -> images.put(id,true));
         return images;
@@ -154,7 +153,7 @@ public class Profile extends Observable {
         return images;
     }
 
-    public void setImages(HashMap<String,Boolean> pictures) {
+    public void setImages(HashMap<String, Boolean> pictures) {
         //keep only the keys, which are the image ids and fetch them from the database
         List<CompletableFuture<Image>> images = pictures.keySet().stream().map(Database::getImage).collect(Collectors.toList());
 
@@ -166,15 +165,11 @@ public class Profile extends Observable {
         });
     }
 
-    public Profile setActiveProfile() {
-        return this;
-    }
-
-    public static Profile getActiveProfile(){
+    public static Profile getActiveProfile() {
         return activeProfile;
     }
 
-    public static void setActiveProfile(Profile profile){
+    public static void setActiveProfile(Profile profile) {
         activeProfile = profile;
     }
 
@@ -193,9 +188,17 @@ public class Profile extends Observable {
                 "username: " + username + "\n" +
                 "email: " + email + "\n" +
                 "phoneNumber: " + phoneNumber + "\n" +
-                "profilePicture: " + profilePicture + "\n" +
+                "profilePicture url: " + profilePicture + "\n" +
                 "pictures: " + images + "\n" +
                 "score: " + score + "\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Profile profile = (Profile) o;
+        return toString().equals(profile.toString());
     }
 
 

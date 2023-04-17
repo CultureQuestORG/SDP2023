@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.social;
 
+import androidx.annotation.NonNull;
+
 /*
     * This class represents a picture with a title, a description, a timestamp and a source
  */
@@ -75,10 +77,22 @@ public class Image implements Comparable<Image> {
 
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Image [description=" + description + ", src=" + src + ", time=" + time + ", title=" + title + ", UId="
                 + Uid + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Image)) {
+            return false;
+        }
+        Image image = (Image) o;
+        return toString().equals(image.toString());
     }
 }
 

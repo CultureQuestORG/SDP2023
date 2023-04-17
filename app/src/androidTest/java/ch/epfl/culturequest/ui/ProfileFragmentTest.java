@@ -53,7 +53,7 @@ public class ProfileFragmentTest {
         // add EspressoIdlingResource to the IdlingRegistry
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
 
-        Database.init(new MockDatabase());
+//        Database.init(new MockDatabase());
 
         image = new Image("Piece of Art","bla bla",  "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8"
                 ,123, "123");
