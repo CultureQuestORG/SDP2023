@@ -33,7 +33,7 @@ public class ProfileViewModel extends ViewModel {
         username = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
-        followed = new MutableLiveData<>(false);
+        followed = new MutableLiveData<>();
 
         EspressoIdlingResource.increment();
         if (profile != null) {
@@ -50,6 +50,14 @@ public class ProfileViewModel extends ViewModel {
                     }
                     return null;
                 });
+
+                if(profile != null) {
+                    Database.getFollowed(profile.getUid()).whenComplete((followedProfiles, t) -> {
+                        if (t == null) {
+                            followed.setValue(followedProfiles.isFollowing(selectedProfile.getUid()));
+                        }
+                    });
+                }
             } else {
                 CompletableFuture<List<Post>> profilePosts = Database.getPosts(profile.getUid());
                 profilePosts.whenComplete((posts, t) -> {
@@ -100,6 +108,15 @@ public class ProfileViewModel extends ViewModel {
     }
 
     public void changeFollow() {
+        if (selectedProfile == null) {
+            return;
+        }
+
         this.followed.setValue(Boolean.FALSE.equals(followed.getValue()));
+        if(Boolean.TRUE.equals(this.followed.getValue())) {
+            Database.addFollow(profile.getUid(), selectedProfile.getUid());
+        } else {
+            Database.removeFollow(profile.getUid(), selectedProfile.getUid());
+        }
     }
 }

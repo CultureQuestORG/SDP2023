@@ -78,4 +78,6 @@ public interface DatabaseInterface {
 
     CompletableFuture<Follows> removeFollow(String follower, String followed);
 
+    CompletableFuture<Follows> getFollowed(String UId);
+
 }

@@ -237,5 +237,12 @@ public class MockDatabase implements DatabaseInterface {
         map.put("follows/" + follower, follow);
         return future;
     }
+
+    @Override
+    public CompletableFuture<Follows> getFollowed(String follower) {
+        CompletableFuture<Follows> future = new CompletableFuture<>();
+//        future.complete((Follows) map.get("follows/"+follower));
+        return future;
+    }
 }
 

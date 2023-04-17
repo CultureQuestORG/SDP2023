@@ -26,8 +26,6 @@ public class Profile extends Observable {
     private Integer score;
     private static Profile activeProfile;
 
-    private ArrayList<String> Friends;
-
 
 
 
@@ -53,7 +51,6 @@ public class Profile extends Observable {
         this.profilePicture = profilePicture;
         this.images = new ArrayList<>();
         this.score = 0;
-        this.Friends = new ArrayList<>();
     }
 
     public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> images, ArrayList<String> friends, Integer score) {
@@ -65,7 +62,6 @@ public class Profile extends Observable {
         this.profilePicture = profilePicture;
         this.images = images;
         this.score = score;
-        this.Friends = friends;
     }
 
 
@@ -83,7 +79,6 @@ public class Profile extends Observable {
         this.profilePicture = "";
         this.images = List.of();
         this.score = 0;
-        this.Friends = new ArrayList<>();
     }
 
     public String getUid() {
@@ -233,12 +228,16 @@ public class Profile extends Observable {
         notifyObservers();
     }
 
-    public ArrayList<String> getFriends() {
-        return Friends;
-    }
-
-    public void setFriends(ArrayList<String> friends) {
-        Friends = friends;
+    public CompletableFuture<List<String>> getFriends() {
+        CompletableFuture<List<String>> future = new CompletableFuture<>();
+        Database.getFollowed(this.uid).whenComplete((friends, throwable) -> {
+            if (throwable != null) {
+                future.completeExceptionally(throwable);
+            } else {
+                future.complete(friends.getFollowed());
+            }
+        });
+        return future;
     }
 
     @NonNull

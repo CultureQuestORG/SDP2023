@@ -202,4 +202,8 @@ public class Database {
     public static CompletableFuture<Follows> removeFollow(String follower, String followed) {
         return databaseInstance.removeFollow(follower, followed);
     }
+
+    public static CompletableFuture<Follows> getFollowed(String uid) {
+        return databaseInstance.getFollowed(uid);
+    }
 }
