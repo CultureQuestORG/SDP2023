@@ -37,7 +37,7 @@ public class HomeFragment extends Fragment {
 
 
         final ImageView searchIcon = binding.searchIcon;
-        final RecyclerView feed = binding.feed;
+        final RecyclerView feed = binding.feedContainer;
         searchIcon.setOnClickListener(view -> startActivity(new Intent(getActivity(), SearchUserActivity.class)));
 
         homeViewModel.getPosts().observe(getViewLifecycleOwner(), images -> {
