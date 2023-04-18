@@ -1,12 +1,17 @@
 package ch.epfl.culturequest.ui;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
+import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.hasMinimumChildCount;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -24,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -43,31 +49,22 @@ public class LeaderboardFragmentTest {
     @Before
     public void setUp() {
         // Set up the database to run on the local emulator of Firebase
-        firebaseDatabase = FirebaseDatabase.getInstance();
-
-        Database.init(new FireDatabase(firebaseDatabase));
-
-
-        //The comments below is what is used to test on the main but weirdly,
-        //it accesses the real database and overwrites its content...
-        //TODO resolve issuee
-        //firebaseDatabase = FirebaseDatabase.getInstance();
-        //try {
-        //    firebaseDatabase.useEmulator("10.0.2.2", 9000);
-        //} catch (IllegalStateException e) {
-
-        //}
-        //Database.init(new FireDatabase(firebaseDatabase));
+        Database.setEmulatorOn();
 
         // clear the database before starting the following tests
-        //firebaseDatabase.getReference().setValue(null);
+        Database.clearDatabase();
 
 
         // Initialize the database with some test profiles
-        Database.setProfile(new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 400));
-        Database.setProfile(new Profile("testUid2", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", List.of(), 300));
-        Database.setProfile(new Profile("testUid3", "testName3", "testUsername3", "testEmail3", "testPhone3", "testProfilePicture3", List.of(), 200));
-        Database.setProfile(new Profile("testUid4", "testName4", "testUsername4", "testEmail4", "testPhone4", "testProfilePicture4", List.of(), 100));
+        ArrayList<String> myFriendsIds = new ArrayList<>();
+        myFriendsIds.add("testUid2");
+        myFriendsIds.add("testUid3");
+        Profile activeProfile =new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture",  new ArrayList<>(), myFriendsIds , 400);
+        Profile.setActiveProfile(activeProfile);
+        Database.setProfile(activeProfile);
+        Database.setProfile(new Profile("testUid2", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", new ArrayList<>(), new ArrayList<>(), 300));
+        Database.setProfile(new Profile("testUid3", "testName3", "testUsername3", "testEmail3", "testPhone3", "testProfilePicture3", new ArrayList<>(), new ArrayList<>(), 200));
+        Database.setProfile(new Profile("testUid4", "testName4", "testUsername4", "testEmail4", "testPhone4", "testProfilePicture4", new ArrayList<>(), new ArrayList<>(), 100));
 
         // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
@@ -109,17 +106,29 @@ public class LeaderboardFragmentTest {
         onView(withId(R.id.current_user_rank)).check(matches(withText("1")));
     }*/
 
+    @Test
+    public void friendlyRankingWorks(){
+        onView(withId(R.id.friendsLeaderboardButton)).perform(click());
+        //R.id.friends_recycler_view should be visible
+        onView(withId(R.id.friends_recycler_view)).check(matches(isEnabled()));
+        //R.id.friends_recycler_view should have exactly 3 children
+        onView(withId(R.id.friends_recycler_view)).check(matches(hasChildCount(3)));
+
+        //R.id.recycler_view should not be visible
+        onView(withId(R.id.recycler_view)).check(matches(not(isDisplayed())));
+
+
+        // should be first among my friends
+        onView(withId(R.id.current_user_rank)).check(matches(withText("1")));
+
+    }
+
     @After
     public void tearDown() {
         // remove EspressoIdlingResource from the IdlingRegistry
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
         // clear the database after finishing the tests
-        Database.deleteProfile("currentUserUid")                  ;
-        Database.deleteProfile("testUid2");
-        Database.deleteProfile("testUid3");
-        Database.deleteProfile("testUid4");
-
-        //firebaseDatabase.getReference().setValue(null);
+        Database.clearDatabase();
 
     }
 }

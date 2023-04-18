@@ -25,14 +25,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.database.MockDatabase;
 import ch.epfl.culturequest.social.Image;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.ProfileFragment;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
@@ -43,9 +51,7 @@ public class ProfileFragmentTest {
     private ProfileFragment fragment;
 
     private Profile profile;
-    private Image image;
-
-
+    private Post image;
 
 
     @Before
@@ -55,11 +61,14 @@ public class ProfileFragmentTest {
 
         Database.init(new MockDatabase());
 
-        image = new Image("Piece of Art","bla bla",  "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8"
-                ,123, "123");
-        Database.setImage(image);
+        image = new Post("abc", "123",
+                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                "Piece of Art", new Date(), 0, new ArrayList<>());
 
-        profile=new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com","0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", List.of(image), 10);
+        Database.uploadPost(image);
+
+        profile = new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", List.of(image), new ArrayList<>(), 10);
+        profile.setPosts(new ArrayList<>(Collections.singleton(image)));
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 

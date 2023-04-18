@@ -18,11 +18,19 @@ public class LeaderboardViewModel extends ViewModel {
     private final MutableLiveData<String> currentUserProfilePictureUri;
     private final MutableLiveData<String> currentUserScore;
     private final MutableLiveData<String> currentUserRank;
+    private final MutableLiveData<String> currentUserRankFriends;
     private final MutableLiveData<List<String>> topNUserNames;
+    private final MutableLiveData<List<String>> topNUserNamesFriends;
     private final MutableLiveData<List<String>> topNUserScores;
+    private final MutableLiveData<List<String>> topNUserScoresFriends;
+    private final MutableLiveData<List<String>> topNUserRanksFriends;
     private final MutableLiveData<List<String>> topNUserProfilePicturesUri;
+    private final MutableLiveData<List<String>> topNUserProfilePicturesUriFriends;
     private final MutableLiveData<List<String>> topNUserRanks;
     private final int N = 10;
+
+
+
 
     public LeaderboardViewModel(String currentUserUid) {
         currentUsername = new MutableLiveData<>();
@@ -31,14 +39,27 @@ public class LeaderboardViewModel extends ViewModel {
         currentUserRank = new MutableLiveData<>();
         topNUserNames = new MutableLiveData<>();
         topNUserScores = new MutableLiveData<>();
+        topNUserScoresFriends = new MutableLiveData<>();
         topNUserProfilePicturesUri = new MutableLiveData<>();
         topNUserRanks = new MutableLiveData<>();
+
+
+
+        topNUserRanksFriends = new MutableLiveData<>();
+        topNUserNamesFriends = new MutableLiveData<>();
+        topNUserProfilePicturesUriFriends = new MutableLiveData<>();
+        currentUserRankFriends = new MutableLiveData<>();
+
+
 
         // EspressoIdlingResource is used to wait for the database to finish loading before
         // the tests are run
         EspressoIdlingResource.increment();
         EspressoIdlingResource.increment();
         EspressoIdlingResource.increment();
+        EspressoIdlingResource.increment();
+        EspressoIdlingResource.increment();
+
 
         // retrieve the current user's information to be displayed in the leaderboard
         Database.getProfile(currentUserUid).whenComplete((p, e) -> {
@@ -48,15 +69,21 @@ public class LeaderboardViewModel extends ViewModel {
             EspressoIdlingResource.decrement();
         });
 
+
         Database.getRank(currentUserUid).whenComplete((rank, e) -> {
             currentUserRank.setValue(rank.toString());
+            EspressoIdlingResource.decrement();
+        });
+
+
+        Database.getRankFriends(currentUserUid).whenComplete((rank, e) -> {
+            currentUserRankFriends.setValue(rank.toString());
             EspressoIdlingResource.decrement();
         });
 
         // retrieve the top N users' information to be displayed in the leaderboard
         Database.getTopNProfiles(N).whenComplete((topN, e) -> {
             // reverse the list so that the top user is at the top of the leaderboard
-            Collections.reverse(topN);
             topNUserNames.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
             topNUserScores.setValue(topN.stream().map(p -> p.getScore().toString()).collect(toList()));
             topNUserProfilePicturesUri.setValue(topN.stream().map(Profile::getProfilePicture).collect(toList()));
@@ -66,6 +93,21 @@ public class LeaderboardViewModel extends ViewModel {
                 ranks[i] = Integer.toString(i + 1);
             }
             topNUserRanks.setValue(List.of(ranks));
+            EspressoIdlingResource.decrement();
+        });
+
+        Database.getTopNFriendsProfiles(N).whenComplete((topN, e) -> {
+            // reverse the list so that the top user is at the top of the leaderboard
+            topNUserNamesFriends.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
+            topNUserScoresFriends.setValue(topN.stream().map(p -> p.getScore().toString()).collect(toList()));
+            topNUserProfilePicturesUriFriends.setValue(topN.stream().map(Profile::getProfilePicture).collect(toList()));
+
+            String[] ranks = new String[N];
+            for (int i = 0; i < N; i++) {
+                ranks[i] = Integer.toString(i + 1);
+            }
+            topNUserRanksFriends.setValue(List.of(ranks));
+
             EspressoIdlingResource.decrement();
         });
     }
@@ -101,4 +143,26 @@ public class LeaderboardViewModel extends ViewModel {
     public LiveData<List<String>> getTopNUserRanks() {
         return topNUserRanks;
     }
+
+    public LiveData<List<String>> getTopNUserScoresFriends() {
+        return topNUserScoresFriends;
+    }
+
+    public LiveData<List<String>> getTopNUserRanksFriends() {
+        return topNUserRanksFriends;
+    }
+
+    public LiveData<List<String>> getTopNUserNamesFriends() {
+        return topNUserNamesFriends;
+    }
+
+    public LiveData<List<String>> getTopNUserProfilePicturesUriFriends() {
+        return topNUserProfilePicturesUriFriends;
+    }
+
+    public LiveData<String> getCurrentUserRankFriends() {
+        return currentUserRankFriends;
+    }
+
+
 }

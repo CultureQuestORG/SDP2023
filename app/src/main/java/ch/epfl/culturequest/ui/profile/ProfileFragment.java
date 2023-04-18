@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.ui.profile;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -19,6 +21,7 @@ import com.squareup.picasso.Picasso;
 import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
+import ch.epfl.culturequest.social.Post;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
@@ -48,13 +51,13 @@ public class ProfileFragment extends Fragment {
         // set the observers for the views so that they are updated when the data changes
         profileViewModel.getUsername().observe(getViewLifecycleOwner(), profileName::setText);
         profileViewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(profilePicture));
-        profileViewModel.getPictures().observe(getViewLifecycleOwner(), images -> {
+        profileViewModel.getPosts().observe(getViewLifecycleOwner(), images -> {
             // Create a new PictureAdapter and set it as the adapter for the RecyclerView
             pictureAdapter = new PictureAdapter(images);
             pictureGrid.setAdapter(pictureAdapter);
 
             // Set the layout manager for the RecyclerView
-            GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
             pictureGrid.setLayoutManager(gridLayoutManager);
         });
 

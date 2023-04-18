@@ -4,16 +4,27 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.List;
+
+import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Post;
+import ch.epfl.culturequest.social.Profile;
+
 public class HomeViewModel extends ViewModel {
 
-    private final MutableLiveData<String> mText;
+
+    private final MutableLiveData<List<Post>> posts;
 
     public HomeViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+        posts = new MutableLiveData<>();
+        Profile profile = Profile.getActiveProfile();
+        if (profile != null) {
+            Database.getPostsFeed(profile.getFriends()).thenAccept(posts::setValue);
+        }
+
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public LiveData<List<Post>> getPosts() {
+        return posts;
     }
 }

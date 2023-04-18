@@ -8,15 +8,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Image;
@@ -30,11 +32,16 @@ public class FireDatabase implements DatabaseInterface {
     private final FirebaseDatabase database;
 
     public FireDatabase() {
-        database = FirebaseDatabase.getInstance();
+        this.database = FirebaseDatabase.getInstance();
     }
 
     public FireDatabase(FirebaseDatabase database) {
         this.database = database;
+    }
+
+    @Override
+    public void clearDatabase() {
+        database.getReference().setValue(null);
     }
 
     @Override
@@ -151,26 +158,62 @@ public class FireDatabase implements DatabaseInterface {
      */
     @Override
     public CompletableFuture<Integer> getRank(String UId) {
-        DatabaseReference usersRef = database.getReference("users");
+
         CompletableFuture<Integer> future = new CompletableFuture<>();
-        getNumberOfProfiles().whenComplete((numberOfProfiles, e) -> {
-            usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    int rank = numberOfProfiles;
-                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                        if (Objects.equals(snapshot.getKey(), UId)) {
-                            future.complete(rank);
-                            return;
-                        }
-                        rank--;
-                    }
-                    future.completeExceptionally(new RuntimeException("User not found"));
-                } else {
-                    future.completeExceptionally(task.getException());
-                }
-            });
+        getAllProfiles().whenComplete((allProfiles, e) -> {
+            int rank = findRank(UId,allProfiles);
+            if (rank != -1) {
+                future.complete(rank);
+            } else {
+                future.completeExceptionally(new RuntimeException("User not found"));
+            }
         });
         return future;
+    }
+
+
+    /**
+     * @param UId the user's id
+     * @return the rank of the user in the database with respect to their score among his friends
+     */
+    @Override
+    public CompletableFuture<Integer> getRankFriends(String UId) {
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        getProfile(UId).whenComplete((profile, e) -> {
+            if (profile == null) {
+                future.completeExceptionally(new RuntimeException("User not found"));
+                return;
+            }
+
+            getTopNFriendsProfiles(profile.getFriends().size()+1).whenComplete((friendsProfiles, e2) -> {
+                if (friendsProfiles == null) {
+                    future.completeExceptionally(new RuntimeException("User not found"));
+                    return;
+                }
+
+                int rank = findRank(UId,friendsProfiles);
+                if (rank != -1) {
+                    future.complete(rank);
+                } else {
+                    future.completeExceptionally(new RuntimeException("User not found"));
+                }
+
+            });
+        });
+
+        return future;
+    }
+
+
+    private int findRank(String UId,List<Profile> profiles){
+        int rank = 1;
+        for (Profile p :profiles){
+            if (Objects.equals(p.getUid(), UId)) {
+                return rank;
+            }
+            rank++;
+        }
+        return -1;
     }
 
     /**
@@ -198,19 +241,55 @@ public class FireDatabase implements DatabaseInterface {
     public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
         DatabaseReference usersRef = database.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
-        getNumberOfProfiles().whenComplete((numberOfUsers, e) -> {
-            usersRef.orderByChild("score").limitToLast(n).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    List<Profile> profilesList = new ArrayList<>();
-                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                        Profile profile = snapshot.getValue(Profile.class);
+        usersRef.orderByChild("score").limitToLast(n).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Profile> profilesList = new ArrayList<>();
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Profile profile = snapshot.getValue(Profile.class);
+                    profilesList.add(profile);
+                }
+                profilesList.sort((p1,p2)-> p2.getScore().compareTo(p1.getScore()));
+                future.complete(profilesList);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    /**
+     * @param n the number of profiles to get
+     * @return the top n profiles in the database with respect to their score among the active user friends
+     */
+    @Override
+    public CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
+        DatabaseReference usersRef = database.getReference("users");
+        CompletableFuture<List<Profile>> future = new CompletableFuture<>();
+        List<String> friends = Profile.getActiveProfile().getFriends();
+        List<Profile> profilesList = new ArrayList<>();
+
+        //if the user does not have any friends, no need to fetch the database
+        if (friends == null || friends.isEmpty()) {
+            profilesList.add(Profile.getActiveProfile());
+            future.complete(profilesList);
+            return future;
+        }
+
+        usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Profile profile = snapshot.getValue(Profile.class);
+                    if (profile != null && (friends.contains(profile.getUid()) || profile.getUid().equals(Profile.getActiveProfile().getUid()))) {
                         profilesList.add(profile);
                     }
-                    future.complete(profilesList);
-                } else {
-                    future.completeExceptionally(task.getException());
                 }
-            });
+                List<Profile> topNProfiles = profilesList.subList(0, Math.min(n, profilesList.size()));
+                topNProfiles.sort((p1,p2)-> p2.getScore().compareTo(p1.getScore()));
+                future.complete(topNProfiles);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
         });
         return future;
     }
@@ -246,16 +325,48 @@ public class FireDatabase implements DatabaseInterface {
     @Override
     public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        DatabaseReference postsRef = database.getReference("posts").child(UId);
+        postsRef.orderByChild("date/time").limitToLast(limit + offset).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<Post> posts = new ArrayList<>();
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Post post = postSnapshot.getValue(Post.class);
+                    if (post != null)
+                        posts.add(post);
+                }
+                // Order posts by date descending
+                Collections.reverse(posts);
+                // Return only the requested number of posts
+                if (posts.size() > offset) {
+                    posts = posts.subList(offset, posts.size());
+                } else {
+                    posts = Collections.emptyList();
+                }
+                future.complete(posts);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                future.completeExceptionally(databaseError.toException());
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<List<Post>> getPosts(String UId){
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
         DatabaseReference usersRef = database.getReference("posts").child(UId);
-        usersRef.orderByChild("date").limitToLast(limit + offset).get().addOnCompleteListener(task -> {
+        usersRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 List<Post> posts = new ArrayList<>();
-                int i = 0;
                 for (DataSnapshot snapshot : task.getResult().getChildren()) {
                     Post post = snapshot.getValue(Post.class);
                     posts.add(post);
-                    if(++i == limit) break;
                 }
+                // sort by date such that we get the latest posts first
+                posts.sort((p1, p2) -> p2.getDate().compareTo(p1.getDate()));
                 future.complete(posts);
             } else {
                 future.complete(List.of());
@@ -267,7 +378,9 @@ public class FireDatabase implements DatabaseInterface {
     @Override
     public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
         //List of posts to retrieve from each user
-        CompletableFuture<List<Post>>[] futures = UIds.stream().map((uid) -> getPosts(uid, limit, 0)).toArray(CompletableFuture[]::new);
+        CompletableFuture<List<Post>>[] futures = UIds.stream().map((uid) -> {
+            return getPosts(uid, limit, 0);
+        }).toArray(CompletableFuture[]::new);
 
         //Future to return
         CompletableFuture<List<Post>> result = new CompletableFuture<>();
@@ -309,8 +422,8 @@ public class FireDatabase implements DatabaseInterface {
     }
 
     /**
-     * @param post   the post to remove the like from
-     * @param UId    the id of the user who liked the post
+     * @param post the post to remove the like from
+     * @param UId  the id of the user who liked the post
      * @return a future that will return true if the like was removed successfully, false otherwise
      */
     @Override
