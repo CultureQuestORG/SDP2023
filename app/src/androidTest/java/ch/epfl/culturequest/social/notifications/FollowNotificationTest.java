@@ -10,6 +10,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.culturequest.R;
@@ -21,7 +22,7 @@ public class FollowNotificationTest {
     // Tests that the like notification is correctly created
     @Test
     public void testFollowNotification() {
-        Profile.setActiveProfile(new Profile("test", "Followee", "test", "test", "test", "test", List.of(), 0));
+        Profile.setActiveProfile(new Profile("test", "Followee", "test", "test", "test", "test", List.of(), new ArrayList<>(),0));
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         android.app.Notification followNotification = new FollowNotification("Follower").get(context);
