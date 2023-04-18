@@ -24,55 +24,29 @@ import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
-
 /**
  * This class is the implementation of the database using Firebase
  */
-public class Database {
-    private static final FirebaseDatabase databaseInstance = FirebaseDatabase.getInstance();
-    private static boolean isEmulatorOn = false;
+public class FireDatabase implements DatabaseInterface {
+    private final FirebaseDatabase databaseInstance;
 
-    public static void setEmulatorOn() {
-        if (!isEmulatorOn) {
-            databaseInstance.useEmulator("10.0.2.2", 9000);
-            isEmulatorOn = true;
-        }
+    public FireDatabase() {
+        this.databaseInstance = FirebaseDatabase.getInstance();
     }
 
-    public static void clearDatabase() {
+    public FireDatabase(FirebaseDatabase databaseInstance) {
+        this.databaseInstance = databaseInstance;
+    }
+
+    @Override
+    public void clearDatabase() {
         databaseInstance.getReference().setValue(null);
     }
 
-    private static <T> CompletableFuture<T> getValue(DatabaseReference ref, Class<T> valueType) {
-        CompletableFuture<T> future = new CompletableFuture<>();
-        ref.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                T value = task.getResult().getValue(valueType);
-                future.complete(value);
-            } else {
-                future.completeExceptionally(task.getException());
-            }
-        });
-        return future;
-    }
-
-    public static CompletableFuture<Profile> getProfile(String UId) {
-        DatabaseReference usersRef = databaseInstance.getReference("users").child(UId);
-        return getValue(usersRef, Profile.class);
-    }
-
-    public static CompletableFuture<Image> getImage(String UId) {
-        DatabaseReference imagesRef = databaseInstance.getReference("images").child(UId);
-        return getValue(imagesRef, Image.class);
-    }
-
-    public static CompletableFuture<List<Profile>> getAllProfiles() {
-        return getNumberOfProfiles().thenCompose(Database::getTopNProfiles);
-    }
-
-    public static CompletableFuture<AtomicBoolean> setImage(Image image) {
+    @Override
+    public CompletableFuture<AtomicBoolean> set(String key, Object value) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        databaseInstance.getReference("images").child(image.getUid()).setValue(image).addOnCompleteListener(task -> {
+        databaseInstance.getReference(key).setValue(value).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 future.complete(new AtomicBoolean(true));
             } else {
@@ -82,7 +56,27 @@ public class Database {
         return future;
     }
 
-    public static CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
+    @Override
+    public CompletableFuture<Object> get(String key) {
+        CompletableFuture<Object> future = new CompletableFuture<>();
+        databaseInstance.getReference(key).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(task.getResult().getValue());
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+
+    @Override
+    public CompletableFuture<List<Profile>> getAllProfiles() {
+        return getNumberOfProfiles().thenCompose(this::getTopNProfiles);
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         databaseInstance.getReference("users").child(profile.getUid()).setValue(profile).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -94,7 +88,8 @@ public class Database {
         return future;
     }
 
-    public static CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
+    @Override
+    public CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference ref = databaseInstance.getReference("users").child(uid);
         ref.removeValue((error, ref1) -> {
@@ -107,7 +102,7 @@ public class Database {
         return future;
     }
 
-    private static void removeAllPosts(String uid, CompletableFuture<AtomicBoolean> future) {
+    private void removeAllPosts(String uid, CompletableFuture<AtomicBoolean> future) {
         DatabaseReference ref = databaseInstance.getReference("posts").child(uid);
         ref.removeValue((error, ref1) -> {
             if (error == null) {
@@ -118,14 +113,54 @@ public class Database {
         });
     }
 
+    @Override
+    public CompletableFuture<Profile> getProfile(String UId) {
+        DatabaseReference usersRef = databaseInstance.getReference("users").child(UId);
+        return getValue(usersRef, Profile.class);
+    }
+
+    @Override
+    public CompletableFuture<Image> getImage(String UId) {
+        DatabaseReference imagesRef = databaseInstance.getReference("images").child(UId);
+        return getValue(imagesRef, Image.class);
+    }
+
+    private <T> CompletableFuture<T> getValue(DatabaseReference ref, Class<T> valueType) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        ref.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                T value = task.getResult().getValue(valueType);
+                future.complete(value);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<AtomicBoolean> setImage(Image image) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        databaseInstance.getReference("images").child(image.getUid()).setValue(image).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
     /**
      * @param UId the user's id
      * @return the rank of the user in the database with respect to their score
      */
-    public static CompletableFuture<Integer> getRank(String UId) {
+    @Override
+    public CompletableFuture<Integer> getRank(String UId) {
+
         CompletableFuture<Integer> future = new CompletableFuture<>();
         getAllProfiles().whenComplete((allProfiles, e) -> {
-            int rank = findRank(UId, allProfiles);
+            int rank = findRank(UId,allProfiles);
             if (rank != -1) {
                 future.complete(rank);
             } else {
@@ -135,11 +170,13 @@ public class Database {
         return future;
     }
 
+
     /**
      * @param UId the user's id
      * @return the rank of the user in the database with respect to their score among his friends
      */
-    public static CompletableFuture<Integer> getRankFriends(String UId) {
+    @Override
+    public CompletableFuture<Integer> getRankFriends(String UId) {
         CompletableFuture<Integer> future = new CompletableFuture<>();
         getProfile(UId).whenComplete((profile, e) -> {
             if (profile == null) {
@@ -147,13 +184,13 @@ public class Database {
                 return;
             }
 
-            getTopNFriendsProfiles(profile.getFriends().size() + 1).whenComplete((friendsProfiles, e2) -> {
+            getTopNFriendsProfiles(profile.getFriends().size()+1).whenComplete((friendsProfiles, e2) -> {
                 if (friendsProfiles == null) {
                     future.completeExceptionally(new RuntimeException("User not found"));
                     return;
                 }
 
-                int rank = findRank(UId, friendsProfiles);
+                int rank = findRank(UId,friendsProfiles);
                 if (rank != -1) {
                     future.complete(rank);
                 } else {
@@ -166,9 +203,10 @@ public class Database {
         return future;
     }
 
-    private static int findRank(String UId, List<Profile> profiles) {
+
+    private int findRank(String UId,List<Profile> profiles){
         int rank = 1;
-        for (Profile p : profiles) {
+        for (Profile p :profiles){
             if (Objects.equals(p.getUid(), UId)) {
                 return rank;
             }
@@ -177,11 +215,11 @@ public class Database {
         return -1;
     }
 
-
     /**
      * @return the number of profiles in the database
      */
-    public static CompletableFuture<Integer> getNumberOfProfiles() {
+    @Override
+    public CompletableFuture<Integer> getNumberOfProfiles() {
         DatabaseReference usersRef = databaseInstance.getReference("users");
         CompletableFuture<Integer> future = new CompletableFuture<>();
         usersRef.get().addOnCompleteListener(task -> {
@@ -198,7 +236,8 @@ public class Database {
      * @param n the number of profiles to get
      * @return the top n profiles in the database with respect to their score
      */
-    public static CompletableFuture<List<Profile>> getTopNProfiles(int n) {
+    @Override
+    public CompletableFuture<List<Profile>> getTopNProfiles(int n) {
         DatabaseReference usersRef = databaseInstance.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
         usersRef.orderByChild("score").limitToLast(n).get().addOnCompleteListener(task -> {
@@ -208,7 +247,7 @@ public class Database {
                     Profile profile = snapshot.getValue(Profile.class);
                     profilesList.add(profile);
                 }
-                profilesList.sort((p1, p2) -> p2.getScore().compareTo(p1.getScore()));
+                profilesList.sort((p1,p2)-> p2.getScore().compareTo(p1.getScore()));
                 future.complete(profilesList);
             } else {
                 future.completeExceptionally(task.getException());
@@ -221,7 +260,8 @@ public class Database {
      * @param n the number of profiles to get
      * @return the top n profiles in the database with respect to their score among the active user friends
      */
-    public static CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
+    @Override
+    public CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
         DatabaseReference usersRef = databaseInstance.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
         List<String> friends = Profile.getActiveProfile().getFriends();
@@ -244,7 +284,7 @@ public class Database {
                     }
                 }
                 List<Profile> topNProfiles = profilesList.subList(0, Math.min(n, profilesList.size()));
-                topNProfiles.sort((p1, p2) -> p2.getScore().compareTo(p1.getScore()));
+                topNProfiles.sort((p1,p2)-> p2.getScore().compareTo(p1.getScore()));
                 future.complete(topNProfiles);
             } else {
                 future.completeExceptionally(task.getException());
@@ -253,13 +293,8 @@ public class Database {
         return future;
     }
 
-    /**
-     * This method is used to upload a post to the database
-     *
-     * @param post the post to be uploaded
-     * @return a CompletableFuture that will be completed when the upload is done
-     */
-    public static CompletableFuture<AtomicBoolean> uploadPost(Post post) {
+    @Override
+    public CompletableFuture<AtomicBoolean> uploadPost(Post post) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference usersRef = databaseInstance.getReference("posts").child(post.getUid()).child(String.valueOf(post.getPostid()));
         usersRef.setValue(post).addOnCompleteListener(task -> {
@@ -272,13 +307,8 @@ public class Database {
         return future;
     }
 
-    /**
-     * This method is used to remove a post from the database
-     *
-     * @param post the post to be removed
-     * @return a CompletableFuture that will be completed when the removal is done
-     */
-    public static CompletableFuture<AtomicBoolean> removePost(Post post) {
+    @Override
+    public CompletableFuture<AtomicBoolean> removePost(Post post) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference usersRef = databaseInstance.getReference("posts").child(post.getUid()).child(post.getPostid());
         usersRef.removeValue((error, ref1) -> {
@@ -291,15 +321,8 @@ public class Database {
         return future;
     }
 
-    /**
-     * This method is used to get the posts of a user
-     *
-     * @param UId    the user's id
-     * @param limit  the maximum number of posts to be returned
-     * @param offset the number of posts to be skipped
-     * @return a CompletableFuture that will be completed when the posts are retrieved
-     */
-    public static CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
+    @Override
+    public CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
         DatabaseReference postsRef = databaseInstance.getReference("posts").child(UId);
         postsRef.orderByChild("date/time").limitToLast(limit + offset).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -308,7 +331,8 @@ public class Database {
                 List<Post> posts = new ArrayList<>();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Post post = postSnapshot.getValue(Post.class);
-                    if (post != null) posts.add(post);
+                    if (post != null)
+                        posts.add(post);
                 }
                 // Order posts by date descending
                 Collections.reverse(posts);
@@ -329,12 +353,8 @@ public class Database {
         return future;
     }
 
-    /**
-     * This method is used to get the posts of a user
-     *
-     * @param UId the user's id
-     */
-    public static CompletableFuture<List<Post>> getPosts(String UId) {
+    @Override
+    public CompletableFuture<List<Post>> getPosts(String UId){
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
         DatabaseReference usersRef = databaseInstance.getReference("posts").child(UId);
         usersRef.get().addOnCompleteListener(task -> {
@@ -354,15 +374,8 @@ public class Database {
         return future;
     }
 
-    /**
-     * This method is used to get the posts of a user's followings
-     *
-     * @param UIds   the user's id
-     * @param limit  the maximum number of posts to be returned
-     * @param offset the number of posts to be skipped
-     * @return a CompletableFuture that will be completed when the posts are retrieved
-     */
-    public static CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset) {
         //List of posts to retrieve from each user
         CompletableFuture<List<Post>>[] futures = UIds.stream().map((uid) -> {
             return getPosts(uid, limit, 0);
@@ -392,35 +405,18 @@ public class Database {
         return result;
     }
 
-    /**
-     * This method is used to get the posts of a user's followings
-     *
-     * @param UIds  the user's id
-     * @param limit the maximum number of posts to be returned
-     * @return a CompletableFuture that will be completed when the posts are retrieved
-     */
-    public static CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit) {
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit) {
         return getPostsFeed(UIds, limit, 0);
     }
 
-    /**
-     * This method is used to get the posts of a user's followings
-     *
-     * @param UIds the user's id
-     * @return a CompletableFuture that will be completed when the posts are retrieved
-     */
-    public static CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
+    @Override
+    public CompletableFuture<List<Post>> getPostsFeed(List<String> UIds) {
         return getPostsFeed(UIds, 100, 0);
     }
 
-    /**
-     * This method is used to get the posts of a user's followings
-     *
-     * @param post the post to be liked
-     * @param UId  the user's id
-     * @return a CompletableFuture that will be completed when the posts are retrieved
-     */
-    public static CompletableFuture<Post> addLike(Post post, String UId) {
+    @Override
+    public CompletableFuture<Post> addLike(Post post, String UId) {
         return changeLike(post, UId, true);
     }
 
@@ -429,11 +425,12 @@ public class Database {
      * @param UId  the id of the user who liked the post
      * @return a future that will return true if the like was removed successfully, false otherwise
      */
-    public static CompletableFuture<Post> removeLike(Post post, String UId) {
+    @Override
+    public CompletableFuture<Post> removeLike(Post post, String UId) {
         return changeLike(post, UId, false);
     }
 
-    private static CompletableFuture<Post> changeLike(Post post, String UId, boolean add) {
+    private CompletableFuture<Post> changeLike(Post post, String UId, boolean add) {
         CompletableFuture<Post> future = new CompletableFuture<>();
         DatabaseReference usersRef = databaseInstance.getReference("posts").child(post.getUid()).child(post.getPostid());
 
@@ -442,7 +439,7 @@ public class Database {
         return future;
     }
 
-    private static Transaction.Handler handler(CompletableFuture<Post> future, String UId, boolean add) {
+    private Transaction.Handler handler(CompletableFuture<Post> future, String UId, boolean add) {
         return new Transaction.Handler() {
             @NonNull
             @Override
@@ -475,22 +472,23 @@ public class Database {
         };
     }
 
-    public static CompletableFuture<Follows> addFollow(String follower, String followed) {
+    @Override
+    public CompletableFuture<Follows> addFollow(String follower, String followed) {
         return changeFollow(follower, followed, true);
     }
 
-    public static CompletableFuture<Follows> removeFollow(String follower, String followed) {
+    @Override
+    public CompletableFuture<Follows> removeFollow(String follower, String followed) {
         return changeFollow(follower, followed, false);
     }
 
-    private static CompletableFuture<Follows> changeFollow(String follower, String followed, boolean follow) {
+    private CompletableFuture<Follows> changeFollow(String follower, String followed, boolean follow) {
         CompletableFuture<Follows> future = new CompletableFuture<>();
         DatabaseReference followsRef = databaseInstance.getReference("follows").child(follower);
 
         followsRef.runTransaction(new Transaction.Handler() {
-            @NonNull
             @Override
-            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+            public Transaction.Result doTransaction(MutableData currentData) {
                 Follows follows = currentData.getValue(Follows.class);
                 if (follows == null) {
                     follows = new Follows(List.of());

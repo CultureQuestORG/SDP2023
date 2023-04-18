@@ -60,10 +60,10 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         final RecyclerView pictureGrid = binding.pictureGrid;
         profileViewModel.getUsername().observe(this, textView::setText);
         profileViewModel.getProfilePictureUri().observe(this, uri -> Picasso.get().load(uri).into(profilePicture));
-        profileViewModel.getPictures().observe(this, images -> {
+        profileViewModel.getPosts().observe(this, images -> {
             pictureAdapter = new PictureAdapter(images);
             pictureGrid.setAdapter(pictureAdapter);
-            GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
             pictureGrid.setLayoutManager(gridLayoutManager);
         });
         setContentView(root);

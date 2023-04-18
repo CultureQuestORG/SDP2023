@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.culturequest.R;
@@ -34,7 +35,7 @@ public class DisplayUserProfileTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
-        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
+        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", new ArrayList<>(), new ArrayList<>(), 0));
 
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
     }
@@ -51,7 +52,7 @@ public class DisplayUserProfileTest {
     @Test
     public void backButtonIsVisible() {
         ProfileUtils.setSelectedProfile(
-                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
+                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", new ArrayList<>(), new ArrayList<>(), 0));
         ActivityScenario.launch(DisplayUserProfileActivity.class);
         onView(withId(R.id.back_button)).check(matches(isClickable()));
     }
@@ -59,7 +60,7 @@ public class DisplayUserProfileTest {
     @Test
     public void homeButtonIsVisible() {
         ProfileUtils.setSelectedProfile(
-                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", List.of(), 0));
+                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", new ArrayList<>(), new ArrayList<>(), 0));
         ActivityScenario.launch(DisplayUserProfileActivity.class);
         onView(withId(R.id.home_icon)).check(matches(isClickable()));
     }

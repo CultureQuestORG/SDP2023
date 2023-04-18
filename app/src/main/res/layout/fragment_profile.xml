@@ -99,6 +99,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
         android:padding="5dp"
+        android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -117,10 +118,7 @@
         android:src="@drawable/home_icon_unsel"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/profilePicture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.5"
-        app:layout_constraintLeft_toRightOf="@id/back_button"
-        app:layout_constraintStart_toStartOf="@id/back_button"
+        app:layout_constraintStart_toEndOf="@id/back_button"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 

@@ -8,7 +8,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -17,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.R;
@@ -24,8 +24,8 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.AndroidUtils;
-import ch.epfl.culturequest.utils.ProfileUtils;
 import ch.epfl.culturequest.utils.AutoComplete;
+import ch.epfl.culturequest.utils.ProfileUtils;
 
 /**
  * This class represents the activity that is opened from the home fragment when we
@@ -56,6 +56,7 @@ public class SearchUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         AndroidUtils.removeStatusBar(getWindow());
         setContentView(R.layout.search_activity);
         ((EditText) findViewById(R.id.search_user)).addTextChangedListener(watcher);
@@ -72,12 +73,17 @@ public class SearchUserActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.list_view);
         listView.setForegroundGravity(Gravity.TOP);
         if (!query.isEmpty()) {
-            Database.getAllProfiles().whenComplete((profiles, throwable) -> {
-                Map<String, Profile> usernameToProfileMap = profiles.stream()
-                        .collect(Collectors.toMap(Profile::getUsername, profile -> profile));
+
+            CompletableFuture<List<Profile>> futureProfiles = Database.getAllProfiles();
+            futureProfiles.thenAccept(profiles -> {
+
+                Map<String, Profile> usernameToProfileMap = profiles.stream().collect(Collectors.toMap(
+                        Profile::getUsername,
+                        p -> p,
+                        (existing, replacement) -> existing // in case of duplicates, use the existing value
+                ));
 
                 List<String> matchingUsernames = AutoComplete.topNMatches(query,usernameToProfileMap.keySet(),NUMBER_USERS_TO_DISPLAY);
-
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, matchingUsernames);
                 listView.setAdapter(adapter);
                 listView.setOnItemClickListener((parent, ignored, position, ignored2) -> searchBarOnClickListener(parent, position, usernameToProfileMap));
@@ -92,20 +98,20 @@ public class SearchUserActivity extends AppCompatActivity {
      * This is the listener for the profile we click on. It opens the DisplayUserProfileActivity intent
      * and waits for a result. The result is used when the user on the DisplayUserProfileActivity clicks
      * on the home button, so that they are directly redirected to the home fragment.
-     *
      */
     private void searchBarOnClickListener(AdapterView<?> parent, int position, Map<String, Profile> usernameToProfileMap) {
         String selectedUsername = (String) parent.getItemAtPosition(position);
-        ProfileUtils.setSelectedProfile(usernameToProfileMap.get(selectedUsername));
+        Profile selected = usernameToProfileMap.get(selectedUsername);
+        ProfileUtils.setSelectedProfile(selected);
         //we put finish() to close the intent and open the display user activity. On that activity, if a user
         //presses on the back button, it will open a new intent for searching
         Intent intent = new Intent(this, DisplayUserProfileActivity.class);
         startActivityForResult(intent, 1);
+
     }
 
     /**
      * When hearing back from the DisplayUserProfileActivity, we close this activity.
-     *
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

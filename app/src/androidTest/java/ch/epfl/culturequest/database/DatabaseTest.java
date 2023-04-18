@@ -27,8 +27,6 @@ public class DatabaseTest {
 
         // clear the database before starting the following tests
         Database.clearDatabase();
-
-        // Initialize the database with some test profiles
     }
 
     @Test
@@ -44,7 +42,7 @@ public class DatabaseTest {
 
     @Test
     public void setAndGetProfileWorks() {
-        Profile profile = new Profile("test", "test", "test", "test", "test", "test", List.of(), 0);
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test", List.of(), List.of(), 0);
         try {
             Database.setProfile(profile).get(5, java.util.concurrent.TimeUnit.SECONDS);
             assertThat(Database.getProfile("test").get(5, java.util.concurrent.TimeUnit.SECONDS), is(profile));
@@ -76,19 +74,27 @@ public class DatabaseTest {
     }
 
     @Test
-    public void getPostsWorks() {
+    public void getPostsWorksWithLimitsAndOffsets() {
         Post post1 = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
         Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
         try {
             Database.uploadPost(post1).get(5, java.util.concurrent.TimeUnit.SECONDS);
             Database.uploadPost(post2).get(5, java.util.concurrent.TimeUnit.SECONDS);
-            Date date = new Date();
             assertThat(Database.getPosts("user1", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(post1));
             assertThat(Database.getPosts("user1", 10, 1).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(post2));
             assertThat(Database.getPosts("user1", 1, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).size(), is(1));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
+    }
+
+    @Test
+    public void getPostsWorks() {
+        Post post = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
+        Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
+        Database.uploadPost(post).join();
+        Database.uploadPost(post2).join();
+        assertThat(Database.getPosts("user1").join(), is(List.of(post, post2)));
     }
 
     @Test

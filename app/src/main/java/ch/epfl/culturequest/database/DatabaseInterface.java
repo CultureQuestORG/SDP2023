@@ -34,9 +34,13 @@ public interface DatabaseInterface {
 
     CompletableFuture<Integer> getRank(String UId);
 
+    CompletableFuture<Integer> getRankFriends(String UId);
+
     CompletableFuture<Integer> getNumberOfProfiles();
 
     CompletableFuture<List<Profile>> getTopNProfiles(int n);
+
+    CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n);
 
 
     /////////////////////////// POSTS ///////////////////////////
@@ -49,6 +53,9 @@ public interface DatabaseInterface {
 
     // Get the posts of a user with a limit and an offset
     CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset);
+
+    // Get all the posts of a user
+    CompletableFuture<List<Post>> getPosts(String UId);
 
     // Get the posts of a user followings with a limit and an offset
     CompletableFuture<List<Post>> getPostsFeed(List<String> UIds, int limit, int offset);

@@ -2,6 +2,7 @@ package ch.epfl.culturequest.authentication;
 
 import static android.app.Activity.RESULT_OK;
 
+
 import android.app.Activity;
 import android.content.Intent;
 
@@ -15,11 +16,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
