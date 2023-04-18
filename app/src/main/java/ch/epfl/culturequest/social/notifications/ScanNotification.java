@@ -8,7 +8,7 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
 
 /**
- * Class that represents a notification for a new offline scan
+ * Class that represents notifications for a new offline scan
  */
 public class ScanNotification implements Notification {
 
