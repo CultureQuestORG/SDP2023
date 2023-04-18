@@ -3,10 +3,8 @@ package ch.epfl.culturequest.social.notifications;
 import android.content.Context;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import ch.epfl.culturequest.R;
-import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 
 /**
