@@ -130,7 +130,7 @@ public class MockDatabase implements DatabaseInterface {
             map1 = new HashMap<>();
             map.put("posts/"+post.getUid(), map1);
         }
-        map1.put(post.getPostid(), post);
+        map1.put(post.getPostId(), post);
         return CompletableFuture.completedFuture(new AtomicBoolean(true));
     }
 
@@ -138,7 +138,7 @@ public class MockDatabase implements DatabaseInterface {
     public CompletableFuture<AtomicBoolean> removePost(Post post) {
         HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
         if(map1 != null) {
-            map1.remove(post.getPostid());
+            map1.remove(post.getPostId());
             return CompletableFuture.completedFuture(new AtomicBoolean(true));
         }
         return CompletableFuture.completedFuture(new AtomicBoolean(false));
@@ -169,7 +169,7 @@ public class MockDatabase implements DatabaseInterface {
             posts.addAll(((HashMap<String, Post>) map.getOrDefault("posts/"+ UId, new HashMap<String, Post>())).values());
         }
 
-        posts.sort(Comparator.comparing(Post::getDate).reversed());
+        posts.sort(Comparator.comparing(Post::getTime).reversed());
         posts = posts.subList(offset, Math.min(offset+limit, posts.size()));
 
         future.complete(posts);
@@ -200,7 +200,7 @@ public class MockDatabase implements DatabaseInterface {
         HashMap<String, Post> map1 = (HashMap<String, Post>) map.get("posts/"+post.getUid());
 
         if(map1 != null) {
-            Post post1 = map1.get(post.getPostid());
+            Post post1 = map1.get(post.getPostId());
             if (post1 == null)  return CompletableFuture.completedFuture(null);
             if(add) post1.addLike(UId);
             else post1.removeLike(UId);

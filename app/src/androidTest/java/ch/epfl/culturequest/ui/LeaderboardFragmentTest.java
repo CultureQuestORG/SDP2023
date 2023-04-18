@@ -41,7 +41,6 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 @RunWith(AndroidJUnit4.class)
 public class LeaderboardFragmentTest {
     private LeaderboardFragment fragment;
-    FirebaseDatabase firebaseDatabase;
 
     @Before
     public void setUp() {

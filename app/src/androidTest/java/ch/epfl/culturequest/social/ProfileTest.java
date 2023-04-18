@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.database.MockDatabase;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileTest {
@@ -159,14 +158,14 @@ public class ProfileTest {
             assertThat(profile.getPosts().size(), is(images.size()));
             assertThat(profile.getPosts().get(0).getUid(), is(image.getUid()));
         }));
-        profile.setImages(images);
+        profile.setPosts(images);
     }
 
     @Test
     public void addingPostIncrementsAllPostsSize() {
         Post post = new Post("def", "123",
                 "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                "Piece of Art", new Date(), 0, new ArrayList<>());
+                "Piece of Art", 0, 0, new ArrayList<>());
 
         profile.addPost(post);
         assertEquals(1, profile.getPosts().size());
@@ -174,35 +173,26 @@ public class ProfileTest {
 
     @Test
     public void postsAreSortedByDate() {
-        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
         List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
-            try {
-                return new Post(String.valueOf(i), "123",
-                        "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                        "Piece of Art", DateFor.parse("0" + i + "/01/2000"), 0, new ArrayList<>());
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+            return new Post(String.valueOf(i), "123",
+                    "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                    "Piece of Art", i, 0, new ArrayList<>());
         }).collect(Collectors.toList());
 
-        profile.setPosts(posts);
+        profile.setPosts((ArrayList<Post>) posts);
         Collections.reverse(posts);
         assertEquals(posts, profile.getPosts());
     }
 
     @Test
     public void retrievingPostsWithLimitAndOffsetReturnsLatestPosts(){
-        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
         List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
-            try {
                 return new Post(String.valueOf(i), "123",
                         "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                        "Piece of Art", DateFor.parse("0" + i + "/01/2000"), 0, new ArrayList<>());
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+                        "Piece of Art", i, 0, new ArrayList<>());
         }).collect(Collectors.toList());
-        profile.setPosts(posts);
+
+        profile.setPosts((ArrayList<Post>) posts);
         Collections.reverse(posts);
         assertEquals(posts.subList(0,3), profile.getPosts(3,0));
         assertEquals(posts.subList(3,7), profile.getPosts(4,3));
@@ -210,17 +200,13 @@ public class ProfileTest {
 
     @Test
     public void givingInvalidLimitsAndOffsetThrowsException(){
-        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
         List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
-            try {
                 return new Post(String.valueOf(i), "123",
                         "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                        "Piece of Art", DateFor.parse("0" + i + "/01/2000"), 0, new ArrayList<>());
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+                        "Piece of Art", i, 0, new ArrayList<>());
         }).collect(Collectors.toList());
-        profile.setPosts(posts);
+
+        profile.setPosts((ArrayList<Post>) posts);
         assertThrows(IllegalArgumentException.class, () -> {
             profile.getPosts(1, 11);//offset is larger than the total number of posts;
         });

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -54,7 +55,7 @@ public class ProfileViewModel extends ViewModel {
                 CompletableFuture<List<Post>> profilePosts = Database.getPosts(profile.getUid());
                 profilePosts.whenComplete((posts, t) -> {
                     if (posts != null && t == null){
-                        profile.setPosts(posts);
+                        profile.setPosts((ArrayList<Post>) posts);
                         //set the values of the live data
                         username.setValue(profile.getUsername());
                         profilePictureUri.setValue(profile.getProfilePicture());

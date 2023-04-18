@@ -2,11 +2,9 @@ package ch.epfl.culturequest.social;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.OrderWith;
 import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
@@ -20,19 +18,19 @@ public class PostTest {
 
     @Before
     public void setUp() throws Exception {
-        post = new Post("postid", "uid", "imageUrl", "artworkName", new Date(2023, 3, 29), 10, List.of());
+        post = new Post("postid", "uid", "imageUrl", "artworkName", 0, 10, new ArrayList<>());
     }
 
     @Test
     public void getPostid() {
-        assertEquals("postid", post.getPostid());
+        assertEquals("postid", post.getPostId());
     }
 
     @Test
     public void setPostid() {
-        post.setPostid("newPostid");
-        assertEquals("newPostid", post.getPostid());
-        post.setPostid("postid");
+        post.setPostId("newPostid");
+        assertEquals("newPostid", post.getPostId());
+        post.setPostId("postid");
     }
 
     @Test
@@ -74,14 +72,14 @@ public class PostTest {
 
     @Test
     public void getDate() {
-        assertEquals(new Date(2023, 3, 29), post.getDate());
+        assertEquals(new Date(2023, 3, 29), post.getTime());
     }
 
     @Test
     public void setDate() {
-        post.setDate(new Date(2024, 4, 30));
-        assertEquals(new Date(2024, 4, 30), post.getDate());
-        post.setDate(new Date(2023, 3, 29));
+        post.setTime(0);
+        assertEquals(0, post.getTime());
+        post.setTime(0);
     }
 
     @Test
@@ -153,6 +151,6 @@ public class PostTest {
 
     @Test
     public void testToString() {
-        assertEquals("Post of artwork " + post.getArtworkName() + ", at date" + post.getDate() + ", imageUrl=" + post.getImageUrl() + ", postid=" + post.getPostid() + ", from user:" + post.getUid() + ".", post.toString());
+        assertEquals("Post of artwork " + post.getArtworkName() + ", at date" + post.getTime() + ", imageUrl=" + post.getImageUrl() + ", postid=" + post.getPostId() + ", from user:" + post.getUid() + ".", post.toString());
     }
 }

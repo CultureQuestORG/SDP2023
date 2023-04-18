@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -42,7 +43,7 @@ public class DatabaseTest {
 
     @Test
     public void setAndGetProfileWorks() {
-        Profile profile = new Profile("test", "test", "test", "test", "test", "test", List.of(), List.of(), 0);
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test", new ArrayList<>(), new ArrayList<>(), 0);
         try {
             Database.setProfile(profile).get(5, java.util.concurrent.TimeUnit.SECONDS);
             assertThat(Database.getProfile("test").get(5, java.util.concurrent.TimeUnit.SECONDS), is(profile));
@@ -53,7 +54,7 @@ public class DatabaseTest {
 
     @Test
     public void uploadPostWorks() {
-        Post post = new Post("test", "user1", "test", "test", new Date(), 0, List.of());
+        Post post = new Post("test", "user1", "test", "test", 0, 0, new ArrayList<>());
         try {
             assertThat(Database.uploadPost(post).get(5, java.util.concurrent.TimeUnit.SECONDS).get(), is(true));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
@@ -63,7 +64,7 @@ public class DatabaseTest {
 
     @Test
     public void removePostWorks() {
-        Post post = new Post("test6", "user1", "test", "test", new Date(), 0, List.of());
+        Post post = new Post("test6", "user1", "test", "test", 0, 0, new ArrayList<>());
         try {
             assertThat(Database.uploadPost(post).get(5, java.util.concurrent.TimeUnit.SECONDS).get(), is(true));
             assertThat(Database.removePost(post).get(5, java.util.concurrent.TimeUnit.SECONDS).get(), is(true));
@@ -75,8 +76,8 @@ public class DatabaseTest {
 
     @Test
     public void getPostsWorksWithLimitsAndOffsets() {
-        Post post1 = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
-        Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
+        Post post1 = new Post("test2", "user1", "test", "test", 0, 0, new ArrayList<>());
+        Post post2 = new Post("test3", "user1", "test", "test", 0, 0, new ArrayList<>());
         try {
             Database.uploadPost(post1).get(5, java.util.concurrent.TimeUnit.SECONDS);
             Database.uploadPost(post2).get(5, java.util.concurrent.TimeUnit.SECONDS);
@@ -90,8 +91,8 @@ public class DatabaseTest {
 
     @Test
     public void getPostsWorks() {
-        Post post = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
-        Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
+        Post post = new Post("test2", "user1", "test", "test", 0, 0, new ArrayList<>());
+        Post post2 = new Post("test3", "user1", "test", "test", 0, 0, new ArrayList<>());
         Database.uploadPost(post).join();
         Database.uploadPost(post2).join();
         assertThat(Database.getPosts("user1").join(), is(List.of(post, post2)));
@@ -99,8 +100,8 @@ public class DatabaseTest {
 
     @Test
     public void getPostsFeedWorks() {
-        Post post1 = new Post("test4", "user2", "test", "test", new Date(2023, 03, 28), 0, List.of());
-        Post post2 = new Post("test5", "user2", "test", "test", new Date(2023, 03, 29), 0, List.of());
+        Post post1 = new Post("test4", "user2", "test", "test", 0, 0, new ArrayList<>());
+        Post post2 = new Post("test5", "user2", "test", "test", 1, 0, new ArrayList<>());
         try {
             Database.uploadPost(post1).get(5, java.util.concurrent.TimeUnit.SECONDS);
             Database.uploadPost(post2).get(5, java.util.concurrent.TimeUnit.SECONDS);
@@ -116,7 +117,7 @@ public class DatabaseTest {
 
     @Test
     public void addLikeWorks() {
-        Post post = new Post("test7", "user1", "test", "test", new Date(), 0, List.of());
+        Post post = new Post("test7", "user1", "test", "test", 0, 0, new ArrayList<>());
         Database.uploadPost(post).join();
         Database.addLike(post, "user3").join();
         assertThat(Database.getPosts("user1", 10, 0).join().get(0).getLikes(), is(1));
@@ -125,7 +126,7 @@ public class DatabaseTest {
 
     @Test
     public void removeLikeWorks() {
-        Post post = new Post("test7", "user1", "test", "test", new Date(), 0, List.of());
+        Post post = new Post("test7", "user1", "test", "test", 0, 0, new ArrayList<>());
         Database.uploadPost(post).join();
         Database.addLike(post, "user3").join();
         assertThat(Database.getPosts("user1", 10, 0).join().get(0).getLikes(), is(1));

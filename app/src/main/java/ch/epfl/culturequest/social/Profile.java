@@ -18,11 +18,10 @@ public class Profile extends Observable {
 
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
-    private List<Post> images;
+    private ArrayList<Post> posts;
     private Integer score;
     private static Profile activeProfile;
-
-    private List<String> friends;
+    private ArrayList<String> friends;
 
 
     /**
@@ -44,19 +43,19 @@ public class Profile extends Observable {
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
-        this.images = new ArrayList<>();
+        this.posts = new ArrayList<>();
         this.score = 0;
         this.friends = new ArrayList<>();
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> images, List<String> friends, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, ArrayList<Post> posts, ArrayList<String> friends, Integer score) {
         this.uid = uid;
         this.name = name;
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
-        this.images = images;
+        this.posts = posts;
         this.score = score;
         this.friends = friends;
     }
@@ -74,9 +73,9 @@ public class Profile extends Observable {
         this.email = "";
         this.phoneNumber = "";
         this.profilePicture = "";
-        this.images = List.of();
+        this.posts = new ArrayList<>();
         this.score = 0;
-        this.friends = List.of();
+        this.friends = new ArrayList<>();
     }
 
     public String getUid() {
@@ -144,21 +143,14 @@ public class Profile extends Observable {
         notifyObservers();
     }
 
-    public HashMap<String, Boolean> getImages() {
-        //HashMap<String,Boolean> images = new HashMap<>();
-        //this.images.stream().map(Image::getUid).forEach(id -> images.put(id,true));
-        //return images;
-        return new HashMap<>();
-    }
-
-    public void setPosts(List<Post> posts) {
-        images = posts;
+    public void setPosts(ArrayList<Post> posts) {
+        this.posts = posts;
         setChanged();
         notifyObservers();
     }
 
     public void addPost(Post post) {
-        images.add(0, post);
+        posts.add(0, post);
         setChanged();
         notifyObservers();
     }
@@ -171,11 +163,11 @@ public class Profile extends Observable {
      * @return the latest posts of a user
      */
     public List<Post> getPosts(int limit, int offset) {
-        List<Post> orderedPosts = new ArrayList<>(images);
+        List<Post> orderedPosts = new ArrayList<>(posts);
         if (orderedPosts.isEmpty()) {
             return new ArrayList<>();
         }
-        orderedPosts.sort((post1, post2) -> post2.getDate().compareTo(post1.getDate()));
+        orderedPosts.sort((post1, post2) -> Long.compare(post2.getTime(), post1.getTime()));
         int size = orderedPosts.size();
         if (offset < 0 || limit < 0) {
             throw new IllegalArgumentException("Limit/Offset is < 0");
@@ -191,14 +183,14 @@ public class Profile extends Observable {
      *
      * @return all the posts of a user
      */
-    public List<Post> getPosts() {
+    public ArrayList<Post> getPosts() {
         //sort by date to be safe
-        List<Post> orderedPosts = new ArrayList<>(images);
-        orderedPosts.sort((post1, post2) -> post2.getDate().compareTo(post1.getDate()));
+        ArrayList<Post> orderedPosts = new ArrayList<>(posts);
+        orderedPosts.sort((post1, post2) -> Long.compare(post2.getTime(), post1.getTime()));
         return orderedPosts;
     }
 
-    public void setImages(HashMap<String, Boolean> pictures) {
+    public void setPosts(HashMap<String, Boolean> pictures) {
         //keep only the keys, which are the image ids and fetch them from the database
         //List<CompletableFuture<Image>> images = pictures.keySet().stream().map(Database::getImage).collect(Collectors.toList());
 
@@ -233,22 +225,23 @@ public class Profile extends Observable {
         return friends;
     }
 
-    public void setFriends(List<String> friends) {
+    public void setFriends(ArrayList<String> friends) {
         this.friends = friends;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return "Profile: \n" +
-                "uid: " + uid + "\n" +
-                "name: " + name + "\n" +
-                "username: " + username + "\n" +
-                "email: " + email + "\n" +
-                "phoneNumber: " + phoneNumber + "\n" +
-                "profilePicture url: " + profilePicture + "\n" +
-                "pictures: " + images + "\n" +
-                "score: " + score + "\n";
+        return "Profile: \n"
+                + "uid: " + uid + "\n"
+                + "name: " + name + "\n"
+                + "username: " + username + "\n"
+                + "email: " + email + "\n"
+                + "phoneNumber: " + phoneNumber + "\n"
+                + "profilePicture url: " + profilePicture + "\n"
+                + "posts: " + posts + "\n"
+                + "friends" + friends + "\n"
+                + "score: " + score + "\n";
     }
 
     @Override
@@ -258,7 +251,6 @@ public class Profile extends Observable {
         Profile profile = (Profile) o;
         return toString().equals(profile.toString());
     }
-
 
 }
 

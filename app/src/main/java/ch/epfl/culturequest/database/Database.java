@@ -261,7 +261,7 @@ public class Database {
      */
     public static CompletableFuture<AtomicBoolean> uploadPost(Post post) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        DatabaseReference usersRef = databaseInstance.getReference("posts").child(post.getUid()).child(String.valueOf(post.getPostid()));
+        DatabaseReference usersRef = databaseInstance.getReference("posts").child(post.getUid()).child(String.valueOf(post.getPostId()));
         usersRef.setValue(post).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 future.complete(new AtomicBoolean(true));
@@ -280,7 +280,7 @@ public class Database {
      */
     public static CompletableFuture<AtomicBoolean> removePost(Post post) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        DatabaseReference usersRef = databaseInstance.getReference("posts").child(post.getUid()).child(post.getPostid());
+        DatabaseReference usersRef = databaseInstance.getReference("posts").child(post.getUid()).child(post.getPostId());
         usersRef.removeValue((error, ref1) -> {
             if (error == null) {
                 future.complete(new AtomicBoolean(true));
@@ -302,7 +302,7 @@ public class Database {
     public static CompletableFuture<List<Post>> getPosts(String UId, int limit, int offset) {
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
         DatabaseReference postsRef = databaseInstance.getReference("posts").child(UId);
-        postsRef.orderByChild("date/time").limitToLast(limit + offset).addListenerForSingleValueEvent(new ValueEventListener() {
+        postsRef.orderByChild("time").limitToLast(limit + offset).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Post> posts = new ArrayList<>();
@@ -310,7 +310,7 @@ public class Database {
                     Post post = postSnapshot.getValue(Post.class);
                     if (post != null) posts.add(post);
                 }
-                // Order posts by date descending
+                // Order posts by time descending
                 Collections.reverse(posts);
                 // Return only the requested number of posts
                 if (posts.size() > offset) {
@@ -344,8 +344,8 @@ public class Database {
                     Post post = snapshot.getValue(Post.class);
                     posts.add(post);
                 }
-                // sort by date such that we get the latest posts first
-                posts.sort((p1, p2) -> p2.getDate().compareTo(p1.getDate()));
+                // sort by time such that we get the latest posts first
+                posts.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
                 future.complete(posts);
             } else {
                 future.complete(List.of());
@@ -380,7 +380,7 @@ public class Database {
                 posts.addAll(future.join());
             }
 
-            posts.sort(Comparator.comparing(Post::getDate).reversed());
+            posts.sort(Comparator.comparing(Post::getTime).reversed());
             posts = posts.subList(offset, Math.min(posts.size(), limit + offset));
             result.complete(posts);
 
@@ -435,7 +435,7 @@ public class Database {
 
     private static CompletableFuture<Post> changeLike(Post post, String UId, boolean add) {
         CompletableFuture<Post> future = new CompletableFuture<>();
-        DatabaseReference usersRef = databaseInstance.getReference("posts").child(post.getUid()).child(post.getPostid());
+        DatabaseReference usersRef = databaseInstance.getReference("posts").child(post.getUid()).child(post.getPostId());
 
         usersRef.runTransaction(handler(future, UId, add));
 

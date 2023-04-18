@@ -1,40 +1,37 @@
 package ch.epfl.culturequest.social;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import ch.epfl.culturequest.database.Database;
 
 public final class Post {
     private String postId;
     private String uid;
     private String imageUrl;
     private String artworkName;
-    private Date date;
+    private long time;
     private int likes;
-    private final ArrayList<String> likers;
+    private ArrayList<String> likers;
 
     /**
      * Constructor for a Post
-     * @param postid the id of the post
-     * @param uid the id of the user who posted the post
-     * @param imageUrl  the url of the image
-     * @param artworkName   the name of the artwork
-     * @param date  the date of the post
-     * @param likes the number of likes
-     * @param likers    the list of users who liked the post
+     *
+     * @param postId      the id of the post
+     * @param uid         the id of the user who posted the post
+     * @param imageUrl    the url of the image
+     * @param artworkName the name of the artwork
+     * @param time        the time of the post
+     * @param likes       the number of likes
+     * @param likers      the list of users who liked the post
      */
-    public Post(String postid, String uid, String imageUrl, String artworkName, Date date, int likes, List<String> likers) {
-        this.postId = postid;
+    public Post(String postId, String uid, String imageUrl, String artworkName, long time, int likes, ArrayList<String> likers) {
+        this.postId = postId;
         this.uid = uid;
         this.imageUrl = imageUrl;
         this.artworkName = artworkName;
-        this.date = date;
+        this.time = time;
         this.likes = likes;
         this.likers = new ArrayList<>(likers);
     }
@@ -47,26 +44,28 @@ public final class Post {
         this.uid = "";
         this.imageUrl = "";
         this.artworkName = "";
-        this.date = new Date();
+        this.time = System.currentTimeMillis();
         this.likes = 0;
         this.likers = new ArrayList<>();
     }
 
     /**
      * Get the post id
-     * @return  the post id
+     *
+     * @return the post id
      */
-    public String getPostid() {
+    public String getPostId() {
         return postId;
     }
 
-    public void setPostid(String postid) {
-        postId = postid;
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 
     /**
      * Get the user id
-     * @return  the user id
+     *
+     * @return the user id
      */
     public String getUid() {
         return uid;
@@ -78,7 +77,8 @@ public final class Post {
 
     /**
      * Get the image url
-     * @return  the image url
+     *
+     * @return the image url
      */
     public String getImageUrl() {
         return imageUrl;
@@ -90,7 +90,8 @@ public final class Post {
 
     /**
      * Get the artwork name
-     * @return  the artwork name
+     *
+     * @return the artwork name
      */
     public String getArtworkName() {
         return artworkName;
@@ -101,20 +102,22 @@ public final class Post {
     }
 
     /**
-     * Get the date
-     * @return  the date
+     * Get the time of the post
+     *
+     * @return the time
      */
-    public Date getDate() {
-        return date;
+    public long getTime() {
+        return time;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setTime(long time) {
+        this.time = time;
     }
 
     /**
      * Get the number of likes
-     * @return  the number of likes
+     *
+     * @return the number of likes
      */
     public int getLikes() {
         return likes;
@@ -126,7 +129,8 @@ public final class Post {
 
     /**
      * Get the list of users who liked the post
-     * @return  the list of users who liked the post
+     *
+     * @return the list of users who liked the post
      */
     public ArrayList<String> getLikers() {
         return likers;
@@ -139,7 +143,8 @@ public final class Post {
 
     /**
      * Add a like to the post
-     * @param uid   the user id of the user who liked the post
+     *
+     * @param uid the user id of the user who liked the post
      */
     public void addLike(String uid) {
         if (!likers.contains(uid)) {
@@ -151,10 +156,11 @@ public final class Post {
 
     /**
      * Remove a like from the post
-     * @param uid   the user id of the user who unliked the post
+     *
+     * @param uid the user id of the user who unliked the post
      */
     public void removeLike(String uid) {
-        if (likers.contains(uid)){
+        if (likers.contains(uid)) {
             likers.remove(uid);
             likes--;
         }
@@ -162,16 +168,23 @@ public final class Post {
 
     /**
      * Check if the post is liked by a user
-     * @param uid   the user id of the user
-     * @return  true if the post is liked by the user, false otherwise
+     *
+     * @param uid the user id of the user
+     * @return true if the post is liked by the user, false otherwise
      */
     public boolean isLikedBy(String uid) {
         return likers.contains(uid);
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return "Post of artwork " + artworkName + ", at date" + date + ", imageUrl=" + imageUrl + ", postid=" + postId
-                + ", from user:" + uid + ".";
+        return "Post of artwork: " + artworkName + "\n"
+                + "by user: " + uid + "\n"
+                + "at time:" + time + "\n"
+                + "with postId:" + postId + "\n"
+                + "imageUrl:" + imageUrl + "\n"
+                + "likes:" + likes + "\n"
+                + "likers:" + likers + "\n";
     }
 }
