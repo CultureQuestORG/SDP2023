@@ -88,7 +88,7 @@ public class DatabaseTest {
         try {
             Thread.sleep(2000);
             assertThat(Database.getPosts("user1").get(5, java.util.concurrent.TimeUnit.SECONDS), is(List.of(post2, post1)));
-        } catch (Exception e) {
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
 
@@ -127,7 +127,7 @@ public class DatabaseTest {
             Thread.sleep(2000);
             assertThat(Database.getPosts("user").get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).getLikes(), is(1));
             assertThat(Database.getPosts("user").get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).isLikedBy("user1"), is(true));
-        } catch (Exception e) {
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
 
@@ -152,7 +152,29 @@ public class DatabaseTest {
             Thread.sleep(2000);
             assertThat(Database.getPosts("user", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).getLikes(), is(0));
             assertThat(Database.getPosts("user", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).isLikedBy("user1"), is(false));
-        } catch (Exception e) {
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void deleteProfileRemovesAllPostsOfTheProfile() {
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", new ArrayList<>(), new ArrayList<>(), 0);
+        Database.setProfile(profile);
+        Post post1 = new Post("test1", "user1", "test", "test", 0, 0, new ArrayList<>());
+        Post post2 = new Post("test2", "user1", "test", "test", 1, 0, new ArrayList<>());
+        Database.uploadPost(post1);
+        Database.uploadPost(post2);
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user1").get(5, java.util.concurrent.TimeUnit.SECONDS), is(List.of(post2, post1)));
+            Database.deleteProfile("user1");
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).size(), is(0));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
 
