@@ -6,7 +6,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
@@ -18,10 +17,10 @@ public class Profile extends Observable {
 
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
-    private ArrayList<Post> posts;
+    private List<Post> posts;
     private Integer score;
     private static Profile activeProfile;
-    private ArrayList<String> friends;
+    private List<String> friends;
 
 
     /**
@@ -48,7 +47,7 @@ public class Profile extends Observable {
         this.friends = new ArrayList<>();
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, ArrayList<Post> posts, ArrayList<String> friends, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> posts, List<String> friends, Integer score) {
         this.uid = uid;
         this.name = name;
         this.username = username;
@@ -143,7 +142,7 @@ public class Profile extends Observable {
         notifyObservers();
     }
 
-    public void setPosts(ArrayList<Post> posts) {
+    public void setPosts(List<Post> posts) {
         this.posts = posts;
         setChanged();
         notifyObservers();
@@ -183,7 +182,7 @@ public class Profile extends Observable {
      *
      * @return all the posts of a user
      */
-    public ArrayList<Post> getPosts() {
+    public List<Post> getPosts() {
         //sort by date to be safe
         ArrayList<Post> orderedPosts = new ArrayList<>(posts);
         orderedPosts.sort((post1, post2) -> Long.compare(post2.getTime(), post1.getTime()));
@@ -207,7 +206,7 @@ public class Profile extends Observable {
         return friends;
     }
 
-    public void setFriends(ArrayList<String> friends) {
+    public void setFriends(List<String> friends) {
         this.friends = friends;
     }
 

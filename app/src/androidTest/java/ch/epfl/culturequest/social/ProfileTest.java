@@ -182,7 +182,7 @@ public class ProfileTest {
                     "Piece of Art", i, 0, new ArrayList<>());
         }).collect(Collectors.toList());
 
-        profile.setPosts((ArrayList<Post>) posts);
+        profile.setPosts(posts);
         Collections.reverse(posts);
         assertEquals(posts.subList(0, 3), profile.getPosts(3, 0));
         assertEquals(posts.subList(3, 7), profile.getPosts(4, 3));
@@ -196,7 +196,7 @@ public class ProfileTest {
                     "Piece of Art", i, 0, new ArrayList<>());
         }).collect(Collectors.toList());
 
-        profile.setPosts((ArrayList<Post>) posts);
+        profile.setPosts(posts);
         assertThrows(IllegalArgumentException.class, () -> {
             profile.getPosts(1, 11);//offset is larger than the total number of posts;
         });

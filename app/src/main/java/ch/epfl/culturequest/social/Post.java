@@ -13,7 +13,7 @@ public final class Post {
     private String artworkName;
     private long time;
     private int likes;
-    private ArrayList<String> likers;
+    private List<String> likers;
 
     /**
      * Constructor for a Post
@@ -26,7 +26,7 @@ public final class Post {
      * @param likes       the number of likes
      * @param likers      the list of users who liked the post
      */
-    public Post(String postId, String uid, String imageUrl, String artworkName, long time, int likes, ArrayList<String> likers) {
+    public Post(String postId, String uid, String imageUrl, String artworkName, long time, int likes, List<String> likers) {
         this.postId = postId;
         this.uid = uid;
         this.imageUrl = imageUrl;
@@ -132,11 +132,11 @@ public final class Post {
      *
      * @return the list of users who liked the post
      */
-    public ArrayList<String> getLikers() {
+    public List<String> getLikers() {
         return likers;
     }
 
-    public void setLikers(ArrayList<String> likers) {
+    public void setLikers(List<String> likers) {
         this.likers.clear();
         this.likers.addAll(likers);
     }
