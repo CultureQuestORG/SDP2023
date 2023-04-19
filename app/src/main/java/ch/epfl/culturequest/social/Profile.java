@@ -189,24 +189,6 @@ public class Profile extends Observable {
         orderedPosts.sort((post1, post2) -> Long.compare(post2.getTime(), post1.getTime()));
         return orderedPosts;
     }
-
-    public void setPosts(HashMap<String, Boolean> pictures) {
-        //keep only the keys, which are the image ids and fetch them from the database
-        //List<CompletableFuture<Image>> images = pictures.keySet().stream().map(Database::getImage).collect(Collectors.toList());
-
-        //wait for all the images to be fetched and then set the list of images
-        //CompletableFuture.allOf(images.toArray(new CompletableFuture[0])).thenRun(() -> {
-        //  this.images = images.stream().map(CompletableFuture::join).sorted().collect(Collectors.toList());
-        //setChanged();
-        //notifyObservers();
-        //});
-    }
-
-    public Profile setActiveProfile() {
-        Profile.activeProfile = this;
-        return this;
-    }
-
     public static Profile getActiveProfile() {
         return activeProfile;
     }

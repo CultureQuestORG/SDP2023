@@ -4,14 +4,11 @@ package ch.epfl.culturequest.ui;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.junit.Assert.assertEquals;
-
-import android.content.Intent;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -25,21 +22,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import ch.epfl.culturequest.R;
-import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.database.MockDatabase;
-import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.ProfileFragment;
@@ -51,24 +38,27 @@ public class ProfileFragmentTest {
     private ProfileFragment fragment;
 
     private Profile profile;
-    private Post image;
 
 
     @Before
     public void setUp() {
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+
         // add EspressoIdlingResource to the IdlingRegistry
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
 
-//        Database.init(new MockDatabase());
-
-        image = new Post("abc", "123",
+        Post post = new Post("abc", "123",
                 "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                "Piece of Art", new Date(), 0, new ArrayList<>());
+                "Piece of Art", 0, 0, new ArrayList<>());
 
-        Database.uploadPost(image);
+        Database.uploadPost(post);
 
-        profile = new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", List.of(image), new ArrayList<>(), 10);
-        profile.setPosts(new ArrayList<>(Collections.singleton(image)));
+        profile = new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", new ArrayList<>(), new ArrayList<>(), 10);
+        profile.setPosts(new ArrayList<>(Collections.singleton(post)));
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 
@@ -86,6 +76,9 @@ public class ProfileFragmentTest {
     public void tearDown() {
         // remove EspressoIdlingResource from the IdlingRegistry
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
+
+        // clear the database after the tests
+        Database.clearDatabase();
     }
 
     @Test

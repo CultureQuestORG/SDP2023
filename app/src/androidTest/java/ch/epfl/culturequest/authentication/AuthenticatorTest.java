@@ -9,9 +9,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import ch.epfl.culturequest.database.Database;
 
 @RunWith(AndroidJUnit4.class)
 public class AuthenticatorTest {
@@ -19,7 +22,13 @@ public class AuthenticatorTest {
 
 
     @Before
-    public void setup(){
+    public void setup() {
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+
         ComponentActivity mockActivity = mock(ComponentActivity.class);
         authenticator = new Authenticator(mockActivity, true);
     }
@@ -42,7 +51,9 @@ public class AuthenticatorTest {
 
     }
 
-
-
-
+    @After
+    public void tearDown() {
+        // clear the database after running the tests
+        Database.clearDatabase();
+    }
 }

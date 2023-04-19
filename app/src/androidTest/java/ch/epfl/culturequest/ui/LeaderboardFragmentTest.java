@@ -3,14 +3,11 @@ package ch.epfl.culturequest.ui;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
-import static androidx.test.espresso.matcher.ViewMatchers.hasMinimumChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -28,7 +25,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -54,9 +50,10 @@ public class LeaderboardFragmentTest {
         ArrayList<String> myFriendsIds = new ArrayList<>();
         myFriendsIds.add("testUid2");
         myFriendsIds.add("testUid3");
-        Profile activeProfile =new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture",  new ArrayList<>(), myFriendsIds , 400);
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", new ArrayList<>(), myFriendsIds, 400);
         Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
+
         Database.setProfile(new Profile("testUid2", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", new ArrayList<>(), new ArrayList<>(), 300));
         Database.setProfile(new Profile("testUid3", "testName3", "testUsername3", "testEmail3", "testPhone3", "testProfilePicture3", new ArrayList<>(), new ArrayList<>(), 200));
         Database.setProfile(new Profile("testUid4", "testName4", "testUsername4", "testEmail4", "testPhone4", "testProfilePicture4", new ArrayList<>(), new ArrayList<>(), 100));
@@ -67,7 +64,7 @@ public class LeaderboardFragmentTest {
         // Launch the fragment with the current user's uid for testing
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
         activityScenario.onActivity(activity -> {
-            fragment = LeaderboardFragment.newInstance("currentUserUid");
+            fragment = new LeaderboardFragment();
             FragmentManager fragmentManager = activity.getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(android.R.id.content, fragment);
@@ -96,13 +93,23 @@ public class LeaderboardFragmentTest {
         onView(withId(R.id.current_username)).check(matches(withText("currentUserUsername")));
     }
 
-   /* @Test
-    public void currentUserRankDisplayedIs1() {
+    @Test
+    public void globalRankingWorks() {
+        onView(withId(R.id.globalLeaderboardButton)).perform(click());
+        //R.id.friends_recycler_view should be visible
+        onView(withId(R.id.global_recycler_view)).check(matches(isEnabled()));
+        //R.id.friends_recycler_view should have exactly 4 children
+        onView(withId(R.id.global_recycler_view)).check(matches(hasChildCount(4)));
+
+        //R.id.friends_recycler_view should not be visible
+        onView(withId(R.id.friends_recycler_view)).check(matches(not(isDisplayed())));
+
+        // should be first among my friends
         onView(withId(R.id.current_user_rank)).check(matches(withText("1")));
-    }*/
+    }
 
     @Test
-    public void friendlyRankingWorks(){
+    public void friendlyRankingWorks() {
         onView(withId(R.id.friendsLeaderboardButton)).perform(click());
         //R.id.friends_recycler_view should be visible
         onView(withId(R.id.friends_recycler_view)).check(matches(isEnabled()));
@@ -110,12 +117,10 @@ public class LeaderboardFragmentTest {
         onView(withId(R.id.friends_recycler_view)).check(matches(hasChildCount(3)));
 
         //R.id.recycler_view should not be visible
-        onView(withId(R.id.recycler_view)).check(matches(not(isDisplayed())));
-
+        onView(withId(R.id.global_recycler_view)).check(matches(not(isDisplayed())));
 
         // should be first among my friends
         onView(withId(R.id.current_user_rank)).check(matches(withText("1")));
-
     }
 
     @After

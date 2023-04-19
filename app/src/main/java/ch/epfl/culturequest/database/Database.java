@@ -20,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.social.Follows;
-import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
@@ -39,8 +38,16 @@ public class Database {
         }
     }
 
-    public static void clearDatabase() {
-        databaseInstance.getReference().setValue(null);
+    public static CompletableFuture<AtomicBoolean> clearDatabase() {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        databaseInstance.getReference().setValue(null).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
     }
 
     private static <T> CompletableFuture<T> getValue(DatabaseReference ref, Class<T> valueType) {
@@ -61,25 +68,8 @@ public class Database {
         return getValue(usersRef, Profile.class);
     }
 
-    public static CompletableFuture<Image> getImage(String UId) {
-        DatabaseReference imagesRef = databaseInstance.getReference("images").child(UId);
-        return getValue(imagesRef, Image.class);
-    }
-
     public static CompletableFuture<List<Profile>> getAllProfiles() {
         return getNumberOfProfiles().thenCompose(Database::getTopNProfiles);
-    }
-
-    public static CompletableFuture<AtomicBoolean> setImage(Image image) {
-        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        databaseInstance.getReference("images").child(image.getUid()).setValue(image).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                future.complete(new AtomicBoolean(true));
-            } else {
-                future.complete(new AtomicBoolean(false));
-            }
-        });
-        return future;
     }
 
     public static CompletableFuture<AtomicBoolean> setProfile(Profile profile) {
@@ -450,8 +440,7 @@ public class Database {
                 Post dbPost = mutableData.getValue(Post.class);
 
                 if (dbPost == null) {
-                    future.completeExceptionally(new RuntimeException("Post not found"));
-                    return Transaction.abort();
+                    return Transaction.success(mutableData);
                 }
 
                 if (add) {

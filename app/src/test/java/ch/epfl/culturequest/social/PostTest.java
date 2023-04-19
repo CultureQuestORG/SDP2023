@@ -1,6 +1,8 @@
 package ch.epfl.culturequest.social;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -8,7 +10,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @FixMethodOrder(MethodSorters.DEFAULT)
@@ -17,7 +18,7 @@ public class PostTest {
     Post post;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         post = new Post("postid", "uid", "imageUrl", "artworkName", 0, 10, new ArrayList<>());
     }
 
@@ -72,13 +73,13 @@ public class PostTest {
 
     @Test
     public void getDate() {
-        assertEquals(new Date(2023, 3, 29), post.getTime());
+        assertEquals(0, post.getTime());
     }
 
     @Test
-    public void setDate() {
-        post.setTime(0);
-        assertEquals(0, post.getTime());
+    public void setTime() {
+        post.setTime(1);
+        assertEquals(1, post.getTime());
         post.setTime(0);
     }
 
@@ -151,6 +152,12 @@ public class PostTest {
 
     @Test
     public void testToString() {
-        assertEquals("Post of artwork " + post.getArtworkName() + ", at date" + post.getTime() + ", imageUrl=" + post.getImageUrl() + ", postid=" + post.getPostId() + ", from user:" + post.getUid() + ".", post.toString());
+        assertEquals(post.toString(), "Post of artwork: " + post.getArtworkName() + "\n"
+                + "by user: " + post.getUid() + "\n"
+                + "at time:" + post.getTime() + "\n"
+                + "with postId:" + post.getPostId() + "\n"
+                + "imageUrl:" + post.getImageUrl() + "\n"
+                + "likes:" + post.getLikes() + "\n"
+                + "likers:" + post.getLikers() + "\n");
     }
 }

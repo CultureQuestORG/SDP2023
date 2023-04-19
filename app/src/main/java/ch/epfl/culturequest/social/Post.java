@@ -187,4 +187,16 @@ public final class Post {
                 + "likes:" + likes + "\n"
                 + "likers:" + likers + "\n";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Post)) {
+            return false;
+        }
+        Post p = (Post) o;
+        return p.toString().equals(this.toString());
+    }
 }
