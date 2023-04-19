@@ -1,13 +1,12 @@
 package ch.epfl.culturequest.social;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
-
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -16,18 +15,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.database.MockDatabase;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileTest {
@@ -142,47 +134,39 @@ public class ProfileTest {
         assertThat(emptyProfile.getEmail(), is(""));
         assertThat(emptyProfile.getPhoneNumber(), is(""));
         assertThat(emptyProfile.getProfilePicture(), is(""));
-        //users images should be an empty list
+        //users posts should be an empty list
         assertThat(emptyProfile.getPosts().size(), is(0));
         assertThat(emptyProfile.getScore(), is(0));
 
     }
 
     @Test
-    public void setImageWorks() {
-        Database.init(new MockDatabase());
-        Image image = new Image("imageTest","this is an image",defaultUriString, 12345,"myUid");
-        Database.setImage(image);
-        HashMap<String, Boolean> images = new HashMap<>();
-        images.put(image.getUid(), true);
-        profile.addObserver(((o, arg) -> {
-            assertThat(profile.getPosts().size(), is(images.size()));
-            assertThat(profile.getPosts().get(0).getUid(), is(image.getUid()));
-        }));
-        profile.setImages(images);
+    public void setPostWorks() {
+        Post post = new Post("postId", "123",
+                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                "Piece of Art", 0, 0, new ArrayList<>());
+
+        profile.setPosts(new ArrayList<>(Collections.singletonList(post)));
+        assertThat(profile.getPosts().size(), is(1));
+        assertThat(profile.getPosts().get(0), is(post));
     }
 
     @Test
     public void addingPostIncrementsAllPostsSize() {
         Post post = new Post("def", "123",
                 "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                "Piece of Art", new Date(), 0, new ArrayList<>());
+                "Piece of Art", 0, 0, new ArrayList<>());
 
         profile.addPost(post);
         assertEquals(1, profile.getPosts().size());
     }
 
     @Test
-    public void postsAreSortedByDate() {
-        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+    public void postsAreSortedByTime() {
         List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
-            try {
-                return new Post(String.valueOf(i), "123",
-                        "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                        "Piece of Art", DateFor.parse("0" + i + "/01/2000"), 0, new ArrayList<>());
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+            return new Post(String.valueOf(i), "123",
+                    "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                    "Piece of Art", i, 0, new ArrayList<>());
         }).collect(Collectors.toList());
 
         profile.setPosts(posts);
@@ -191,56 +175,57 @@ public class ProfileTest {
     }
 
     @Test
-    public void retrievingPostsWithLimitAndOffsetReturnsLatestPosts(){
-        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+    public void retrievingPostsWithLimitAndOffsetReturnsLatestPosts() {
         List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
-            try {
-                return new Post(String.valueOf(i), "123",
-                        "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                        "Piece of Art", DateFor.parse("0" + i + "/01/2000"), 0, new ArrayList<>());
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+            return new Post(String.valueOf(i), "123",
+                    "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                    "Piece of Art", i, 0, new ArrayList<>());
         }).collect(Collectors.toList());
+
         profile.setPosts(posts);
         Collections.reverse(posts);
-        assertEquals(posts.subList(0,3), profile.getPosts(3,0));
-        assertEquals(posts.subList(3,7), profile.getPosts(4,3));
+        assertEquals(posts.subList(0, 3), profile.getPosts(3, 0));
+        assertEquals(posts.subList(3, 7), profile.getPosts(4, 3));
     }
 
     @Test
-    public void givingInvalidLimitsAndOffsetThrowsException(){
-        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+    public void givingInvalidLimitsAndOffsetThrowsException() {
         List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
-            try {
-                return new Post(String.valueOf(i), "123",
-                        "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                        "Piece of Art", DateFor.parse("0" + i + "/01/2000"), 0, new ArrayList<>());
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+            return new Post(String.valueOf(i), "123",
+                    "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                    "Piece of Art", i, 0, new ArrayList<>());
         }).collect(Collectors.toList());
+
         profile.setPosts(posts);
         assertThrows(IllegalArgumentException.class, () -> {
             profile.getPosts(1, 11);//offset is larger than the total number of posts;
         });
 
-        assertThrows(IllegalArgumentException.class, () ->{
+        assertThrows(IllegalArgumentException.class, () -> {
             profile.getPosts(-1, 0);
         });
-        assertThrows(IllegalArgumentException.class, () ->{
+        assertThrows(IllegalArgumentException.class, () -> {
             profile.getPosts(1, -1);
         });
     }
 
     @Test
-    public void noPostsGivesEmptyListWithListAndOffset(){
-        assertTrue(profile.getPosts(1,0).isEmpty());
+    public void noPostsGivesEmptyListWithListAndOffset() {
+        assertTrue(profile.getPosts(1, 0).isEmpty());
     }
 
     @Test
     public void toStringWorks() {
-        assertThat(profile.toString(), is("Profile: {uid: " + profile.getUid() + ", username: " + profile.getUsername() + ", score: " + profile.getScore() + "}"));
+        assertThat(profile.toString(), is("Profile: \n"
+                + "uid: " + profile.getUid() + "\n"
+                + "name: " + profile.getName() + "\n"
+                + "username: " + profile.getUsername() + "\n"
+                + "email: " + profile.getEmail() + "\n"
+                + "phoneNumber: " + profile.getPhoneNumber() + "\n"
+                + "profilePicture url: " + profile.getProfilePicture() + "\n"
+                + "posts: " + profile.getPosts() + "\n"
+                + "friends" + profile.getFriends() + "\n"
+                + "score: " + profile.getScore() + "\n"));
     }
 
 

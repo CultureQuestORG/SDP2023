@@ -3,16 +3,17 @@ package ch.epfl.culturequest.database;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
-import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
@@ -20,107 +21,172 @@ public class DatabaseTest {
 
     @Before
     public void setUp() {
-        HashMap<String, Object> map = new HashMap<>();
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
 
-        HashMap<String, Post> user1Posts = new HashMap<>();
-        map.put("user1", user1Posts);
-
-        HashMap<String, Post> user2Posts = new HashMap<>();
-        map.put("user2", user2Posts);
-
-        Database.init(new MockDatabase(map));
-    }
-
-    @Test
-    public void setAndGetWorks() {
-        Database.set("test", "test");
-        assertThat(Database.get("test").join(), is("test"));
+        // clear the database before starting the following tests
+        Database.clearDatabase();
     }
 
     @Test
     public void setAndGetProfileWorks() {
-        Profile profile = new Profile("test", "test", "test", "test", "test", "test",null, new ArrayList<>(),0);
-        Database.setProfile(profile);
-        assertThat(Database.getProfile("test").join(), is(profile));
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test", new ArrayList<>(), new ArrayList<>(), 0);
+        try {
+            Database.setProfile(profile);
+            Thread.sleep(2000);
+            assertThat(Database.getProfile("test").get(5, java.util.concurrent.TimeUnit.SECONDS), is(profile));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
     }
 
     @Test
-    public void setAndGetImageWorks() {
-        Image image = new Image("test", "test", "test", 0, "test");
-        Database.setImage(image);
-        assertThat(Database.getImage("test").join(), is(image));
-    }
+    public void uploadAndRemovePostWorks() {
+        Post post = new Post("test", "user", "test", "test", 0, 0, new ArrayList<>());
+        try {
+            assertThat(Database.getPosts("user").get(5, java.util.concurrent.TimeUnit.SECONDS).contains(post), is(false));
+            Database.uploadPost(post);
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user").get(5, java.util.concurrent.TimeUnit.SECONDS).contains(post), is(true));
+            Database.removePost(post);
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user").get(5, java.util.concurrent.TimeUnit.SECONDS).contains(post), is(false));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
 
-    @Test
-    public void uploadPostWorks() {
-        Post post = new Post("test", "user1", "test", "test", new Date(), 0, List.of());
-        boolean result = Database.uploadPost(post).join().get();
-        assertThat(result, is(true));
-    }
-
-    @Test
-    public void removePostWorks() {
-        Post post = new Post("test6", "user1", "test", "test", new Date(), 0, List.of());
-        boolean result = Database.uploadPost(post).join().get();
-        assertThat(result, is(true));
-        boolean result2 = Database.removePost(post).join().get();
-        assertThat(result2, is(true));
-        assertThat(Database.getPosts("user1", 10, 0).join().contains(post), is(false));
+        Database.clearDatabase();
     }
 
     @Test
     public void getPostsWorksWithLimitsAndOffsets() {
-        Post post = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
-        Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
-        Database.uploadPost(post).join();
-        Database.uploadPost(post2).join();
-        assertThat(Database.getPosts("user1", 10, 0).join().get(0), is(post));
-        assertThat(Database.getPosts("user1", 10, 1).join().get(0), is(post2));
-        assertThat(Database.getPosts("user1", 1, 0).join().size(), is(1));
+        Post post1 = new Post("test1", "user1", "test", "test", 0, 0, new ArrayList<>());
+        Post post2 = new Post("test2", "user1", "test", "test", 1, 0, new ArrayList<>());
+        Database.uploadPost(post1);
+        Database.uploadPost(post2);
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user1", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(post2));
+            assertThat(Database.getPosts("user1", 10, 1).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(post1));
+            assertThat(Database.getPosts("user1", 1, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).size(), is(1));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
     }
 
     @Test
-    public void getPostsWorks(){
-        Post post = new Post("test2", "user1", "test", "test", new Date(), 0, List.of());
-        Post post2 = new Post("test3", "user1", "test", "test", new Date(), 0, List.of());
-        Database.uploadPost(post).join();
-        Database.uploadPost(post2).join();
-        assertThat(Database.getPosts("user1").join(), is(List.of(post, post2)));
+    public void getPostsWorks() {
+        Post post1 = new Post("test1", "user1", "test", "test", 0, 0, new ArrayList<>());
+        Post post2 = new Post("test2", "user1", "test", "test", 1, 0, new ArrayList<>());
+        Database.uploadPost(post1);
+        Database.uploadPost(post2);
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user1").get(5, java.util.concurrent.TimeUnit.SECONDS), is(List.of(post2, post1)));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
     }
 
     @Test
     public void getPostsFeedWorks() {
-        Post post = new Post("test4", "user2", "test", "test", new Date(2023, 03, 28), 0, List.of());
-        Post post2 = new Post("test5", "user2", "test", "test", new Date(2023, 03, 29), 0, List.of());
-        Database.uploadPost(post).join();
-        Database.uploadPost(post2).join();
-        assertThat(Database.getPostsFeed(List.of("user2"), 10, 0).join().get(0), is(post2));
-        assertThat(Database.getPostsFeed(List.of("user2")).join().get(0), is(post2));
-        assertThat(Database.getPostsFeed(List.of("user2"), 10).join().get(0), is(post2));
-        assertThat(Database.getPostsFeed(List.of("user2"), 10, 1).join().get(0), is(post));
-        assertThat(Database.getPostsFeed(List.of("user2"), 1, 0).join().size(), is(1));
+        Post post1 = new Post("test1", "user1", "test", "test", 0, 0, new ArrayList<>());
+        Post post2 = new Post("test2", "user1", "test", "test", 1, 0, new ArrayList<>());
+        Database.uploadPost(post1);
+        Database.uploadPost(post2);
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getPostsFeed(List.of("user1"), 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(post2));
+            assertThat(Database.getPostsFeed(List.of("user1")).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(post2));
+            assertThat(Database.getPostsFeed(List.of("user1"), 10).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(post2));
+            assertThat(Database.getPostsFeed(List.of("user1"), 10, 1).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(post1));
+            assertThat(Database.getPostsFeed(List.of("user1"), 1, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).size(), is(1));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
     }
 
     @Test
     public void addLikeWorks() {
-        Post post = new Post("test7", "user1", "test", "test", new Date(), 0, List.of());
-        Database.uploadPost(post).join();
-        Database.addLike(post, "user3").join();
-        assertThat(Database.getPosts("user1", 10, 0).join().get(0).getLikes(), is(1));
-        assertThat(Database.getPosts("user1", 10, 0).join().get(0).isLikedBy("user3"), is(true));
+        Post post = new Post("test", "user", "test", "test", 0, 0, new ArrayList<>());
+        Database.uploadPost(post);
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user").get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).getLikes(), is(0));
+            assertThat(Database.getPosts("user").get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).isLikedBy("user1"), is(false));
+            Database.addLike(post, "user1");
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user").get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).getLikes(), is(1));
+            assertThat(Database.getPosts("user").get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).isLikedBy("user1"), is(true));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
     }
 
     @Test
     public void removeLikeWorks() {
-        Post post = new Post("test7", "user1", "test", "test", new Date(), 0, List.of());
-        Database.uploadPost(post).join();
-        Database.addLike(post, "user3").join();
-        assertThat(Database.getPosts("user1", 10, 0).join().get(0).getLikes(), is(1));
-        assertThat(Database.getPosts("user1", 10, 0).join().get(0).isLikedBy("user3"), is(true));
+        Post post = new Post("test", "user", "test", "test", 0, 0, new ArrayList<>());
+        Database.uploadPost(post);
 
-        Database.removeLike(post, "user3").join();
-        assertThat(Database.getPosts("user1", 10, 0).join().get(0).getLikes(), is(0));
-        assertThat(Database.getPosts("user1", 10, 0).join().get(0).isLikedBy("user3"), is(false));
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).getLikes(), is(0));
+            assertThat(Database.getPosts("user", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).isLikedBy("user1"), is(false));
+            Database.addLike(post, "user1");
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).getLikes(), is(1));
+            assertThat(Database.getPosts("user", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).isLikedBy("user1"), is(true));
+
+            Database.removeLike(post, "user1");
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).getLikes(), is(0));
+            assertThat(Database.getPosts("user", 10, 0).get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).isLikedBy("user1"), is(false));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void deleteProfileRemovesAllPostsOfTheProfile() {
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", new ArrayList<>(), new ArrayList<>(), 0);
+        Database.setProfile(profile);
+        Post post1 = new Post("test1", "user1", "test", "test", 0, 0, new ArrayList<>());
+        Post post2 = new Post("test2", "user1", "test", "test", 1, 0, new ArrayList<>());
+        Database.uploadPost(post1);
+        Database.uploadPost(post2);
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user1").get(5, java.util.concurrent.TimeUnit.SECONDS), is(List.of(post2, post1)));
+            Database.deleteProfile("user1");
+            Thread.sleep(2000);
+            Database.removeAllPosts("user1");
+            Thread.sleep(2000);
+            assertThat(Database.getPosts("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).size(), is(0));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @After
+    public void tearDown() {
+        // clear the database after finishing the tests
+        Database.clearDatabase();
     }
 
 }

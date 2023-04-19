@@ -17,10 +17,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
-
-import java.util.Objects;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.FragmentLeaderboardBinding;
@@ -42,8 +39,7 @@ public class LeaderboardFragment extends Fragment {
     private TextView currentUserScore ;
     private TextView currentUserRank;
     private CircleImageView currentUserProfilePicture;
-
-    private RecyclerView leaderboardRecyclerView;
+    private RecyclerView globalLeaderboardRecyclerView;
     private RecyclerView friendsLeaderboardRecyclerView;
     private LeaderboardViewModel leaderboardViewModel;
 
@@ -51,32 +47,9 @@ public class LeaderboardFragment extends Fragment {
 
     private static final MutableLiveData<Integer> selectedMode = new MutableLiveData<>(R.id.globalLeaderboardButton);
 
-    /**
-     * Creates a new instance of the LeaderboardFragment that is initialized with the current user's uid.
-     * This is particularly useful for testing purposes.
-     *
-     * @param currentUserUid the uid of the current user
-     * @return a new instance of the LeaderboardFragment
-     */
-    public static LeaderboardFragment newInstance(String currentUserUid) {
-        LeaderboardFragment fragment = new LeaderboardFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("currentUserUid", currentUserUid);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        // get the current user's uid depending on whether the fragment was created with newInstance or not
-        String currentUserUid;
-        try {
-            currentUserUid = (String) requireArguments().getSerializable("currentUserUid");
-        } catch (IllegalStateException e) {
-            currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        }
-
-        leaderboardViewModel = new ViewModelProvider(this, new LeaderboardViewModelFactory(currentUserUid)).get(LeaderboardViewModel.class);
+        leaderboardViewModel = new ViewModelProvider(this).get(LeaderboardViewModel.class);
 
         binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -106,9 +79,9 @@ public class LeaderboardFragment extends Fragment {
         // define the RecyclerView's adapter
         LeaderboardRecycleViewAdapter globalAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel,Mode.GLOBAL);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
-        leaderboardRecyclerView.setLayoutManager(layoutManager);
-        leaderboardRecyclerView.setAdapter(globalAdapter);
-        leaderboardRecyclerView.addItemDecoration(new DividerItemDecoration(this.requireActivity(), DividerItemDecoration.VERTICAL));
+        globalLeaderboardRecyclerView.setLayoutManager(layoutManager);
+        globalLeaderboardRecyclerView.setAdapter(globalAdapter);
+        globalLeaderboardRecyclerView.addItemDecoration(new DividerItemDecoration(this.requireActivity(), DividerItemDecoration.VERTICAL));
 
         LeaderboardRecycleViewAdapter friendsAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel,Mode.FRIENDS);
         RecyclerView.LayoutManager friendsLayoutManager = new LinearLayoutManager(this.getActivity());
@@ -125,11 +98,11 @@ public class LeaderboardFragment extends Fragment {
     private void handleModeSelection(Integer mode){
         if (mode == R.id.friendsLeaderboardButton) {
             currentUserRank.setText(leaderboardViewModel.getCurrentUserRankFriends().getValue());
-            leaderboardRecyclerView.setVisibility(View.GONE);
+            globalLeaderboardRecyclerView.setVisibility(View.GONE);
             friendsLeaderboardRecyclerView.setVisibility(View.VISIBLE);
         } else {
             currentUserRank.setText(leaderboardViewModel.getCurrentUserRank().getValue());
-            leaderboardRecyclerView.setVisibility(View.VISIBLE);
+            globalLeaderboardRecyclerView.setVisibility(View.VISIBLE);
             friendsLeaderboardRecyclerView.setVisibility(View.GONE);
         }
     }
@@ -142,7 +115,7 @@ public class LeaderboardFragment extends Fragment {
         currentUserProfilePicture = binding.currentUserProfilePicture;
         globalLeaderboardButton = binding.globalLeaderboardButton;
         friendsLeaderboardButton = binding.friendsLeaderboardButton;
-        leaderboardRecyclerView = binding.recyclerView;
+        globalLeaderboardRecyclerView = binding.globalRecyclerView;
         friendsLeaderboardRecyclerView = binding.friendsRecyclerView;
     }
 

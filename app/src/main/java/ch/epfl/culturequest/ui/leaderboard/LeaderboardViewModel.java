@@ -6,8 +6,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
@@ -29,10 +32,7 @@ public class LeaderboardViewModel extends ViewModel {
     private final MutableLiveData<List<String>> topNUserRanks;
     private final int N = 10;
 
-
-
-
-    public LeaderboardViewModel(String currentUserUid) {
+    public LeaderboardViewModel() {
         currentUsername = new MutableLiveData<>();
         currentUserProfilePictureUri = new MutableLiveData<>();
         currentUserScore = new MutableLiveData<>();
@@ -42,15 +42,10 @@ public class LeaderboardViewModel extends ViewModel {
         topNUserScoresFriends = new MutableLiveData<>();
         topNUserProfilePicturesUri = new MutableLiveData<>();
         topNUserRanks = new MutableLiveData<>();
-
-
-
         topNUserRanksFriends = new MutableLiveData<>();
         topNUserNamesFriends = new MutableLiveData<>();
         topNUserProfilePicturesUriFriends = new MutableLiveData<>();
         currentUserRankFriends = new MutableLiveData<>();
-
-
 
         // EspressoIdlingResource is used to wait for the database to finish loading before
         // the tests are run
@@ -60,6 +55,14 @@ public class LeaderboardViewModel extends ViewModel {
         EspressoIdlingResource.increment();
         EspressoIdlingResource.increment();
 
+        String currentUserUid;
+        Profile activeProfile = Profile.getActiveProfile();
+        if (activeProfile == null) {
+            currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        }
+        else {
+            currentUserUid = activeProfile.getUid();
+        }
 
         // retrieve the current user's information to be displayed in the leaderboard
         Database.getProfile(currentUserUid).whenComplete((p, e) -> {
