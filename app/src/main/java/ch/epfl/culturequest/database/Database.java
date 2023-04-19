@@ -87,25 +87,29 @@ public class Database {
     public static CompletableFuture<AtomicBoolean> deleteProfile(String uid) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference ref = databaseInstance.getReference("users").child(uid);
-        ref.removeValue((error, ref1) -> {
-            if (error == null) {
-                removeAllPosts(uid, future);
-            } else {
-                future.complete(new AtomicBoolean(false));
-            }
-        });
-        return future;
-    }
-
-    private static void removeAllPosts(String uid, CompletableFuture<AtomicBoolean> future) {
-        DatabaseReference ref = databaseInstance.getReference("posts").child(uid);
-        ref.removeValue((error, ref1) -> {
-            if (error == null) {
+        ref.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
                 future.complete(new AtomicBoolean(true));
             } else {
                 future.complete(new AtomicBoolean(false));
             }
         });
+
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> removeAllPosts(String uid) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference ref = databaseInstance.getReference("posts").child(uid);
+        ref.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+
+        return future;
     }
 
     /**

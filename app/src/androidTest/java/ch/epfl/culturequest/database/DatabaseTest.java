@@ -173,6 +173,8 @@ public class DatabaseTest {
             assertThat(Database.getPosts("user1").get(5, java.util.concurrent.TimeUnit.SECONDS), is(List.of(post2, post1)));
             Database.deleteProfile("user1");
             Thread.sleep(2000);
+            Database.removeAllPosts("user1");
+            Thread.sleep(2000);
             assertThat(Database.getPosts("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).size(), is(0));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
