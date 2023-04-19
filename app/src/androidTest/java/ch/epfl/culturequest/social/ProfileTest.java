@@ -169,7 +169,7 @@ public class ProfileTest {
                     "Piece of Art", i, 0, new ArrayList<>());
         }).collect(Collectors.toList());
 
-        profile.setPosts((ArrayList<Post>) posts);
+        profile.setPosts(posts);
         Collections.reverse(posts);
         assertEquals(posts, profile.getPosts());
     }
