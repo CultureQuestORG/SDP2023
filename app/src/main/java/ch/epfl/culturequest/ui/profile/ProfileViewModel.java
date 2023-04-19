@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -46,7 +45,7 @@ public class ProfileViewModel extends ViewModel {
                 //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
                 CompletableFuture<List<Post>> profilePosts = Database.getPosts(selectedProfile.getUid());
                 profilePosts.handle((posts, t) -> {
-                    if (posts != null && t == null){
+                    if (posts != null && t == null) {
                         pictures.setValue(posts);
                     }
                     return null;
@@ -54,8 +53,8 @@ public class ProfileViewModel extends ViewModel {
             } else {
                 CompletableFuture<List<Post>> profilePosts = Database.getPosts(profile.getUid());
                 profilePosts.whenComplete((posts, t) -> {
-                    if (posts != null && t == null){
-                        profile.setPosts((ArrayList<Post>) posts);
+                    if (posts != null && t == null) {
+                        profile.setPosts(posts);
                         //set the values of the live data
                         username.setValue(profile.getUsername());
                         profilePictureUri.setValue(profile.getProfilePicture());
