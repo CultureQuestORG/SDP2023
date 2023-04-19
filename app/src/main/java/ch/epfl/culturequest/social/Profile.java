@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
+import java.util.concurrent.CompletableFuture;
+
+import ch.epfl.culturequest.database.Database;
 
 /**
  * Creates a profile for users
@@ -48,7 +51,7 @@ public class Profile extends Observable {
         this.score = 0;
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> posts, List<String> friends, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> posts, Integer score) {
         this.uid = uid;
         this.name = name;
         this.username = username;
@@ -224,7 +227,6 @@ public class Profile extends Observable {
                 + "phoneNumber: " + phoneNumber + "\n"
                 + "profilePicture url: " + profilePicture + "\n"
                 + "posts: " + posts + "\n"
-                + "friends" + friends + "\n"
                 + "score: " + score + "\n";
     }
 
