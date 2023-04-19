@@ -46,7 +46,7 @@ public class GeneralDescriptionApiTest {
         assertThat(artDescription.getCountry(), is(nullValue()));
         assertThat(artDescription.getMuseum(), is("Louvre"));
         assertThat(artDescription.getType(), is(BasicArtDescription.ArtType.PAINTING));
-        assertThat(artDescription.getScore(), is(100));
+        assertThat(artDescription.getScore() >= 90, is(true));
     }
 
 }

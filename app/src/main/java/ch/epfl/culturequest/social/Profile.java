@@ -6,14 +6,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
-import ch.epfl.culturequest.database.Database;
 
 /**
  * Creates a profile for users
@@ -22,7 +17,7 @@ public class Profile extends Observable {
 
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
-    private List<Post> images;
+    private List<Post> posts;
     private Integer score;
     private static Profile activeProfile;
 
@@ -49,18 +44,18 @@ public class Profile extends Observable {
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
-        this.images = new ArrayList<>();
+        this.posts = new ArrayList<>();
         this.score = 0;
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> images, ArrayList<String> friends, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> posts, List<String> friends, Integer score) {
         this.uid = uid;
         this.name = name;
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
-        this.images = images;
+        this.posts = posts;
         this.score = score;
     }
 
@@ -77,7 +72,7 @@ public class Profile extends Observable {
         this.email = "";
         this.phoneNumber = "";
         this.profilePicture = "";
-        this.images = List.of();
+        this.posts = new ArrayList<>();
         this.score = 0;
     }
 
@@ -105,7 +100,9 @@ public class Profile extends Observable {
         return profilePicture;
     }
 
-    public Integer getScore() {return score;}
+    public Integer getScore() {
+        return score;
+    }
 
     public void setUid(String uid) {
         this.uid = uid;
@@ -144,42 +141,36 @@ public class Profile extends Observable {
         notifyObservers();
     }
 
-    public HashMap<String,Boolean> getImages() {
-        //HashMap<String,Boolean> images = new HashMap<>();
-        //this.images.stream().map(Image::getUid).forEach(id -> images.put(id,true));
-        //return images;
-        return new HashMap<>();
-    }
-
-    public void setPosts(List<Post> posts){
-        images = posts;
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
         setChanged();
         notifyObservers();
     }
 
     public void addPost(Post post) {
-        images.add(0, post);
+        posts.add(0, post);
         setChanged();
         notifyObservers();
     }
 
     /**
      * Retrieve a set of posts of a user using a limit and offset
-     * @param limit the number of posts to retrieve
+     *
+     * @param limit  the number of posts to retrieve
      * @param offset the number of posts to skip
      * @return the latest posts of a user
      */
     public List<Post> getPosts(int limit, int offset) {
-        List<Post> orderedPosts = new ArrayList<>(images);
-        if (orderedPosts.isEmpty()){
+        List<Post> orderedPosts = new ArrayList<>(posts);
+        if (orderedPosts.isEmpty()) {
             return new ArrayList<>();
         }
-        orderedPosts.sort((post1, post2) -> post2.getDate().compareTo(post1.getDate()));
+        orderedPosts.sort((post1, post2) -> Long.compare(post2.getTime(), post1.getTime()));
         int size = orderedPosts.size();
-        if (offset < 0 || limit < 0){
+        if (offset < 0 || limit < 0) {
             throw new IllegalArgumentException("Limit/Offset is < 0");
         }
-        if(offset > size) {
+        if (offset > size) {
             throw new IllegalArgumentException("Offset surpasses images list size");
         }
         return orderedPosts.subList(offset, Math.min(offset + limit, orderedPosts.size()));
@@ -187,38 +178,20 @@ public class Profile extends Observable {
 
     /**
      * The difference from above is that we retrieve all the posts for a user, sorted by date
+     *
      * @return all the posts of a user
      */
-    public List<Post> getPosts(){
+    public List<Post> getPosts() {
         //sort by date to be safe
-        List<Post> orderedPosts = new ArrayList<>(images);
-        orderedPosts.sort((post1, post2) -> post2.getDate().compareTo(post1.getDate()));
+        ArrayList<Post> orderedPosts = new ArrayList<>(posts);
+        orderedPosts.sort((post1, post2) -> Long.compare(post2.getTime(), post1.getTime()));
         return orderedPosts;
     }
-
-
-    public void setImages(HashMap<String, Boolean> pictures) {
-        //keep only the keys, which are the image ids and fetch them from the database
-        //List<CompletableFuture<Image>> images = pictures.keySet().stream().map(Database::getImage).collect(Collectors.toList());
-
-        //wait for all the images to be fetched and then set the list of images
-        //CompletableFuture.allOf(images.toArray(new CompletableFuture[0])).thenRun(() -> {
-          //  this.images = images.stream().map(CompletableFuture::join).sorted().collect(Collectors.toList());
-            //setChanged();
-            //notifyObservers();
-        //});
-    }
-
-    public Profile setActiveProfile() {
-        Profile.activeProfile = this;
-        return this;
-    }
-
-    public static Profile getActiveProfile(){
+    public static Profile getActiveProfile() {
         return activeProfile;
     }
 
-    public static void setActiveProfile(Profile profile){
+    public static void setActiveProfile(Profile profile) {
         activeProfile = profile;
     }
 
@@ -243,9 +216,25 @@ public class Profile extends Observable {
     @NonNull
     @Override
     public String toString() {
-        return "Profile: {uid: " + uid + ", username: " + username + ", score: " + score + "}";
+        return "Profile: \n"
+                + "uid: " + uid + "\n"
+                + "name: " + name + "\n"
+                + "username: " + username + "\n"
+                + "email: " + email + "\n"
+                + "phoneNumber: " + phoneNumber + "\n"
+                + "profilePicture url: " + profilePicture + "\n"
+                + "posts: " + posts + "\n"
+                + "friends" + friends + "\n"
+                + "score: " + score + "\n";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Profile profile = (Profile) o;
+        return toString().equals(profile.toString());
+    }
 
 }
 

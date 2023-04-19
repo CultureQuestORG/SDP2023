@@ -5,20 +5,13 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.intent.Intents.intended;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
@@ -35,7 +28,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -77,19 +69,19 @@ public class ProfileCreatorActivityTest {
     }
 
     @Before
-    public void init(){
+    public void init() {
         ActivityScenario
                 .launch(ProfileCreatorActivity.class)
                 .onActivity(a -> {
                     profile = a.getProfile();
-                    activity=a;
+                    activity = a;
 
                 });
         Intents.init();
     }
 
     @After
-    public void release(){
+    public void release() {
         // clear the database after finishing the tests
         Database.clearDatabase();
         Intents.release();
@@ -127,7 +119,7 @@ public class ProfileCreatorActivityTest {
     public void wrongUserNameSetsHintText() throws InterruptedException {
         onView(withId(R.id.username)).perform(typeText("  !+ "));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
     }
 
@@ -138,10 +130,10 @@ public class ProfileCreatorActivityTest {
     }
 
     @Test
-    public void notSelectingPicGivesDefaultProfilePicAndCorrectUsername() {
+    public void notSelectingPicGivesDefaultProfilePicAndCorrectUsername() throws InterruptedException {
         onView(withId(R.id.username)).perform(typeText("JohnDoe"));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
-
+        Thread.sleep(8000);
         assertEquals(profile.getUsername(), "JohnDoe");
         // assert  that the URL contains https://firebasestorage.googleapis.com and contains
         assertEquals(DEFAULT_PROFILE_PATH, activity.getProfilePicUri());

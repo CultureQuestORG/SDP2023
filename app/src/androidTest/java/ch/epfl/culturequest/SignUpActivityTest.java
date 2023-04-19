@@ -21,11 +21,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import ch.epfl.culturequest.database.Database;
 
 @RunWith(AndroidJUnit4.class)
 public class SignUpActivityTest {
@@ -35,6 +38,12 @@ public class SignUpActivityTest {
 
     @Before
     public void setup() {
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+
         if (auth.getCurrentUser() != null) {
             auth.signOut();
         }
@@ -66,5 +75,11 @@ public class SignUpActivityTest {
             Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), NavigationActivity.class);
             assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
         }
+    }
+
+    @After
+    public void tearDown() {
+        // clear the database after running the tests
+        Database.clearDatabase();
     }
 }
