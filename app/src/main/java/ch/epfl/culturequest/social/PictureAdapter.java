@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -22,6 +23,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureViewHolder> {
 
     private final List<Post> pictures;
+
+    private static AlertDialog lastDialog;
 
     public PictureAdapter(List<Post> pictures) {
         if (pictures == null) {
@@ -61,17 +64,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         holder.location.setText("Lausanne");
 
 
-        handleLike(holder,post);
+        handleLike(holder, post);
 
-        handleDelete(holder,post);
-
-
-
-
+        handleDelete(holder, post);
 
     }
 
-    private void handleLike(@NonNull PictureViewHolder holder,Post post){
+    private void handleLike(@NonNull PictureViewHolder holder, Post post) {
         if (post.isLikedBy(Profile.getActiveProfile().getUid())) {
             holder.isLiked = true;
             Picasso.get().load(R.drawable.like_full).into(holder.like);
@@ -102,21 +101,29 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
             holder.delete.setVisibility(View.VISIBLE);
             holder.delete.setOnClickListener(v -> {
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                builder.setMessage("Are you sure you want to delete this post?")
+                AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
                         .setPositiveButton("Yes", (dialog, which) -> {
                             pictures.remove(post);
                             notifyItemRemoved(pictures.indexOf(post));
                             notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
                             Database.removePost(post);
+                            //TODO: delete image from storage when the mock is removed
+                            //FirebaseStorage storage = FirebaseStorage.getInstance();
+                            //storage.getReferenceFromUrl(post.getImageUrl()).delete();
                             Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
                         })
-                        .setNegativeButton("No", (dialog, which) -> dialog.dismiss());
-                builder.create().show();
+                        .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
+                lastDialog = dial;
+                dial.show();
             });
         } else {
             holder.delete.setVisibility(View.GONE);
         }
+    }
+
+
+    public static AlertDialog getLastDialog() {
+        return lastDialog;
     }
 
 
@@ -135,9 +142,6 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public ImageView like;
         public ImageView delete;
         public boolean isLiked = false;
-
-
-
 
 
         public PictureViewHolder(@NonNull View itemView) {

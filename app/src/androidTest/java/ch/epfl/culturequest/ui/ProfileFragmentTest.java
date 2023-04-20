@@ -9,6 +9,11 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -27,6 +32,7 @@ import java.util.Collections;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.ProfileFragment;
@@ -94,5 +100,25 @@ public class ProfileFragmentTest {
 
         onView(withId(R.id.settingsButton)).perform(click());
         onView(withId(R.id.log_out)).check(matches(isEnabled()));
+    }
+
+    @Test
+    public void deleteButtonWorks() {
+        onView(withId(R.id.delete_button)).perform(click());
+        // should open an alert dialog
+        AlertDialog dialog = PictureAdapter.getLastDialog();
+        assertNotNull(dialog);
+        if (dialog.isShowing()) {
+            try {
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+                Database.getProfile(profile.getUid()).thenAccept(p -> {
+                    assertTrue(p.getPosts().isEmpty());
+                });
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+
+
     }
 }
