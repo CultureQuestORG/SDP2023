@@ -202,7 +202,6 @@ public class MapsFragment extends Fragment {
         Picasso.get().load(Profile.getActiveProfile().getProfilePicture()).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Log.i("PICTURE", "PICTURE LOADED");
                 profilePicture = getCircularBitmap(bitmap);
                 drawPositionMarker(viewModel.getCurrentLocation().getValue());
             }
@@ -214,7 +213,6 @@ public class MapsFragment extends Fragment {
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-                Log.i("PICTURE", "PREPARING TO LOAD PICTURE");
             }
         });
     }
