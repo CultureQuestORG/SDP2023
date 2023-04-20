@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -24,14 +23,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import org.mockito.internal.matchers.And;
-
 import java.util.Objects;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
-import ch.epfl.culturequest.social.Image;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;

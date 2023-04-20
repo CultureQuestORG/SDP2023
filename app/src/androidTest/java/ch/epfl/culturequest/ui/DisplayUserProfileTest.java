@@ -9,8 +9,6 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.database.FirebaseDatabase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +19,6 @@ import java.util.List;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.database.FireDatabase;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;

@@ -29,25 +29,17 @@ import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.database.MockDatabase;
 import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
@@ -64,7 +56,11 @@ public class SettingsActivityTest {
 
     @BeforeClass
     public static void setup() throws InterruptedException {
-        Database.init(new MockDatabase());
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
 
         FirebaseAuth.getInstance()
                 .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
@@ -91,6 +87,9 @@ public class SettingsActivityTest {
     @After
     public void release() {
         Intents.release();
+
+        // clear the database after each test
+        Database.clearDatabase();
     }
 
     @Test

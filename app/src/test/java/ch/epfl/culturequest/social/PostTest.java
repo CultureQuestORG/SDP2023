@@ -1,16 +1,15 @@
 package ch.epfl.culturequest.social;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.OrderWith;
 import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @FixMethodOrder(MethodSorters.DEFAULT)
@@ -19,20 +18,20 @@ public class PostTest {
     Post post;
 
     @Before
-    public void setUp() throws Exception {
-        post = new Post("postid", "uid", "imageUrl", "artworkName", new Date(2023, 3, 29), 10, List.of());
+    public void setUp() {
+        post = new Post("postid", "uid", "imageUrl", "artworkName", 0, 10, new ArrayList<>());
     }
 
     @Test
     public void getPostid() {
-        assertEquals("postid", post.getPostid());
+        assertEquals("postid", post.getPostId());
     }
 
     @Test
     public void setPostid() {
-        post.setPostid("newPostid");
-        assertEquals("newPostid", post.getPostid());
-        post.setPostid("postid");
+        post.setPostId("newPostid");
+        assertEquals("newPostid", post.getPostId());
+        post.setPostId("postid");
     }
 
     @Test
@@ -74,14 +73,14 @@ public class PostTest {
 
     @Test
     public void getDate() {
-        assertEquals(new Date(2023, 3, 29), post.getDate());
+        assertEquals(0, post.getTime());
     }
 
     @Test
-    public void setDate() {
-        post.setDate(new Date(2024, 4, 30));
-        assertEquals(new Date(2024, 4, 30), post.getDate());
-        post.setDate(new Date(2023, 3, 29));
+    public void setTime() {
+        post.setTime(1);
+        assertEquals(1, post.getTime());
+        post.setTime(0);
     }
 
     @Test
@@ -153,6 +152,12 @@ public class PostTest {
 
     @Test
     public void testToString() {
-        assertEquals("Post of artwork " + post.getArtworkName() + ", at date" + post.getDate() + ", imageUrl=" + post.getImageUrl() + ", postid=" + post.getPostid() + ", from user:" + post.getUid() + ".", post.toString());
+        assertEquals(post.toString(), "Post of artwork: " + post.getArtworkName() + "\n"
+                + "by user: " + post.getUid() + "\n"
+                + "at time:" + post.getTime() + "\n"
+                + "with postId:" + post.getPostId() + "\n"
+                + "imageUrl:" + post.getImageUrl() + "\n"
+                + "likes:" + post.getLikes() + "\n"
+                + "likers:" + post.getLikers() + "\n");
     }
 }
