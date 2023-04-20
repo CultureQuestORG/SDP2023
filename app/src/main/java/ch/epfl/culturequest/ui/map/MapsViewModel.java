@@ -20,6 +20,8 @@ public class MapsViewModel extends ViewModel{
 
     private final MutableLiveData<List<OTMLocation>> locations;
 
+    private final MutableLiveData<LatLng> centerOfLocations;
+
     /**
      * Constructor for the MapsViewModel
      */
@@ -27,6 +29,7 @@ public class MapsViewModel extends ViewModel{
         isLocationPermissionGranted = new MutableLiveData<>(false);
         currentLocation = new MutableLiveData<>(DEFAULT);
         locations = new MutableLiveData<>(null);
+        centerOfLocations = new MutableLiveData<>(null);
     }
 
     /**
@@ -83,4 +86,13 @@ public class MapsViewModel extends ViewModel{
     public List<OTMLocation> getLocations(){
         return locations.getValue();
     }
+
+    public void setCenterOfLocations(LatLng center){
+        Objects.requireNonNull(center, "Center of locations cannot be null");
+        centerOfLocations.setValue(center);
+    }
+    public LatLng getCenterOfLocations() {
+        return centerOfLocations.getValue();
+    }
+
 }

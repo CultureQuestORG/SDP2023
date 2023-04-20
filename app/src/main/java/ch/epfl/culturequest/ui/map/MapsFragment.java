@@ -1,9 +1,18 @@
 package ch.epfl.culturequest.ui.map;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +22,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LastLocationRequest;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,9 +40,11 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.R;
@@ -40,12 +53,18 @@ import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMProvider;
 import ch.epfl.culturequest.backend.map_collection.RetryingOTMProvider;
 import ch.epfl.culturequest.databinding.FragmentMapsBinding;
+import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.PermissionRequest;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsFragment extends Fragment {
 
     private final static float DEFAULT_ZOOM = 15f;
+    private final static float LONGITUDE_DIFF = 0.015449859201908112f;
+    private final static float LATITUDE_DIFF = 0.023033438247566096f;
     private FusedLocationProviderClient fusedLocationClient;
+    private LocationRequest locationRequest;
+
     private FragmentMapsBinding binding;
     private MapsViewModel viewModel;
 
@@ -59,6 +78,11 @@ public class MapsFragment extends Fragment {
             registerForActivityResult(new ActivityResultContracts.RequestPermission(),
                     this::onRequestPermissionsResult);
     private final PermissionRequest permissionRequest = new PermissionRequest(Manifest.permission.ACCESS_FINE_LOCATION);
+
+    private Bitmap profilePicture;
+
+    private Marker frame;
+    private Marker profileMarker;
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -73,6 +97,7 @@ public class MapsFragment extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             mMap = googleMap;
+            drawPositionMarker(viewModel.getCurrentLocation().getValue());
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.maps_style_json));
             getLocationPermission();
             mMap.moveCamera(CameraUpdateFactory
@@ -80,17 +105,66 @@ public class MapsFragment extends Fragment {
         }
     };
 
-    public void getMarkers(){
+
+    private void drawPositionMarker(LatLng latestLocation){
+        frame = mMap.addMarker(new MarkerOptions().zIndex(10000f).position(latestLocation).icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.map_icon_frame), 75, 75, false))));
+        if(profilePicture != null) {
+            profileMarker = mMap.addMarker(new MarkerOptions().zIndex(10001f).icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(profilePicture, 70, 70, false))).position(latestLocation));
+        }
+    }
+
+    // Method to change the profile picture from square to round
+    private static Bitmap getCircularBitmap(Bitmap bitmap) {
+        Bitmap output;
+
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            output = Bitmap.createBitmap(bitmap.getHeight(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        } else {
+            output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getWidth(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        float r = 0;
+
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            r = bitmap.getHeight() / 2;
+        } else {
+            r = bitmap.getWidth() / 2;
+        }
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawCircle(r, r, r, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        return output;
+    }
+
+    private void getMarkers(LatLng latestLocation){
         CompletableFuture<List<OTMLocation>> places;
-        LatLng upperRight = mMap.getProjection().getVisibleRegion().latLngBounds.northeast;
-        LatLng lowerLeft = mMap.getProjection().getVisibleRegion().latLngBounds.southwest;
-        LatLng upperLeft = new LatLng(upperRight.latitude, lowerLeft.longitude);
-        LatLng lowerRight = new LatLng(lowerLeft.latitude, upperRight.longitude);
-        if(viewModel.getLocations() != null){
+        float distance[] = new float[1];
+        if (viewModel.getCenterOfLocations() == null) {
+            viewModel.setCenterOfLocations(latestLocation); // Just put a default value, this should only happen at the beginning
+        }
+        Location.distanceBetween(latestLocation.latitude, latestLocation.longitude, viewModel.getCenterOfLocations().latitude, viewModel.getCenterOfLocations().longitude, distance);
+
+        if(viewModel.getLocations() != null && distance[0] < 1000){
             places = CompletableFuture.completedFuture(viewModel.getLocations());
         }
         else {
+            mMap.clear();
+            drawPositionMarker(latestLocation);
+
+            LatLng upperLeft = new LatLng(latestLocation.latitude + LATITUDE_DIFF/2, latestLocation.longitude - LONGITUDE_DIFF/2);
+            LatLng lowerRight = new LatLng(latestLocation.latitude - LATITUDE_DIFF/2, latestLocation.longitude + LONGITUDE_DIFF/2);
             places = otmProvider.getLocations(upperLeft, lowerRight).thenApply(x -> {
+                viewModel.setCenterOfLocations(latestLocation);
                 viewModel.setLocations(x);
                 return x;
             });
@@ -121,6 +195,26 @@ public class MapsFragment extends Fragment {
         if (mMap != null) {
             getLocationPermission();
         }
+        getProfilePicture();
+    }
+
+    private void getProfilePicture(){
+        Picasso.get().load(Profile.getActiveProfile().getProfilePicture()).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                profilePicture = getCircularBitmap(bitmap);
+                drawPositionMarker(viewModel.getCurrentLocation().getValue());
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                Log.i("PICTURE", "FAILED TO LOAD PICTURE");
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+            }
+        });
     }
 
     @Nullable
@@ -134,6 +228,7 @@ public class MapsFragment extends Fragment {
 
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         View mapView = binding.getRoot();
+        getProfilePicture();
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
@@ -157,7 +252,6 @@ public class MapsFragment extends Fragment {
          */
         if (viewModel.isLocationPermissionGranted() || permissionRequest.hasPermission(getContext())) {
             viewModel.setIsLocationPermissionGranted(true);
-            updateLocationUI();
             getDeviceLocation();
         } else {
             permissionRequest.askPermission(launcher);
@@ -171,7 +265,6 @@ public class MapsFragment extends Fragment {
             // If request is cancelled, the result arrays are empty.
             viewModel.setIsLocationPermissionGranted(true);
         }
-        updateLocationUI();
         getDeviceLocation();
     }
 
@@ -186,27 +279,6 @@ public class MapsFragment extends Fragment {
     }
 
     /**
-     * Updates the map's UI settings based on whether the user has granted location permission.
-     */
-    private void updateLocationUI() {
-        if (mMap == null) {
-            return;
-        }
-        try {
-            if (viewModel.isLocationPermissionGranted()) {
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            } else {
-                mMap.setMyLocationEnabled(false);
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                lastKnownLocation = null;
-            }
-        } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
-        }
-    }
-
-    /**
      * Gets the current location of the device, and positions the map's camera.
      */
     private void getDeviceLocation() {
@@ -216,29 +288,39 @@ public class MapsFragment extends Fragment {
          */
         try {
             if (viewModel.isLocationPermissionGranted()) {
-                Task<Location> locationResult = fusedLocationClient.getLastLocation(new LastLocationRequest.Builder().setMaxUpdateAgeMillis(10000).build());
-                locationResult.addOnCompleteListener(getActivity(), task -> {
-                    if (task.isSuccessful()) {
-                        // Set the map's camera position to the current location of the device.
-                        lastKnownLocation = task.getResult();
-                        if (lastKnownLocation != null) {
-                            Log.i("INFORMATION", lastKnownLocation.toString());
-                            viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
-                                    lastKnownLocation.getLongitude()));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    locationRequest = new LocationRequest.Builder(200000).build(); //Unfrequent updates needed for now but will be fixed later
+                }
+                LocationCallback locationCallback = new LocationCallback() {
+                    @Override
+                    public void onLocationResult(@NonNull LocationResult result) {
+                        super.onLocationResult(result);
+                        if (result != null) {
+                            for(Location location : result.getLocations()){
+                                    lastKnownLocation = location;
+                            }
+                            if (lastKnownLocation != null) {
+                                viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
+                                        lastKnownLocation.getLongitude()));
+                                frame.setPosition(viewModel.getCurrentLocation().getValue());
+                                if (profileMarker != null) {
+                                    profileMarker.setPosition(viewModel.getCurrentLocation().getValue());
+                                }
+                                else {
+                                    getProfilePicture();
+                                }
+                            }
+                            mMap.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
+
+                            getMarkers(viewModel.getCurrentLocation().getValue());
                         }
-                    } else {
-                        Log.d("MapsFragment", "Current location is null. Using defaults.");
-                        Log.e("MapsFragment", "Exception: %s", task.getException());
-                        viewModel.resetCurrentLocation();
-                        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
                     }
-                    mMap.moveCamera(CameraUpdateFactory
-                            .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
+                };
 
-                    getMarkers();
-                });
+                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
             }
-
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage(), e);
         }
