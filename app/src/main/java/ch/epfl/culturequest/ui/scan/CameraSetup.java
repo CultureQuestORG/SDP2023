@@ -24,6 +24,7 @@ import android.view.TextureView;
 
 import androidx.annotation.NonNull;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -125,6 +126,12 @@ public class CameraSetup {
         byte[] data = new byte[planes[0].getBuffer().remaining()];
         planes[0].getBuffer().get(data);
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, null);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.WEBP, 70, out);
+
+        byte[] bytes = out.toByteArray();
+        bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
         //We rotate the image
         Matrix matrix = new Matrix();
