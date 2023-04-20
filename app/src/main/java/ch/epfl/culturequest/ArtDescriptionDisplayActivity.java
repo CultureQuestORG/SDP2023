@@ -79,52 +79,75 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
         // Set Score
         TextView artScoreView = findViewById(R.id.artScore);
-        artScoreView.setText(artDescription.getScore() != null ? "+" + artDescription.getScore().toString() + " pts" : "+50 pts");
+        artScoreView.setText(artDescription.getScore() != null ? "+" + artDescription.getScore().toString() + " pts" : "+30 pts");
 
         // Set Rarity Badge
         ImageView rarityBadge = findViewById(R.id.rarity);
-        rarityBadge.setImageResource(getRarityLevel(artDescription.getScore()).getRarenessIcon());
-
+        setRarityBadge(rarityBadge, artDescription.getScore());
 
         // Set Country Badge
         ImageView countryBadge = findViewById(R.id.countryBadge);
         TextView countryName = findViewById(R.id.countryName);
 
-        if(artDescription.getCountry() != null ) {
-            countryBadge.setImageResource(ScanBadge.Country.fromString(artDescription.getCountry()).getBadge());
-            countryName.setText(artDescription.getCountry());
-        } else {
-            countryBadge.setVisibility(ImageView.GONE);
-            countryName.setVisibility(TextView.GONE);
-        }
+        setCountryBadge(countryBadge, countryName, artDescription.getCountry());
 
         // Set City Badge
         ImageView cityBadge = findViewById(R.id.cityBadge);
         TextView cityName = findViewById(R.id.cityName);
 
-        if(artDescription.getCity() != null ) {
-            cityBadge.setImageResource(ScanBadge.City.fromString(artDescription.getCity()).getBadge());
-            cityName.setText(artDescription.getCity());
-        } else {
-            cityBadge.setVisibility(ImageView.GONE);
-            cityName.setVisibility(TextView.GONE);
-        }
+        setCityBadge(cityBadge, cityName, artDescription.getCity());
 
         // Set Museum Badge
         ImageView museumBadge = findViewById(R.id.museumBadge);
         TextView museumName = findViewById(R.id.museumName);
 
-        if(artDescription.getMuseum() != null ) {
-            museumBadge.setImageResource(ScanBadge.Museum.fromString(artDescription.getMuseum()).getBadge());
-            museumName.setText(artDescription.getMuseum());
-        } else {
-            museumBadge.setVisibility(ImageView.GONE);
-            museumName.setVisibility(TextView.GONE);
-        }
+        setMuseumBadge(museumBadge, museumName, artDescription.getMuseum());
     }
 
     private void setTextOrFallback(TextView textView, String text, String fallbackText) {
         textView.setText(text != null ? text : fallbackText);
     }
 
+    private void setRarityBadge(ImageView rarityBadge, Integer score) {
+        if (score != null) {
+            rarityBadge.setImageResource(getRarityLevel(score).getRarenessIcon());
+            rarityBadge.setTag(getRarityLevel(score).name());
+        } else {
+            rarityBadge.setImageResource(getRarityLevel(30).getRarenessIcon());
+            rarityBadge.setTag(getRarityLevel(30).name());
+        }
+    }
+
+    private void setCountryBadge(ImageView countryBadge, TextView countryText, String country) {
+        if (country != null) {
+            countryBadge.setImageResource(ScanBadge.Country.fromString(country).getBadge());
+            countryText.setText(country);
+            countryBadge.setTag(ScanBadge.Country.fromString(country).name());
+        } else {
+            countryBadge.setVisibility(ImageView.GONE);
+            countryText.setVisibility(TextView.GONE);
+        }
+    }
+
+    private void setCityBadge(ImageView cityBadge, TextView cityText, String city) {
+        if (city != null) {
+            cityBadge.setImageResource(ScanBadge.City.fromString(city).getBadge());
+            cityText.setText(city);
+            cityBadge.setTag(ScanBadge.City.fromString(city).name());
+        } else {
+            cityBadge.setVisibility(ImageView.GONE);
+            cityText.setVisibility(TextView.GONE);
+        }
+    }
+
+    private void setMuseumBadge(ImageView museumBadge, TextView museumText, String museum) {
+        if (museum != null) {
+            museumBadge.setImageResource(ScanBadge.Museum.fromString(museum).getBadge());
+            museumText.setText(museum);
+            museumBadge.setTag(ScanBadge.Museum.fromString(museum).name());
+        } else {
+            museumBadge.setVisibility(ImageView.GONE);
+            museumText.setVisibility(TextView.GONE);
+        }
+    }
 }
