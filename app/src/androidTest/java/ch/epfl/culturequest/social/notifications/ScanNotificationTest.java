@@ -22,7 +22,7 @@ public class ScanNotificationTest {
     // Tests that the like notification is correctly created
     @Test
     public void testScanNotification() {
-        Profile.setActiveProfile(new Profile("test", "Scanner", "test", "test", "test", "test", List.of(), new ArrayList<>(),0));
+        Profile.setActiveProfile(new Profile("test", "Scanner", "test", "test", "test", "test",0));
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         android.app.Notification scanNotif = new ScanNotification().get(context);
