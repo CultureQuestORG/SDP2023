@@ -92,8 +92,9 @@ public class LeaderboardFragmentTest {
     }
 
     @Test
-    public void globalRankingWorks() {
+    public void globalRankingWorks() throws InterruptedException {
         onView(withId(R.id.globalLeaderboardButton)).perform(click());
+        Thread.sleep(5000);
         //R.id.friends_recycler_view should be visible
         onView(withId(R.id.global_recycler_view)).check(matches(isEnabled()));
         //R.id.friends_recycler_view should have exactly 4 children
@@ -107,8 +108,9 @@ public class LeaderboardFragmentTest {
     }
 
     @Test
-    public void friendlyRankingWorks() {
+    public void friendlyRankingWorks() throws InterruptedException {
         onView(withId(R.id.friendsLeaderboardButton)).perform(click());
+        Thread.sleep(5000);
         //R.id.friends_recycler_view should be visible
         onView(withId(R.id.friends_recycler_view)).check(matches(isEnabled()));
         //R.id.friends_recycler_view should have exactly 3 children
