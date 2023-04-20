@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
@@ -95,6 +96,28 @@ public class MapsViewModelTest {
         assertThat(mapsViewModel.getLocations().get(0).getCoordinates().longitude(), is(0.0));
         assertThat(mapsViewModel.getLocations().get(0).getKinds().size(), is(2));
         assertThat(mapsViewModel.getLocations().get(0).getKinds(), containsInAnyOrder("kind1", "kind2"));
+    }
+
+    // Test if the default center is correct
+    @Test
+    public void defaultCenterIsCorrect() {
+        MapsViewModel mapsViewModel = new MapsViewModel();
+        assertNull(mapsViewModel.getCenterOfLocations());
+    }
+
+    // Test if the center is correctly set
+    @Test
+    public void centerIsCorrectlySet() {
+        MapsViewModel mapsViewModel = new MapsViewModel();
+        mapsViewModel.setCenterOfLocations(new LatLng(0.0, 0.0));
+        assertEquals(mapsViewModel.getCenterOfLocations(), new LatLng(0.0, 0.0));
+    }
+
+    // Test that setting the center to null throws an exception
+    @Test
+    public void centerCannotBeSetToNull() {
+        MapsViewModel mapsViewModel = new MapsViewModel();
+        assertThrows(NullPointerException.class, () -> mapsViewModel.setCenterOfLocations(null));
     }
 
     @After
