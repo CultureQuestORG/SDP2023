@@ -143,14 +143,14 @@ public class Database {
 
             System.out.println("Following " + followed.getFollowed().size());
 
-            getTopNFriendsProfiles(followed.getFollowed().size()+1).whenComplete((friendsProfiles, e2) -> {
+            getTopNFriendsProfiles(followed.getFollowed().size() + 1).whenComplete((friendsProfiles, e2) -> {
                 if (friendsProfiles == null) {
                     System.out.println("Error 1");
                     future.completeExceptionally(new RuntimeException("User not found"));
                     return;
                 }
 
-                int rank = findRank(UId,friendsProfiles);
+                int rank = findRank(UId, friendsProfiles);
                 if (rank != -1) {
                     future.complete(rank);
                 } else {
@@ -222,7 +222,7 @@ public class Database {
     public static CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
         DatabaseReference usersRef = databaseInstance.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
-        Profile.getActiveProfile().getFriends().thenAccept(friends -> {
+        Profile.getActiveProfile().retrieveFriends().thenAccept(friends -> {
             //the list of profiles to return (the top n profiles)
             List<Profile> profilesList = new ArrayList<>();
 
@@ -242,7 +242,7 @@ public class Database {
                         }
                     }
                     List<Profile> topNProfiles = profilesList.subList(0, Math.min(n, profilesList.size()));
-                    topNProfiles.sort((p1,p2)-> p2.getScore().compareTo(p1.getScore()));
+                    topNProfiles.sort((p1, p2) -> p2.getScore().compareTo(p1.getScore()));
                     future.complete(topNProfiles);
                 } else {
                     future.completeExceptionally(task.getException());
@@ -526,6 +526,9 @@ public class Database {
         followsRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Follows follows = task.getResult().getValue(Follows.class);
+                if (follows == null) {
+                    follows = new Follows(new ArrayList<>());
+                }
                 future.complete(follows);
             } else {
                 future.complete(new Follows(new ArrayList<>()));

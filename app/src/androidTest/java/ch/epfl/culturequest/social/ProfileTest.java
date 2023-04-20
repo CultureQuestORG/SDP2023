@@ -15,12 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 @RunWith(AndroidJUnit4.class)
 public class ProfileTest {
 
@@ -147,7 +141,6 @@ public class ProfileTest {
                 + "email: " + profile.getEmail() + "\n"
                 + "phoneNumber: " + profile.getPhoneNumber() + "\n"
                 + "profilePicture url: " + profile.getProfilePicture() + "\n"
-                + "friends" + profile.getFriends() + "\n"
                 + "score: " + profile.getScore() + "\n"));
     }
 

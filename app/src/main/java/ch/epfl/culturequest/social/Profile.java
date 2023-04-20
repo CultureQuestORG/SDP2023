@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
@@ -144,7 +143,7 @@ public class Profile extends Observable {
      * @param offset the number of posts to skip
      * @return the latest posts of a user
      */
-    public CompletableFuture<List<Post>> getPosts(int limit, int offset) {
+    public CompletableFuture<List<Post>> retrievePosts(int limit, int offset) {
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
         Database.getPosts(this.uid, limit, offset).whenComplete((posts, throwable) -> {
             if (throwable != null) {
@@ -161,7 +160,7 @@ public class Profile extends Observable {
      *
      * @return all the posts of a user
      */
-    public CompletableFuture<List<Post>> getPosts() {
+    public CompletableFuture<List<Post>> retrievePosts() {
         //sort by date to be safe
         CompletableFuture<List<Post>> future = new CompletableFuture<>();
         Database.getPosts(this.uid).whenComplete((posts, throwable) -> {
@@ -187,7 +186,7 @@ public class Profile extends Observable {
         notifyObservers();
     }
 
-    public CompletableFuture<List<String>> getFriends() {
+    public CompletableFuture<List<String>> retrieveFriends() {
         CompletableFuture<List<String>> future = new CompletableFuture<>();
         Database.getFollowed(this.uid).whenComplete((friends, throwable) -> {
             if (throwable != null) {
