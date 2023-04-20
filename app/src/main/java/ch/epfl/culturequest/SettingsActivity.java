@@ -87,6 +87,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void UpdateProfile(View v) {
         EspressoIdlingResource.increment();
+
         // Check if the username is valid
         if (!ProfileUtils.isValid(activeProfile, username.getText().toString())) {
             username.setText("");
@@ -104,8 +105,9 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
+        // TODO: fix this with the emulator for next sprint
         // Upload the new profile picture and update the profile
-        FirebaseStorage storage = FirebaseStorage.getInstance();
+        /*FirebaseStorage storage = FirebaseStorage.getInstance();
         UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
         task.addOnSuccessListener(taskSnapshot ->
                 storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().
@@ -114,9 +116,9 @@ public class SettingsActivity extends AppCompatActivity {
                     Database.setProfile(activeProfile);
                     finish();
                     EspressoIdlingResource.decrement();
-                }));
+                }));*/
 
-
+        EspressoIdlingResource.decrement();
     }
 
     /**
