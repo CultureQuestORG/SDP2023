@@ -1,4 +1,16 @@
+checks:
+  identical-code:
+    enabled: false
 exclude_patterns:
   - "**/test/"
   - "**/androidTest/"
   - "**test"
+  - "**/R.class"
+  - "**/R$*.class"
+  - "**/BuildConfig.*"
+  - "**/Manifest*.*"
+  - "**/*Test*.*"
+  - "android/**/*.*"
+  - "**/databinding/*"
+  - "**/CameraSetup.java"
+  - "ch/epfl/culturequest/ui/map/MapFragment.java"

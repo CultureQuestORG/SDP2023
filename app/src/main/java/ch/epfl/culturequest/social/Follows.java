@@ -29,37 +29,28 @@ public class Follows extends Observable {
         notifyObservers();
     }
 
-    public CompletableFuture<AtomicBoolean> addFollowed(String followed) {
-        return changeFollowed(followed, true);
+    public void addFollowed(String followed) {
+        changeFollowed(followed, true);
     }
 
-    public CompletableFuture<AtomicBoolean> removeFollowed(String followed) {
-        return changeFollowed(followed, false);
+    public void removeFollowed(String followed) {
+        changeFollowed(followed, false);
     }
 
-    private CompletableFuture<AtomicBoolean> changeFollowed(String followed, boolean add) {
-        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+    private void changeFollowed(String followed, boolean add) {
+        if (this.followed == null) {
+            this.followed = new ArrayList<>();
+        }
+        if (add && !this.followed.contains(followed)) {
+            this.followed.add(followed);
+        } else if (!add){
+            this.followed.remove(followed);
+        }
+        setChanged();
+        notifyObservers();
+    }
 
-        CompletableFuture<Follows> update = add ?
-                Database.addFollow(Profile.getActiveProfile().getUid(), followed) :
-                Database.removeFollow(Profile.getActiveProfile().getUid(), followed);
-
-        update.thenAccept(f -> {
-            if (add && f.getFollowed().contains(followed)) {
-                setFollowed(f.getFollowed());
-                setChanged();
-                notifyObservers();
-                future.complete(new AtomicBoolean(true));
-            } else if (!add && !f.getFollowed().contains(followed)) {
-                setFollowed(f.getFollowed());
-                setChanged();
-                notifyObservers();
-                future.complete(new AtomicBoolean(true));
-            } else {
-                future.complete(new AtomicBoolean(false));
-            }
-        });
-
-        return future;
+    public boolean isFollowing(String followed) {
+        return this.followed != null && this.followed.contains(followed);
     }
 }

@@ -19,7 +19,9 @@ public class HomeViewModel extends ViewModel {
         posts = new MutableLiveData<>();
         Profile profile = Profile.getActiveProfile();
         if (profile != null) {
-            Database.getPostsFeed(profile.getFriends()).thenAccept(posts::setValue);
+            profile.retrieveFriends().thenAccept(friends -> {
+                Database.getPostsFeed(friends).thenAccept(posts::setValue);
+            });
         }
 
     }

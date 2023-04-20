@@ -32,7 +32,7 @@
             android:layout_height="40dp"
             android:layout_marginTop="5dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/trophy_icon" />
+            android:src="@drawable/trophee" />
 
         <TextView
             android:id="@+id/user_score"
