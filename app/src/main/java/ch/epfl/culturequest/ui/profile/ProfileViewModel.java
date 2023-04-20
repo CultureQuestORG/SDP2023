@@ -23,7 +23,6 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<Boolean> followed;
 
     Profile profile = Profile.getActiveProfile();
-    Profile selectedProfile = ProfileUtils.getSelectedProfile();
 
     /**
      * Constructor of the ProfileViewModel
@@ -37,18 +36,20 @@ public class ProfileViewModel extends ViewModel {
 
         EspressoIdlingResource.increment();
         if (profile != null) {
-            if (selectedProfile != null && selectedProfile.getUid().equals(uid)) {
-                username.setValue(selectedProfile.getUsername());
-                profilePictureUri.setValue(selectedProfile.getProfilePicture());
-                // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
-                // a time, but it is computationally more efficient to do 1 big query:
-                //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
-                CompletableFuture<List<Post>> profilePosts = Database.getPosts(selectedProfile.getUid());
-                profilePosts.handle((posts, t) -> {
-                    if (posts != null && t == null) {
-                        pictures.setValue(posts);
-                    }
-                    return null;
+            if (!profile.getUid().equals(uid)) {
+                Database.getProfile(uid).whenComplete((selectedProfile, e) -> {
+                    username.setValue(selectedProfile.getUsername());
+                    profilePictureUri.setValue(selectedProfile.getProfilePicture());
+                    // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
+                    // a time, but it is computationally more efficient to do 1 big query:
+                    //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
+                    CompletableFuture<List<Post>> profilePosts = Database.getPosts(selectedProfile.getUid());
+                    profilePosts.handle((posts, t) -> {
+                        if (posts != null && t == null) {
+                            pictures.setValue(posts);
+                        }
+                        return null;
+                    });
                 });
             } else {
                 CompletableFuture<List<Post>> profilePosts = Database.getPosts(profile.getUid());
