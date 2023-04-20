@@ -134,84 +134,8 @@ public class ProfileTest {
         assertThat(emptyProfile.getEmail(), is(""));
         assertThat(emptyProfile.getPhoneNumber(), is(""));
         assertThat(emptyProfile.getProfilePicture(), is(""));
-        //users posts should be an empty list
-        assertThat(emptyProfile.getPosts().size(), is(0));
         assertThat(emptyProfile.getScore(), is(0));
 
-    }
-
-    @Test
-    public void setPostWorks() {
-        Post post = new Post("postId", "123",
-                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                "Piece of Art", 0, 0, new ArrayList<>());
-
-        profile.setPosts(new ArrayList<>(Collections.singletonList(post)));
-        assertThat(profile.getPosts().size(), is(1));
-        assertThat(profile.getPosts().get(0), is(post));
-    }
-
-    @Test
-    public void addingPostIncrementsAllPostsSize() {
-        Post post = new Post("def", "123",
-                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                "Piece of Art", 0, 0, new ArrayList<>());
-
-        profile.addPost(post);
-        assertEquals(1, profile.getPosts().size());
-    }
-
-    @Test
-    public void postsAreSortedByTime() {
-        List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
-            return new Post(String.valueOf(i), "123",
-                    "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                    "Piece of Art", i, 0, new ArrayList<>());
-        }).collect(Collectors.toList());
-
-        profile.setPosts(posts);
-        Collections.reverse(posts);
-        assertEquals(posts, profile.getPosts());
-    }
-
-    @Test
-    public void retrievingPostsWithLimitAndOffsetReturnsLatestPosts() {
-        List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
-            return new Post(String.valueOf(i), "123",
-                    "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                    "Piece of Art", i, 0, new ArrayList<>());
-        }).collect(Collectors.toList());
-
-        profile.setPosts(posts);
-        Collections.reverse(posts);
-        assertEquals(posts.subList(0, 3), profile.getPosts(3, 0));
-        assertEquals(posts.subList(3, 7), profile.getPosts(4, 3));
-    }
-
-    @Test
-    public void givingInvalidLimitsAndOffsetThrowsException() {
-        List<Post> posts = IntStream.range(1, 10).mapToObj(i -> {
-            return new Post(String.valueOf(i), "123",
-                    "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                    "Piece of Art", i, 0, new ArrayList<>());
-        }).collect(Collectors.toList());
-
-        profile.setPosts(posts);
-        assertThrows(IllegalArgumentException.class, () -> {
-            profile.getPosts(1, 11);//offset is larger than the total number of posts;
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            profile.getPosts(-1, 0);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            profile.getPosts(1, -1);
-        });
-    }
-
-    @Test
-    public void noPostsGivesEmptyListWithListAndOffset() {
-        assertTrue(profile.getPosts(1, 0).isEmpty());
     }
 
     @Test
@@ -223,7 +147,6 @@ public class ProfileTest {
                 + "email: " + profile.getEmail() + "\n"
                 + "phoneNumber: " + profile.getPhoneNumber() + "\n"
                 + "profilePicture url: " + profile.getProfilePicture() + "\n"
-                + "posts: " + profile.getPosts() + "\n"
                 + "friends" + profile.getFriends() + "\n"
                 + "score: " + profile.getScore() + "\n"));
     }

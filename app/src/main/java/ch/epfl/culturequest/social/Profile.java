@@ -20,12 +20,8 @@ public class Profile extends Observable {
 
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
-    private List<Post> posts;
     private Integer score;
     private static Profile activeProfile;
-
-
-
 
 
     /**
@@ -47,18 +43,16 @@ public class Profile extends Observable {
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
-        this.posts = new ArrayList<>();
         this.score = 0;
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, List<Post> posts, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, Integer score) {
         this.uid = uid;
         this.name = name;
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
-        this.posts = posts;
         this.score = score;
     }
 
@@ -75,7 +69,6 @@ public class Profile extends Observable {
         this.email = "";
         this.phoneNumber = "";
         this.profilePicture = "";
-        this.posts = new ArrayList<>();
         this.score = 0;
     }
 
@@ -144,18 +137,6 @@ public class Profile extends Observable {
         notifyObservers();
     }
 
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
-        setChanged();
-        notifyObservers();
-    }
-
-    public void addPost(Post post) {
-        posts.add(0, post);
-        setChanged();
-        notifyObservers();
-    }
-
     /**
      * Retrieve a set of posts of a user using a limit and offset
      *
@@ -163,20 +144,16 @@ public class Profile extends Observable {
      * @param offset the number of posts to skip
      * @return the latest posts of a user
      */
-    public List<Post> getPosts(int limit, int offset) {
-        List<Post> orderedPosts = new ArrayList<>(posts);
-        if (orderedPosts.isEmpty()) {
-            return new ArrayList<>();
-        }
-        orderedPosts.sort((post1, post2) -> Long.compare(post2.getTime(), post1.getTime()));
-        int size = orderedPosts.size();
-        if (offset < 0 || limit < 0) {
-            throw new IllegalArgumentException("Limit/Offset is < 0");
-        }
-        if (offset > size) {
-            throw new IllegalArgumentException("Offset surpasses images list size");
-        }
-        return orderedPosts.subList(offset, Math.min(offset + limit, orderedPosts.size()));
+    public CompletableFuture<List<Post>> getPosts(int limit, int offset) {
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        Database.getPosts(this.uid, limit, offset).whenComplete((posts, throwable) -> {
+            if (throwable != null) {
+                future.completeExceptionally(throwable);
+            } else {
+                future.complete(posts);
+            }
+        });
+        return future;
     }
 
     /**
@@ -184,11 +161,17 @@ public class Profile extends Observable {
      *
      * @return all the posts of a user
      */
-    public List<Post> getPosts() {
+    public CompletableFuture<List<Post>> getPosts() {
         //sort by date to be safe
-        ArrayList<Post> orderedPosts = new ArrayList<>(posts);
-        orderedPosts.sort((post1, post2) -> Long.compare(post2.getTime(), post1.getTime()));
-        return orderedPosts;
+        CompletableFuture<List<Post>> future = new CompletableFuture<>();
+        Database.getPosts(this.uid).whenComplete((posts, throwable) -> {
+            if (throwable != null) {
+                future.completeExceptionally(throwable);
+            } else {
+                future.complete(posts);
+            }
+        });
+        return future;
     }
     public static Profile getActiveProfile() {
         return activeProfile;
@@ -226,7 +209,6 @@ public class Profile extends Observable {
                 + "email: " + email + "\n"
                 + "phoneNumber: " + phoneNumber + "\n"
                 + "profilePicture url: " + profilePicture + "\n"
-                + "posts: " + posts + "\n"
                 + "score: " + score + "\n";
     }
 
