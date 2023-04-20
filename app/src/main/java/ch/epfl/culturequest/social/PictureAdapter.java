@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.social;
 
+import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -61,6 +63,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
         handleLike(holder,post);
 
+        handleDelete(holder,post);
+
 
 
 
@@ -93,6 +97,29 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     }
 
+
+    private void handleDelete(@NonNull PictureViewHolder holder, Post post) {
+        if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
+            holder.delete.setVisibility(View.VISIBLE);
+            holder.delete.setOnClickListener(v -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setMessage("Are you sure you want to delete this post?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            pictures.remove(post);
+                            notifyItemRemoved(pictures.indexOf(post));
+                            notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
+                            Database.removePost(post);
+                            Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
+                        })
+                        .setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+                builder.create().show();
+            });
+        } else {
+            holder.delete.setVisibility(View.GONE);
+        }
+    }
+
+
     @Override
     public int getItemCount() {
         return pictures.size();
@@ -106,6 +133,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView username;
         public TextView location;
         public ImageView like;
+        public ImageView delete;
         public boolean isLiked = false;
 
 
@@ -120,6 +148,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             location = itemView.findViewById(R.id.location);
             profilePicture = itemView.findViewById(R.id.profile_picture);
             like = itemView.findViewById(R.id.like_button);
+            delete = itemView.findViewById(R.id.delete_button);
+
         }
     }
 }
