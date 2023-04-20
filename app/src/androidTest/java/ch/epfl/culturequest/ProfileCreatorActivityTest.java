@@ -65,7 +65,7 @@ public class ProfileCreatorActivityTest {
                         user = FirebaseAuth.getInstance().getCurrentUser();
                     }
                 });
-        Thread.sleep(2000);
+        Thread.sleep(8000);
     }
 
     @Before

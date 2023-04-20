@@ -36,15 +36,10 @@ public class DisplayUserProfileTest {
         Database.clearDatabase();
 
         Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0));
-
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
     }
 
     @After
     public void tearDown() {
-        // remove EspressoIdlingResource from the IdlingRegistry
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-
         // clear the database after finishing the tests
         Database.clearDatabase();
     }

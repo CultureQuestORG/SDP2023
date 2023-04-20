@@ -41,15 +41,12 @@ public class ProfileFragmentTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
         // clear the database before starting the following tests
         Database.clearDatabase();
-
-        // add EspressoIdlingResource to the IdlingRegistry
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
 
         Post post = new Post("abc", "123",
                 "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
@@ -69,13 +66,12 @@ public class ProfileFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
+
+        Thread.sleep(8000);
     }
 
     @After
     public void tearDown() {
-        // remove EspressoIdlingResource from the IdlingRegistry
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-
         // clear the database after the tests
         Database.clearDatabase();
     }

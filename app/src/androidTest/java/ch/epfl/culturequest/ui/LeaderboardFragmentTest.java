@@ -38,7 +38,7 @@ public class LeaderboardFragmentTest {
     private LeaderboardFragment fragment;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
@@ -57,9 +57,6 @@ public class LeaderboardFragmentTest {
         Database.addFollow("currentUserUid", "testUid2");
         Database.addFollow("currentUserUid", "testUid3");
 
-        // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
-
         // Launch the fragment with the current user's uid for testing
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
         activityScenario.onActivity(activity -> {
@@ -69,6 +66,8 @@ public class LeaderboardFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
+
+        Thread.sleep(8000);
     }
 
     @Test
@@ -92,8 +91,7 @@ public class LeaderboardFragmentTest {
         onView(withId(R.id.current_username)).check(matches(withText("currentUserUsername")));
     }
 
-    // TODO: fix the bug with idling resource timeout
-    /*@Test
+    @Test
     public void globalRankingWorks() {
         onView(withId(R.id.globalLeaderboardButton)).perform(click());
         //R.id.friends_recycler_view should be visible
@@ -106,7 +104,7 @@ public class LeaderboardFragmentTest {
 
         // should be first among my friends
         onView(withId(R.id.current_user_rank)).check(matches(withText("1")));
-    }*/
+    }
 
     @Test
     public void friendlyRankingWorks() {
@@ -125,9 +123,6 @@ public class LeaderboardFragmentTest {
 
     @After
     public void tearDown() {
-        // remove EspressoIdlingResource from the IdlingRegistry
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-
         // clear the database after finishing the tests
         Database.clearDatabase();
     }

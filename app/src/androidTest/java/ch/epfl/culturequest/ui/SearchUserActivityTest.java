@@ -54,8 +54,6 @@ public class SearchUserActivityTest {
         Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", 0));
         Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0));
 
-        // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
     }
 
 
@@ -100,9 +98,6 @@ public class SearchUserActivityTest {
 
     @After
     public void teardown() {
-        //Database.deleteProfile("testUid1");
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-
         // clear the database after finishing the tests
         Database.clearDatabase();
     }

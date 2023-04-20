@@ -33,7 +33,7 @@ public class HomeFragmentTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
@@ -56,8 +56,6 @@ public class HomeFragmentTest {
                 0,
                 0,
                 new ArrayList<>()));
-        // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
 
         // Launch the fragment with the current user's uid for testing
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
@@ -68,6 +66,8 @@ public class HomeFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
+
+        Thread.sleep(8000);
     }
 
     @Test
@@ -79,9 +79,6 @@ public class HomeFragmentTest {
 
     @After
     public void tearDown() {
-        // Unregister the IdlingResource to make sure tests don't wait for the fragment and database to be ready
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-
         // clear the database after the tests
         Database.clearDatabase();
     }
