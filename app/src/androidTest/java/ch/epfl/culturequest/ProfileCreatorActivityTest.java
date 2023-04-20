@@ -105,11 +105,12 @@ public class ProfileCreatorActivityTest {
     }
 
     @Test
-    public void wrongUserNameDoesntChangeIntent() {
+    public void wrongUserNameDoesntChangeIntent() throws InterruptedException {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
                 .addMonitor(NavigationActivity.class.getName(), null, false);
         onView(withId(R.id.username)).perform(typeText("  !+ "));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
+
         NavigationActivity secondActivity = (NavigationActivity) activityMonitor
                 .waitForActivityWithTimeout(2000);
         assertNull(secondActivity);
@@ -141,21 +142,25 @@ public class ProfileCreatorActivityTest {
 
 
     @Test
-    public void wrongUsernamesFailProfileCreation() {
+    public void wrongUsernamesFailProfileCreation() throws InterruptedException {
         onView(withId(R.id.username)).perform(typeText(""));
         onView(withId(R.id.create_profile)).perform(click());
+        Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
 
         onView(withId(R.id.username)).perform(typeText("lol"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
+        Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
 
         onView(withId(R.id.username)).perform(typeText("abcdefghijklmnopqrstuvxyz"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
+        Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
 
         onView(withId(R.id.username)).perform(typeText("john Doe"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
+        Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
     }
 }
