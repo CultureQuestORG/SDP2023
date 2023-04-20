@@ -113,6 +113,7 @@ public class MapsFragment extends Fragment {
         }
     }
 
+    // Method to change the profile picture from square to round
     private static Bitmap getCircularBitmap(Bitmap bitmap) {
         Bitmap output;
 
@@ -290,7 +291,7 @@ public class MapsFragment extends Fragment {
         try {
             if (viewModel.isLocationPermissionGranted()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    locationRequest = new LocationRequest.Builder(200000).build();
+                    locationRequest = new LocationRequest.Builder(200000).build(); //Unfrequent updates needed for now but will be fixed later
                 }
                 LocationCallback locationCallback = new LocationCallback() {
                     @Override
@@ -298,10 +299,7 @@ public class MapsFragment extends Fragment {
                         super.onLocationResult(result);
                         if (result != null) {
                             for(Location location : result.getLocations()){
-                                if (location == null) {
-                                } else {
                                     lastKnownLocation = location;
-                                }
                             }
                             if (lastKnownLocation != null) {
                                 viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
@@ -314,13 +312,12 @@ public class MapsFragment extends Fragment {
                                     getProfilePicture();
                                 }
                             }
-                        } else {
-                            return;
-                        }
-                        mMap.moveCamera(CameraUpdateFactory
-                                .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
+                            mMap.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
 
-                        getMarkers(viewModel.getCurrentLocation().getValue());
+                            getMarkers(viewModel.getCurrentLocation().getValue());
+                        }
+
                     }
                 };
 
