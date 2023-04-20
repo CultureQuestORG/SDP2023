@@ -1,5 +1,6 @@
 package ch.epfl.culturequest;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.database.Cursor;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -58,6 +60,10 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     }
     private void displayArtInformation(BasicArtDescription artDescription){
 
+        if(artDescription.isOpenAiRequired()){
+            showOpenAIPopup();
+        }
+
         TextView artNameView = findViewById(R.id.artName);
         setTextOrFallback(artNameView, artDescription.getName(), "No name found");
 
@@ -72,10 +78,18 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
         TextView artScoreView = findViewById(R.id.artScore);
         artScoreView.setText(artDescription.getScore() != null ? artDescription.getScore().toString() : "50");
+
+
+
     }
 
     private void setTextOrFallback(TextView textView, String text, String fallbackText) {
         textView.setText(text != null ? text : fallbackText);
     }
 
+    private void showOpenAIPopup() {
+        Toast toast = Toast.makeText(this, "OpenAI was used to provide some info. Keep in mind that AI-generated content may not always be accurate.", Toast.LENGTH_SHORT);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.show();
+    }
 }
