@@ -20,6 +20,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.After;
@@ -29,6 +32,7 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
@@ -99,16 +103,17 @@ public class ProfileFragmentTest {
 
     @Test
     public void deleteButtonWorks() {
-        onView(withId(R.id.delete_button)).perform(click());
+        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).orTimeout(10, java.util.concurrent.TimeUnit.SECONDS).join()).size());
+
+        // click in the right corner of the first picture
+        onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
         // should open an alert dialog
         AlertDialog dialog = PictureAdapter.getLastDialog();
         assertNotNull(dialog);
         if (dialog.isShowing()) {
             try {
                 dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-                Database.getProfile(profile.getUid()).thenAccept(p -> {
-                    assertTrue(p.getPosts().isEmpty());
-                });
+                assertTrue(Database.getPosts(Profile.getActiveProfile().getUid()).orTimeout(10, java.util.concurrent.TimeUnit.SECONDS).join().isEmpty());
             } catch (Throwable e) {
                 e.printStackTrace();
             }

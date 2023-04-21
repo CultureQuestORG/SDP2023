@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -108,25 +109,32 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     private void handleDelete(@NonNull PictureViewHolder holder, Post post) {
         if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
             holder.delete.setVisibility(View.VISIBLE);
-            holder.delete.setOnClickListener(v -> {
-                AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
-                        .setPositiveButton("Yes", (dialog, which) -> {
-                            pictures.remove(post);
-                            notifyItemRemoved(pictures.indexOf(post));
-                            notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
-                            Database.removePost(post);
-                            //TODO: delete image from storage when the mock is removed
-                            //FirebaseStorage storage = FirebaseStorage.getInstance();
-                            //storage.getReferenceFromUrl(post.getImageUrl()).delete();
-                            Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
-                        })
-                        .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
-                lastDialog = dial;
-                dial.show();
+            holder.delete.setOnClickListener(v->handleDeletePopUp(v,post));
+            holder.pictureImageView.setOnLongClickListener(v -> {
+                handleDeletePopUp(v,post);
+                return true;
             });
         } else {
             holder.delete.setVisibility(View.GONE);
         }
+    }
+
+    private void handleDeletePopUp(View v, Post post){
+
+        AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    pictures.remove(post);
+                    notifyItemRemoved(pictures.indexOf(post));
+                    notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
+                    Database.removePost(post);
+                    //TODO: delete image from storage when the mock is removed
+                    //FirebaseStorage storage = FirebaseStorage.getInstance();
+                    //storage.getReferenceFromUrl(post.getImageUrl()).delete();
+                    Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
+                })
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
+        lastDialog = dial;
+        dial.show();
     }
 
 
@@ -149,6 +157,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView location;
         public ImageView like;
         public ImageView delete;
+
+
         public boolean isLiked = false;
 
 
@@ -163,6 +173,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             delete = itemView.findViewById(R.id.delete_button);
 
         }
+
     }
 }
 
