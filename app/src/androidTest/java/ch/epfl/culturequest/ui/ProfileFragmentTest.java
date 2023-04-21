@@ -129,8 +129,8 @@ public class ProfileFragmentTest {
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
 
         final AlertDialog dialog2 = PictureAdapter.getLastDialog();
-        assertNotNull(dialog);
-        if (dialog.isShowing()) {
+        assertNotNull(dialog2);
+        if (dialog2.isShowing()) {
             try {
                 runOnUiThread(() -> dialog2.getButton(DialogInterface.BUTTON_POSITIVE).performClick());
                 assertTrue(Database.getPosts(Profile.getActiveProfile().getUid()).join().isEmpty());
