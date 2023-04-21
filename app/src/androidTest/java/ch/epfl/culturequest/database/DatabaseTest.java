@@ -3,6 +3,8 @@ package ch.epfl.culturequest.database;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.After;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
@@ -28,9 +32,10 @@ public class DatabaseTest {
         Database.clearDatabase();
     }
 
+    // PROFILE TESTS
     @Test
     public void setAndGetProfileWorks() {
-        Profile profile = new Profile("test", "test", "test", "test", "test", "test", new ArrayList<>(), new ArrayList<>(), 0);
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test", 0);
         try {
             Database.setProfile(profile);
             Thread.sleep(2000);
@@ -42,6 +47,7 @@ public class DatabaseTest {
         Database.clearDatabase();
     }
 
+    // POSTS TESTS
     @Test
     public void uploadAndRemovePostWorks() {
         Post post = new Post("test", "user", "test", "test", 0, 0, new ArrayList<>());
@@ -161,7 +167,7 @@ public class DatabaseTest {
 
     @Test
     public void deleteProfileRemovesAllPostsOfTheProfile() {
-        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", new ArrayList<>(), new ArrayList<>(), 0);
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0);
         Database.setProfile(profile);
         Post post1 = new Post("test1", "user1", "test", "test", 0, 0, new ArrayList<>());
         Post post2 = new Post("test2", "user1", "test", "test", 1, 0, new ArrayList<>());
@@ -176,6 +182,79 @@ public class DatabaseTest {
             Database.removeAllPosts("user1");
             Thread.sleep(2000);
             assertThat(Database.getPosts("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).size(), is(0));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    //FOLLOWING TESTS
+    @Test
+    public void getFollowedWorks() {
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0);
+        Database.setProfile(profile);
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().size(), is(0));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void addFollowedWorks() {
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0);
+        Database.setProfile(profile);
+
+        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0);
+        Database.setProfile(profile2);
+
+        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0);
+        Database.setProfile(profile3);
+
+        Database.addFollow("user1", "user2");
+        Database.addFollow("user1", "user3");
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().size(), is(2));
+            assertTrue(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().contains("user2"));
+            assertTrue(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().contains("user3"));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void removeFollowedWorks() {
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0);
+        Database.setProfile(profile);
+
+        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0);
+        Database.setProfile(profile2);
+
+        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0);
+        Database.setProfile(profile3);
+
+        Database.addFollow("user1", "user2");
+        Database.addFollow("user1", "user3");
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().size(), is(2));
+            assertTrue(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().contains("user2"));
+            assertTrue(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().contains("user3"));
+            Database.removeFollow("user1", "user2");
+            Thread.sleep(2000);
+            assertThat(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().size(), is(1));
+            assertFalse(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().contains("user2"));
+            assertTrue(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().contains("user3"));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }

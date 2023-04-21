@@ -1,6 +1,7 @@
 package ch.epfl.culturequest.social;
 
 import android.content.Intent;
+import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -67,11 +71,9 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         holder.location.setText("Lausanne");
 
 
-        handleLike(holder,post);
+        handleLike(holder, post);
 
-
-
-
+        handleDelete(holder, post);
 
     }
 
@@ -88,18 +90,60 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         holder.like.setOnClickListener(v -> {
             if (holder.isLiked) {
                 holder.isLiked = false;
-                post.removeLike(Profile.getActiveProfile().getUid());
+                Database.removeLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
+                    if (throwable != null) {
+                        post.setLikers(aVoid.getLikers());
+                    }
+                });
                 Picasso.get()
                         .load(R.drawable.like_empty)
                         .into(holder.like);
             } else {
                 holder.isLiked = true;
-                post.addLike(Profile.getActiveProfile().getUid());
+                Database.addLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
+                    if (throwable != null) {
+                        post.setLikers(aVoid.getLikers());
+                    }
+                });
                 Picasso.get().load(R.drawable.like_full).into(holder.like);
             }
         });
 
     }
+
+
+    private void handleDelete(@NonNull PictureViewHolder holder, Post post) {
+        if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
+            holder.delete.setVisibility(View.VISIBLE);
+            holder.delete.setOnClickListener(v->handleDeletePopUp(v,post));
+            holder.pictureImageView.setOnLongClickListener(v -> {
+                handleDeletePopUp(v,post);
+                return true;
+            });
+        } else {
+            holder.delete.setVisibility(View.GONE);
+        }
+    }
+
+    private void handleDeletePopUp(View v, Post post){
+
+        AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    pictures.remove(post);
+                    notifyItemRemoved(pictures.indexOf(post));
+                    notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
+                    Database.removePost(post);
+                    //TODO: delete image from storage when the mock is removed
+                    //FirebaseStorage storage = FirebaseStorage.getInstance();
+                    //storage.getReferenceFromUrl(post.getImageUrl()).delete();
+                    Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
+                })
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
+        dial.show();
+    }
+
+
+
 
     @Override
     public int getItemCount() {
@@ -114,10 +158,10 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView username;
         public TextView location;
         public ImageView like;
+        public ImageView delete;
+
+
         public boolean isLiked = false;
-
-
-
 
 
         public PictureViewHolder(@NonNull View itemView) {
@@ -128,7 +172,10 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             location = itemView.findViewById(R.id.location);
             profilePicture = itemView.findViewById(R.id.profile_picture);
             like = itemView.findViewById(R.id.like_button);
+            delete = itemView.findViewById(R.id.delete_button);
+
         }
+
     }
 }
 

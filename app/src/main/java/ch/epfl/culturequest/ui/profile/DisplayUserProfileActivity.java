@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,6 +80,9 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         followButton.setOnClickListener(v -> profileViewModel.changeFollow());
 
         binding.settingsButton.setVisibility(View.INVISIBLE);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.pictureGrid.getLayoutParams();
+        params.setMargins(0, 80, 0, 0);
+        binding.pictureGrid.setLayoutParams(params);
 
         List.of(backIcon, homeIcon).forEach(elem -> elem.setVisibility(View.VISIBLE));
         backIcon.setOnClickListener(l -> super.onBackPressed());
