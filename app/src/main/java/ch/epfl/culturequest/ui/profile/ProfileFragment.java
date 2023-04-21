@@ -31,6 +31,8 @@ public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
     private RecyclerView pictureRecyclerView;
     private PictureAdapter pictureAdapter;
+    private TextView level ;
+    private ProgressBar progressBar ;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -48,8 +50,10 @@ public class ProfileFragment extends Fragment {
         final CircleImageView profilePicture = binding.profilePicture;
         final RecyclerView pictureGrid = binding.pictureGrid;
         final View settingsButton = binding.settingsButton;
-        final TextView level = binding.level;
-        final ProgressBar progressBar = binding.progressBar;
+
+        level = binding.level;
+        progressBar = binding.progressBar;
+
 
         profilePlace.setText("Lausanne");
 
@@ -66,16 +70,7 @@ public class ProfileFragment extends Fragment {
             pictureGrid.setLayoutManager(gridLayoutManager);
         });
 
-        profileViewModel.getScore().observe(getViewLifecycleOwner(), score -> {
-            int levelNumber = (int) Math.floor(Math.log10(score));
-            int progress = (int) Math.floor((score - Math.pow(10, levelNumber)) / (Math.pow(10, levelNumber + 1) - Math.pow(10, levelNumber)) * 100);
-            System.out.println("Score: "+score);
-            System.out.println("Level: "+levelNumber);
-            System.out.println("Progress: "+progress);
-            level.setText(Integer.toString(levelNumber));
-            progressBar.setProgress(progress);
-            System.out.println("Progress bar set");
-        });
+        profileViewModel.getScore().observe(getViewLifecycleOwner(), this::handleScore);
 
         // set the onClickListener for the settings button
         settingsButton.setOnClickListener(this::goToSettings);
@@ -89,6 +84,14 @@ public class ProfileFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+
+    private void handleScore(int score){
+        int levelNumber = (int) Math.floor(Math.log10(score));
+        int progress = (int) Math.floor((score - Math.pow(10, levelNumber)) / (Math.pow(10, levelNumber + 1) - Math.pow(10, levelNumber)) * 100);
+        level.setText(Integer.toString(levelNumber));
+        progressBar.setProgress(progress);
     }
 
     /**
