@@ -1,9 +1,12 @@
 package ch.epfl.culturequest.social;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -70,6 +73,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     }
 
     private void handleLike(@NonNull PictureViewHolder holder,Post post){
+        if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
+            holder.like.setVisibility(View.GONE);
+            return;
+        }
+
+        holder.like.setVisibility(View.VISIBLE);
+
         if (post.isLikedBy(Profile.getActiveProfile().getUid())) {
             holder.isLiked = true;
             Picasso.get().load(R.drawable.like_full).into(holder.like);
@@ -128,14 +138,12 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     //TODO: delete image from storage when the mock is removed
                     //FirebaseStorage storage = FirebaseStorage.getInstance();
                     //storage.getReferenceFromUrl(post.getImageUrl()).delete();
-                    Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
+                    final Snackbar snackbar = createSnackbar(v);
+                    snackbar.show();
                 })
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
         dial.show();
     }
-
-
-
 
     @Override
     public int getItemCount() {
@@ -165,9 +173,40 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             profilePicture = itemView.findViewById(R.id.profile_picture);
             like = itemView.findViewById(R.id.like_button);
             delete = itemView.findViewById(R.id.delete_button);
-
         }
 
+    }
+
+    private Snackbar createSnackbar(View v) {
+        LayoutInflater inflater =  LayoutInflater.from(v.getContext());
+        final Snackbar snackbar = Snackbar.make(v, "", Snackbar.LENGTH_LONG);
+
+        // inflate the custom_snackbar_view created previously
+        View customSnackView = inflater.inflate(R.layout.custom_snackbar, null);
+
+        // set the background of the default snackbar as transparent
+        snackbar.getView().setBackgroundColor(Color.TRANSPARENT);
+
+        // now change the layout of the snackbar
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+
+        // set padding of the all corners as 0
+        snackbarLayout.setPadding(0, 0, 0, 0);
+
+        // register the button from the custom_snackbar_view layout file
+        Button bGotoWebsite = customSnackView.findViewById(R.id.gotoWebsiteButton);
+
+        // now handle the same button with onClickListener
+        bGotoWebsite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snackbar.dismiss();
+            }
+        });
+
+        // add the custom snack bar layout to snackbar layout
+        snackbarLayout.addView(customSnackView, 0);
+        return snackbar;
     }
 }
 

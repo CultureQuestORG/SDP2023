@@ -135,7 +135,7 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.username)).perform(typeText("JohnDoe"));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(8000);
-        assertEquals(profile.getUsername(), "JohnDoe");
+        assertEquals("JohnDoe", profile.getUsername());
         // assert  that the URL contains https://firebasestorage.googleapis.com and contains
         assertEquals(DEFAULT_PROFILE_PATH, activity.getProfilePicUri());
     }
