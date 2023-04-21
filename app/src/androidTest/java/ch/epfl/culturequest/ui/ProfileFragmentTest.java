@@ -9,6 +9,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -105,10 +106,23 @@ public class ProfileFragmentTest {
     public void deleteButtonWorks() {
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
 
-        // click in the right corner of the first picture
+        //long click on the first picture should open an alert dialog
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
         // should open an alert dialog
         AlertDialog dialog = PictureAdapter.getLastDialog();
+        assertNotNull(dialog);
+        if (dialog.isShowing()) {
+            try {
+                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).performClick();
+                assertFalse(dialog.isShowing());
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+
+        onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
+
+        dialog = PictureAdapter.getLastDialog();
         assertNotNull(dialog);
         if (dialog.isShowing()) {
             try {
