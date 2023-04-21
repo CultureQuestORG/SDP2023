@@ -63,7 +63,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         List.of(holder.username, holder.profilePicture).forEach(view -> {
             view.setOnClickListener(l ->{
                 Intent intent = new Intent(holder.itemView.getContext(), DisplayUserProfileActivity.class);
-                intent.putExtra("uid", "1");
+                intent.putExtra("uid", post.getUid());
                 holder.itemView.getContext().startActivity(intent);
             });
         });
