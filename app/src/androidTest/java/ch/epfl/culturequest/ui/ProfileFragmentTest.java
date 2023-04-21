@@ -7,6 +7,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.widget.Button;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -34,6 +36,7 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.TreeMap;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
@@ -103,30 +106,32 @@ public class ProfileFragmentTest {
     }
 
     @Test
-    public void deleteButtonWorks() {
+    public void deleteButtonWorks() throws InterruptedException {
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
 
         //long click on the first picture should open an alert dialog
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
         // should open an alert dialog
-        AlertDialog dialog = PictureAdapter.getLastDialog();
+        final AlertDialog dialog = PictureAdapter.getLastDialog();
         assertNotNull(dialog);
         if (dialog.isShowing()) {
             try {
-                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).performClick();
+                // click on the negative button on the ui thread
+                runOnUiThread(() -> dialog.getButton(DialogInterface.BUTTON_NEGATIVE).performClick());
                 assertFalse(dialog.isShowing());
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
 
+
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
 
-        dialog = PictureAdapter.getLastDialog();
+        final AlertDialog dialog2 = PictureAdapter.getLastDialog();
         assertNotNull(dialog);
         if (dialog.isShowing()) {
             try {
-                dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+                runOnUiThread(() -> dialog2.getButton(DialogInterface.BUTTON_POSITIVE).performClick());
                 assertTrue(Database.getPosts(Profile.getActiveProfile().getUid()).join().isEmpty());
             } catch (Throwable e) {
                 e.printStackTrace();
