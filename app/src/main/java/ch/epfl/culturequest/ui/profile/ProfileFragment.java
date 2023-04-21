@@ -24,6 +24,7 @@ import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
+import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
@@ -31,8 +32,6 @@ public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
     private RecyclerView pictureRecyclerView;
     private PictureAdapter pictureAdapter;
-    private TextView level ;
-    private ProgressBar progressBar ;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -51,8 +50,8 @@ public class ProfileFragment extends Fragment {
         final RecyclerView pictureGrid = binding.pictureGrid;
         final View settingsButton = binding.settingsButton;
 
-        level = binding.level;
-        progressBar = binding.progressBar;
+        final TextView level = binding.level;
+        final ProgressBar progressBar = binding.progressBar;
 
 
         profilePlace.setText("Lausanne");
@@ -70,7 +69,8 @@ public class ProfileFragment extends Fragment {
             pictureGrid.setLayoutManager(gridLayoutManager);
         });
 
-        profileViewModel.getScore().observe(getViewLifecycleOwner(), this::handleScore);
+        //handle the score
+        profileViewModel.getScore().observe(getViewLifecycleOwner(), s-> ProfileUtils.handleScore(level,progressBar,s));
 
         // set the onClickListener for the settings button
         settingsButton.setOnClickListener(this::goToSettings);
@@ -86,13 +86,6 @@ public class ProfileFragment extends Fragment {
         binding = null;
     }
 
-
-    private void handleScore(int score){
-        int levelNumber = (int) Math.floor(Math.log10(score));
-        int progress = (int) Math.floor((score - Math.pow(10, levelNumber)) / (Math.pow(10, levelNumber + 1) - Math.pow(10, levelNumber)) * 100);
-        level.setText(Integer.toString(levelNumber));
-        progressBar.setProgress(progress);
-    }
 
     /**
      * Starts the SettingsActivity

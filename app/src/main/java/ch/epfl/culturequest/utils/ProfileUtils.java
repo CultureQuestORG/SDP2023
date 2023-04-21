@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -74,6 +76,14 @@ public class ProfileUtils {
 
     public static Profile getSelectedProfile(){
         return SELECTED_PROFILE;
+    }
+
+
+    public static void handleScore(TextView level, ProgressBar progressBar, int score){
+        int levelNumber = (int) Math.floor(Math.log10(score));
+        int progress = (int) Math.floor((score - Math.pow(10, levelNumber)) / (Math.pow(10, levelNumber + 1) - Math.pow(10, levelNumber)) * 100);
+        level.setText(Integer.toString(levelNumber));
+        progressBar.setProgress(progress);
     }
 
 
