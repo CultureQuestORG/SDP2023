@@ -3,8 +3,10 @@ package ch.epfl.culturequest.ui;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -14,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalMatchers.not;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -107,41 +110,22 @@ public class ProfileFragmentTest {
     }
 
     @Test
-    public void deleteButtonWorks() throws InterruptedException {
+    public void deleteButtonWorks() {
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
 
         //long click on the first picture should open an alert dialog
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
         // should open an alert dialog
-        final AlertDialog dialog = PictureAdapter.getLastDialog();
-        assertNotNull(dialog);
-        if (dialog.isShowing()) {
-            try {
-                // click on the negative button on the ui thread
-                runOnUiThread(() -> dialog.getButton(DialogInterface.BUTTON_NEGATIVE).performClick());
-                assertFalse(dialog.isShowing());
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-
+        onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
+        onView(withText("No")).perform(click());
+        onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
+        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
 
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
-
-        final AlertDialog dialog2 = PictureAdapter.getLastDialog();
-        assertNotNull(dialog2);
-        if (dialog2.isShowing()) {
-            try {
-                runOnUiThread(() -> dialog2.getButton(DialogInterface.BUTTON_POSITIVE).performClick());
-                assertTrue(Database.getPosts(Profile.getActiveProfile().getUid()).join().isEmpty());
-                // check that the pictureGrid has no child
-                onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
-
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-
-
+        onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
+        onView(withText("Yes")).perform(click());
+        onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
+        assertEquals(0, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+        onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
     }
 }

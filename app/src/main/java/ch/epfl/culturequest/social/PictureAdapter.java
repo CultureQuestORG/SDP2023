@@ -25,8 +25,6 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     private final List<Post> pictures;
 
-    private static AlertDialog lastDialog;
-
     public PictureAdapter(List<Post> pictures) {
         if (pictures == null) {
             throw new IllegalArgumentException("pictures cannot be null");
@@ -133,14 +131,10 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
                 })
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
-        lastDialog = dial;
         dial.show();
     }
 
 
-    public static AlertDialog getLastDialog() {
-        return lastDialog;
-    }
 
 
     @Override
