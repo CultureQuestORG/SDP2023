@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EDECED"
+    android:background="#D9C2A6"
     android:id="@+id/homeFragment"
     tools:context=".ui.home.HomeFragment"
     tools:visibility="visible">

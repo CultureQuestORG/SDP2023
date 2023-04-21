@@ -70,7 +70,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     }
 
-    private void handleLike(@NonNull PictureViewHolder holder, Post post) {
+    private void handleLike(@NonNull PictureViewHolder holder,Post post){
         if (post.isLikedBy(Profile.getActiveProfile().getUid())) {
             holder.isLiked = true;
             Picasso.get().load(R.drawable.like_full).into(holder.like);
@@ -83,13 +83,21 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         holder.like.setOnClickListener(v -> {
             if (holder.isLiked) {
                 holder.isLiked = false;
-                post.removeLike(Profile.getActiveProfile().getUid());
+                Database.removeLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
+                    if (throwable != null) {
+                        post.setLikers(aVoid.getLikers());
+                    }
+                });
                 Picasso.get()
                         .load(R.drawable.like_empty)
                         .into(holder.like);
             } else {
                 holder.isLiked = true;
-                post.addLike(Profile.getActiveProfile().getUid());
+                Database.addLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
+                    if (throwable != null) {
+                        post.setLikers(aVoid.getLikers());
+                    }
+                });
                 Picasso.get().load(R.drawable.like_full).into(holder.like);
             }
         });

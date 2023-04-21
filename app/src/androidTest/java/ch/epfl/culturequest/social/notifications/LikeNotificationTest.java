@@ -22,7 +22,7 @@ public class LikeNotificationTest {
     // Tests that the like notification is correctly created
     @Test
     public void testLikeNotification() {
-        Profile.setActiveProfile(new Profile("test", "Likee", "test", "test", "test", "test", List.of(), new ArrayList<>(),0));
+        Profile.setActiveProfile(new Profile("test", "Likee", "test", "test", "test", "test",0));
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         android.app.Notification likeNotification = new LikeNotification("Liker").get(context);

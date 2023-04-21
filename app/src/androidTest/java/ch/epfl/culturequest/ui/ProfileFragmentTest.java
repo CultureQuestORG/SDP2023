@@ -47,15 +47,12 @@ public class ProfileFragmentTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
         // clear the database before starting the following tests
         Database.clearDatabase();
-
-        // add EspressoIdlingResource to the IdlingRegistry
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
 
         Post post = new Post("abc", "123",
                 "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
@@ -63,8 +60,7 @@ public class ProfileFragmentTest {
 
         Database.uploadPost(post);
 
-        profile = new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", new ArrayList<>(), new ArrayList<>(), 10);
-        profile.setPosts(new ArrayList<>(Collections.singleton(post)));
+        profile = new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", 10);
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 
@@ -76,13 +72,12 @@ public class ProfileFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
+
+        Thread.sleep(8000);
     }
 
     @After
     public void tearDown() {
-        // remove EspressoIdlingResource from the IdlingRegistry
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-
         // clear the database after the tests
         Database.clearDatabase();
     }

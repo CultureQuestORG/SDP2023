@@ -35,16 +35,11 @@ public class DisplayUserProfileTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
-        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", new ArrayList<>(), new ArrayList<>(), 0));
-
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
+        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0));
     }
 
     @After
     public void tearDown() {
-        // remove EspressoIdlingResource from the IdlingRegistry
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-
         // clear the database after finishing the tests
         Database.clearDatabase();
     }
@@ -52,7 +47,7 @@ public class DisplayUserProfileTest {
     @Test
     public void backButtonIsVisible() {
         ProfileUtils.setSelectedProfile(
-                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", new ArrayList<>(), new ArrayList<>(), 0));
+                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0));
         ActivityScenario.launch(DisplayUserProfileActivity.class);
         onView(withId(R.id.back_button)).check(matches(isClickable()));
     }
@@ -60,7 +55,7 @@ public class DisplayUserProfileTest {
     @Test
     public void homeButtonIsVisible() {
         ProfileUtils.setSelectedProfile(
-                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", new ArrayList<>(), new ArrayList<>(), 0));
+                new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0));
         ActivityScenario.launch(DisplayUserProfileActivity.class);
         onView(withId(R.id.home_icon)).check(matches(isClickable()));
     }

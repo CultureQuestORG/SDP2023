@@ -14,15 +14,14 @@ import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.ProfileUtils;
@@ -35,7 +34,21 @@ public class DisplayUserProfileActivityTest {
 
     @BeforeClass
     public static void setUp() {
-        ProfileUtils.setSelectedProfile(new Profile("uid", "name", "username", "email", "phone", "photo", new ArrayList<>(), new ArrayList<>(), 3));
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+
+        // Initialize the database with some test profiles
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400);
+        Profile.setActiveProfile(activeProfile);
+
+        Profile profile1 = new Profile("uid", "name", "username", "email", "phone", "photo", 3);
+        ProfileUtils.setSelectedProfile(profile1);
+
+        Database.setProfile(profile1);
+        Database.setProfile(activeProfile);
     }
 
     @Test
@@ -55,9 +68,14 @@ public class DisplayUserProfileActivityTest {
     }
 
     @Test
-    public void textViewDisplaysUnfollowButton() {
+    public void textViewDisplaysUnfollowButton() throws InterruptedException {
         onView(withId(R.id.profileFollowText)).check(matches(withText("Follow")));
         onView(withId(R.id.profileFollowButton)).perform(click());
         onView(withId(R.id.profileFollowText)).check(matches(withText("Unfollow")));
+    }
+
+    @After
+    public void tearDown() {
+        Database.clearDatabase();
     }
 }
