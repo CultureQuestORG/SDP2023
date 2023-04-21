@@ -1,11 +1,13 @@
 package ch.epfl.culturequest.ui.profile;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +32,7 @@ public class ProfileFragment extends Fragment {
     private RecyclerView pictureRecyclerView;
     private PictureAdapter pictureAdapter;
 
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         ProfileViewModelFactory factory = new ProfileViewModelFactory(FirebaseAuth.getInstance().getUid());
@@ -45,6 +48,8 @@ public class ProfileFragment extends Fragment {
         final CircleImageView profilePicture = binding.profilePicture;
         final RecyclerView pictureGrid = binding.pictureGrid;
         final View settingsButton = binding.settingsButton;
+        final TextView level = binding.level;
+        final ProgressBar progressBar = binding.progressBar;
 
         profilePlace.setText("Lausanne");
 
@@ -59,6 +64,17 @@ public class ProfileFragment extends Fragment {
             // Set the layout manager for the RecyclerView
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
             pictureGrid.setLayoutManager(gridLayoutManager);
+        });
+
+        profileViewModel.getScore().observe(getViewLifecycleOwner(), score -> {
+            int levelNumber = (int) Math.floor(Math.log10(score));
+            int progress = (int) Math.floor((score - Math.pow(10, levelNumber)) / (Math.pow(10, levelNumber + 1) - Math.pow(10, levelNumber)) * 100);
+            System.out.println("Score: "+score);
+            System.out.println("Level: "+levelNumber);
+            System.out.println("Progress: "+progress);
+            level.setText(Integer.toString(levelNumber));
+            progressBar.setProgress(progress);
+            System.out.println("Progress bar set");
         });
 
         // set the onClickListener for the settings button

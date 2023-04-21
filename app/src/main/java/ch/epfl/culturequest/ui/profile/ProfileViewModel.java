@@ -22,6 +22,8 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<List<Post>> pictures;
     private final MutableLiveData<Boolean> followed;
 
+    private final MutableLiveData<Integer> score;
+
     Profile profile = Profile.getActiveProfile();
     Profile selectedProfile = ProfileUtils.getSelectedProfile();
 
@@ -34,12 +36,15 @@ public class ProfileViewModel extends ViewModel {
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
         followed = new MutableLiveData<>();
+        score = new MutableLiveData<>();
 
         EspressoIdlingResource.increment();
         if (profile != null) {
             if (selectedProfile != null && selectedProfile.getUid().equals(uid)) {
                 username.setValue(selectedProfile.getUsername());
+                score.setValue(selectedProfile.getScore());
                 profilePictureUri.setValue(selectedProfile.getProfilePicture());
+
                 // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
                 // a time, but it is computationally more efficient to do 1 big query:
                 //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
@@ -65,6 +70,7 @@ public class ProfileViewModel extends ViewModel {
                         //set the values of the live data
                         username.setValue(profile.getUsername());
                         profilePictureUri.setValue(profile.getProfilePicture());
+                        score.setValue(profile.getScore());
                         pictures.setValue(posts);
                     }
                 });
@@ -73,6 +79,7 @@ public class ProfileViewModel extends ViewModel {
                     Profile p = (Profile) profileObject;
                     username.postValue(p.getUsername());
                     profilePictureUri.postValue(p.getProfilePicture());
+                    score.postValue(p.getScore());
 //                    pictures.postValue(p.getPosts());
                 });
             }
@@ -100,6 +107,13 @@ public class ProfileViewModel extends ViewModel {
      */
     public LiveData<List<Post>> getPosts() {
         return pictures;
+    }
+
+    /**
+     * @return the score of the profile
+     */
+    public LiveData<Integer> getScore() {
+        return score;
     }
 
     public LiveData<Boolean> getFollowed() {
