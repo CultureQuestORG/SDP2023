@@ -164,5 +164,18 @@
             app:layout_constraintVertical_bias="0.255" />
     </RelativeLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="177dp"
+        android:layout_height="15dp"
+        android:indeterminateDrawable="@drawable/progress_bar_shape"
+        android:progress="25"
+        android:progressDrawable="@drawable/progress_bar_shape"
+
+        app:layout_constraintBottom_toBottomOf="@+id/profilePicture"
+        app:layout_constraintStart_toEndOf="@+id/profilePicture" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
