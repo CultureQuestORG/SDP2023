@@ -3,18 +3,33 @@ package ch.epfl.culturequest.ui;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalMatchers.not;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.widget.Button;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.After;
@@ -24,9 +39,12 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.TreeMap;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.ProfileFragment;
@@ -89,5 +107,25 @@ public class ProfileFragmentTest {
 
         onView(withId(R.id.settingsButton)).perform(click());
         onView(withId(R.id.log_out)).check(matches(isEnabled()));
+    }
+
+    @Test
+    public void deleteButtonWorks() {
+        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+
+        //long click on the first picture should open an alert dialog
+        onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
+        // should open an alert dialog
+        onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
+        onView(withText("No")).perform(click());
+        onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
+        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+
+        onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
+        onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
+        onView(withText("Yes")).perform(click());
+        onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
+        assertEquals(0, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+        onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
     }
 }
