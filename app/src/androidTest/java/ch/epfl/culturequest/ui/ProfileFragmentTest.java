@@ -103,7 +103,7 @@ public class ProfileFragmentTest {
 
     @Test
     public void deleteButtonWorks() {
-        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).orTimeout(10, java.util.concurrent.TimeUnit.SECONDS).join()).size());
+        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
 
         // click in the right corner of the first picture
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
@@ -113,7 +113,7 @@ public class ProfileFragmentTest {
         if (dialog.isShowing()) {
             try {
                 dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-                assertTrue(Database.getPosts(Profile.getActiveProfile().getUid()).orTimeout(10, java.util.concurrent.TimeUnit.SECONDS).join().isEmpty());
+                assertTrue(Database.getPosts(Profile.getActiveProfile().getUid()).join().isEmpty());
             } catch (Throwable e) {
                 e.printStackTrace();
             }
