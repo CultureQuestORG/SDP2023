@@ -4,6 +4,7 @@ package ch.epfl.culturequest.ui;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -133,6 +134,9 @@ public class ProfileFragmentTest {
             try {
                 runOnUiThread(() -> dialog2.getButton(DialogInterface.BUTTON_POSITIVE).performClick());
                 assertTrue(Database.getPosts(Profile.getActiveProfile().getUid()).join().isEmpty());
+                // check that the pictureGrid has no child
+                onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
+
             } catch (Throwable e) {
                 e.printStackTrace();
             }
