@@ -1,72 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="99dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="52dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="60dp"
+        android:fontFamily="@font/poppins_bold"
         android:text="Settings"
-        android:textColor="#323232"
-        android:textSize="24sp"
+        android:textColor="@color/colorPrimary"
+        android:textSize="28sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_picture"
-        android:layout_width="193dp"
-        android:layout_height="158dp"
-        android:layout_marginStart="162dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="159dp"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="200dp"
+        android:layout_marginEnd="100dp"
         android:onClick="selectProfilePicture"
         android:src="@drawable/plus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/profile_pic_text"
-        android:layout_width="224dp"
-        android:layout_height="29dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:paddingStart="10dp"
         android:text="@string/update_profile_picture"
-        android:textSize="20sp"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/grey"
+        android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_picture" />
 
+    <TextView
+        android:id="@+id/username_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:fontFamily="@font/poppins"
+        android:text="@string/username"
+        android:textColor="@color/grey"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/username"
+        app:layout_constraintStart_toStartOf="@+id/username" />
+
     <EditText
         android:id="@+id/username"
         android:layout_width="320dp"
-        android:layout_height="52dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/my_border"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/rounded_bg"
+        android:backgroundTint="@color/grey"
         android:ems="10"
+        android:fontFamily="@font/poppins"
         android:hint="@string/username"
         android:inputType="textPersonName"
         android:padding="10dp"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.386"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_pic_text" />
 
     <Button
         android:id="@+id/update_profile"
-        android:layout_width="397dp"
-        android:layout_height="65dp"
-        android:layout_marginBottom="52dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="30dp"
         android:background="@drawable/rounded_button"
         android:onClick="createProfile"
         android:text="@string/update_profile"
+        android:textAllCaps="false"
+        android:fontFamily="@font/poppins_semibold"
+        android:textColor="@color/white"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -74,12 +97,17 @@
 
     <Button
         android:id="@+id/log_out"
-        android:layout_width="397dp"
-        android:layout_height="65dp"
-        android:layout_marginBottom="20dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/rounded_button"
         android:onClick="createProfile"
+        android:textAllCaps="false"
         android:text="@string/log_out"
+        android:fontFamily="@font/poppins_semibold"
+        android:textColor="@color/white"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/update_profile"
         app:layout_constraintEnd_toEndOf="parent"
@@ -87,11 +115,11 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="157dp"
-        android:layout_height="105dp"
-        android:layout_marginStart="104dp"
-        android:layout_marginTop="28dp"
-        app:layout_constraintStart_toEndOf="@+id/textView"
+        android:layout_width="139dp"
+        android:layout_height="82dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/logo_compact" />
 

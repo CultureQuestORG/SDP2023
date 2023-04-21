@@ -25,7 +25,7 @@ public class ArtImageUpload {
         ByteArrayInputStream baos = new ByteArrayInputStream(bitmapImage.toString().getBytes());
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmapImage.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+        bitmapImage.compress(Bitmap.CompressFormat.WEBP, 80, bos);
         byte[] bitmapdata = bos.toByteArray();
         ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
 

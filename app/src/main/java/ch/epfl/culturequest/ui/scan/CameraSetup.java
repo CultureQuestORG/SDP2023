@@ -127,12 +127,6 @@ public class CameraSetup {
         planes[0].getBuffer().get(data);
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, null);
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.WEBP, 70, out);
-
-        byte[] bytes = out.toByteArray();
-        bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
         //We rotate the image
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
