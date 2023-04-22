@@ -99,6 +99,7 @@ public class SettingsActivity extends AppCompatActivity {
         // if the profile picture has not been changed, we don't need to upload it again
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
+            Profile.setActiveProfile(activeProfile);
             finish();
             EspressoIdlingResource.decrement();
             return;
@@ -111,6 +112,7 @@ public class SettingsActivity extends AppCompatActivity {
                         throwable.printStackTrace();
                     } else {
                         Database.setProfile(profile);
+                        Profile.setActiveProfile(profile);
                     }
 
                     finish();
