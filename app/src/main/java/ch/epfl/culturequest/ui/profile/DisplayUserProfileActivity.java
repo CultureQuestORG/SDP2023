@@ -64,7 +64,9 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         final RecyclerView pictureGrid = binding.pictureGrid;
 
         final TextView level = binding.level;
+        final TextView levelText= binding.levelText;
         final ProgressBar progressBar = binding.progressBar;
+
 
 
         profileViewModel.getUsername().observe(this, textView::setText);
@@ -75,7 +77,7 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
             GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
             pictureGrid.setLayoutManager(gridLayoutManager);
         });
-        profileViewModel.getScore().observe(this, s-> ProfileUtils.handleScore(level,progressBar,s));
+        profileViewModel.getScore().observe(this, s-> ProfileUtils.handleScore(level,levelText,progressBar,s));
 
 
         setContentView(root);
@@ -84,6 +86,7 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
 
         final TextView profilePlace = binding.profilePlace;
         profilePlace.setText("Lausanne");
+
 
         followButton = new FollowButton(binding.profileFollowButton);
         profileViewModel.getFollowed().observe(this, followButton::setFollowed);

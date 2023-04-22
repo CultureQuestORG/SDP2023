@@ -31,7 +31,6 @@ public class ProfileUtils {
     public static int DEFAULT_POST_LIMIT = 4, DEFAULT_POST_OFFSET = 0;
 
 
-
     public static final String GALLERY_PERMISSION =
             //Version code R is android 11.
             Build.VERSION.SDK_INT > Build.VERSION_CODES.R ?
@@ -79,10 +78,23 @@ public class ProfileUtils {
     }
 
 
-    public static void handleScore(TextView level, ProgressBar progressBar, int score){
-        int levelNumber = (int) Math.floor(Math.log10(score));
-        int progress = (int) Math.floor((score - Math.pow(10, levelNumber)) / (Math.pow(10, levelNumber + 1) - Math.pow(10, levelNumber)) * 100);
+    public static void handleScore(TextView level,TextView levelText, ProgressBar progressBar, int score){
+
+
+        int levelNumber = (int) Math.floor(Math.pow(score, 1.0/3.0));
+
+
+        int pointsfromlastlevel = (int) (Math.pow(levelNumber, 3));
+        int pointstolevelup = (int) (Math.pow(levelNumber + 1, 3));
+        int pointsfromlevelup = pointstolevelup - pointsfromlastlevel;
+        int pointsfromlastlevelup = score - pointsfromlastlevel;
+        int progress = (int) ((pointsfromlastlevelup * 100) / pointsfromlevelup);
+
+
+
+
         level.setText(Integer.toString(levelNumber));
+        levelText.setText(Integer.toString(pointsfromlastlevelup) + "/" + Integer.toString(pointsfromlevelup)+ " points");
         progressBar.setProgress(progress);
     }
 

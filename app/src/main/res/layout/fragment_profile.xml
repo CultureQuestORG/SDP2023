@@ -187,5 +187,14 @@
         android:layout_marginBottom="5dp"
         />
 
+    <TextView
+        android:id="@+id/levelText"
+        android:layout_width="112dp"
+        android:layout_height="17dp"
+        android:layout_marginBottom="5dp"
+        android:textColor="#FFF27329"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintEnd_toStartOf="@+id/level" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

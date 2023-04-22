@@ -51,6 +51,7 @@ public class ProfileFragment extends Fragment {
         final View settingsButton = binding.settingsButton;
 
         final TextView level = binding.level;
+        final TextView levelText = binding.levelText;
         final ProgressBar progressBar = binding.progressBar;
 
 
@@ -70,7 +71,7 @@ public class ProfileFragment extends Fragment {
         });
 
         //handle the score
-        profileViewModel.getScore().observe(getViewLifecycleOwner(), s-> ProfileUtils.handleScore(level,progressBar,s));
+        profileViewModel.getScore().observe(getViewLifecycleOwner(), s-> ProfileUtils.handleScore(level,levelText,progressBar,s));
 
         // set the onClickListener for the settings button
         settingsButton.setOnClickListener(this::goToSettings);
