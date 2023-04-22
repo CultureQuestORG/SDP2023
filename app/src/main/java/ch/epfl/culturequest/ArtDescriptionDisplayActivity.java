@@ -4,7 +4,6 @@ import static ch.epfl.culturequest.social.RarityLevel.getRarityLevel;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -12,18 +11,9 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.OutputStream;
 
-import ch.epfl.culturequest.backend.LocalStorage;
-import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
-import ch.epfl.culturequest.backend.artprocessing.utils.ArtImageUpload;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.social.ScanBadge;
 

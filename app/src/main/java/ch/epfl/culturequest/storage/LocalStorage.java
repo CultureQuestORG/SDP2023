@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.backend;
+package ch.epfl.culturequest.storage;
 
 import static android.graphics.Bitmap.CompressFormat.JPEG;
 

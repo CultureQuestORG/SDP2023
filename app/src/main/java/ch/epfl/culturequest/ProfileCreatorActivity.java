@@ -2,9 +2,7 @@ package ch.epfl.culturequest;
 
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,20 +17,18 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
-import ch.epfl.culturequest.utils.ProfileUtils;
 import ch.epfl.culturequest.utils.PermissionRequest;
+import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -96,7 +92,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         String username = textView.getText().toString();
 
         //check if username is valid
-        if (!ProfileUtils.isValid(profile,username)) {
+        if (!ProfileUtils.isValid(profile, username)) {
             textView.setText("");
             textView.setHint(INCORRECT_USERNAME_FORMAT);
             return;
@@ -104,17 +100,32 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
         setDefaultPicIfNoneSelected();
 
+        profile.setUsername(username);
+        profile.setUid(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
+
+        //if user is anonymous, we don't want to store the profile in the database
         if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
-            profile.setUsername(username);
-            //if the profile pic is the default one, we don't have to store it in the database
-            if ((profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PATH)))
-                storeProfileInDatabase(ProfileUtils.DEFAULT_PROFILE_PATH);
-             else
-                storeImageAndProfileInDatabase();
-        } else{
+
+            //if the profile picture is not the default one, we store it in the storage
+            if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PATH))
+                FireStorage.storeNewProfilePictureInStorage(profile, profilePicUri).whenComplete(
+                        (profile, throwable) -> {
+                            if (throwable != null) {
+                                throwable.printStackTrace();
+                            } else {
+                                Database.setProfile(profile);
+                                Profile.setActiveProfile(profile);
+                            }
+                        }
+                );
+            // if the profile picture is the default one, we don't need to store it in the storage
+            else {
+                Database.setProfile(profile);
+                Profile.setActiveProfile(profile);
+            }
+
+        } else {
             //if user is anonymous, we don't want to store the profile in the database
-            profile.setUsername(username);
-            profile.setProfilePicture(profilePicUri);
             Profile.setActiveProfile(profile);
         }
 
@@ -122,39 +133,22 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         startActivity(successfulProfileCreation);
     }
 
-
-
-    private void storeProfileInDatabase(String path) {
-        profile.setProfilePicture(path);
-        Profile.setActiveProfile(profile);
-        Database.setProfile(profile);
-    }
-
-    private void storeImageAndProfileInDatabase() {
-        //upload image to firebase storage
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
-        // on failure, store profile with default profile pic
-        task.addOnFailureListener(e -> storeProfileInDatabase(ProfileUtils.DEFAULT_PROFILE_PATH))
-                .addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnFailureListener(e -> storeProfileInDatabase(ProfileUtils.DEFAULT_PROFILE_PATH)).addOnSuccessListener(uri -> storeProfileInDatabase(uri.toString())));
-    }
-
-
     private void openGallery() {
         profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
     }
 
 
-
     private void setDefaultPicIfNoneSelected() {
         if (profileView.getDrawable().equals(initialDrawable)) {
             profilePicUri = ProfileUtils.DEFAULT_PROFILE_PATH;
+            profile.setProfilePicture(profilePicUri);
         }
     }
 
 
     /**
      * Displays the profile picture selected by the user
+     *
      * @param result the result of the activity launched to select the profile picture
      */
     public void displayProfilePic(ActivityResult result) {
@@ -171,6 +165,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
     /**
      * Getter for the profile being created
+     *
      * @return the profile being created
      */
     public Profile getProfile() {

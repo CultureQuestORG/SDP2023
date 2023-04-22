@@ -18,17 +18,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
-
-import java.util.Objects;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
@@ -68,6 +64,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         activeProfile = Profile.getActiveProfile();
 
+        // if the user is not logged in, we can't display the settings so we finish the activity
+        if (activeProfile == null) {
+            finish();
+            return;
+        }
+
         username = binding.username;
         username.setText(activeProfile.getUsername());
 
@@ -102,16 +104,19 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO: fix this with the emulator for next sprint
         // Upload the new profile picture and update the profile
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
-        task.addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnSuccessListener(uri -> {
-            activeProfile.setProfilePicture(uri.toString());
-            Database.setProfile(activeProfile);
-            finish();
-            EspressoIdlingResource.decrement();
-        }));
+        FireStorage.storeNewProfilePictureInStorage(activeProfile, profilePicUri).whenComplete(
+                (profile, throwable) -> {
+                    if (throwable != null) {
+                        throwable.printStackTrace();
+                    } else {
+                        Database.setProfile(profile);
+                    }
+
+                    finish();
+                    EspressoIdlingResource.decrement();
+                }
+        );
     }
 
     /**

@@ -9,22 +9,16 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.view.View;
-import android.widget.ImageView;
 
-import androidx.annotation.DrawableRes;
-import androidx.core.content.ContextCompat;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 
-import ch.epfl.culturequest.backend.LocalStorage;
+import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.backend.artprocessingtest.ArtImageUploadTest;
 
 public class ArtDescriptionDisplayActivityTest1 {
