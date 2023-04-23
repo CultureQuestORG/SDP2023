@@ -174,17 +174,23 @@
 
     <TextView
         android:id="@+id/level"
-        android:layout_width="43dp"
-        android:layout_height="43dp"
-        android:background="@drawable/orange_circle"
-        android:ems="10"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/map_icon_frame"
+        android:fontFamily="@font/poppins"
         android:gravity="center"
+
+        android:paddingTop="1dp"
+        android:shadowDx="0"
+        android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="30sp"
-        android:fontFamily="@font/poppins_bold"
+        android:textIsSelectable="false"
+        android:textSize="18sp"
+        app:drawableTint="@color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="@+id/progressBar"
-        android:layout_marginBottom="5dp"
         />
 
     <TextView
