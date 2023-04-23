@@ -1,7 +1,9 @@
 package ch.epfl.culturequest;
 
 import static ch.epfl.culturequest.social.RarityLevel.getRarityLevel;
+import static ch.epfl.culturequest.utils.ProfileUtils.postsAdded;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.database.Cursor;
@@ -9,8 +11,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.w3c.dom.Text;
 
@@ -19,26 +27,35 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
 
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.artprocessing.utils.ArtImageUpload;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
+import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Post;
+import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.ScanBadge;
+import ch.epfl.culturequest.utils.ProfileUtils;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     private Bitmap scannedImage;
 
+    private Button postButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
 
         findViewById(R.id.back_button).setOnClickListener(view -> finish());
-
+        postButton = findViewById(R.id.post_button);
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
         String imageUriExtra = getIntent().getStringExtra("imageUri");
         Uri imageUri = Uri.parse(imageUriExtra);
@@ -53,6 +70,9 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             ImageView imageView = findViewById(R.id.artImage);
             imageView.setImageBitmap(scannedImage);
             displayArtInformation(artDescription);
+            postButton.setOnClickListener(v -> {
+                uploadImageToDatabase(imageUri, artDescription.getName());
+            });
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -149,5 +169,46 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             museumBadge.setVisibility(ImageView.GONE);
             museumText.setVisibility(TextView.GONE);
         }
+    }
+
+    /**
+     * Uploads an image to the database when the user presses on the post button. While the images/ folder in the folder is not emptied, we create a folder test
+     * with subfolders for each user and in it the post ids of the images. This way it is easy to categorise images per user.
+     *
+     * @param uri         the uri to upload
+     * @param artworkName the name of the artwork
+     */
+    private void uploadImageToDatabase(Uri uri, String artworkName) {
+        String postId = UUID.randomUUID().toString();
+        String uid = Profile.getActiveProfile().getUid();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference fileRef = storage.getReference().child("test/" + uid + "/" + postId);
+        UploadTask task = fileRef.putFile(uri);
+        task.addOnSuccessListener(taskSnapshot -> {
+            storage.getReference()
+                    .child("test/" + uid + "/" + postId)
+                    .getDownloadUrl()
+                    .addOnSuccessListener(URI -> {
+                        Post post = new Post(postId, uid, URI.toString(), artworkName, new Date().getTime(), 0, new ArrayList<>());
+                        Database.uploadPost(post).thenAccept(done ->  {
+                            // we add then accept so that we are sure the post is uploaded before the user rushes back to the app and checks
+                            //their profile to find the post isnt there
+                            if (done.get()) {
+                                postsAdded.setValue(postsAdded.getValue()+1);
+                                finish();
+                            }
+                        });
+                    });
+        }).addOnFailureListener(exception -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Error")
+                    .setMessage("Couldn't post picture")
+                    .setCancelable(false)
+                    .setPositiveButton("Cancel", (dialog, which) -> {
+                        dialog.dismiss();
+                    });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        });
     }
 }

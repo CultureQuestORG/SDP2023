@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -15,41 +14,31 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.UploadTask;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.UUID;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.backend.artprocessing.utils.UploadAndProcess;
-import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
-import ch.epfl.culturequest.social.Post;
-import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.ui.commons.LoadingAnimation;
+import ch.epfl.culturequest.utils.PermissionRequest;
 
 public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
     private CameraSetup cameraSetup;
+
     private LoadingAnimation loadingAnimation;
 
     //SurfaceTextureListener is used to detect when the TextureView is ready to be used
@@ -84,27 +73,6 @@ public class ScanFragment extends Fragment {
 
                             UploadAndProcess.uploadAndProcess(bitmap).thenAccept(artDescription -> {
                                 Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
-                                String postId = UUID.randomUUID().toString();
-                                String uid = Profile.getActiveProfile().getUid();
-                                String artworkName = artDescription.getName();
-                                FirebaseStorage storage = FirebaseStorage.getInstance();
-                                UploadTask task = storage.getReference()
-                                        .child("images")
-                                        .child(uid)
-                                        .putFile(Uri.parse(lastlyStoredImageUri.toString()));
-
-                                task.addOnSuccessListener(taskSnapshot -> {
-                                    storage.getReference()
-                                            .child("images")
-                                            .child(uid)
-                                            .getDownloadUrl()
-                                            .addOnSuccessListener(uri -> {
-                                                Post post = new Post(postId, uid, uri.toString(), artworkName, new Date().getTime(), 0, new ArrayList<>());
-                                                Database.uploadPost(post);
-                                            });
-                                }); //.addOnFailureListener() --- show popup message saying we couldnt upload post
-
-
                                 Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
                                 String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
                                 intent.putExtra("artDescription", serializedArtDescription);
