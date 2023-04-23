@@ -2,12 +2,6 @@ package ch.epfl.culturequest;
 
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -17,6 +11,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
@@ -47,13 +47,10 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView username;
 
 
-    private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            this.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
-                    isGranted -> {
-                        if (isGranted) openGallery();
-                    });
+    private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
+    private final ActivityResultLauncher<String> requestPermissionLauncher = this.registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        if (isGranted) openGallery();
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +63,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         //handle logout
         Button logoutButton = binding.logOut;
-        Authenticator auth= new Authenticator(this, false);
+        Authenticator auth = new Authenticator(this, false);
         logoutButton.setOnClickListener(v -> auth.signOut());
 
         activeProfile = Profile.getActiveProfile();
@@ -87,6 +84,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void UpdateProfile(View v) {
         EspressoIdlingResource.increment();
+
         // Check if the username is valid
         if (!ProfileUtils.isValid(activeProfile, username.getText().toString())) {
             username.setText("");
@@ -104,36 +102,31 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
+        // TODO: fix this with the emulator for next sprint
         // Upload the new profile picture and update the profile
         FirebaseStorage storage = FirebaseStorage.getInstance();
         UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
-        task.addOnSuccessListener(taskSnapshot ->
-                storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().
-                addOnSuccessListener(uri -> {
-                    activeProfile.setProfilePicture(uri.toString());
-                    Database.setProfile(activeProfile);
-                    finish();
-                    EspressoIdlingResource.decrement();
-                }));
-
-
+        task.addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnSuccessListener(uri -> {
+            activeProfile.setProfilePicture(uri.toString());
+            Database.setProfile(activeProfile);
+            finish();
+            EspressoIdlingResource.decrement();
+        }));
     }
 
     /**
      * Displays the profile picture selected by the user
+     *
      * @param result the result of the activity launched to select the profile picture
      */
     private void displayProfilePic(ActivityResult result) {
-        if (result.getResultCode() != RESULT_OK)
-            return;
+        if (result.getResultCode() != RESULT_OK) return;
 
         Intent data = result.getData();
-        if (data == null)
-            return;
+        if (data == null) return;
 
         Uri selectedImage = data.getData();
-        if (selectedImage == null)
-            return;
+        if (selectedImage == null) return;
 
         Picasso.get().load(selectedImage).into(profilePictureView);
         profilePicUri = selectedImage.toString();
@@ -142,6 +135,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     /**
      * Opens the gallery to select a profile picture
+     *
      * @param view the view that was clicked
      */
     public void selectProfilePicture(View view) {

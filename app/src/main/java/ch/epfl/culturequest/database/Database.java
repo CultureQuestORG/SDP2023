@@ -135,14 +135,17 @@ public class Database {
      */
     public static CompletableFuture<Integer> getRankFriends(String UId) {
         CompletableFuture<Integer> future = new CompletableFuture<>();
-        getProfile(UId).whenComplete((profile, e) -> {
-            if (profile == null) {
-                future.completeExceptionally(new RuntimeException("User not found"));
+        getFollowed(UId).whenComplete((followed, e) -> {
+            if (followed == null || followed.getFollowed().isEmpty()) {
+                future.complete(1);
                 return;
             }
 
-            getTopNFriendsProfiles(profile.getFriends().size() + 1).whenComplete((friendsProfiles, e2) -> {
+            System.out.println("Following " + followed.getFollowed().size());
+
+            getTopNFriendsProfiles(followed.getFollowed().size() + 1).whenComplete((friendsProfiles, e2) -> {
                 if (friendsProfiles == null) {
+                    System.out.println("Error 1");
                     future.completeExceptionally(new RuntimeException("User not found"));
                     return;
                 }
@@ -151,7 +154,8 @@ public class Database {
                 if (rank != -1) {
                     future.complete(rank);
                 } else {
-                    future.completeExceptionally(new RuntimeException("User not found"));
+                    System.out.println("Error 2");
+                    future.completeExceptionally(new RuntimeException("User not found in ranking"));
                 }
 
             });
@@ -218,32 +222,37 @@ public class Database {
     public static CompletableFuture<List<Profile>> getTopNFriendsProfiles(int n) {
         DatabaseReference usersRef = databaseInstance.getReference("users");
         CompletableFuture<List<Profile>> future = new CompletableFuture<>();
-        List<String> friends = Profile.getActiveProfile().getFriends();
-        List<Profile> profilesList = new ArrayList<>();
+        Profile.getActiveProfile().retrieveFriends().thenAccept(friends -> {
+            //the list of profiles to return (the top n profiles)
+            List<Profile> profilesList = new ArrayList<>();
 
-        //if the user does not have any friends, no need to fetch the database
-        if (friends == null || friends.isEmpty()) {
-            profilesList.add(Profile.getActiveProfile());
-            future.complete(profilesList);
-            return future;
-        }
-
-        usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-
-                for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                    Profile profile = snapshot.getValue(Profile.class);
-                    if (profile != null && (friends.contains(profile.getUid()) || profile.getUid().equals(Profile.getActiveProfile().getUid()))) {
-                        profilesList.add(profile);
-                    }
-                }
-                List<Profile> topNProfiles = profilesList.subList(0, Math.min(n, profilesList.size()));
-                topNProfiles.sort((p1, p2) -> p2.getScore().compareTo(p1.getScore()));
-                future.complete(topNProfiles);
-            } else {
-                future.completeExceptionally(task.getException());
+            //if the user does not have any friends, no need to fetch the database
+            if (friends == null || friends.isEmpty()) {
+                profilesList.add(Profile.getActiveProfile());
+                future.complete(profilesList);
             }
+
+            usersRef.orderByChild("score").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+
+                    for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                        Profile profile = snapshot.getValue(Profile.class);
+                        if (profile != null && (friends.contains(profile.getUid()) || profile.getUid().equals(Profile.getActiveProfile().getUid()))) {
+                            profilesList.add(profile);
+                        }
+                    }
+                    List<Profile> topNProfiles = profilesList.subList(0, Math.min(n, profilesList.size()));
+                    topNProfiles.sort((p1, p2) -> p2.getScore().compareTo(p1.getScore()));
+                    future.complete(topNProfiles);
+                } else {
+                    future.completeExceptionally(task.getException());
+                }
+            });
+        }).exceptionally(e -> {
+            future.completeExceptionally(e);
+            return null;
         });
+
         return future;
     }
 
@@ -486,7 +495,7 @@ public class Database {
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                 Follows follows = currentData.getValue(Follows.class);
                 if (follows == null) {
-                    follows = new Follows(List.of());
+                    follows = new Follows(new ArrayList<>());
                 }
                 if (follow) {
                     follows.addFollowed(followed);
@@ -510,4 +519,21 @@ public class Database {
         return future;
     }
 
+
+    public static CompletableFuture<Follows> getFollowed(String UId) {
+        CompletableFuture<Follows> future = new CompletableFuture<>();
+        DatabaseReference followsRef = databaseInstance.getReference("follows").child(UId);
+        followsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Follows follows = task.getResult().getValue(Follows.class);
+                if (follows == null) {
+                    follows = new Follows(new ArrayList<>());
+                }
+                future.complete(follows);
+            } else {
+                future.complete(new Follows(new ArrayList<>()));
+            }
+        });
+        return future;
+    }
 }
