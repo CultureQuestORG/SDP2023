@@ -163,14 +163,16 @@
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="214dp"
-        android:layout_height="12dp"
+        android:layout_width="242dp"
+        android:layout_height="13dp"
+
+        android:layout_marginStart="72dp"
+
+        android:layout_marginBottom="4dp"
         android:indeterminateDrawable="@drawable/progress_bar_shape"
-
         android:progressDrawable="@drawable/progress_bar_shape"
-
         app:layout_constraintBottom_toBottomOf="@+id/profilePicture"
-        app:layout_constraintStart_toEndOf="@+id/profilePicture" />
+        app:layout_constraintStart_toStartOf="@+id/profilePicture" />
 
     <TextView
         android:id="@+id/level"
