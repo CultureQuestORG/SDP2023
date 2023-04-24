@@ -72,7 +72,7 @@ public class ProfileFragmentTest {
 
         Database.uploadPost(post);
 
-        profile = new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", 10);
+        profile = new Profile("123", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", 35);
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 
@@ -127,5 +127,13 @@ public class ProfileFragmentTest {
         onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
         assertEquals(0, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
         onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
+    }
+
+    @Test
+    public void scoreWorks() {
+        // the score is 35 so the level should be 3
+        onView(withId(R.id.level)).check(matches(withText(Integer.toString(3))));
+        // the progress is "8/37 points"
+        onView(withId(R.id.levelText)).check(matches(withText("8/37 points")));
     }
 }

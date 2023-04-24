@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,7 +29,6 @@ public class ProfileUtils {
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
 
     public static int DEFAULT_POST_LIMIT = 4, DEFAULT_POST_OFFSET = 0;
-
 
 
     public static final String GALLERY_PERMISSION =
@@ -74,6 +75,27 @@ public class ProfileUtils {
 
     public static Profile getSelectedProfile(){
         return SELECTED_PROFILE;
+    }
+
+
+    public static void handleScore(TextView level,TextView levelText, ProgressBar progressBar, int score){
+
+
+        int levelNumber = (int) Math.floor(Math.pow(score, 1.0/3.0));
+
+
+        int pointsfromlastlevel = (int) (Math.pow(levelNumber, 3));
+        int pointstolevelup = (int) (Math.pow(levelNumber + 1, 3));
+        int pointsfromlevelup = pointstolevelup - pointsfromlastlevel;
+        int pointsfromlastlevelup = score - pointsfromlastlevel;
+        int progress = (int) ((pointsfromlastlevelup * 100) / pointsfromlevelup);
+
+
+
+
+        level.setText(Integer.toString(levelNumber));
+        levelText.setText(Integer.toString(pointsfromlastlevelup) + "/" + Integer.toString(pointsfromlevelup)+ " points");
+        progressBar.setProgress(progress);
     }
 
 
