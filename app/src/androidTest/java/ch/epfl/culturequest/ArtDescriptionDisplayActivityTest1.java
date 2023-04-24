@@ -97,14 +97,14 @@ public class ArtDescriptionDisplayActivityTest1 {
 
     @Test
     public void postToProfileWorks(){
-        Log.d("UID", Profile.getActiveProfile().getUid());
         onView(withId(R.id.post_button)).perform(click());
+        ActivityScenario.launch(createTestIntentWithExtras(serializedMonaLisaDescription)).onActivity(activity -> {
+            Database.getPosts("cT93LtGk2dT9Jvg46pOpbBP69Kx1", 1, 0)
+                    .whenComplete((posts, throwable) -> {
+                        assertThat(posts.size(), is(1));
+                        assertThat(posts.get(0).getArtworkName(), is("Mona Lisa"));
 
-        Database.getPosts("cT93LtGk2dT9Jvg46pOpbBP69Kx1", 1,0)
-                .whenComplete((posts, throwable) -> {
-                    assertThat(posts.size(), is(1));
-                    assertThat(posts.get(0).getArtworkName(), is("Mona Lisa"));
-
+                    });
         });
     }
 
