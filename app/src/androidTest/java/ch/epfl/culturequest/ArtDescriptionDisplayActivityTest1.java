@@ -9,17 +9,21 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withResourceName;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import static org.hamcrest.Matchers.is;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.DaggerBaseLayerComponent;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -29,18 +33,40 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.backend.artprocessingtest.ArtImageUploadTest;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Post;
+import ch.epfl.culturequest.social.Profile;
 
 public class ArtDescriptionDisplayActivityTest1 {
 
     private Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     private String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100";
+
+    @Before
+    public void setup(){
+        Database.setEmulatorOn();
+        Database.clearDatabase();
+        FirebaseAuth.getInstance().signInWithEmailAndPassword("test@gmail.com", "abcdefg");
+
+        Profile profile = new Profile("cT93LtGk2dT9Jvg46pOpbBP69Kx1", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", 10);
+        Profile.setActiveProfile(profile);
+    }
+
+    @After
+    public void tearDown() {
+        // clear the database after the tests
+        Database.clearDatabase();
+    }
 
     @Rule
     public ActivityScenarioRule<ArtDescriptionDisplayActivity> activityRule =
@@ -71,9 +97,15 @@ public class ArtDescriptionDisplayActivityTest1 {
 
     @Test
     public void postToProfileWorks(){
-
+        Log.d("UID", Profile.getActiveProfile().getUid());
         onView(withId(R.id.post_button)).perform(click());
-        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        Database.getPosts("cT93LtGk2dT9Jvg46pOpbBP69Kx1", 1,0)
+                .whenComplete((posts, throwable) -> {
+                    assertThat(posts.size(), is(1));
+                    assertThat(posts.get(0).getArtworkName(), is("Mona Lisa"));
+
+        });
     }
 
 
