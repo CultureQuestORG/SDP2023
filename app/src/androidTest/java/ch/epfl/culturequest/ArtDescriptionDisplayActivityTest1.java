@@ -1,7 +1,9 @@
 package ch.epfl.culturequest;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withResourceName;
@@ -12,13 +14,19 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
+import androidx.test.espresso.DaggerBaseLayerComponent;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
@@ -26,6 +34,7 @@ import org.junit.Test;
 
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.backend.artprocessingtest.ArtImageUploadTest;
+import ch.epfl.culturequest.database.Database;
 
 public class ArtDescriptionDisplayActivityTest1 {
 
@@ -59,6 +68,14 @@ public class ArtDescriptionDisplayActivityTest1 {
 
         return intent;
     }
+
+    @Test
+    public void postToProfileWorks(){
+
+        onView(withId(R.id.post_button)).perform(click());
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+    }
+
 
     @Test
     public void activityDisplaysCorrectInformation(){

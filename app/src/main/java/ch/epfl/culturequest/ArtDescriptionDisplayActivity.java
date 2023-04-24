@@ -61,7 +61,6 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         Uri imageUri = Uri.parse(imageUriExtra);
 
         BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
-
         // get bitmap from imageUri with the ContentResolver
         try {
             // get bitmap from imageUri with the ContentResolver
@@ -71,7 +70,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             imageView.setImageBitmap(scannedImage);
             displayArtInformation(artDescription);
             postButton.setOnClickListener(v -> {
-                uploadImageToDatabase(imageUri, artDescription.getName());
+                uploadImageToDatabase(imageUri, artDescription);
             });
 
         } catch (FileNotFoundException e) {
@@ -176,11 +175,12 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
      * with subfolders for each user and in it the post ids of the images. This way it is easy to categorise images per user.
      *
      * @param uri         the uri to upload
-     * @param artworkName the name of the artwork
+     * @param artwork the artwork to add to the database
      */
-    private void uploadImageToDatabase(Uri uri, String artworkName) {
+    private void uploadImageToDatabase(Uri uri, BasicArtDescription artwork) {
         String postId = UUID.randomUUID().toString();
-        String uid = Profile.getActiveProfile().getUid();
+        Profile activeProfile = Profile.getActiveProfile();
+        String uid = activeProfile.getUid();
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference fileRef = storage.getReference().child("test/" + uid + "/" + postId);
         UploadTask task = fileRef.putFile(uri);
@@ -189,12 +189,13 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
                     .child("test/" + uid + "/" + postId)
                     .getDownloadUrl()
                     .addOnSuccessListener(URI -> {
-                        Post post = new Post(postId, uid, URI.toString(), artworkName, new Date().getTime(), 0, new ArrayList<>());
+                        Post post = new Post(postId, uid, URI.toString(), artwork.getName(), new Date().getTime(), 0, new ArrayList<>());
                         Database.uploadPost(post).thenAccept(done ->  {
                             // we add then accept so that we are sure the post is uploaded before the user rushes back to the app and checks
                             //their profile to find the post isnt there
                             if (done.get()) {
-                                postsAdded.setValue(postsAdded.getValue()+1);
+                                postsAdded++;
+                                activeProfile.incrementScore(artwork.getScore());
                                 finish();
                             }
                         });

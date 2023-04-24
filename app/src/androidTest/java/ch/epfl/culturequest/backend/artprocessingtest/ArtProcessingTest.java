@@ -21,10 +21,8 @@ public class ArtProcessingTest {
     public void artProcessingOutputsCorrectDescription(){
 
         BasicArtDescription artDescription = new ProcessingApi().getArtDescriptionFromUrl(imageUrl).join();
-
         assertThat(artDescription.getName(), is("David of Michelangelo"));
         assertThat(artDescription.getType(), is(BasicArtDescription.ArtType.SCULPTURE));
-
     }
 
 }

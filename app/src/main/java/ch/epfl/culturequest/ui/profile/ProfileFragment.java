@@ -84,17 +84,17 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        int limit = postsAdded.getValue();
+        int limit = postsAdded;
         List<Post> images = this.images.getValue();
         if (limit > 0) {
-            Database.getPosts(Profile.getActiveProfile().getUid(), limit, 0)
+            Profile.getActiveProfile().retrievePosts(limit, 0)
                     .thenAccept(posts -> {
                         assert images != null;
                         images.addAll(0, posts);
                         images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
                         pictureAdapter.notifyItemRangeChanged(0, posts.size());
             });
-            postsAdded.setValue(0);
+            postsAdded = 0;
         }
     }
 

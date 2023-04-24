@@ -2,6 +2,7 @@ package ch.epfl.culturequest.utils;
 
 import android.Manifest;
 import android.os.Build;
+import android.util.MutableInt;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -15,7 +16,7 @@ import ch.epfl.culturequest.social.Profile;
 public class ProfileUtils {
 
     public static String DEFAULT_PROFILE_PATH = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2Fbasic_profile_picture.png?alt=media&token=8e407bd6-ad5f-401a-9b2d-7852ccfb9d62";
-    public static MutableLiveData<Integer> postsAdded = new MutableLiveData<>(0);
+    public static int postsAdded = 0;
     private static Profile SELECTED_PROFILE = null;
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";

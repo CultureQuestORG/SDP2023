@@ -101,7 +101,6 @@ public class Profile extends Observable {
 
     public void setUid(String uid) {
         this.uid = uid;
-
     }
 
     public void setName(String name) {
@@ -182,6 +181,12 @@ public class Profile extends Observable {
 
     public void setScore(int score) {
         this.score = score;
+        setChanged();
+        notifyObservers();
+    }
+
+    public void incrementScore(int score){
+        this.score += score;
         setChanged();
         notifyObservers();
     }
