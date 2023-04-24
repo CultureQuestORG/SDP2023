@@ -2,9 +2,8 @@ package ch.epfl.culturequest.utils;
 
 import android.Manifest;
 import android.os.Build;
-import android.util.MutableInt;
-
-import androidx.lifecycle.MutableLiveData;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import ch.epfl.culturequest.social.Profile;
 
@@ -22,7 +21,6 @@ public class ProfileUtils {
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
 
     public static int DEFAULT_POST_LIMIT = 4, DEFAULT_POST_OFFSET = 0;
-
 
 
     public static final String GALLERY_PERMISSION =
@@ -69,6 +67,27 @@ public class ProfileUtils {
 
     public static Profile getSelectedProfile(){
         return SELECTED_PROFILE;
+    }
+
+
+    public static void handleScore(TextView level,TextView levelText, ProgressBar progressBar, int score){
+
+
+        int levelNumber = (int) Math.floor(Math.pow(score, 1.0/3.0));
+
+
+        int pointsfromlastlevel = (int) (Math.pow(levelNumber, 3));
+        int pointstolevelup = (int) (Math.pow(levelNumber + 1, 3));
+        int pointsfromlevelup = pointstolevelup - pointsfromlastlevel;
+        int pointsfromlastlevelup = score - pointsfromlastlevel;
+        int progress = (int) ((pointsfromlastlevelup * 100) / pointsfromlevelup);
+
+
+
+
+        level.setText(Integer.toString(levelNumber));
+        levelText.setText(Integer.toString(pointsfromlastlevelup) + "/" + Integer.toString(pointsfromlevelup)+ " points");
+        progressBar.setProgress(progress);
     }
 
 
