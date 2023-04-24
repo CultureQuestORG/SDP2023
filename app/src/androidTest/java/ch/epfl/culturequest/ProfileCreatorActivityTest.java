@@ -88,6 +88,9 @@ public class ProfileCreatorActivityTest {
     public void release() {
         // clear the database after finishing the tests
         Database.clearDatabase();
+        // Clear the storage after the tests
+        FireStorage.clearStorage();
+
         Intents.release();
     }
 
