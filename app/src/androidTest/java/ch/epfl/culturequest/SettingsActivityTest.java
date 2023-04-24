@@ -57,6 +57,9 @@ public class SettingsActivityTest {
         // Set up the online storage to run on the local emulator of Firebase
         FireStorage.setEmulatorOn();
 
+        // Clear the storage after the tests
+        FireStorage.clearStorage();
+
         FirebaseAuth.getInstance()
                 .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
                 .addOnCompleteListener(task -> {
@@ -85,6 +88,7 @@ public class SettingsActivityTest {
 
         // clear the database after each test
         Database.clearDatabase();
+
         // Clear the storage after the tests
         FireStorage.clearStorage();
 

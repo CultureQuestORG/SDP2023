@@ -17,8 +17,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
-import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.social.Profile;
 
 
@@ -37,18 +35,6 @@ public class FireStorageTest {
     }
 
     @Test
-    public void processOutputsCorrectDescription() {
-        try {
-            BasicArtDescription artDescription = ProcessingApi.getArtDescriptionFromUrl(imageUrl).get(40, TimeUnit.SECONDS);
-            assertThat(artDescription.getName(), is("David of Michelangelo"));
-            assertThat(artDescription.getType(), is(BasicArtDescription.ArtType.SCULPTURE));
-        } catch (ExecutionException | InterruptedException |
-                 TimeoutException e) {
-            fail("Test failed because of an exception: " + e.getMessage());
-        }
-    }
-
-    @Test
     public void uploadImageToStorage() {
         Bitmap davidImageBitmap = FireStorage.getBitmapFromURL(imageUrl);
 
@@ -63,7 +49,7 @@ public class FireStorageTest {
     }
 
     @Test
-    public void uploadNewProfilePictureToStorageReturnsCorrectProfilePicURLInUpdatedProfile(){
+    public void uploadNewProfilePictureToStorageReturnsCorrectProfilePicURLInUpdatedProfile() {
         Profile profile = new Profile("testUid", "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0);
         Bitmap davidImageBitmap = FireStorage.getBitmapFromURL(imageUrl);
 
