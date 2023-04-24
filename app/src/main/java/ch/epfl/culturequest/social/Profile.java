@@ -189,6 +189,7 @@ public class Profile extends Observable {
         this.score += score;
         setChanged();
         notifyObservers();
+        Database.updateScore(this.uid, this.score);
     }
 
     public CompletableFuture<List<String>> retrieveFriends() {
