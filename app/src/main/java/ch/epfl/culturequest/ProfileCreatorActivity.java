@@ -3,6 +3,7 @@ package ch.epfl.culturequest;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import ch.epfl.culturequest.database.Database;
@@ -37,6 +39,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public class ProfileCreatorActivity extends AppCompatActivity {
     private String profilePicUri;
+
+    private Bitmap profilePicBitmap;
     private final Profile profile = new Profile(null, "");
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
@@ -108,7 +112,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
             //if the profile picture is not the default one, we store it in the storage
             if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PATH))
-                FireStorage.storeNewProfilePictureInStorage(profile, profilePicUri).whenComplete(
+                FireStorage.uploadNewProfilePictureToStorage(profile, profilePicBitmap).whenComplete(
                         (profile, throwable) -> {
                             if (throwable != null) {
                                 throwable.printStackTrace();
@@ -118,7 +122,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
                             }
                         }
                 );
-            // if the profile picture is the default one, we don't need to store it in the storage
+                // if the profile picture is the default one, we don't need to store it in the storage
             else {
                 Database.setProfile(profile);
                 Profile.setActiveProfile(profile);
@@ -158,7 +162,11 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             Picasso.get().load(profilePicture).into(image);
             ((TextView) findViewById(R.id.profile_pic_text)).setText("");
             profilePicUri = profilePicture.toString();
-
+            try {
+                profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), profilePicture);
+            } catch (IOException e) {
+                profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PATH);
+            }
         }
     }
 

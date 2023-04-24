@@ -4,6 +4,7 @@ import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
@@ -37,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private ImageView profilePictureView;
     private String profilePicUri;
-
+    private Bitmap profilePicBitmap;
     private Profile activeProfile;
 
     private TextView username;
@@ -106,7 +109,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         // Upload the new profile picture and update the profile
-        FireStorage.storeNewProfilePictureInStorage(activeProfile, profilePicUri).whenComplete(
+        FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap).whenComplete(
                 (profile, throwable) -> {
                     if (throwable != null) {
                         throwable.printStackTrace();
@@ -137,6 +140,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         Picasso.get().load(selectedImage).into(profilePictureView);
         profilePicUri = selectedImage.toString();
+        try {
+            profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+        } catch (IOException e) {
+            profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PATH);
+        }
     }
 
 

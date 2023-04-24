@@ -26,12 +26,13 @@ import java.io.IOException;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
-import ch.epfl.culturequest.storage.LocalStorage;
+import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
-import ch.epfl.culturequest.backend.artprocessing.utils.UploadAndProcess;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
-import ch.epfl.culturequest.utils.PermissionRequest;
+import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.ui.commons.LoadingAnimation;
+import ch.epfl.culturequest.utils.PermissionRequest;
 
 public class ScanFragment extends Fragment {
 
@@ -44,11 +45,13 @@ public class ScanFragment extends Fragment {
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
-            if(permissionRequest.hasPermission(getContext()))
+            if (permissionRequest.hasPermission(getContext()))
                 cameraSetup.openCamera();
         }
+
         @Override
-        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {}
+        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {
+        }
 
         @Override
         public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surfaceTexture) {
@@ -57,7 +60,8 @@ public class ScanFragment extends Fragment {
 
         @Override
         public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surfaceTexture) {
-        }};
+        }
+    };
 
     // ScanButtonListener is used to detect when the scan button is clicked
     private final View.OnClickListener scanButtonListener = view -> {
@@ -70,16 +74,17 @@ public class ScanFragment extends Fragment {
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
 
-                            UploadAndProcess.uploadAndProcess(bitmap).thenAccept(artDescription -> {
-                                Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
+                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(ProcessingApi::getArtDescriptionFromUrl)
+                                    .thenAccept(artDescription -> {
+                                        Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
 
-                                Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
-                                String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
-                                intent.putExtra("artDescription", serializedArtDescription);
-                                intent.putExtra("imageUri", lastlyStoredImageUri.toString());
-                                startActivity(intent);
-                                loadingAnimation.stopLoading();
-                            });
+                                        Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
+                                        String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
+                                        intent.putExtra("artDescription", serializedArtDescription);
+                                        intent.putExtra("imageUri", lastlyStoredImageUri.toString());
+                                        startActivity(intent);
+                                        loadingAnimation.stopLoading();
+                                    });
 
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -161,7 +166,7 @@ public class ScanFragment extends Fragment {
         if (!permissionRequest.hasPermission(getContext())) {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
-           permissionRequest.askPermission(requestPermissionLauncher);
+            permissionRequest.askPermission(requestPermissionLauncher);
         }
     }
 }
