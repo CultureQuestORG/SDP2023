@@ -163,12 +163,11 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
     // (because the lists are updated asynchronously)
     @Override
     public int getItemCount() {
-        if (topNUserNames == null || topNUserScores == null || topNUserRanks == null || topNUserProfilePicturesUri == null
-        ) {
+        if (topNUserNames == null || topNUserScores == null || topNUserRanks == null || topNUserProfilePicturesUri == null || topNUids == null) {
             return 0;
         } else {
             // return the minimum size of the lists
-            return Math.min(Math.min(topNUserNames.size(), topNUserScores.size()), Math.min(topNUserRanks.size(), topNUserProfilePicturesUri.size()));
+            return Math.min(topNUids.size(), Math.min(Math.min(topNUserNames.size(), topNUserScores.size()), Math.min(topNUserRanks.size(), topNUserProfilePicturesUri.size())));
         }
     }
 
