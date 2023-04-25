@@ -23,12 +23,11 @@ public class ArtDescriptionDisplayActivityTest1 {
 
     private Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-    private String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100";
+    private String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100|false";
 
     @Rule
     public ActivityScenarioRule<ArtDescriptionDisplayActivity> activityRule =
             new ActivityScenarioRule<>(createTestIntentWithExtras(serializedMonaLisaDescription));
-
 
     public static Intent createTestIntentWithExtras(String serializedDescription) {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();

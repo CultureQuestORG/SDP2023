@@ -3,12 +3,20 @@ package ch.epfl.culturequest;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +33,7 @@ import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.artprocessing.utils.ArtImageUpload;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
+import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
@@ -44,6 +53,17 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
         BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
 
+        // Get SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
+        boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
+
+        // Check if artDescription.openAIRequired is true and doNotShowAgain is false
+        if (artDescription.isOpenAiRequired() && !doNotShowAgain) {
+            EspressoIdlingResource.countingIdlingResource.increment();
+            showOpenAIPopup();
+            EspressoIdlingResource.countingIdlingResource.decrement();
+        }
+
         // get bitmap from imageUri with the ContentResolver
         try {
             // get bitmap from imageUri with the ContentResolver
@@ -58,11 +78,8 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             finish();
         }
     }
-    private void displayArtInformation(BasicArtDescription artDescription){
 
-        if(artDescription.isOpenAiRequired()){
-            showOpenAIPopup();
-        }
+    private void displayArtInformation(BasicArtDescription artDescription){
 
         TextView artNameView = findViewById(R.id.artName);
         setTextOrFallback(artNameView, artDescription.getName(), "No name found");
@@ -78,9 +95,6 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
         TextView artScoreView = findViewById(R.id.artScore);
         artScoreView.setText(artDescription.getScore() != null ? artDescription.getScore().toString() : "50");
-
-
-
     }
 
     private void setTextOrFallback(TextView textView, String text, String fallbackText) {
@@ -88,8 +102,33 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     }
 
     private void showOpenAIPopup() {
-        Toast toast = Toast.makeText(this, "OpenAI was used to provide some info. Keep in mind that AI-generated content may not always be accurate.", Toast.LENGTH_SHORT);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.show();
+        View popupView = LayoutInflater.from(this).inflate(R.layout.popup_openai_message, null);
+        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+
+        // Show the popup in the center of the screen after the activity has been fully initialized
+        findViewById(android.R.id.content).post(() -> {
+            if (!isFinishing()) {
+                popupWindow.showAtLocation(findViewById(android.R.id.content), Gravity.CENTER, 0, 0);
+            }
+        });
+
+        // Set the "Do not show it again" button click listener
+        Button btnDoNotShowAgain = popupView.findViewById(R.id.btn_do_not_show_again);
+        btnDoNotShowAgain.setOnClickListener(view -> {
+
+            SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("do_not_show_again", true);
+            editor.apply();
+
+            popupWindow.dismiss();
+        });
+
+        // Set a delay of 5 seconds before making the popup invisible
+        new Handler().postDelayed(() -> {
+            if (popupWindow.isShowing()) {
+                popupWindow.dismiss();
+            }
+        }, 5000);
     }
 }

@@ -12,7 +12,7 @@ import org.junit.Test;
 
 public class ArtDescriptionDisplayActivityTest2 {
 
-    private String nullSerializedDescription = "null|null|null|null|null|null|null|null|null";
+    private String nullSerializedDescription = "null|null|null|null|null|null|null|null|null|false";
 
     @Rule
     public ActivityScenarioRule<ArtDescriptionDisplayActivity> activityRule =
@@ -21,7 +21,7 @@ public class ArtDescriptionDisplayActivityTest2 {
     @Test
     public void activityDisplaysCorrectInformationWithNullFields(){
 
-        String nulLSerializedDescription = "null|null|null|null|null|null|null|null|null";
+        String nulLSerializedDescription = "null|null|null|null|null|null|null|null|null|false";
 
         onView(withId(R.id.artName)).check(matches(withText("No name found")));
         onView(withId(R.id.artistName)).check(matches(withText("No artist found")));

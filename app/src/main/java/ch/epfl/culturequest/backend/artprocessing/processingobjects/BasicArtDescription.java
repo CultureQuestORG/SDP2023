@@ -23,7 +23,7 @@ public class BasicArtDescription {
 
     private String artist;
 
-    private Boolean requiredOpenAi;
+    private Boolean requiredOpenAi = false;
 
 
     public BasicArtDescription(String name, String artist, String summary, ArtType type, String year, String city, String country, String museum, Integer score) {
