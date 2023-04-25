@@ -133,4 +133,12 @@ public class ProfileFragmentTest {
         assertEquals(0, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
         onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
     }
+
+    @Test
+    public void scoreWorks() {
+        // the score is 35 so the level should be 3
+        onView(withId(R.id.level)).check(matches(withText(Integer.toString(3))));
+        // the progress is "8/37 points"
+        onView(withId(R.id.levelText)).check(matches(withText("8/37 points")));
+    }
 }

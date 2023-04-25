@@ -1,11 +1,13 @@
 package ch.epfl.culturequest.ui.profile;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,6 +24,7 @@ import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
+import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
@@ -29,6 +32,7 @@ public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
     private RecyclerView pictureRecyclerView;
     private PictureAdapter pictureAdapter;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,6 +50,11 @@ public class ProfileFragment extends Fragment {
         final RecyclerView pictureGrid = binding.pictureGrid;
         final View settingsButton = binding.settingsButton;
 
+        final TextView level = binding.level;
+        final TextView levelText = binding.levelText;
+        final ProgressBar progressBar = binding.progressBar;
+
+
         profilePlace.setText("Lausanne");
 
         // set the observers for the views so that they are updated when the data changes
@@ -61,6 +70,9 @@ public class ProfileFragment extends Fragment {
             pictureGrid.setLayoutManager(gridLayoutManager);
         });
 
+        //handle the score
+        profileViewModel.getScore().observe(getViewLifecycleOwner(), s-> ProfileUtils.handleScore(level,levelText,progressBar,s));
+
         // set the onClickListener for the settings button
         settingsButton.setOnClickListener(this::goToSettings);
 
@@ -74,6 +86,7 @@ public class ProfileFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 
     /**
      * Starts the SettingsActivity
