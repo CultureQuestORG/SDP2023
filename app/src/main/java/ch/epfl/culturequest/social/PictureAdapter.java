@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.social;
 
+import android.content.Intent;
 import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureViewHolder> {
@@ -57,7 +59,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     .load(profile.getProfilePicture())
                     .placeholder(android.R.drawable.progress_horizontal)
                     .into(holder.profilePicture);
-
+        });
+        List.of(holder.username, holder.profilePicture).forEach(view -> {
+            view.setOnClickListener(l ->{
+                Intent intent = new Intent(holder.itemView.getContext(), DisplayUserProfileActivity.class);
+                intent.putExtra("uid", post.getUid());
+                holder.itemView.getContext().startActivity(intent);
+            });
         });
 
         holder.location.setText("Lausanne");

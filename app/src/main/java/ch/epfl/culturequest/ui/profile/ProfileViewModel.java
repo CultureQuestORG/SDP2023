@@ -25,8 +25,8 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<Integer> score;
 
     Profile profile = Profile.getActiveProfile();
-    Profile selectedProfile = ProfileUtils.getSelectedProfile();
 
+    MutableLiveData<Profile> selectedProfile = new MutableLiveData<>();
     /**
      * Constructor of the ProfileViewModel
      */
@@ -35,31 +35,33 @@ public class ProfileViewModel extends ViewModel {
         username = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
-        followed = new MutableLiveData<>();
         score = new MutableLiveData<>();
+        followed = new MutableLiveData<>(false);
 
         EspressoIdlingResource.increment();
         if (profile != null) {
-            if (selectedProfile != null && selectedProfile.getUid().equals(uid)) {
-                username.setValue(selectedProfile.getUsername());
-                score.setValue(selectedProfile.getScore());
-                profilePictureUri.setValue(selectedProfile.getProfilePicture());
-
-                // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
-                // a time, but it is computationally more efficient to do 1 big query:
-                //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
-                CompletableFuture<List<Post>> profilePosts = selectedProfile.retrievePosts();
-                profilePosts.handle((posts, t) -> {
-                    if (posts != null && t == null) {
-                        pictures.setValue(posts);
-                    }
-                    return null;
+            if (!profile.getUid().equals(uid)) {
+                Database.getProfile(uid).whenComplete((selectedProfile, e) -> {
+                    this.selectedProfile.setValue(selectedProfile);
+                    username.setValue(selectedProfile.getUsername());
+                    score.setValue(selectedProfile.getScore());
+                    profilePictureUri.setValue(selectedProfile.getProfilePicture());
+                    // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
+                    // a time, but it is computationally more efficient to do 1 big query:
+                    //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
+                    CompletableFuture<List<Post>> profilePosts = Database.getPosts(selectedProfile.getUid());
+                    profilePosts.handle((posts, t) -> {
+                        if (posts != null && t == null) {
+                            pictures.setValue(posts);
+                        }
+                        return null;
+                    });
                 });
 
                 if(profile != null) {
                     Database.getFollowed(profile.getUid()).whenComplete((followedProfiles, t) -> {
                         if (t == null) {
-                            followed.setValue(followedProfiles.isFollowing(selectedProfile.getUid()));
+                            followed.setValue(followedProfiles.isFollowing(selectedProfile.getValue().getUid()));
                         }
                     });
                 }
@@ -127,9 +129,9 @@ public class ProfileViewModel extends ViewModel {
 
         this.followed.setValue(Boolean.FALSE.equals(followed.getValue()));
         if(Boolean.TRUE.equals(this.followed.getValue())) {
-            Database.addFollow(profile.getUid(), selectedProfile.getUid());
+            Database.addFollow(profile.getUid(), selectedProfile.getValue().getUid());
         } else {
-            Database.removeFollow(profile.getUid(), selectedProfile.getUid());
+            Database.removeFollow(profile.getUid(), selectedProfile.getValue().getUid());
         }
     }
 }
