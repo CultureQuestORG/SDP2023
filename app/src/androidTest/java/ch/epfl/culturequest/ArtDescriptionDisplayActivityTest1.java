@@ -2,51 +2,36 @@ package ch.epfl.culturequest;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withResourceName;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
 import static org.hamcrest.Matchers.is;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.ContactsContract;
-import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 
-import androidx.annotation.DrawableRes;
-import androidx.core.content.ContextCompat;
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.espresso.DaggerBaseLayerComponent;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 import ch.epfl.culturequest.backend.LocalStorage;
 import ch.epfl.culturequest.backend.artprocessingtest.ArtImageUploadTest;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
-public class ArtDescriptionDisplayActivityTest1 {
+public class  ArtDescriptionDisplayActivityTest1 {
 
     private Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
@@ -96,14 +81,17 @@ public class ArtDescriptionDisplayActivityTest1 {
     }
 
     @Test
-    public void postToProfileWorks(){
+    public void postToProfileWorks() throws InterruptedException {
+        onView(withId(R.id.artName)).perform(swipeUp());
+        // I couldnt find a nice and easy way to get the test to swipe all the way down on a Scroll view
+        //it'd be easier if it was a recycler view
+        onView(withId(R.id.artSummary)).perform(swipeUp(), swipeUp(), swipeUp(), swipeUp());// Scroll to the bottom of the RecyclerView
         onView(withId(R.id.post_button)).perform(click());
         ActivityScenario.launch(createTestIntentWithExtras(serializedMonaLisaDescription)).onActivity(activity -> {
             Database.getPosts("cT93LtGk2dT9Jvg46pOpbBP69Kx1", 1, 0)
                     .whenComplete((posts, throwable) -> {
                         assertThat(posts.size(), is(1));
                         assertThat(posts.get(0).getArtworkName(), is("Mona Lisa"));
-
                     });
         });
     }
