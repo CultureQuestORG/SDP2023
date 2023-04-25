@@ -1,6 +1,8 @@
 package ch.epfl.culturequest;
 
 import androidx.appcompat.app.AlertDialog;
+import static ch.epfl.culturequest.social.RarityLevel.getRarityLevel;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
@@ -33,6 +35,7 @@ import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.artprocessing.utils.ArtImageUpload;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
+import ch.epfl.culturequest.social.ScanBadge;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
@@ -78,23 +81,49 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             finish();
         }
     }
-
     private void displayArtInformation(BasicArtDescription artDescription){
 
+        // Set Art Name
         TextView artNameView = findViewById(R.id.artName);
         setTextOrFallback(artNameView, artDescription.getName(), "No name found");
 
+        // Set Artist
         TextView artistNameView = findViewById(R.id.artistName);
         setTextOrFallback(artistNameView, artDescription.getArtist(), "No artist found");
 
+        // Set Year
         TextView artYearView = findViewById(R.id.artYear);
         setTextOrFallback(artYearView, artDescription.getYear(), "No year found");
 
+        // Set Summary
         TextView artSummaryView = findViewById(R.id.artSummary);
         setTextOrFallback(artSummaryView, artDescription.getSummary(), "No description found");
 
+        // Set Score
         TextView artScoreView = findViewById(R.id.artScore);
-        artScoreView.setText(artDescription.getScore() != null ? artDescription.getScore().toString() : "50");
+        artScoreView.setText(artDescription.getScore() != null ? "+" + artDescription.getScore().toString() + " pts" : "+30 pts");
+
+        // Set Rarity Badge
+        ImageView rarityBadge = findViewById(R.id.rarity);
+        setRarityBadge(rarityBadge, artDescription.getScore());
+
+        // Set Country Badge
+        ImageView countryBadge = findViewById(R.id.countryBadge);
+        TextView countryName = findViewById(R.id.countryName);
+
+        setCountryBadge(countryBadge, countryName, artDescription.getCountry());
+
+        // Set City Badge
+        ImageView cityBadge = findViewById(R.id.cityBadge);
+        TextView cityName = findViewById(R.id.cityName);
+
+        setCityBadge(cityBadge, cityName, artDescription.getCity());
+
+        // Set Museum Badge
+        ImageView museumBadge = findViewById(R.id.museumBadge);
+        TextView museumName = findViewById(R.id.museumName);
+
+        setMuseumBadge(museumBadge, museumName, artDescription.getMuseum());
     }
 
     private void setTextOrFallback(TextView textView, String text, String fallbackText) {
@@ -130,5 +159,47 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
                 popupWindow.dismiss();
             }
         }, 5000);
+    }
+    private void setRarityBadge(ImageView rarityBadge, Integer score) {
+        if (score != null) {
+            rarityBadge.setImageResource(getRarityLevel(score).getRarenessIcon());
+            rarityBadge.setTag(getRarityLevel(score).name());
+        } else {
+            rarityBadge.setImageResource(getRarityLevel(30).getRarenessIcon());
+            rarityBadge.setTag(getRarityLevel(30).name());
+        }
+    }
+
+    private void setCountryBadge(ImageView countryBadge, TextView countryText, String country) {
+        if (country != null) {
+            countryBadge.setImageResource(ScanBadge.Country.fromString(country).getBadge());
+            countryText.setText(country);
+            countryBadge.setTag(ScanBadge.Country.fromString(country).name());
+        } else {
+            countryBadge.setVisibility(ImageView.GONE);
+            countryText.setVisibility(TextView.GONE);
+        }
+    }
+
+    private void setCityBadge(ImageView cityBadge, TextView cityText, String city) {
+        if (city != null) {
+            cityBadge.setImageResource(ScanBadge.City.fromString(city).getBadge());
+            cityText.setText(city);
+            cityBadge.setTag(ScanBadge.City.fromString(city).name());
+        } else {
+            cityBadge.setVisibility(ImageView.GONE);
+            cityText.setVisibility(TextView.GONE);
+        }
+    }
+
+    private void setMuseumBadge(ImageView museumBadge, TextView museumText, String museum) {
+        if (museum != null) {
+            museumBadge.setImageResource(ScanBadge.Museum.fromString(museum).getBadge());
+            museumText.setText(museum);
+            museumBadge.setTag(ScanBadge.Museum.fromString(museum).name());
+        } else {
+            museumBadge.setVisibility(ImageView.GONE);
+            museumText.setVisibility(TextView.GONE);
+        }
     }
 }

@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -22,7 +24,6 @@ public class ProfileUtils {
 
     public static String DEFAULT_PROFILE_PATH = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2Fbasic_profile_picture.png?alt=media&token=8e407bd6-ad5f-401a-9b2d-7852ccfb9d62";
 
-    private static Profile SELECTED_PROFILE = null;
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
 
@@ -67,13 +68,24 @@ public class ProfileUtils {
         }
         return false;
     }
+    public static void handleScore(TextView level,TextView levelText, ProgressBar progressBar, int score){
 
-    public static void setSelectedProfile(Profile profile){
-        SELECTED_PROFILE = profile;
-    }
 
-    public static Profile getSelectedProfile(){
-        return SELECTED_PROFILE;
+        int levelNumber = (int) Math.floor(Math.pow(score, 1.0/3.0));
+
+
+        int pointsfromlastlevel = (int) (Math.pow(levelNumber, 3));
+        int pointstolevelup = (int) (Math.pow(levelNumber + 1, 3));
+        int pointsfromlevelup = pointstolevelup - pointsfromlastlevel;
+        int pointsfromlastlevelup = score - pointsfromlastlevel;
+        int progress = (int) ((pointsfromlastlevelup * 100) / pointsfromlevelup);
+
+
+
+
+        level.setText(Integer.toString(levelNumber));
+        levelText.setText(Integer.toString(pointsfromlastlevelup) + "/" + Integer.toString(pointsfromlevelup)+ " points");
+        progressBar.setProgress(progress);
     }
 
 

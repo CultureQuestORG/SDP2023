@@ -22,9 +22,11 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<List<Post>> pictures;
     private final MutableLiveData<Boolean> followed;
 
-    Profile profile = Profile.getActiveProfile();
-    Profile selectedProfile = ProfileUtils.getSelectedProfile();
+    private final MutableLiveData<Integer> score;
 
+    Profile profile = Profile.getActiveProfile();
+
+    MutableLiveData<Profile> selectedProfile = new MutableLiveData<>();
     /**
      * Constructor of the ProfileViewModel
      */
@@ -33,32 +35,45 @@ public class ProfileViewModel extends ViewModel {
         username = new MutableLiveData<>();
         profilePictureUri = new MutableLiveData<>();
         pictures = new MutableLiveData<>();
+        score = new MutableLiveData<>();
         followed = new MutableLiveData<>(false);
 
         EspressoIdlingResource.increment();
         if (profile != null) {
-            if (selectedProfile != null && selectedProfile.getUid().equals(uid)) {
-                username.setValue(selectedProfile.getUsername());
-                profilePictureUri.setValue(selectedProfile.getProfilePicture());
-                // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
-                // a time, but it is computationally more efficient to do 1 big query:
-                //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
-                CompletableFuture<List<Post>> profilePosts = Database.getPosts(selectedProfile.getUid());
-                profilePosts.handle((posts, t) -> {
-                    if (posts != null && t == null) {
-                        pictures.setValue(posts);
-                    }
-                    return null;
+            if (!profile.getUid().equals(uid)) {
+                Database.getProfile(uid).whenComplete((selectedProfile, e) -> {
+                    this.selectedProfile.setValue(selectedProfile);
+                    username.setValue(selectedProfile.getUsername());
+                    score.setValue(selectedProfile.getScore());
+                    profilePictureUri.setValue(selectedProfile.getProfilePicture());
+                    // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
+                    // a time, but it is computationally more efficient to do 1 big query:
+                    //https://stackoverflow.com/questions/3910317/is-it-better-to-return-one-big-query-or-a-few-smaller-ones#:~:text=It%20is%20significantly%20faster%20to,the%20server%20more%20each%20time.
+                    CompletableFuture<List<Post>> profilePosts = Database.getPosts(selectedProfile.getUid());
+                    profilePosts.handle((posts, t) -> {
+                        if (posts != null && t == null) {
+                            pictures.setValue(posts);
+                        }
+                        return null;
+                    });
                 });
+
+                if(profile != null) {
+                    Database.getFollowed(profile.getUid()).whenComplete((followedProfiles, t) -> {
+                        if (t == null) {
+                            followed.setValue(followedProfiles.isFollowing(selectedProfile.getValue().getUid()));
+                        }
+                    });
+                }
             } else {
-                CompletableFuture<List<Post>> profilePosts = Database.getPosts(profile.getUid());
+                CompletableFuture<List<Post>> profilePosts = profile.retrievePosts();
                 profilePosts.whenComplete((posts, t) -> {
                     if (posts != null && t == null) {
-                        profile.setPosts(posts);
                         //set the values of the live data
                         username.setValue(profile.getUsername());
                         profilePictureUri.setValue(profile.getProfilePicture());
-                        pictures.setValue(profile.getPosts());
+                        score.setValue(profile.getScore());
+                        pictures.setValue(posts);
                     }
                 });
                 // add an observer to the profile so that the view is updated when the profile is updated
@@ -66,7 +81,8 @@ public class ProfileViewModel extends ViewModel {
                     Profile p = (Profile) profileObject;
                     username.postValue(p.getUsername());
                     profilePictureUri.postValue(p.getProfilePicture());
-                    pictures.postValue(p.getPosts());
+                    score.postValue(p.getScore());
+//                    pictures.postValue(p.getPosts());
                 });
             }
             // if no profile is active, we load a default profile
@@ -95,11 +111,27 @@ public class ProfileViewModel extends ViewModel {
         return pictures;
     }
 
+    /**
+     * @return the score of the profile
+     */
+    public LiveData<Integer> getScore() {
+        return score;
+    }
+
     public LiveData<Boolean> getFollowed() {
         return followed;
     }
 
     public void changeFollow() {
+        if (selectedProfile == null) {
+            return;
+        }
+
         this.followed.setValue(Boolean.FALSE.equals(followed.getValue()));
+        if(Boolean.TRUE.equals(this.followed.getValue())) {
+            Database.addFollow(profile.getUid(), selectedProfile.getValue().getUid());
+        } else {
+            Database.removeFollow(profile.getUid(), selectedProfile.getValue().getUid());
+        }
     }
 }

@@ -23,11 +23,13 @@ public class LeaderboardViewModel extends ViewModel {
     private final MutableLiveData<String> currentUserRank;
     private final MutableLiveData<String> currentUserRankFriends;
     private final MutableLiveData<List<String>> topNUserNames;
+    private final MutableLiveData<List<String>> topNUserUids;
     private final MutableLiveData<List<String>> topNUserNamesFriends;
     private final MutableLiveData<List<String>> topNUserScores;
     private final MutableLiveData<List<String>> topNUserScoresFriends;
     private final MutableLiveData<List<String>> topNUserRanksFriends;
     private final MutableLiveData<List<String>> topNUserProfilePicturesUri;
+    private final MutableLiveData<List<String>> topNUserUidsFriends;
     private final MutableLiveData<List<String>> topNUserProfilePicturesUriFriends;
     private final MutableLiveData<List<String>> topNUserRanks;
     private final int N = 10;
@@ -38,12 +40,14 @@ public class LeaderboardViewModel extends ViewModel {
         currentUserScore = new MutableLiveData<>();
         currentUserRank = new MutableLiveData<>();
         topNUserNames = new MutableLiveData<>();
+        topNUserUids = new MutableLiveData<>();
         topNUserScores = new MutableLiveData<>();
         topNUserScoresFriends = new MutableLiveData<>();
         topNUserProfilePicturesUri = new MutableLiveData<>();
         topNUserRanks = new MutableLiveData<>();
         topNUserRanksFriends = new MutableLiveData<>();
         topNUserNamesFriends = new MutableLiveData<>();
+        topNUserUidsFriends = new MutableLiveData<>();
         topNUserProfilePicturesUriFriends = new MutableLiveData<>();
         currentUserRankFriends = new MutableLiveData<>();
 
@@ -90,6 +94,7 @@ public class LeaderboardViewModel extends ViewModel {
             topNUserNames.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
             topNUserScores.setValue(topN.stream().map(p -> p.getScore().toString()).collect(toList()));
             topNUserProfilePicturesUri.setValue(topN.stream().map(Profile::getProfilePicture).collect(toList()));
+            topNUserUids.setValue(topN.stream().map(Profile::getUid).collect(toList()));
             // create array of string int from 1 to N corresponding to the ranks of the top N users
             String[] ranks = new String[N];
             for (int i = 0; i < N; i++) {
@@ -104,13 +109,12 @@ public class LeaderboardViewModel extends ViewModel {
             topNUserNamesFriends.setValue(topN.stream().map(Profile::getUsername).collect(toList()));
             topNUserScoresFriends.setValue(topN.stream().map(p -> p.getScore().toString()).collect(toList()));
             topNUserProfilePicturesUriFriends.setValue(topN.stream().map(Profile::getProfilePicture).collect(toList()));
-
+            topNUserUidsFriends.setValue(topN.stream().map(Profile::getUid).collect(toList()));
             String[] ranks = new String[N];
             for (int i = 0; i < N; i++) {
                 ranks[i] = Integer.toString(i + 1);
             }
             topNUserRanksFriends.setValue(List.of(ranks));
-
             EspressoIdlingResource.decrement();
         });
     }
@@ -135,6 +139,10 @@ public class LeaderboardViewModel extends ViewModel {
         return topNUserNames;
     }
 
+    public LiveData<List<String>> getTopNUserUids() {
+        return topNUserUids;
+    }
+
     public LiveData<List<String>> getTopNUserScores() {
         return topNUserScores;
     }
@@ -157,6 +165,10 @@ public class LeaderboardViewModel extends ViewModel {
 
     public LiveData<List<String>> getTopNUserNamesFriends() {
         return topNUserNamesFriends;
+    }
+
+    public LiveData<List<String>> getTopNUserUidsFriends() {
+        return topNUserUidsFriends;
     }
 
     public LiveData<List<String>> getTopNUserProfilePicturesUriFriends() {

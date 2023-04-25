@@ -33,7 +33,7 @@ public class HomeFragmentTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
@@ -43,10 +43,11 @@ public class HomeFragmentTest {
         // Initialize the database with some test profiles
         ArrayList<String> myFriendsIds = new ArrayList<>();
         myFriendsIds.add("friendID");
-        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", new ArrayList<>(), myFriendsIds, 400);
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400);
         Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
-        Database.setProfile(new Profile("friendID", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", new ArrayList<>(), new ArrayList<>(), 300));
+        Database.setProfile(new Profile("friendID", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", 300));
+        Database.addFollow("currentUserUid", "friendID");
 
         Database.uploadPost(new Post("postUid1",
                 "friendID",
@@ -55,8 +56,6 @@ public class HomeFragmentTest {
                 0,
                 0,
                 new ArrayList<>()));
-        // Add EspressoIdlingResource to the IdlingRegistry to make sure tests wait for the fragment and database to be ready
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
 
         // Launch the fragment with the current user's uid for testing
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
@@ -67,6 +66,8 @@ public class HomeFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
+
+        Thread.sleep(8000);
     }
 
     @Test
@@ -78,9 +79,6 @@ public class HomeFragmentTest {
 
     @After
     public void tearDown() {
-        // Unregister the IdlingResource to make sure tests don't wait for the fragment and database to be ready
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
-
         // clear the database after the tests
         Database.clearDatabase();
     }

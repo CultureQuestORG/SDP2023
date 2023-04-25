@@ -2,17 +2,25 @@ package ch.epfl.culturequest;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withResourceName;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.view.View;
+import android.widget.ImageView;
 
+import androidx.annotation.DrawableRes;
+import androidx.core.content.ContextCompat;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -58,7 +66,11 @@ public class ArtDescriptionDisplayActivityTest1 {
         onView(withId(R.id.artistName)).check(matches(withText("Da Vinci")));
         onView(withId(R.id.artYear)).check(matches(withText("1519")));
         onView(withId(R.id.artSummary)).check(matches(withText("Pure Masterclass")));
-        onView(withId(R.id.artScore)).check(matches(withText("100")));
+        onView(withId(R.id.artScore)).check(matches(withText("+100 pts")));
+        onView(withId(R.id.artImage)).check(matches(isDisplayed()));
+        onView(withId(R.id.rarity)).check(matches(isDisplayed()));
+        onView(withId(R.id.countryBadge)).check(matches(isDisplayed()));
+        onView(withId(R.id.cityBadge)).check(matches(isDisplayed()));
+        onView(withId(R.id.museumBadge)).check(matches(isDisplayed()));
     }
-
 }

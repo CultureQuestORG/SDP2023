@@ -57,14 +57,14 @@
 
     <TextView
         android:id="@+id/profileUsername"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
+        android:layout_width="196dp"
+        android:layout_height="32dp"
         android:shadowColor="#80000000"
         android:shadowDx="0"
         android:shadowDy="4"
-        android:shadowRadius="20"
+        android:shadowRadius="10"
         android:textColor="@color/white"
-        android:textSize="25sp"
+        android:textSize="24sp"
         android:fontFamily="@font/poppins_bold"
         app:drawableTint="@color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -76,29 +76,24 @@
 
     <TextView
         android:id="@+id/profilePlace"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
+        android:layout_width="147dp"
+        android:layout_height="28dp"
         android:shadowColor="#80000000"
         android:shadowDx="0"
         android:shadowDy="4"
-        android:shadowRadius="20"
+        android:shadowRadius="10"
         android:textColor="@color/white"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:fontFamily="@font/poppins"
         app:drawableTint="@color/transparent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.75"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/profilePicture"
-        app:layout_constraintVertical_bias="0.05" />
+        app:layout_constraintStart_toStartOf="@+id/profileUsername"
+        app:layout_constraintTop_toBottomOf="@+id/profileUsername" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pictureGrid"
-        android:layout_width="400dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
-        android:padding="5dp"
         android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -164,6 +159,51 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintVertical_bias="0.255" />
     </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="242dp"
+        android:layout_height="13dp"
+
+        android:layout_marginStart="72dp"
+
+        android:layout_marginBottom="4dp"
+        android:indeterminateDrawable="@drawable/progress_bar_shape"
+        android:progressDrawable="@drawable/progress_bar_shape"
+        app:layout_constraintBottom_toBottomOf="@+id/profilePicture"
+        app:layout_constraintStart_toStartOf="@+id/profilePicture" />
+
+    <TextView
+        android:id="@+id/level"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/map_icon_frame"
+        android:fontFamily="@font/poppins"
+        android:gravity="center"
+
+        android:paddingTop="1dp"
+        android:shadowDx="0"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textIsSelectable="false"
+        android:textSize="18sp"
+        app:drawableTint="@color/transparent"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintEnd_toEndOf="@+id/progressBar"
+        />
+
+    <TextView
+        android:id="@+id/levelText"
+        android:layout_width="112dp"
+        android:layout_height="17dp"
+        android:layout_marginBottom="5dp"
+        android:textColor="#FFF27329"
+        android:fontFamily="@font/poppins"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintEnd_toStartOf="@+id/level" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
