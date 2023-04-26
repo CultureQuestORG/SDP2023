@@ -153,12 +153,12 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             popupWindow.dismiss();
         });
 
-        // Set a delay of 5 seconds before making the popup invisible
+        // Set a delay of 3 seconds before making the popup invisible
         new Handler().postDelayed(() -> {
             if (popupWindow.isShowing()) {
                 popupWindow.dismiss();
             }
-        }, 5000);
+        }, 3000);
     }
     private void setRarityBadge(ImageView rarityBadge, Integer score) {
         if (score != null) {

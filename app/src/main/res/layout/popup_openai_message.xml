@@ -29,6 +29,7 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/rounded_button"
         android:text="Don't show again"
+        android:layout_gravity="center"
         android:textSize="14sp"
         android:paddingLeft="12dp"
         android:paddingTop="8dp"
