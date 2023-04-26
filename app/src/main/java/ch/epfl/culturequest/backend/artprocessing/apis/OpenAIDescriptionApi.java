@@ -1,6 +1,7 @@
 package ch.epfl.culturequest.backend.artprocessing.apis;
 
 
+import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
@@ -11,8 +12,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
+import ch.epfl.culturequest.backend.exceptions.OpenAiFailedException;
 
 
 /**
@@ -54,13 +57,17 @@ public class OpenAIDescriptionApi {
                 .build();
 
         return CompletableFuture.supplyAsync( () -> service.createChatCompletion(completionRequest))
-                    .thenApply(result -> result.getChoices().get(0).getMessage().getContent());
+                    .thenApply(result -> result.getChoices().get(0).getMessage().getContent())
+                    .exceptionally(e -> {
+                        throw new CompletionException(new OpenAiFailedException("OpenAI failed to respond"));
+                    });
     }
 
     private String getStringOrNull(JSONObject obj, String key) {
         String value = obj.optString(key, null);
         return "null".equals(value) ? null : value;
     }
+
     private ArrayList<String> parseMissingData(String jsonData){
 
         try {
@@ -76,7 +83,7 @@ public class OpenAIDescriptionApi {
         }
 
         catch (JSONException e) {
-            throw new RuntimeException(e);
+            throw new CompletionException(new OpenAiFailedException("OpenAI failed to provide JSON data"));
         }
     }
 

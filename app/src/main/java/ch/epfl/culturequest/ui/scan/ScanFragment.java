@@ -14,6 +14,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -28,6 +29,9 @@ import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
+import ch.epfl.culturequest.backend.exceptions.OpenAiFailedException;
+import ch.epfl.culturequest.backend.exceptions.RecognitionFailedException;
+import ch.epfl.culturequest.backend.exceptions.WikipediaDescriptionFailedException;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.storage.LocalStorage;
@@ -84,6 +88,26 @@ public class ScanFragment extends Fragment {
                                         intent.putExtra("imageUri", lastlyStoredImageUri.toString());
                                         startActivity(intent);
                                         loadingAnimation.stopLoading();
+                                    })
+                                    .exceptionally(ex -> {
+
+                                        Throwable cause = ex.getCause();
+                                        String errorMessage;
+
+                                        if (cause instanceof OpenAiFailedException) {
+                                            errorMessage = "OpenAI failed to process the art.";
+                                        } else if (cause instanceof RecognitionFailedException) {
+                                            errorMessage = "Art recognition failed. Please try again.";
+                                        } else if (cause instanceof WikipediaDescriptionFailedException) {
+                                            errorMessage = "Failed to retrieve description from Wikipedia.";
+                                        } else {
+                                            errorMessage = "An unknown error occurred.";
+                                        }
+
+                                        // Show the Toast with the error message
+                                        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+
+                                        return null;
                                     });
 
                         } catch (IOException e) {
