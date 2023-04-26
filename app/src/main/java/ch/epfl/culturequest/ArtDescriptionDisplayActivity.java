@@ -30,6 +30,8 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     private Bitmap scannedImage;
 
+    private static final int POPUP_DELAY = 3000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -146,7 +148,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             if (popupWindow.isShowing()) {
                 popupWindow.dismiss();
             }
-        }, 3000);
+        }, POPUP_DELAY);
     }
     private void setRarityBadge(ImageView rarityBadge, Integer score) {
         if (score != null) {
