@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.backend;
+package ch.epfl.culturequest.storage;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;

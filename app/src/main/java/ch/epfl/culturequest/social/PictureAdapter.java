@@ -9,11 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -77,7 +75,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     }
 
-    private void handleLike(@NonNull PictureViewHolder holder,Post post){
+    private void handleLike(@NonNull PictureViewHolder holder, Post post) {
         if (post.isLikedBy(Profile.getActiveProfile().getUid())) {
             holder.isLiked = true;
             Picasso.get().load(R.drawable.like_full).into(holder.like);
@@ -115,9 +113,9 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     private void handleDelete(@NonNull PictureViewHolder holder, Post post) {
         if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
             holder.delete.setVisibility(View.VISIBLE);
-            holder.delete.setOnClickListener(v->handleDeletePopUp(v,post));
+            holder.delete.setOnClickListener(v -> handleDeletePopUp(v, post));
             holder.pictureImageView.setOnLongClickListener(v -> {
-                handleDeletePopUp(v,post);
+                handleDeletePopUp(v, post);
                 return true;
             });
         } else {
@@ -125,7 +123,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         }
     }
 
-    private void handleDeletePopUp(View v, Post post){
+    private void handleDeletePopUp(View v, Post post) {
 
         AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
                 .setPositiveButton("Yes", (dialog, which) -> {
@@ -141,8 +139,6 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
         dial.show();
     }
-
-
 
 
     @Override

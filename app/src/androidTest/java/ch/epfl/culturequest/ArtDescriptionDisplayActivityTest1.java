@@ -9,23 +9,17 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.view.View;
-import android.widget.ImageView;
 
-import androidx.annotation.DrawableRes;
-import androidx.core.content.ContextCompat;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 
-import ch.epfl.culturequest.backend.LocalStorage;
-import ch.epfl.culturequest.backend.artprocessingtest.ArtImageUploadTest;
+import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.LocalStorage;
 
 public class ArtDescriptionDisplayActivityTest1 {
 
@@ -44,7 +38,7 @@ public class ArtDescriptionDisplayActivityTest1 {
         //String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100";
         intent.putExtra("artDescription", serializedDescription);
 
-        Bitmap bitmap = new ArtImageUploadTest().getBitmapFromURL("https://uploads0.wikiart.org/00339/images/leonardo-da-vinci/mona-lisa-c-1503-1519.jpg");
+        Bitmap bitmap = FireStorage.getBitmapFromURL("https://uploads0.wikiart.org/00339/images/leonardo-da-vinci/mona-lisa-c-1503-1519.jpg");
 
         // get content resolver from the target context
         LocalStorage localStorage = new LocalStorage(targetContext.getContentResolver());
