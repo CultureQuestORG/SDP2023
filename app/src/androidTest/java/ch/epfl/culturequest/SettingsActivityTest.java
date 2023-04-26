@@ -6,20 +6,11 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.intent.Intents.intended;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
 
 import android.Manifest;
@@ -41,6 +32,7 @@ import org.junit.runner.RunWith;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.storage.FireStorage;
 
 @RunWith(AndroidJUnit4.class)
 public class SettingsActivityTest {
@@ -61,6 +53,12 @@ public class SettingsActivityTest {
 
         // clear the database before starting the following tests
         Database.clearDatabase();
+
+        // Set up the online storage to run on the local emulator of Firebase
+        FireStorage.setEmulatorOn();
+
+        // Clear the storage after the tests
+        FireStorage.clearStorage();
 
         FirebaseAuth.getInstance()
                 .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
@@ -90,6 +88,10 @@ public class SettingsActivityTest {
 
         // clear the database after each test
         Database.clearDatabase();
+
+        // Clear the storage after the tests
+        FireStorage.clearStorage();
+
     }
 
     @Test
