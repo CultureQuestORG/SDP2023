@@ -97,7 +97,7 @@ public class MapsFragment extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             mMap = googleMap;
-            drawPositionMarker(viewModel.getCurrentLocation().getValue());
+            getProfilePicture();
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.maps_style_json));
             getLocationPermission();
             mMap.moveCamera(CameraUpdateFactory
@@ -228,10 +228,11 @@ public class MapsFragment extends Fragment {
 
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         View mapView = binding.getRoot();
-        getProfilePicture();
+
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
+
         otmProvider = new RetryingOTMProvider(new BasicOTMProvider());
         viewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location -> {
             if (mMap != null) {
