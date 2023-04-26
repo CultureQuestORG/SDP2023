@@ -171,6 +171,7 @@ public class Profile extends Observable {
         });
         return future;
     }
+
     public static Profile getActiveProfile() {
         return activeProfile;
     }

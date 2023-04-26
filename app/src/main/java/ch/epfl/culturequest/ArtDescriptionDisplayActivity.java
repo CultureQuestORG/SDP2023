@@ -32,10 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
-import ch.epfl.culturequest.backend.LocalStorage;
-import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
-import ch.epfl.culturequest.backend.artprocessing.utils.ArtImageUpload;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
@@ -51,6 +48,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
 
@@ -61,6 +59,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         Uri imageUri = Uri.parse(imageUriExtra);
 
         BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
+
         // get bitmap from imageUri with the ContentResolver
         try {
             // get bitmap from imageUri with the ContentResolver

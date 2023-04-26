@@ -1,6 +1,8 @@
 package ch.epfl.culturequest.ui.leaderboard;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
+import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -22,6 +27,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<LeaderboardRecycleViewAdapter.LeaderboardViewHolder> {
     private List<String> topNUserNames;
 
+    private List<String> topNUids;
     private List<String> topNUserScores;
 
     private List<String> topNUserRanks;
@@ -77,6 +83,11 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
                     notifyItemRangeChanged(0, getItemCount());
                 });
 
+                leaderboardViewModel.getTopNUserUids().observeForever(topNUids ->{
+                    this.topNUids = topNUids;
+                    notifyItemRangeChanged(0, getItemCount());
+                });
+
                 leaderboardViewModel.getTopNUserScores().observeForever(topNUserScores -> {
                     this.topNUserScores = topNUserScores;
                     notifyItemRangeChanged(0, getItemCount());
@@ -93,6 +104,11 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
             case FRIENDS:
                 leaderboardViewModel.getTopNUserNamesFriends().observeForever(topNUserNames -> {
                     this.topNUserNames = topNUserNames;
+                    notifyItemRangeChanged(0, getItemCount());
+                });
+
+                leaderboardViewModel.getTopNUserUidsFriends().observeForever(topNUids ->{
+                    this.topNUids = topNUids;
                     notifyItemRangeChanged(0, getItemCount());
                 });
 
@@ -120,14 +136,20 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
     public LeaderboardViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the leaderboard items
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.leaderboard_item, viewGroup, false);
-
         return new LeaderboardViewHolder(view);
     }
 
     // Replace the contents of a view when data changed (invoked by the layout manager)
     @Override
     public void onBindViewHolder(LeaderboardViewHolder leaderboardViewHolder, final int position) {
-
+        Context itemViewContext = leaderboardViewHolder.itemView.getContext();
+        List.of(leaderboardViewHolder.userName, leaderboardViewHolder.userProfilePicture).forEach(view -> {
+            view.setOnClickListener(l -> {
+                Intent intent = new Intent(itemViewContext, DisplayUserProfileActivity.class);
+                intent.putExtra("uid", topNUids.get(position));
+                itemViewContext.startActivity(intent);
+            });
+        });
         // Get element at this position and replace the contents of the view with that element
         leaderboardViewHolder.getUserName().setText(topNUserNames.get(position));
         leaderboardViewHolder.getUserScore().setText(topNUserScores.get(position));
@@ -141,12 +163,11 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
     // (because the lists are updated asynchronously)
     @Override
     public int getItemCount() {
-        if (topNUserNames == null || topNUserScores == null || topNUserRanks == null || topNUserProfilePicturesUri == null
-        ) {
+        if (topNUserNames == null || topNUserScores == null || topNUserRanks == null || topNUserProfilePicturesUri == null || topNUids == null) {
             return 0;
         } else {
             // return the minimum size of the lists
-            return Math.min(Math.min(topNUserNames.size(), topNUserScores.size()), Math.min(topNUserRanks.size(), topNUserProfilePicturesUri.size()));
+            return Math.min(topNUids.size(), Math.min(Math.min(topNUserNames.size(), topNUserScores.size()), Math.min(topNUserRanks.size(), topNUserProfilePicturesUri.size())));
         }
     }
 

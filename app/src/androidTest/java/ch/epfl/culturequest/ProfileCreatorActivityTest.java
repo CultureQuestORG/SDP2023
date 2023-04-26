@@ -36,6 +36,7 @@ import org.junit.runner.RunWith;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.storage.FireStorage;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileCreatorActivityTest {
@@ -57,6 +58,12 @@ public class ProfileCreatorActivityTest {
 
         // clear the database before starting the following tests
         Database.clearDatabase();
+
+        // Set up the online storage to run on the local emulator of Firebase
+        FireStorage.setEmulatorOn();
+
+        // Clear the storage after the tests
+        FireStorage.clearStorage();
 
         FirebaseAuth.getInstance()
                 .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
@@ -84,6 +91,10 @@ public class ProfileCreatorActivityTest {
     public void release() {
         // clear the database after finishing the tests
         Database.clearDatabase();
+
+        // Clear the storage after the tests
+        FireStorage.clearStorage();
+
         Intents.release();
     }
 

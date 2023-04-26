@@ -26,8 +26,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import ch.epfl.culturequest.backend.LocalStorage;
-import ch.epfl.culturequest.backend.artprocessingtest.ArtImageUploadTest;
+import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 
@@ -65,7 +65,7 @@ public class  ArtDescriptionDisplayActivityTest1 {
         //String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100";
         intent.putExtra("artDescription", serializedDescription);
 
-        Bitmap bitmap = new ArtImageUploadTest().getBitmapFromURL("https://uploads0.wikiart.org/00339/images/leonardo-da-vinci/mona-lisa-c-1503-1519.jpg");
+        Bitmap bitmap = FireStorage.getBitmapFromURL("https://uploads0.wikiart.org/00339/images/leonardo-da-vinci/mona-lisa-c-1503-1519.jpg");
 
         // get content resolver from the target context
         LocalStorage localStorage = new LocalStorage(targetContext.getContentResolver());
@@ -81,7 +81,7 @@ public class  ArtDescriptionDisplayActivityTest1 {
     }
 
     @Test
-    public void postToProfileWorks() throws InterruptedException {
+    public void postToProfileWorks() {
         onView(withId(R.id.artName)).perform(swipeUp());
         // I couldnt find a nice and easy way to get the test to swipe all the way down on a Scroll view
         //it'd be easier if it was a recycler view

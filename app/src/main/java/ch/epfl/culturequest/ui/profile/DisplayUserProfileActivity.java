@@ -37,7 +37,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class DisplayUserProfileActivity extends AppCompatActivity {
     private FragmentProfileBinding binding;
     private PictureAdapter pictureAdapter;
-    private Profile selectedProfile = ProfileUtils.getSelectedProfile();
     private ImageView backIcon, homeIcon;
     private FollowButton followButton;
 
@@ -56,7 +55,9 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidUtils.removeStatusBar(getWindow());
-        ProfileViewModel profileViewModel = new ViewModelProvider(this, new ProfileViewModelFactory(selectedProfile.getUid())).get(ProfileViewModel.class);
+        //we use the extra bc we wont always open from the search activity
+        String uid = getIntent().getStringExtra("uid");
+        ProfileViewModel profileViewModel = new ViewModelProvider(this, new ProfileViewModelFactory(uid)).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(getLayoutInflater());
         View root = binding.getRoot();
         final TextView textView = binding.profileUsername;

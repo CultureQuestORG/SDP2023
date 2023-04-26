@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -14,10 +15,12 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,10 +29,11 @@ import java.io.IOException;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
-import ch.epfl.culturequest.backend.LocalStorage;
+import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
-import ch.epfl.culturequest.backend.artprocessing.utils.UploadAndProcess;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
+import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.ui.commons.LoadingAnimation;
 import ch.epfl.culturequest.utils.PermissionRequest;
 
@@ -45,11 +49,13 @@ public class ScanFragment extends Fragment {
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
-            if(permissionRequest.hasPermission(getContext()))
+            if (permissionRequest.hasPermission(getContext()))
                 cameraSetup.openCamera();
         }
+
         @Override
-        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {}
+        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {
+        }
 
         @Override
         public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surfaceTexture) {
@@ -58,7 +64,8 @@ public class ScanFragment extends Fragment {
 
         @Override
         public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surfaceTexture) {
-        }};
+        }
+    };
 
     // ScanButtonListener is used to detect when the scan button is clicked
     private final View.OnClickListener scanButtonListener = view -> {
@@ -71,15 +78,17 @@ public class ScanFragment extends Fragment {
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
 
-                            UploadAndProcess.uploadAndProcess(bitmap).thenAccept(artDescription -> {
-                                Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
-                                Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
-                                String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
-                                intent.putExtra("artDescription", serializedArtDescription);
-                                intent.putExtra("imageUri", lastlyStoredImageUri.toString());
-                                startActivity(intent);
-                                loadingAnimation.stopLoading();
-                            });
+                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(ProcessingApi::getArtDescriptionFromUrl)
+                                    .thenAccept(artDescription -> {
+                                        Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
+
+                                        Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
+                                        String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
+                                        intent.putExtra("artDescription", serializedArtDescription);
+                                        intent.putExtra("imageUri", lastlyStoredImageUri.toString());
+                                        startActivity(intent);
+                                        loadingAnimation.stopLoading();
+                                    });
 
                         } catch (IOException e) {
                             throw new RuntimeException(e);
