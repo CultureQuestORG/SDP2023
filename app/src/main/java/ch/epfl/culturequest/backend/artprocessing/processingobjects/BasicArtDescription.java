@@ -23,6 +23,9 @@ public class BasicArtDescription {
 
     private String artist;
 
+    private Boolean requiredOpenAi = false;
+
+
     public BasicArtDescription(String name, String artist, String summary, ArtType type, String year, String city, String country, String museum, Integer score) {
         this.artist = artist;
         this.name = name;
@@ -67,7 +70,10 @@ public class BasicArtDescription {
 
     public Integer getScore() {
         return this.score;
+    }
 
+    public Boolean isOpenAiRequired() {
+        return requiredOpenAi;
     }
 
     public void setScore(Integer score) {
@@ -89,6 +95,8 @@ public class BasicArtDescription {
         this.year = year;
     }
 
-
+    public void setRequiredOpenAi(Boolean requiredOpenAi) {
+        this.requiredOpenAi = requiredOpenAi;
+    }
 
 }

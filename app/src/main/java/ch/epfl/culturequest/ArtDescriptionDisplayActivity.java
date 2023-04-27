@@ -4,11 +4,19 @@ import static ch.epfl.culturequest.social.RarityLevel.getRarityLevel;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import java.io.FileNotFoundException;
@@ -16,10 +24,13 @@ import java.io.FileNotFoundException;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.social.ScanBadge;
+import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     private Bitmap scannedImage;
+
+    private static final int POPUP_DELAY = 3000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +45,17 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         Uri imageUri = Uri.parse(imageUriExtra);
 
         BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
+
+        // Get SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
+        boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
+
+        // Check if artDescription.openAIRequired is true and doNotShowAgain is false
+        if (artDescription.isOpenAiRequired() && !doNotShowAgain) {
+            EspressoIdlingResource.countingIdlingResource.increment();
+            showOpenAIPopup();
+            EspressoIdlingResource.countingIdlingResource.decrement();
+        }
 
         // get bitmap from imageUri with the ContentResolver
         try {
@@ -98,6 +120,36 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         textView.setText(text != null ? text : fallbackText);
     }
 
+    private void showOpenAIPopup() {
+        View popupView = LayoutInflater.from(this).inflate(R.layout.popup_openai_message, null);
+        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+
+        // Show the popup in the center of the screen after the activity has been fully initialized
+        findViewById(android.R.id.content).post(() -> {
+            if (!isFinishing()) {
+                popupWindow.showAtLocation(findViewById(android.R.id.content), Gravity.CENTER, 0, 0);
+            }
+        });
+
+        // Set the "Do not show it again" button click listener
+        Button btnDoNotShowAgain = popupView.findViewById(R.id.btn_do_not_show_again);
+        btnDoNotShowAgain.setOnClickListener(view -> {
+
+            SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("do_not_show_again", true);
+            editor.apply();
+
+            popupWindow.dismiss();
+        });
+
+        // Set a delay of 3 seconds before making the popup invisible
+        new Handler().postDelayed(() -> {
+            if (popupWindow.isShowing()) {
+                popupWindow.dismiss();
+            }
+        }, POPUP_DELAY);
+    }
     private void setRarityBadge(ImageView rarityBadge, Integer score) {
         if (score != null) {
             rarityBadge.setImageResource(getRarityLevel(score).getRarenessIcon());

@@ -18,9 +18,10 @@ public class DescriptionSerializer {
         String artist = fieldOrNullSerialize(artDescription.getArtist());
         String type = artDescription.getType() == null ? "null" : artDescription.getType().toString();
         String score = artDescription.getScore() == null ? "null" : artDescription.getScore().toString();
+        String requiredOpenAi = artDescription.isOpenAiRequired().toString();
 
         // use | as a separator
-        return summary + "|" + city + "|" + country + "|" + museum + "|" + year + "|" + name + "|" + artist + "|" + type + "|" + score;
+        return summary + "|" + city + "|" + country + "|" + museum + "|" + year + "|" + name + "|" + artist + "|" + type + "|" + score+ "|"+requiredOpenAi;
 
     }
 
@@ -38,8 +39,12 @@ public class DescriptionSerializer {
 
         BasicArtDescription.ArtType type = fields[7].equals("null") ? null : BasicArtDescription.ArtType.valueOf(fields[7]);
         Integer score = fields[8].equals("null") ? null : Integer.parseInt(fields[8]);
+        Boolean requiredOpenAi = Boolean.parseBoolean(fields[9]);
 
-        return new BasicArtDescription(name, artist, summary, type, year, city, country, museum, score);
+        BasicArtDescription basicArtDescription = new BasicArtDescription(name, artist, summary, type, year, city, country, museum, score);
+        basicArtDescription.setRequiredOpenAi(requiredOpenAi);
+
+        return basicArtDescription;
 
     }
 
