@@ -103,7 +103,7 @@ public class ScanFragment extends Fragment {
 
                                         if (cause instanceof OpenAiFailedException) {
                                             errorMessage = "OpenAI failed to process the art.";
-                                            drawableId = R.drawable.image_recognition_error;
+                                            drawableId = R.drawable.openai_logo;
                                         } else if (cause instanceof RecognitionFailedException) {
                                             errorMessage = "Art recognition failed. Please try again.";
                                             drawableId = R.drawable.image_recognition_error;
