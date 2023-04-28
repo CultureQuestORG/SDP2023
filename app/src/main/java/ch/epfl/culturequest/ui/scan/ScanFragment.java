@@ -1,9 +1,12 @@
 package ch.epfl.culturequest.ui.scan;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -13,8 +16,8 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -22,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
 
 import java.io.IOException;
 
@@ -36,13 +40,15 @@ import ch.epfl.culturequest.databinding.FragmentScanBinding;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.ui.commons.LoadingAnimation;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.PermissionRequest;
 
 public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
-    private CameraSetup cameraSetup;
+    public static CameraSetup cameraSetup;
+    public static ProcessingApi processingApi;
     private LoadingAnimation loadingAnimation;
 
     //SurfaceTextureListener is used to detect when the TextureView is ready to be used
@@ -78,7 +84,7 @@ public class ScanFragment extends Fragment {
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
 
-                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(ProcessingApi::getArtDescriptionFromUrl)
+                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(processingApi::getArtDescriptionFromUrl)
                                     .thenAccept(artDescription -> {
                                         Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
 
@@ -90,22 +96,27 @@ public class ScanFragment extends Fragment {
                                         loadingAnimation.stopLoading();
                                     })
                                     .exceptionally(ex -> {
-
+                                        loadingAnimation.stopLoading();
                                         Throwable cause = ex.getCause();
                                         String errorMessage;
+                                        int drawableId;
 
                                         if (cause instanceof OpenAiFailedException) {
                                             errorMessage = "OpenAI failed to process the art.";
+                                            drawableId = R.drawable.image_recognition_error;
                                         } else if (cause instanceof RecognitionFailedException) {
                                             errorMessage = "Art recognition failed. Please try again.";
+                                            drawableId = R.drawable.image_recognition_error;
                                         } else if (cause instanceof WikipediaDescriptionFailedException) {
                                             errorMessage = "Failed to retrieve description from Wikipedia.";
+                                            drawableId = R.drawable.wikipedia_error;
                                         } else {
                                             errorMessage = "An unknown error occurred.";
+                                            drawableId = R.drawable.unknown_error;
                                         }
 
-                                        // Show the Toast with the error message
-                                        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+                                        View rootView = requireActivity().findViewById(android.R.id.content);
+                                        CustomSnackbar.showCustomSnackbar(errorMessage, drawableId, rootView);
 
                                         return null;
                                     });
@@ -113,6 +124,12 @@ public class ScanFragment extends Fragment {
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
+                    }).exceptionally(e -> {
+                        loadingAnimation.stopLoading();
+
+                        View rootView = requireActivity().findViewById(android.R.id.content);
+                        CustomSnackbar.showCustomSnackbar("Failed to take picture.", R.drawable.camera_error, rootView);
+                        return null;
                     });
                 }
             });
@@ -193,4 +210,5 @@ public class ScanFragment extends Fragment {
             permissionRequest.askPermission(requestPermissionLauncher);
         }
     }
+
 }

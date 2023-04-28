@@ -16,10 +16,14 @@ public class MockOpenAiService extends OpenAiService {
     }
 
     private String mockResponse;
+    private Boolean chatCompletionThrowsException = false;
 
     @Override
     public ChatCompletionResult createChatCompletion(ChatCompletionRequest completionRequest) {
         // Return a mock JSON response here
+
+        if(chatCompletionThrowsException) throw new RuntimeException("Mock exception thrown");
+
         ChatCompletionResult result = new ChatCompletionResult();
         String jsonResponse = getMockResponse();
         ChatMessage responseMessage = new ChatMessage("ai", jsonResponse);
@@ -35,6 +39,10 @@ public class MockOpenAiService extends OpenAiService {
 
     public String getMockResponse() {
         return mockResponse;
+    }
+
+    public void setChatCompletionThrowsException(Boolean chatCompletionThrowsException) {
+        this.chatCompletionThrowsException = chatCompletionThrowsException;
     }
 
 

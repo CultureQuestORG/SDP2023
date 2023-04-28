@@ -82,7 +82,7 @@ public class OpenAIDescriptionApi {
             return data;
         }
 
-        catch (JSONException e) {
+        catch (Exception e) {
             throw new CompletionException(new OpenAiFailedException("OpenAI failed to provide JSON data"));
         }
     }
@@ -93,8 +93,8 @@ public class OpenAIDescriptionApi {
 
             return obj.getInt("artPopularity");
         }
-        catch (JSONException e) {
-            throw new RuntimeException(e);
+        catch (Exception e) {
+            throw new CompletionException(new OpenAiFailedException("OpenAI failed to provide JSON data"));
         }
     }
 

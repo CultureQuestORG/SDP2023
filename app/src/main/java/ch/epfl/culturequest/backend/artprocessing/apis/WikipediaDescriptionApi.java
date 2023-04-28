@@ -87,16 +87,18 @@ public class WikipediaDescriptionApi {
                     pageHtmlFuture.completeExceptionally(new CompletionException(new WikipediaDescriptionFailedException("Failed to retrieve Wikipedia HTTP response")));
                 }
 
-                if (wikipediaResponseIsAmbiguous(response.body().string())) {
+                String pageHtml = response.body().string();
+
+                if (wikipediaResponseIsAmbiguous(pageHtml)) {
                     pageHtmlFuture.completeExceptionally(new CompletionException(new WikipediaDescriptionFailedException("Ambiguity detected")));
                 }
 
-                else if(wikipediaPageDoesNotExist(response.body().string())){
+                else if(wikipediaPageDoesNotExist(pageHtml)){
                     pageHtmlFuture.completeExceptionally(new CompletionException(new WikipediaDescriptionFailedException("Wikipedia page does not exist")));
                 }
 
                 else {
-                    pageHtmlFuture.complete(response.body().string());
+                    pageHtmlFuture.complete(pageHtml);
                 }
             }});
 
