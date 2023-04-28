@@ -29,6 +29,7 @@ public class GeneralDescriptionApiTest {
         assertThat(description.getYear(), is("1836"));
         assertThat(description.getCity(), is("Paris"));
         assertThat(description.getCountry(), is("France"));
+        assertThat(description.isOpenAiRequired(), is(true));
     }
 
     @Test

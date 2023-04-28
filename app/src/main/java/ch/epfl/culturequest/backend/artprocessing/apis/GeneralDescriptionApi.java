@@ -53,10 +53,11 @@ public class GeneralDescriptionApi {
                                     basicArtDescription.setCity(city);
                                     basicArtDescription.setCountry(country);
                                     basicArtDescription.setScore(s);
+                                    basicArtDescription.setRequiredOpenAi(true);
 
                                     return basicArtDescription;
-                                })
-                                .exceptionally(e -> basicArtDescription);
+
+                        }).exceptionally(e -> basicArtDescription);
                     }
                 }
         );
