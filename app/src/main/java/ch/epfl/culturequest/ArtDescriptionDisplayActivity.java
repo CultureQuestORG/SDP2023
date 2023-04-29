@@ -64,17 +64,14 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
         // Check if artDescription.openAIRequired is true and doNotShowAgain is false
         if (artDescription.isOpenAiRequired() && !doNotShowAgain) {
-            EspressoIdlingResource.countingIdlingResource.increment();
             showOpenAIPopup();
-            EspressoIdlingResource.countingIdlingResource.decrement();
         }
         // get bitmap from imageUri with the ContentResolver
         try {
             // get bitmap from imageUri with the ContentResolver
             Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
             scannedImage = bitmap;
-            ImageView imageView = findViewById(R.id.artImage);
-            imageView.setImageBitmap(scannedImage);
+            ((ImageView) findViewById(R.id.artImage)).setImageBitmap(bitmap);
             displayArtInformation(artDescription);
             postButton.setOnClickListener(v -> uploadImage(bitmap, artDescription));
         } catch (FileNotFoundException e) {

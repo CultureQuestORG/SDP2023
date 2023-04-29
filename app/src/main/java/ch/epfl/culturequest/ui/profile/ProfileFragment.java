@@ -1,7 +1,6 @@
 package ch.epfl.culturequest.ui.profile;
 
 
-import static ch.epfl.culturequest.utils.AndroidUtils.testMode;
 import static ch.epfl.culturequest.utils.ProfileUtils.postsAdded;
 
 import android.content.Intent;
