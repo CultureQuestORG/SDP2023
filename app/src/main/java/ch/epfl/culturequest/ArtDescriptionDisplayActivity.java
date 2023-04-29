@@ -50,7 +50,6 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
         animation = findViewById(R.id.uploadingAnimation);
@@ -59,19 +58,16 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
         String imageUriExtra = getIntent().getStringExtra("imageUri");
         Uri imageUri = Uri.parse(imageUriExtra);
-
         BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
         // Get SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
         boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
-
         // Check if artDescription.openAIRequired is true and doNotShowAgain is false
         if (artDescription.isOpenAiRequired() && !doNotShowAgain) {
             EspressoIdlingResource.countingIdlingResource.increment();
             showOpenAIPopup();
             EspressoIdlingResource.countingIdlingResource.decrement();
         }
-
         // get bitmap from imageUri with the ContentResolver
         try {
             // get bitmap from imageUri with the ContentResolver
@@ -80,10 +76,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             ImageView imageView = findViewById(R.id.artImage);
             imageView.setImageBitmap(scannedImage);
             displayArtInformation(artDescription);
-            postButton.setOnClickListener(v -> {
-                uploadImage(bitmap, artDescription);
-            });
-
+            postButton.setOnClickListener(v -> uploadImage(bitmap, artDescription));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             finish();
