@@ -18,6 +18,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalMatchers.not;
 
+import static ch.epfl.culturequest.utils.AndroidUtils.testMode;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.widget.Button;
@@ -90,7 +92,7 @@ public class ProfileFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
-
+        testMode = true;
         Thread.sleep(8000);
     }
 
@@ -117,12 +119,6 @@ public class ProfileFragmentTest {
 
     @Test
     public void deleteButtonWorks() {
-        Database.clearDatabase();
-        Post post = new Post("abc", "cT93LtGk2dT9Jvg46pOpbBP69Kx1",
-                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                "Piece of Art", 0, 0, new ArrayList<>());
-
-        Database.uploadPost(post);
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
 
         //long click on the first picture should open an alert dialog

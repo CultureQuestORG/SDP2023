@@ -98,14 +98,16 @@ public class ProfileFragment extends Fragment {
         int limit = postsAdded;
         List<Post> images = this.images.getValue();
         if (limit > 0) {
-            Profile.getActiveProfile().retrievePosts(limit, 0)
-                    .whenComplete((posts, e) -> {
-                        assert images != null;
-                        images.addAll(0, posts);
-                        images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
-                        pictureAdapter.notifyItemRangeInserted(0, limit);
-                    });
-            postsAdded = 0;
+            if (!testMode) {
+                Profile.getActiveProfile().retrievePosts(limit, 0)
+                        .whenComplete((posts, e) -> {
+                            assert images != null;
+                            images.addAll(0, posts);
+                            images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
+                            pictureAdapter.notifyItemRangeInserted(0, limit);
+                        });
+                postsAdded = 0;
+            }
         }
     }
 
