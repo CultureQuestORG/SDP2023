@@ -1,6 +1,7 @@
 package ch.epfl.culturequest.ui.profile;
 
 
+import static ch.epfl.culturequest.utils.AndroidUtils.testMode;
 import static ch.epfl.culturequest.utils.ProfileUtils.postsAdded;
 
 import android.content.Intent;
@@ -98,13 +99,15 @@ public class ProfileFragment extends Fragment {
         int limit = postsAdded;
         List<Post> images = this.images.getValue();
         if (limit > 0) {
-            Profile.getActiveProfile().retrievePosts(limit, 0)
-                    .whenComplete((posts, e) -> {
-                        assert images != null;
-                        images.addAll(0, posts);
-                        images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
-                        pictureAdapter.notifyItemRangeInserted(0, limit);
-                    });
+            if(!testMode) {
+                Profile.getActiveProfile().retrievePosts(limit, 0)
+                        .whenComplete((posts, e) -> {
+                            assert images != null;
+                            images.addAll(0, posts);
+                            images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
+                            pictureAdapter.notifyItemRangeInserted(0, limit);
+                        });
+            }
             postsAdded = 0;
         }
     }

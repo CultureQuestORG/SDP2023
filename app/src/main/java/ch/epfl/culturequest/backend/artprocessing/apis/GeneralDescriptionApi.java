@@ -52,6 +52,8 @@ public class GeneralDescriptionApi {
                             basicArtDescription.setCountry(country);
                             basicArtDescription.setScore(s);
 
+                            basicArtDescription.setRequiredOpenAi(true);
+
                             return basicArtDescription;
                         });
                     }
