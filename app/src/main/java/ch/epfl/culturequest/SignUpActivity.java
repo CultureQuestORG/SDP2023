@@ -19,7 +19,7 @@ import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class SignUpActivity extends AppCompatActivity {
     private final Authenticator auth = new Authenticator(this, false);
-    private final FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    private final FirebaseUser currentUser = Authenticator.getCurrentUser();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

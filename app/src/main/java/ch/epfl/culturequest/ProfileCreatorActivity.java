@@ -25,6 +25,7 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.util.Objects;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
@@ -105,10 +106,10 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         setDefaultPicIfNoneSelected();
 
         profile.setUsername(username);
-        profile.setUid(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
+        profile.setUid(Authenticator.getCurrentUser().getUid());
 
         //if user is anonymous, we don't want to store the profile in the database
-        if (!Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isAnonymous()) {
+        if (!Authenticator.getCurrentUser().isAnonymous()) {
 
             //if the profile picture is not the default one, we store it in the storage
             if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PATH))

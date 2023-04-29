@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
@@ -62,7 +63,7 @@ public class LeaderboardViewModel extends ViewModel {
         String currentUserUid;
         Profile activeProfile = Profile.getActiveProfile();
         if (activeProfile == null) {
-            currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+            currentUserUid = Authenticator.getCurrentUser().getUid();
         }
         else {
             currentUserUid = activeProfile.getUid();

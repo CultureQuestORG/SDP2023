@@ -34,6 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
@@ -64,6 +65,9 @@ public class ProfileCreatorActivityTest {
 
         // Clear the storage after the tests
         FireStorage.clearStorage();
+
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
 
         FirebaseAuth.getInstance()
                 .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
