@@ -62,8 +62,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         //handle logout
         Button logoutButton = binding.logOut;
-        Authenticator auth = new Authenticator(this, false);
-        logoutButton.setOnClickListener(v -> auth.signOut());
+        logoutButton.setOnClickListener(v -> Authenticator.signOut(this));
 
         activeProfile = Profile.getActiveProfile();
 

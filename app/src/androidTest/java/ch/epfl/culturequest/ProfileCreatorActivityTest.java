@@ -69,14 +69,8 @@ public class ProfileCreatorActivityTest {
         //Set up the authentication to run on the local emulator of Firebase
         Authenticator.setEmulatorOn();
 
-        FirebaseAuth.getInstance()
-                .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        user = FirebaseAuth.getInstance().getCurrentUser();
-                    }
-                });
-        Thread.sleep(8000);
+        // Signs in a test user because all the tests require a signed in user
+        Authenticator.manualSignIn("test@gmail.com", "abcdefg").join();
     }
 
     @Before
