@@ -41,19 +41,16 @@ import ch.epfl.culturequest.storage.FireStorage;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileCreatorActivityTest {
-
-    private static FirebaseUser user;
-
-
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
 
     private static Profile profile;
-
     private static ProfileCreatorActivity activity;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
-    @BeforeClass
-    public static void setup() throws InterruptedException {
+    @Before
+    public void setup() throws InterruptedException {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
@@ -69,12 +66,12 @@ public class ProfileCreatorActivityTest {
         //Set up the authentication to run on the local emulator of Firebase
         Authenticator.setEmulatorOn();
 
-        // Signs in a test user because all the tests require a signed in user
-        Authenticator.manualSignIn("test@gmail.com", "abcdefg").join();
-    }
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
 
-    @Before
-    public void init() {
+        // Manually signs in the user before the test in order to test the automatic redirection
+        Authenticator.manualSignIn(email, password).join();
+
         ActivityScenario
                 .launch(ProfileCreatorActivity.class)
                 .onActivity(a -> {
@@ -83,17 +80,6 @@ public class ProfileCreatorActivityTest {
 
                 });
         Intents.init();
-    }
-
-    @After
-    public void release() {
-        // clear the database after finishing the tests
-        Database.clearDatabase();
-
-        // Clear the storage after the tests
-        FireStorage.clearStorage();
-
-        Intents.release();
     }
 
     @Test
@@ -171,5 +157,20 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+    }
+
+    @After
+    public void tearDown() {
+        // clear the database after finishing the tests
+        Database.clearDatabase();
+
+        // Clear the storage after the tests
+        FireStorage.clearStorage();
+
+        // Delete the user created for the tests
+        Authenticator.manualSignIn(email, password).join();
+        Authenticator.deleteCurrentUser();
+
+        Intents.release();
     }
 }

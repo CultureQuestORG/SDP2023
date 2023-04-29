@@ -134,6 +134,7 @@ public class AuthenticatorTest {
         Database.clearDatabase();
 
         // Delete the user created for the tests
+        Authenticator.manualSignIn(email, password).join();
         Authenticator.deleteCurrentUser();
     }
 }
