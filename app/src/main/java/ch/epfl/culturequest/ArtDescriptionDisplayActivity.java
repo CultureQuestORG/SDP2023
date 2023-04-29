@@ -67,7 +67,8 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             finish();
         }
     }
-    private void displayArtInformation(BasicArtDescription artDescription){
+
+    private void displayArtInformation(BasicArtDescription artDescription) {
 
         // Set Art Name
         TextView artNameView = findViewById(R.id.artName);
@@ -172,17 +173,13 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         String uid = activeProfile.getUid();
         animation.startLoading();
         Bitmap bitmap = FireStorage.getBitmapFromURI(uri, getContentResolver());
-        FireStorage.uploadAndGetUrlFromImage(Objects.requireNonNull(bitmap)).whenComplete((url, e) -> {
+        FireStorage.uploadAndGetUrlFromImage(Objects.requireNonNull(bitmap)).thenCompose(url ->
+                Database.uploadPost(new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>()))).whenComplete((lambda, e) -> {
             if (e == null) {
-                Post post = new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>());
-                Database.uploadPost(post).thenAccept((done) -> {
-                    if (done.get()) {
-                        postsAdded++;
-                        activeProfile.incrementScore(artwork.getScore());
-                        animation.stopLoading();
-                        finish();
-                    }
-                });
+                postsAdded++;
+                activeProfile.incrementScore(artwork.getScore());
+                animation.stopLoading();
+                finish();
             } else {
                 e.printStackTrace();
             }

@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +32,7 @@ public class FireStorageTest {
         // Set up the online storage to run on the local emulator of Firebase
         FireStorage.setEmulatorOn();
 
+        FirebaseAuth.getInstance().signInWithEmailAndPassword("test@gmail.com", "abcdefg");
         // Clear the storage before starting the tests
         FireStorage.clearStorage();
     }
