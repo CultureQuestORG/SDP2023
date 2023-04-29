@@ -155,22 +155,4 @@ public class FireStorage {
             return null;
         }
     }
-
-    /**
-     * Returns the bitmap image from the uri. This method is useful to
-     * access images stored in the storage.
-     *
-     * @param uri the uri of the image
-     * @param resolver resolver for the image -- usually getContentResolver() in activities
-     * @return the bitmap for the image
-     */
-    public static Bitmap getBitmapFromURI(Uri uri, ContentResolver resolver) {
-        try {
-            InputStream inputStream = resolver.openInputStream(uri);
-            return BitmapFactory.decodeStream(inputStream);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

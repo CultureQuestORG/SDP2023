@@ -220,7 +220,6 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
      * @param artwork the artwork to add to the database
      */
     private void uploadImage(Bitmap bitmap, BasicArtDescription artwork) {
-        Log.d("WTF", "WTFFF");
         String postId = UUID.randomUUID().toString();
         Profile activeProfile = Profile.getActiveProfile();
         String uid = activeProfile.getUid();
@@ -238,12 +237,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         }).exceptionally(l -> {
             animation.stopLoading();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Error")
-                    .setMessage("Couldn't post picture")
-                    .setCancelable(false)
-                    .setPositiveButton("Cancel", (dialog, which) -> {
-                        dialog.dismiss();
-                    });
+            builder.setTitle("Error").setMessage("Couldn't post picture").setCancelable(false).setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss());
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
             return null;
