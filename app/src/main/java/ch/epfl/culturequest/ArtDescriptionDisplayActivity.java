@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,7 +61,6 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         Uri imageUri = Uri.parse(imageUriExtra);
 
         BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
-
         // Get SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
         boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
@@ -80,6 +80,9 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             ImageView imageView = findViewById(R.id.artImage);
             imageView.setImageBitmap(scannedImage);
             displayArtInformation(artDescription);
+            postButton.setOnClickListener(v -> {
+                uploadImage(bitmap, artDescription);
+            });
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -210,18 +213,18 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     }
 
     /**
-     * Uploads an image to the database when the user presses on the post button. While the images/ folder in the folder is not emptied, we create a folder test
-     * with subfolders for each user and in it the post ids of the images. This way it is easy to categorise images per user.
+     * Uploads an image to the database when the user presses on the post button. it will post
+     * the image in the storage at the address: images/uid/postId
      *
-     * @param uri     the uri to upload
+     * @param bitmap     the bitmap to upload
      * @param artwork the artwork to add to the database
      */
-    private void uploadImage(Uri uri, BasicArtDescription artwork) {
+    private void uploadImage(Bitmap bitmap, BasicArtDescription artwork) {
+        Log.d("WTF", "WTFFF");
         String postId = UUID.randomUUID().toString();
         Profile activeProfile = Profile.getActiveProfile();
         String uid = activeProfile.getUid();
         animation.startLoading();
-        Bitmap bitmap = FireStorage.getBitmapFromURI(uri, getContentResolver());
         FireStorage.uploadAndGetUrlFromImage(Objects.requireNonNull(bitmap)).thenCompose(url ->
                 Database.uploadPost(new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>()))).whenComplete((lambda, e) -> {
             if (e == null) {
