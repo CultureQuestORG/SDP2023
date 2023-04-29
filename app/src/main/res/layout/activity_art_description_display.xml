@@ -233,6 +233,14 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+    <ch.epfl.culturequest.ui.commons.LoadingAnimation
+        android:id="@+id/uploadingAnimation"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/back_button"

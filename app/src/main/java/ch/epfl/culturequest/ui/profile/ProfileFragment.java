@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.culturequest.SettingsActivity;
-import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
@@ -101,12 +99,12 @@ public class ProfileFragment extends Fragment {
         List<Post> images = this.images.getValue();
         if (limit > 0) {
             Profile.getActiveProfile().retrievePosts(limit, 0)
-                    .thenAccept(posts -> {
+                    .whenComplete((posts, e) -> {
                         assert images != null;
                         images.addAll(0, posts);
                         images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
-                        pictureAdapter.notifyItemRangeChanged(0, posts.size());
-            });
+                        pictureAdapter.notifyItemRangeInserted(0, limit);
+                    });
             postsAdded = 0;
         }
     }
