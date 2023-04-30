@@ -66,8 +66,6 @@ public class HomeFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
-
-        Thread.sleep(8000);
     }
 
     @Test

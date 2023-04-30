@@ -79,8 +79,6 @@ public class ProfileFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
-
-        Thread.sleep(8000);
     }
 
     @Test
