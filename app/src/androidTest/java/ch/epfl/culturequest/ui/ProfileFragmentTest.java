@@ -11,7 +11,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
-
 import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
 
 import androidx.fragment.app.FragmentActivity;
@@ -79,6 +78,8 @@ public class ProfileFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
+
+        Thread.sleep(5000);
     }
 
     @Test

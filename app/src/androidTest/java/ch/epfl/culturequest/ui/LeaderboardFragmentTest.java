@@ -65,6 +65,7 @@ public class LeaderboardFragmentTest {
             fragmentTransaction.commitNow();
         });
 
+        Thread.sleep(5000);
     }
 
     @Test
