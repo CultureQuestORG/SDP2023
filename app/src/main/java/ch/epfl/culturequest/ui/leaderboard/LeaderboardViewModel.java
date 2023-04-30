@@ -60,14 +60,7 @@ public class LeaderboardViewModel extends ViewModel {
         EspressoIdlingResource.increment();
         EspressoIdlingResource.increment();
 
-        String currentUserUid;
-        Profile activeProfile = Profile.getActiveProfile();
-        if (activeProfile == null) {
-            currentUserUid = Authenticator.getCurrentUser().getUid();
-        }
-        else {
-            currentUserUid = activeProfile.getUid();
-        }
+        String currentUserUid = Profile.getActiveProfile().getUid();
 
         // retrieve the current user's information to be displayed in the leaderboard
         Database.getProfile(currentUserUid).whenComplete((p, e) -> {

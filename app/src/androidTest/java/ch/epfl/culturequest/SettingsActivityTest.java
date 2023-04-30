@@ -60,7 +60,7 @@ public class SettingsActivityTest {
         // Signs up a test user used in all the tests
         Authenticator.manualSignUp(email, password).join();
 
-        // Manually signs in the user before the test
+        // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
 
         Profile.setActiveProfile(new Profile("userName", DEFAULT_PROFILE_PATH));

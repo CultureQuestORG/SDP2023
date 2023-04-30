@@ -106,8 +106,7 @@ public class Authenticator {
      */
     public static CompletableFuture<AtomicBoolean> manualSignUp(String email, String password) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        FirebaseAuth.getInstance()
-                .createUserWithEmailAndPassword(email, password)
+        authInstance.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         future.complete(new AtomicBoolean(true));
@@ -123,8 +122,7 @@ public class Authenticator {
      */
     public static CompletableFuture<AtomicBoolean> manualSignIn(String email, String password) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        FirebaseAuth.getInstance()
-                .signInWithEmailAndPassword(email, password)
+        authInstance.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         future.complete(new AtomicBoolean(true));

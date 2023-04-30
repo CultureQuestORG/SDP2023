@@ -10,29 +10,17 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.AdditionalMatchers.not;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.widget.Button;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.espresso.IdlingRegistry;
-import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,24 +28,22 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Objects;
-import java.util.TreeMap;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.ProfileFragment;
-import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileFragmentTest {
 
     private ProfileFragment fragment;
-
     private Profile profile;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
 
     @Before
@@ -68,16 +54,20 @@ public class ProfileFragmentTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
-        //UID FOR test mail is cT93LtGk2dT9Jvg46pOpbBP69Kx1123
-        FirebaseAuth.getInstance().signInWithEmailAndPassword("test@gmail.com", "abcdefg");
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
 
-        Post post = new Post("abc", "cT93LtGk2dT9Jvg46pOpbBP69Kx1",
-                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
-                "Piece of Art", 0, 0, new ArrayList<>());
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
 
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
+
+        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PATH
+                , "Piece of Art", 0, 0, new ArrayList<>());
         Database.uploadPost(post);
 
-        profile = new Profile("cT93LtGk2dT9Jvg46pOpbBP69Kx1", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", 35);
+        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PATH, 35);
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 
@@ -91,12 +81,6 @@ public class ProfileFragmentTest {
         });
 
         Thread.sleep(8000);
-    }
-
-    @After
-    public void tearDown() {
-        // clear the database after the tests
-        Database.clearDatabase();
     }
 
     @Test
@@ -140,5 +124,15 @@ public class ProfileFragmentTest {
         onView(withId(R.id.level)).check(matches(withText(Integer.toString(3))));
         // the progress is "8/37 points"
         onView(withId(R.id.levelText)).check(matches(withText("8/37 points")));
+    }
+
+    @After
+    public void tearDown() {
+        // clear the database after the tests
+        Database.clearDatabase();
+
+        // Delete the user created for the tests
+        Authenticator.manualSignIn(email, password).join();
+        Authenticator.deleteCurrentUser();
     }
 }

@@ -48,7 +48,7 @@ public class AuthenticatorTest {
         // Signs up a test user used in all the tests
         Authenticator.manualSignUp(email, password).join();
 
-        // Manually signs in the user before the test in order to test the automatic redirection
+        // Manually signs in the user before the tests in order to test the automatic redirection
         Authenticator.manualSignIn(email, password).join();
 
         ActivityScenario<SignUpActivity> activityScenario = ActivityScenario.launch(SignUpActivity.class);
