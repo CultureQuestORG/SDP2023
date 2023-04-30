@@ -2,13 +2,9 @@ package ch.epfl.culturequest.social;
 
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import org.junit.After;
@@ -17,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ch.epfl.culturequest.authentication.Authenticator;
-import ch.epfl.culturequest.database.Database;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileTest {
@@ -40,7 +35,7 @@ public class ProfileTest {
         Authenticator.manualSignIn(email, password).join();
 
         profile = new Profile("joker", defaultUriString);
-        user =Authenticator.getCurrentUser();
+        user = Authenticator.getCurrentUser();
     }
 
     @Test
