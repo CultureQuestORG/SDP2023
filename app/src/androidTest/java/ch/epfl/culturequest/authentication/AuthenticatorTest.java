@@ -54,7 +54,6 @@ public class AuthenticatorTest {
         ActivityScenario<SignUpActivity> activityScenario = ActivityScenario.launch(SignUpActivity.class);
         activityScenario.onActivity(activity -> {
             this.activity = activity;
-            Authenticator.setSignInLauncher(activity);
         });
     }
 

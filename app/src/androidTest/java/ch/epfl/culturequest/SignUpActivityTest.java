@@ -44,7 +44,6 @@ public class SignUpActivityTest {
         ActivityScenario<SignUpActivity> activityScenario = ActivityScenario.launch(SignUpActivity.class);
         activityScenario.onActivity(activity -> {
             this.activity = activity;
-            Authenticator.setSignInLauncher(activity);
         });
     }
 
@@ -52,7 +51,6 @@ public class SignUpActivityTest {
     public void googleSignInButtonIsClickableForSignedOutUser() {
         // Sign out any Current User that is signed in to ensure that the Google Sign In button is clickable
         Authenticator.signOut(activity).join();
-        AndroidUtils.redirectToActivity(activity, SignUpActivity.class);
         onView(withId(R.id.sign_in_button)).check(matches(isEnabled()));
     }
 
