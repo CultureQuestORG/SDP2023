@@ -141,11 +141,4 @@ public class ProfileTest {
                 + "profilePicture url: " + profile.getProfilePicture() + "\n"
                 + "score: " + profile.getScore() + "\n"));
     }
-
-    @After
-    public void tearDown() {
-        // Delete the user created for the tests
-        Authenticator.manualSignIn(email, password).join();
-        Authenticator.deleteCurrentUser();
-    }
 }

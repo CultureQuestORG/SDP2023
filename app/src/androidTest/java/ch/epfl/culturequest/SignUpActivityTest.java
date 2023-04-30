@@ -70,9 +70,5 @@ public class SignUpActivityTest {
     public void tearDown() {
         // clear the database after running the tests
         Database.clearDatabase();
-
-        // Delete the user created for the tests
-        Authenticator.manualSignIn(email, password).join();
-        Authenticator.deleteCurrentUser();
     }
 }

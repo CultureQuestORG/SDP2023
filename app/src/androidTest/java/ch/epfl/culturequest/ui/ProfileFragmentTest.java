@@ -130,9 +130,5 @@ public class ProfileFragmentTest {
     public void tearDown() {
         // clear the database after the tests
         Database.clearDatabase();
-
-        // Delete the user created for the tests
-        Authenticator.manualSignIn(email, password).join();
-        Authenticator.deleteCurrentUser();
     }
 }

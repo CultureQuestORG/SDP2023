@@ -167,10 +167,6 @@ public class ProfileCreatorActivityTest {
         // Clear the storage after the tests
         FireStorage.clearStorage();
 
-        // Delete the user created for the tests
-        Authenticator.manualSignIn(email, password).join();
-        Authenticator.deleteCurrentUser();
-
         Intents.release();
     }
 }

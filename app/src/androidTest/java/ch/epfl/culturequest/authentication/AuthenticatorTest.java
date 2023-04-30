@@ -6,6 +6,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -126,14 +127,26 @@ public class AuthenticatorTest {
         }
     }
 
+    @Test
+    public void deleteCurrentUserDeletesTheCurrentUser() {
+        try {
+            assertNotNull(Authenticator.getCurrentUser());
+            assertTrue(Authenticator.deleteCurrentUser().get(5, TimeUnit.SECONDS).get());
+            assertNull(Authenticator.getCurrentUser());
+
+            // Signs up the user again for the other tests
+            assertTrue(Authenticator.manualSignUp(email, password).get(5, TimeUnit.SECONDS).get());
+            // Signs in the user again for the other tests
+            assertTrue(Authenticator.manualSignIn(email, password).get(5, TimeUnit.SECONDS).get());
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+    }
+
 
     @After
     public void tearDown() {
         // clear the database after running the tests
         Database.clearDatabase();
-
-        // Delete the user created for the tests
-        Authenticator.manualSignIn(email, password).join();
-        Authenticator.deleteCurrentUser();
     }
 }
