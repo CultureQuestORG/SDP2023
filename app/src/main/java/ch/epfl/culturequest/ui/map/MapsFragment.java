@@ -54,6 +54,8 @@ import ch.epfl.culturequest.backend.map_collection.OTMProvider;
 import ch.epfl.culturequest.backend.map_collection.RetryingOTMProvider;
 import ch.epfl.culturequest.databinding.FragmentMapsBinding;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.leaderboard.LeaderboardFragment;
+import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -105,6 +107,16 @@ public class MapsFragment extends Fragment {
         }
     };
 
+    private void checkInternet(){
+
+        Log.i("FRAGMENT1", getActivity().getSupportFragmentManager().toString());
+        if(!AndroidUtils.isNetworkAvailable()) {
+            Bundle args = new Bundle();
+            args.putBoolean("no_wifi", true);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.map, MapUnavailableFragment.class, args).setReorderingAllowed(true).commit();
+        }
+
+    }
 
     private void drawPositionMarker(LatLng latestLocation){
         frame = mMap.addMarker(new MarkerOptions().zIndex(10000f).position(latestLocation).icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.map_icon_frame), 75, 75, false))));
@@ -192,7 +204,9 @@ public class MapsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        checkInternet();
         if (mMap != null) {
+            Log.i("MAP", String.valueOf(getActivity().getSupportFragmentManager().getFragments().size()));
             getLocationPermission();
         }
         getProfilePicture();
@@ -229,7 +243,7 @@ public class MapsFragment extends Fragment {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         View mapView = binding.getRoot();
 
-
+        checkInternet();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
 
@@ -239,6 +253,7 @@ public class MapsFragment extends Fragment {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
             }
         });
+        Log.i("MAPS", "CREATED VIEW");
         return mapView;
     }
 
@@ -255,6 +270,7 @@ public class MapsFragment extends Fragment {
             viewModel.setIsLocationPermissionGranted(true);
             getDeviceLocation();
         } else {
+            Log.i("PERMISSION", "PERMISSION NOT GRANTED");
             permissionRequest.askPermission(launcher);
         }
     }
@@ -265,8 +281,14 @@ public class MapsFragment extends Fragment {
         if (grantResults) {
             // If request is cancelled, the result arrays are empty.
             viewModel.setIsLocationPermissionGranted(true);
+            getDeviceLocation();
         }
-        getDeviceLocation();
+        else {
+            /*Log.i("PERMISSION", "PERMISSION DENIED");
+            Bundle args = new Bundle();
+            args.putBoolean("no_wifi", false);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.map, MapUnavailableFragment.class, args).setReorderingAllowed(true).commit();*/
+        }
     }
 
     @Override
@@ -303,7 +325,9 @@ public class MapsFragment extends Fragment {
                             if (lastKnownLocation != null) {
                                 viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
                                         lastKnownLocation.getLongitude()));
-                                frame.setPosition(viewModel.getCurrentLocation().getValue());
+                                if(frame != null) {
+                                    frame.setPosition(viewModel.getCurrentLocation().getValue());
+                                }
                                 if (profileMarker != null) {
                                     profileMarker.setPosition(viewModel.getCurrentLocation().getValue());
                                 }
