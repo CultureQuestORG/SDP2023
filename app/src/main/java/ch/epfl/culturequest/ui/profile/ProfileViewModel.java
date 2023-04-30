@@ -27,6 +27,7 @@ public class ProfileViewModel extends ViewModel {
     Profile profile = Profile.getActiveProfile();
 
     MutableLiveData<Profile> selectedProfile = new MutableLiveData<>();
+
     /**
      * Constructor of the ProfileViewModel
      */
@@ -58,7 +59,7 @@ public class ProfileViewModel extends ViewModel {
                     });
                 });
 
-                if(profile != null) {
+                if (profile != null) {
                     Database.getFollowed(profile.getUid()).whenComplete((followedProfiles, t) -> {
                         if (t == null) {
                             followed.setValue(followedProfiles.isFollowing(selectedProfile.getValue().getUid()));
@@ -70,12 +71,16 @@ public class ProfileViewModel extends ViewModel {
                 profilePosts.whenComplete((posts, t) -> {
                     if (posts != null && t == null) {
                         //set the values of the live data
-                        username.setValue(profile.getUsername());
-                        profilePictureUri.setValue(profile.getProfilePicture());
-                        score.setValue(profile.getScore());
+
                         pictures.setValue(posts);
                     }
                 });
+                // this checks if user has connection: in signUpActivity we create a profile with an empty
+                //username if user is offline.
+                String profileUsername = profile.getUsername();
+                username.setValue(profileUsername.isEmpty() ? profile.getName(): profileUsername);
+                profilePictureUri.setValue(profile.getProfilePicture());
+                score.setValue(profile.getScore());
                 // add an observer to the profile so that the view is updated when the profile is updated
                 profile.addObserver((profileObject, arg) -> {
                     Profile p = (Profile) profileObject;
@@ -128,7 +133,7 @@ public class ProfileViewModel extends ViewModel {
         }
 
         this.followed.setValue(Boolean.FALSE.equals(followed.getValue()));
-        if(Boolean.TRUE.equals(this.followed.getValue())) {
+        if (Boolean.TRUE.equals(this.followed.getValue())) {
             Database.addFollow(profile.getUid(), selectedProfile.getValue().getUid());
         } else {
             Database.removeFollow(profile.getUid(), selectedProfile.getValue().getUid());
