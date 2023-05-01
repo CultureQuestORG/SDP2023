@@ -132,8 +132,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
                     Database.removePost(post);
                     //TODO: delete image from storage when the mock is removed
-                    //FirebaseStorage storage = FirebaseStorage.getInstance();
-                    //storage.getReferenceFromUrl(post.getImageUrl()).delete();
+
                     Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
                 })
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
