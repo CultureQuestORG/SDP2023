@@ -3,10 +3,29 @@ package ch.epfl.culturequest.social;
 import ch.epfl.culturequest.R;
 
 public class ScanBadge {
+
+
+    public static Object identifyPlace(String s) {
+        Country country = Country.fromString(s);
+        if (country != Country.OTHER) {
+            return country;
+        }
+        City city = City.fromString(s);
+        if (city != City.OTHER) {
+            return city;
+        }
+        Museum museum = Museum.fromString(s);
+        if (museum != Museum.OTHER) {
+            return museum;
+        }
+        return null;
+    }
+
+
     /**
      * Represents the country of the badge
      */
-    public enum Country {
+    public enum Country  {
         //List of supported countries
         AUSTRALIA, EGYPT, FRANCE, INDIA, ITALY, MEXICO, SWITZERLAND, USA, OTHER;
 
@@ -45,30 +64,27 @@ public class ScanBadge {
          * @return (Country) the Country corresponding to the string
          */
         public static Country fromString(String s) {
-            switch (s) {
-                case "Australia":
-                case "Australie":
-                case "australie":
-                case "Commonwealth of Australia":
+            switch (s.toUpperCase()) {
+                case "AUSTRALIA":
+                case "AUSTRALIE":
+                case "COMMONWEALTH OF AUSTRALIA":
                     return AUSTRALIA;
-                case "Egypt":
+                case "EGYPT":
                     return EGYPT;
-                case "France":
-                case "france":
                 case "FRANCE":
-                case "Republic of France":
+                case "REPUBLIC OF FRANCE":
                     return FRANCE;
-                case "India":
+                case "INDIA":
                     return INDIA;
-                case "Italy":
+                case "ITALY":
                     return ITALY;
-                case "Mexico":
+                case "MEXICO":
                     return MEXICO;
-                case "Switzerland":
+                case "SWITZERLAND":
                     return SWITZERLAND;
                 case "USA":
-                case "United States":
-                case "United States of America":
+                case "UNITED STATES":
+                case "UNITED STATES OF AMERICA":
                     return USA;
                 default:
                     return OTHER;
@@ -124,33 +140,33 @@ public class ScanBadge {
          * @return (City) the City corresponding to the string
          */
         public static City fromString(String s) {
-            switch (s) {
-                case "Barcelona":
+            switch (s.toUpperCase()) {
+                case "BARCELONA":
                     return BARCELONA;
-                case "Berlin":
+                case "BERLIN":
                     return BERLIN;
-                case "Geneva":
-                case "Genève":
+                case "GENEVA":
+                case "GENÈVE":
                     return GENEVA;
-                case "Lausanne":
+                case "LAUSANNE":
                     return LAUSANNE;
-                case "London":
+                case "LONDON":
                     return LONDON;
-                case "Madrid":
+                case "MADRID":
                     return MADRID;
-                case "Munich":
-                case "München":
+                case "MUNICH":
+                case "MÜNCHEN":
                     return MUNICH;
-                case "New York":
+                case "NEW YORK":
                     return NEW_YORK;
-                case "Paris":
+                case "PARIS":
                     return PARIS;
-                case "Rome":
-                case "Roma":
+                case "ROME":
+                case "ROMA":
                     return ROME;
-                case "Washington, D.C.":
-                case "Washington, DC":
-                case "Washington":
+                case "WASHINGTON, D.C.":
+                case "WASHINGTON, DC":
+                case "WASHINGTON":
                     return WASHINGTON_DC;
                 default:
                     return OTHER;
@@ -196,28 +212,26 @@ public class ScanBadge {
          * @return (Museum) the Museum corresponding to the string
          */
         public static Museum fromString(String s) {
-            switch (s) {
-                case "British Museum":
-                case "British Museum, London":
+            switch (s.toUpperCase()) {
+                case "BRITISH MUSEUM":
+                case "BRITISH MUSEUM, LONDON":
                     return BRITISH_MUSEUM;
-                case "Guggenheim":
-                case "Guggenheim Museum":
+                case "GUGGENHEIM MUSEUM":
+                case "GUUGENHEIM":
                     return GUGGENHEIM;
-                case "Louvre":
-                case "Musée du Louvre":
+                case "LOUVRE":
+                case "MUSÉE DU LOUVRE":
                     return LOUVRE;
-                case "Metropolitan Museum of Art":
-                case "Metropolitan Museum":
-                case "Met":
+                case "METROPOLITAN MUSEUM OF ART":
+                case "METROPOLITAN MUSEUM":
                 case "MET":
                     return MET;
-                case "Museum of Modern Art":
-                case "MoMA":
+                case "MUSEUM OF MODERN ART":
                 case "MOMA":
                     return MOMA;
-                case "Vatican Museums":
-                case "Vatican":
-                case "Musei Vaticani":
+                case "VATICAN MUSEUMS":
+                case "VATICAN":
+                case "MUSEI VATICANI":
                     return VATICAN;
                 default:
                     return OTHER;

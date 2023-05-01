@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
@@ -20,6 +21,8 @@ public class Profile extends Observable {
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
     private Integer score;
+
+    private HashMap<String, Integer> badges;
     private static Profile activeProfile;
 
 
@@ -43,9 +46,10 @@ public class Profile extends Observable {
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
         this.score = 0;
+        this.badges = new HashMap<>();
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, Integer score, HashMap<String, Integer> badges) {
         this.uid = uid;
         this.name = name;
         this.username = username;
@@ -53,6 +57,7 @@ public class Profile extends Observable {
         this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
         this.score = score;
+        this.badges = badges;
     }
 
 
@@ -69,6 +74,7 @@ public class Profile extends Observable {
         this.phoneNumber = "";
         this.profilePicture = "";
         this.score = 0;
+        this.badges = new HashMap<>();
     }
 
     public String getUid() {
@@ -97,6 +103,10 @@ public class Profile extends Observable {
 
     public Integer getScore() {
         return score;
+    }
+
+    public HashMap<String, Integer> getBadges() {
+        return badges;
     }
 
     public void setUid(String uid) {
@@ -132,6 +142,22 @@ public class Profile extends Observable {
 
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
+        setChanged();
+        notifyObservers();
+    }
+
+    public void setBadges(HashMap<String, Integer> badges) {
+        this.badges = badges;
+        setChanged();
+        notifyObservers();
+    }
+
+    public void addBadge(String badge) {
+        if (badges.containsKey(badge)) {
+            badges.put(badge, badges.get(badge) + 1);
+        } else {
+            badges.put(badge, 1);
+        }
         setChanged();
         notifyObservers();
     }
