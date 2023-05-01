@@ -98,7 +98,8 @@ public class ProfileFragmentTest {
     }
 
     @Test
-    public void deleteButtonWorks() {
+    public void deleteButtonWorks() throws InterruptedException {
+        Thread.sleep(5000);
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
 
         //long click on the first picture should open an alert dialog
