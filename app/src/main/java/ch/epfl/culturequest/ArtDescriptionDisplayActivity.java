@@ -46,17 +46,16 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     private static final int POPUP_DELAY = 3000;
 
     private Button postButton;
-    private LoadingAnimation animation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
-        animation = findViewById(R.id.uploadingAnimation);
         findViewById(R.id.back_button).setOnClickListener(view -> finish());
         postButton = findViewById(R.id.post_button);
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
         String imageUriExtra = getIntent().getStringExtra("imageUri");
+        String imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
         Uri imageUri = Uri.parse(imageUriExtra);
         BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
         // Get SharedPreferences
@@ -73,7 +72,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             scannedImage = bitmap;
             ((ImageView) findViewById(R.id.artImage)).setImageBitmap(bitmap);
             displayArtInformation(artDescription);
-            postButton.setOnClickListener(v -> uploadImage(bitmap, artDescription));
+            postButton.setOnClickListener(v -> uploadImage(imageDownloadUrl, artDescription));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             finish();
@@ -159,6 +158,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             }
         }, POPUP_DELAY);
     }
+
     private void setRarityBadge(ImageView rarityBadge, Integer score) {
         if (score != null) {
             rarityBadge.setImageResource(getRarityLevel(score).getRarenessIcon());
@@ -206,26 +206,22 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
      * Uploads an image to the database when the user presses on the post button. it will post
      * the image in the storage at the address: images/uid/postId
      *
-     * @param bitmap     the bitmap to upload
+     * @param url  the image url to upload
      * @param artwork the artwork to add to the database
      */
-    private void uploadImage(Bitmap bitmap, BasicArtDescription artwork) {
+    private void uploadImage(String url, BasicArtDescription artwork) {
         String postId = UUID.randomUUID().toString();
         Profile activeProfile = Profile.getActiveProfile();
         String uid = activeProfile.getUid();
-        animation.startLoading();
-        FireStorage.uploadAndGetUrlFromImage(Objects.requireNonNull(bitmap)).thenCompose(url ->
-                Database.uploadPost(new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>()))).whenComplete((lambda, e) -> {
+        Database.uploadPost(new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>())).whenComplete((lambda, e) -> {
             if (e == null) {
                 postsAdded++;
                 activeProfile.incrementScore(artwork.getScore());
-                animation.stopLoading();
                 finish();
             } else {
                 e.printStackTrace();
             }
         }).exceptionally(l -> {
-            animation.stopLoading();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Error").setMessage("Couldn't post picture").setCancelable(false).setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss());
             AlertDialog alertDialog = builder.create();

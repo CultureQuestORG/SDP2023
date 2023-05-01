@@ -77,12 +77,13 @@ public class ScanFragment extends Fragment {
                         boolean isWifiAvailable = false;
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
-
-                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(ProcessingApi::getArtDescriptionFromUrl)
+                            Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
+                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
+                                        intent.putExtra("downloadUrl", url);
+                                        return ProcessingApi.getArtDescriptionFromUrl(url);
+                                    })
                                     .thenAccept(artDescription -> {
                                         Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
-
-                                        Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
                                         String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
                                         intent.putExtra("artDescription", serializedArtDescription);
                                         intent.putExtra("imageUri", lastlyStoredImageUri.toString());
@@ -170,7 +171,7 @@ public class ScanFragment extends Fragment {
         if (!permissionRequest.hasPermission(getContext())) {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
-           permissionRequest.askPermission(requestPermissionLauncher);
+            permissionRequest.askPermission(requestPermissionLauncher);
         }
     }
 }
