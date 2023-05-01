@@ -256,6 +256,19 @@ public class Database {
         return future;
     }
 
+    public static CompletableFuture<AtomicBoolean> updateScore(String uid, int newScore) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference scoreRef = databaseInstance.getReference("users/" + uid + "/score");
+        scoreRef.setValue(newScore, (error, ref) -> {
+            if (error != null) {
+                future.complete(new AtomicBoolean(false));
+            } else {
+                future.complete(new AtomicBoolean(true));
+            }
+        });
+        return future;
+    }
+
     /**
      * This method is used to upload a post to the database
      *

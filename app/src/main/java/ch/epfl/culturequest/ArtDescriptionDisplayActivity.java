@@ -1,8 +1,7 @@
 package ch.epfl.culturequest;
 
 import static ch.epfl.culturequest.social.RarityLevel.getRarityLevel;
-
-import androidx.appcompat.app.AppCompatActivity;
+import static ch.epfl.culturequest.utils.ProfileUtils.postsAdded;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -10,20 +9,34 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
+import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Post;
+import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.ScanBadge;
+import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.ui.commons.LoadingAnimation;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
@@ -32,46 +45,41 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     private static final int POPUP_DELAY = 3000;
 
+    private Button postButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
-
         findViewById(R.id.back_button).setOnClickListener(view -> finish());
-
+        postButton = findViewById(R.id.post_button);
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
         String imageUriExtra = getIntent().getStringExtra("imageUri");
+        String imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
         Uri imageUri = Uri.parse(imageUriExtra);
-
         BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
-
         // Get SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
         boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
-
         // Check if artDescription.openAIRequired is true and doNotShowAgain is false
         if (artDescription.isOpenAiRequired() && !doNotShowAgain) {
-            EspressoIdlingResource.countingIdlingResource.increment();
             showOpenAIPopup();
-            EspressoIdlingResource.countingIdlingResource.decrement();
         }
-
         // get bitmap from imageUri with the ContentResolver
         try {
             // get bitmap from imageUri with the ContentResolver
             Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
             scannedImage = bitmap;
-            ImageView imageView = findViewById(R.id.artImage);
-            imageView.setImageBitmap(scannedImage);
+            ((ImageView) findViewById(R.id.artImage)).setImageBitmap(bitmap);
             displayArtInformation(artDescription);
-
+            postButton.setOnClickListener(v -> uploadImage(imageDownloadUrl, artDescription));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             finish();
         }
     }
-    private void displayArtInformation(BasicArtDescription artDescription){
+
+    private void displayArtInformation(BasicArtDescription artDescription) {
 
         // Set Art Name
         TextView artNameView = findViewById(R.id.artName);
@@ -150,6 +158,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             }
         }, POPUP_DELAY);
     }
+
     private void setRarityBadge(ImageView rarityBadge, Integer score) {
         if (score != null) {
             rarityBadge.setImageResource(getRarityLevel(score).getRarenessIcon());
@@ -191,5 +200,33 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             museumBadge.setVisibility(ImageView.GONE);
             museumText.setVisibility(TextView.GONE);
         }
+    }
+
+    /**
+     * Uploads an image to the database when the user presses on the post button. it will post
+     * the image in the storage at the address: images/uid/postId
+     *
+     * @param url  the image url to upload
+     * @param artwork the artwork to add to the database
+     */
+    private void uploadImage(String url, BasicArtDescription artwork) {
+        String postId = UUID.randomUUID().toString();
+        Profile activeProfile = Profile.getActiveProfile();
+        String uid = activeProfile.getUid();
+        Database.uploadPost(new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>())).whenComplete((lambda, e) -> {
+            if (e == null) {
+                postsAdded++;
+                activeProfile.incrementScore(artwork.getScore());
+                finish();
+            } else {
+                e.printStackTrace();
+            }
+        }).exceptionally(l -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Error").setMessage("Couldn't post picture").setCancelable(false).setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss());
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+            return null;
+        });
     }
 }
