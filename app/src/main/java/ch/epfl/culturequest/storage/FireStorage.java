@@ -1,14 +1,18 @@
 package ch.epfl.culturequest.storage;
 
+import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -103,8 +107,9 @@ public class FireStorage {
      * @return a completable future with the url of the image
      */
     public static CompletableFuture<String> uploadAndGetUrlFromImage(Bitmap bitmapImage) {
+        String path = "images/" + Profile.getActiveProfile().getUid() + "/" + UUID.randomUUID().toString();
 
-        StorageReference imageRef = storage.getReference().child("images/" + UUID.randomUUID().toString());
+        StorageReference imageRef = storage.getReference().child(path);
 
         CompletableFuture<String> f = new CompletableFuture<>();
 

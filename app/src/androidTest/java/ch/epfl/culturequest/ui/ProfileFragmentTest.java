@@ -99,23 +99,31 @@ public class ProfileFragmentTest {
 
     @Test
     public void deleteButtonWorks() {
-        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+        Post post = new Post("abc", "cT93LtGk2dT9Jvg46pOpbBP69Kx1",
+                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/0000598561_OG.jpeg?alt=media&token=503f241d-cebf-4050-8897-4cbb7595e0b8",
+                "Piece of Art", 0, 0, new ArrayList<>());
 
-        //long click on the first picture should open an alert dialog
-        onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
-        // should open an alert dialog
-        onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
-        onView(withText("No")).perform(click());
-        onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
-        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+        Database.uploadPost(post).whenComplete((a,b) -> {
+            assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid(),1,0).join()).size());
 
-        onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
-        onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
-        onView(withText("Yes")).perform(click());
-        onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
-        assertEquals(0, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
-        onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
-    }
+            //long click on the first picture should open an alert dialog
+            onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
+            // should open an alert dialog
+            onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
+            onView(withText("No")).perform(click());
+            onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
+            assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+
+            onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
+            onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
+            onView(withText("Yes")).perform(click());
+            onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
+            assertEquals(0, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+            onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
+
+        });
+
+       }
 
     @Test
     public void scoreWorks() {

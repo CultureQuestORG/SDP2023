@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -14,10 +15,12 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -39,6 +42,7 @@ public class ScanFragment extends Fragment {
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
     private CameraSetup cameraSetup;
+
     private LoadingAnimation loadingAnimation;
 
     //SurfaceTextureListener is used to detect when the TextureView is ready to be used
@@ -73,12 +77,13 @@ public class ScanFragment extends Fragment {
                         boolean isWifiAvailable = false;
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
-
-                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(ProcessingApi::getArtDescriptionFromUrl)
+                            Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
+                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
+                                        intent.putExtra("downloadUrl", url);
+                                        return ProcessingApi.getArtDescriptionFromUrl(url);
+                                    })
                                     .thenAccept(artDescription -> {
                                         Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
-
-                                        Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
                                         String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
                                         intent.putExtra("artDescription", serializedArtDescription);
                                         intent.putExtra("imageUri", lastlyStoredImageUri.toString());

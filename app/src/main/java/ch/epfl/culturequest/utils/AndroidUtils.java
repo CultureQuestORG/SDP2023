@@ -7,6 +7,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class AndroidUtils {
+
     public static void redirectToActivity(Activity src, Class<? extends Activity> dest){
         src.startActivity(new Intent(src, dest));
     }
