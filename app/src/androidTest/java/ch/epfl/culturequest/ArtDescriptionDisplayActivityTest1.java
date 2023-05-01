@@ -19,42 +19,46 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.storage.LocalStorage;
 
-public class  ArtDescriptionDisplayActivityTest1 {
-
-    private Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-
-    private String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100|false";
-
-    @Before
-    public void setup(){
-        Database.setEmulatorOn();
-        Database.clearDatabase();
-        FirebaseAuth.getInstance().signInWithEmailAndPassword("test@gmail.com", "abcdefg");
-        Profile profile = new Profile("cT93LtGk2dT9Jvg46pOpbBP69Kx1", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/izi.png?alt=media&token=b62383d6-3831-4d22-9e82-0a02a9425289", 10);
-        Profile.setActiveProfile(profile);
-    }
-
-    @After
-    public void tearDown() {
-        // clear the database after the tests
-        Database.clearDatabase();
-    }
+public class ArtDescriptionDisplayActivityTest1 {
+    private final String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100|false";
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
     @Rule
     public ActivityScenarioRule<ArtDescriptionDisplayActivity> activityRule =
             new ActivityScenarioRule<>(createTestIntentWithExtras(serializedMonaLisaDescription));
+
+    @Before
+    public void setup() {
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+
+        // Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
+
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
+
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0);
+        Profile.setActiveProfile(profile);
+    }
 
     public static Intent createTestIntentWithExtras(String serializedDescription) {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
@@ -71,7 +75,7 @@ public class  ArtDescriptionDisplayActivityTest1 {
             localStorage.storeImageLocally(bitmap, true);
             Uri imageUri = localStorage.lastlyStoredImageUri;
             intent.putExtra("imageUri", imageUri.toString());
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -86,7 +90,7 @@ public class  ArtDescriptionDisplayActivityTest1 {
         onView(withId(R.id.artSummary)).perform(swipeUp(), swipeUp(), swipeUp(), swipeUp());// Scroll to the bottom of the RecyclerView
         onView(withId(R.id.post_button)).perform(click());
         ActivityScenario.launch(createTestIntentWithExtras(serializedMonaLisaDescription)).onActivity(activity -> {
-            Database.getPosts("cT93LtGk2dT9Jvg46pOpbBP69Kx1", 1, 0)
+            Database.getPosts(Authenticator.getCurrentUser().getUid(), 1, 0)
                     .whenComplete((posts, throwable) -> {
                         assertThat(posts.size(), is(1));
                         assertThat(posts.get(0).getArtworkName(), is("Mona Lisa"));
@@ -96,7 +100,7 @@ public class  ArtDescriptionDisplayActivityTest1 {
 
 
     @Test
-    public void activityDisplaysCorrectInformation(){
+    public void activityDisplaysCorrectInformation() {
 
         onView(withId(R.id.artName)).check(matches(withText("Mona Lisa")));
         onView(withId(R.id.artistName)).check(matches(withText("Da Vinci")));
@@ -108,5 +112,11 @@ public class  ArtDescriptionDisplayActivityTest1 {
         onView(withId(R.id.countryBadge)).check(matches(isDisplayed()));
         onView(withId(R.id.cityBadge)).check(matches(isDisplayed()));
         onView(withId(R.id.museumBadge)).check(matches(isDisplayed()));
+    }
+
+    @After
+    public void tearDown() {
+        // clear the database after the tests
+        Database.clearDatabase();
     }
 }
