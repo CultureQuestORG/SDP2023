@@ -3,29 +3,32 @@ package ch.epfl.culturequest.social;
 import ch.epfl.culturequest.R;
 
 public class ScanBadge {
+    public interface Badge {
 
+        int getBadge();
 
-    public static Object identifyPlace(String s) {
-        Country country = Country.fromString(s);
-        if (country != Country.OTHER) {
-            return country;
+        static Badge identifyPlace(String s) {
+            Country country = Country.fromString(s);
+            if (country != Country.OTHER) {
+                return country;
+            }
+            City city = City.fromString(s);
+            if (city != City.OTHER) {
+                return city;
+            }
+            Museum museum = Museum.fromString(s);
+            if (museum != Museum.OTHER) {
+                return museum;
+            }
+            return Country.OTHER;
         }
-        City city = City.fromString(s);
-        if (city != City.OTHER) {
-            return city;
-        }
-        Museum museum = Museum.fromString(s);
-        if (museum != Museum.OTHER) {
-            return museum;
-        }
-        return null;
     }
 
 
     /**
      * Represents the country of the badge
      */
-    public enum Country  {
+    public enum Country implements Badge{
         //List of supported countries
         AUSTRALIA, EGYPT, FRANCE, INDIA, ITALY, MEXICO, SWITZERLAND, USA, OTHER;
 
@@ -95,7 +98,7 @@ public class ScanBadge {
     /**
      * Represents the city of the badge
      */
-    public enum City {
+    public enum City implements Badge {
         //List of supported cities
         BARCELONA, BERLIN, GENEVA, LAUSANNE, LONDON, MADRID, MUNICH, NEW_YORK, PARIS, ROME, WASHINGTON_DC, OTHER;
 
@@ -177,7 +180,7 @@ public class ScanBadge {
     /**
      * Represents the museum of the badge
      */
-    public enum Museum {
+    public enum Museum implements Badge {
         //List of supported museums
         BRITISH_MUSEUM, GUGGENHEIM, LOUVRE, MET, MOMA, VATICAN, OTHER;
 

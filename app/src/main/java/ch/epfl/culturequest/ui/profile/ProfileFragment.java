@@ -24,6 +24,7 @@ import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
+import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -75,6 +76,15 @@ public class ProfileFragment extends Fragment {
 
         // set the onClickListener for the settings button
         settingsButton.setOnClickListener(this::goToSettings);
+
+        progressBar.setOnClickListener(v -> {
+            // open the badges activity
+            Intent intent = new Intent(getActivity(), DisplayUserBadgeCollectionActivity.class);
+            intent.putExtra("uid", Profile.getActiveProfile().getUid());
+            startActivity(intent);
+        });
+
+
 
 
 
