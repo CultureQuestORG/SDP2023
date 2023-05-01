@@ -18,13 +18,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.culturequest.SettingsActivity;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
@@ -40,8 +40,10 @@ public class ProfileFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ProfileViewModelFactory factory = new ProfileViewModelFactory(FirebaseAuth.getInstance().getUid());
+
+        ProfileViewModelFactory factory = new ProfileViewModelFactory(Authenticator.getCurrentUser().getUid());
         ProfileViewModel profileViewModel = new ViewModelProvider(this, factory).get(ProfileViewModel.class);
+
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         // bind the views

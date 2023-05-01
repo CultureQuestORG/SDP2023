@@ -11,9 +11,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
-import ch.epfl.culturequest.backend.artprocessing.apis.WikipediaDescriptionApi;
-import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
-import ch.epfl.culturequest.backend.artprocessing.apis.RecognitionApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 
 public class ArtProcessingTest {

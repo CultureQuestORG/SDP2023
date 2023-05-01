@@ -20,34 +20,28 @@ import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
 
 @RunWith(AndroidJUnit4.class)
 public class SettingsActivityTest {
-
-    private static FirebaseUser user;
-
-
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
 
-
     private static SettingsActivity activity;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
-    @BeforeClass
-    public static void setup() throws InterruptedException {
+    @Before
+    public void setup() throws InterruptedException {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
@@ -60,38 +54,19 @@ public class SettingsActivityTest {
         // Clear the storage after the tests
         FireStorage.clearStorage();
 
-        FirebaseAuth.getInstance()
-                .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        user = FirebaseAuth.getInstance().getCurrentUser();
-                        Profile.setActiveProfile(new Profile("userName", DEFAULT_PROFILE_PATH));
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
 
-                    }
-                });
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
 
-        Thread.sleep(2000);
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
 
-    }
+        Profile.setActiveProfile(new Profile("userName", DEFAULT_PROFILE_PATH));
 
-    @Before
-    public void init() {
-        ActivityScenario
-                .launch(SettingsActivity.class)
-                .onActivity(a -> activity = a);
+        ActivityScenario.launch(SettingsActivity.class).onActivity(a -> activity = a);
         Intents.init();
-    }
-
-    @After
-    public void release() {
-        Intents.release();
-
-        // clear the database after each test
-        Database.clearDatabase();
-
-        // Clear the storage after the tests
-        FireStorage.clearStorage();
-
     }
 
     @Test
@@ -116,6 +91,17 @@ public class SettingsActivityTest {
 
 
         assertEquals("newUserName", Profile.getActiveProfile().getUsername());
+    }
+
+    @After
+    public void tearDown() {
+        Intents.release();
+
+        // clear the database after each test
+        Database.clearDatabase();
+
+        // Clear the storage after the tests
+        FireStorage.clearStorage();
     }
 
 

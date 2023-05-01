@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Observable;
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 
 /**
@@ -35,7 +36,7 @@ public class Profile extends Observable {
      * @param profilePicture Profile picture. Can be set to null
      */
     public Profile(String username, String profilePicture) {
-        FirebaseUser user = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser());
+        FirebaseUser user = Authenticator.getCurrentUser();
         this.username = username;
         this.uid = user.getUid();
         this.name = user.getDisplayName();
