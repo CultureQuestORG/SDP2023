@@ -99,7 +99,7 @@ public class ProfileFragmentTest {
 
     @Test
     public void deleteButtonWorks() {
-        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid(), 1, 0).join()).size());
+        assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
 
         //long click on the first picture should open an alert dialog
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
