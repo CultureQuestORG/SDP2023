@@ -44,10 +44,6 @@ public class FireStorage {
     public static void clearStorage() {
         storage.getReference().child("images").listAll().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                for (StorageReference item : Objects.requireNonNull(task.getResult()).getItems()) {
-                    item.delete();
-                }
-
                 for (StorageReference prefixes : Objects.requireNonNull(task.getResult()).getPrefixes()) {
                     prefixes.listAll().addOnCompleteListener(task1 -> {
                         for (StorageReference item : Objects.requireNonNull(task1.getResult()).getItems()) {
@@ -56,7 +52,6 @@ public class FireStorage {
                     });
                 }
             }
-
         });
 
         storage.getReference().child("profilePictures").listAll().addOnCompleteListener(task -> {

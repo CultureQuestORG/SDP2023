@@ -35,6 +35,7 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.ProfileFragment;
+import ch.epfl.culturequest.utils.ProfileUtils;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileFragmentTest {
@@ -65,6 +66,8 @@ public class ProfileFragmentTest {
         Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PATH
                 , "Piece of Art", 0, 0, new ArrayList<>());
         Database.uploadPost(post);
+
+        ProfileUtils.postsAdded = 0;
 
         profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PATH, 35);
         Profile.setActiveProfile(profile);
@@ -98,10 +101,8 @@ public class ProfileFragmentTest {
     }
 
     @Test
-    public void deleteButtonWorks() throws InterruptedException {
-        Thread.sleep(5000);
+    public void deleteButtonWorks() {
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
-
         //long click on the first picture should open an alert dialog
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
         // should open an alert dialog
@@ -109,7 +110,6 @@ public class ProfileFragmentTest {
         onView(withText("No")).perform(click());
         onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
-
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
         onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
         onView(withText("Yes")).perform(click());
