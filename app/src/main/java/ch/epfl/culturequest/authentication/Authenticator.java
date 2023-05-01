@@ -93,6 +93,8 @@ public class Authenticator {
                 }
                 return null;
             }).exceptionally(throwable -> {
+                // If an error occurs, sign out the user
+                signOut(activity);
                 future.completeExceptionally(throwable);
                 return null;
             });

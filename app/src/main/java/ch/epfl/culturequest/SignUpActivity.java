@@ -2,11 +2,8 @@ package ch.epfl.culturequest;
 
 import android.os.Bundle;
 
-import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.auth.FirebaseUser;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.utils.AndroidUtils;
