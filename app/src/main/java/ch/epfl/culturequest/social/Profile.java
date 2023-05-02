@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Observable;
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 
 /**
@@ -35,7 +36,7 @@ public class Profile extends Observable {
      * @param profilePicture Profile picture. Can be set to null
      */
     public Profile(String username, String profilePicture) {
-        FirebaseUser user = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser());
+        FirebaseUser user = Authenticator.getCurrentUser();
         this.username = username;
         this.uid = user.getUid();
         this.name = user.getDisplayName();
@@ -101,7 +102,6 @@ public class Profile extends Observable {
 
     public void setUid(String uid) {
         this.uid = uid;
-
     }
 
     public void setName(String name) {
@@ -185,6 +185,13 @@ public class Profile extends Observable {
         this.score = score;
         setChanged();
         notifyObservers();
+    }
+
+    public void incrementScore(int score){
+        this.score += score;
+        setChanged();
+        notifyObservers();
+        Database.updateScore(this.uid, this.score);
     }
 
     public CompletableFuture<List<String>> retrieveFriends() {

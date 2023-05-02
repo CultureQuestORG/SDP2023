@@ -55,7 +55,7 @@ public class DisplayUserProfileActivityTest {
 
         Database.setProfile(profile1);
         Database.setProfile(activeProfile);
-        Thread.sleep(1000);
+
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(), DisplayUserProfileActivity.class);
         intent.putExtra("uid", "fakeuid");
         scenario = ActivityScenario.launch(intent);
