@@ -1,5 +1,7 @@
 package ch.epfl.culturequest;
 
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
+import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
 import android.content.Intent;
@@ -107,21 +109,27 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
-        // Upload the new profile picture and update the profile
-        FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap).whenComplete(
-                (profile, throwable) -> {
-                    if (throwable != null) {
-                        throwable.printStackTrace();
-                    } else {
-                        Database.setProfile(profile);
-                        Profile.setActiveProfile(profile);
-                    }
+        if (!hasConnection(this)) {
+            showNoConnectionAlert(this, "You have no internet connection. Your profile will be updated once you connect.");
+        }
+            FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap).whenComplete(
+                    (profile, throwable) -> {
+                        if (throwable != null) {
+                            throwable.printStackTrace();
+                        } else {
+                            Database.setProfile(profile);
+                            Profile.setActiveProfile(profile);
+                        }
 
-                    finish();
-                    EspressoIdlingResource.decrement();
-                }
-        );
-    }
+                        finish();
+                        EspressoIdlingResource.decrement();
+                    }
+            );
+
+        }
+        // Upload the new profile picture and update the profile
+
+
 
     /**
      * Displays the profile picture selected by the user

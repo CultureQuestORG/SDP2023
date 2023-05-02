@@ -1,5 +1,8 @@
 package ch.epfl.culturequest.ui.scan;
 
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
+import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
+
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -69,35 +72,38 @@ public class ScanFragment extends Fragment {
 
     // ScanButtonListener is used to detect when the scan button is clicked
     private final View.OnClickListener scanButtonListener = view -> {
-        loadingAnimation.startLoading();
         if (cameraSetup != null) {
-            cameraSetup.takePicture().thenAccept(captureTaken -> {
-                if (captureTaken) {
-                    cameraSetup.getLatestImage().thenAccept(bitmap -> {
-                        boolean isWifiAvailable = false;
-                        try {
-                            localStorage.storeImageLocally(bitmap, isWifiAvailable);
-                            Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
-                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
-                                        intent.putExtra("downloadUrl", url);
-                                        return ProcessingApi.getArtDescriptionFromUrl(url);
-                                    })
-                                    .thenAccept(artDescription -> {
-                                        Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
-                                        String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
-                                        intent.putExtra("artDescription", serializedArtDescription);
-                                        intent.putExtra("imageUri", lastlyStoredImageUri.toString());
-                                        startActivity(intent);
-                                        loadingAnimation.stopLoading();
-                                    });
+            boolean isWifiAvailable = hasConnection(this.getContext());
+            if (!isWifiAvailable) {
+                showNoConnectionAlert(this.getContext(), "Scannning postponed, you have no internet connection.\nConnect to network to load description");
+            }
+                loadingAnimation.startLoading();
+                cameraSetup.takePicture().thenAccept(captureTaken -> {
+                    if (captureTaken) {
+                        cameraSetup.getLatestImage().thenAccept(bitmap -> {
+                            try {
+                                localStorage.storeImageLocally(bitmap, isWifiAvailable);
+                                Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
+                                FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
+                                            intent.putExtra("downloadUrl", url);
+                                            return ProcessingApi.getArtDescriptionFromUrl(url);
+                                        })
+                                        .thenAccept(artDescription -> {
+                                            Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
+                                            String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
+                                            intent.putExtra("artDescription", serializedArtDescription);
+                                            intent.putExtra("imageUri", lastlyStoredImageUri.toString());
+                                            startActivity(intent);
+                                            loadingAnimation.stopLoading();
+                                        });
 
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                }
-            });
-        }
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                    }
+                });
+            }
     };
 
     public View onCreateView(@NonNull LayoutInflater inflater,

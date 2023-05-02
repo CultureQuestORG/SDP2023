@@ -31,6 +31,12 @@ public class Database {
     private static final FirebaseDatabase databaseInstance = FirebaseDatabase.getInstance();
     private static boolean isEmulatorOn = false;
 
+    public static void setPersistenceEnabled(){
+        databaseInstance.setPersistenceEnabled(true);
+        databaseInstance.getReference("users").keepSynced(true);
+        databaseInstance.getReference("posts").keepSynced(true);
+        databaseInstance.getReference("follows").keepSynced(true);
+    }
     public static void setEmulatorOn() {
         if (!isEmulatorOn) {
             databaseInstance.useEmulator("10.0.2.2", 9000);
