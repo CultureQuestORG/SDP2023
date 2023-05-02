@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -260,11 +261,18 @@ public class Database {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference scoreRef = databaseInstance.getReference("users/" + uid + "/score");
         scoreRef.setValue(newScore, (error, ref) -> {
-            if (error != null) {
-                future.complete(new AtomicBoolean(false));
-            } else {
-                future.complete(new AtomicBoolean(true));
-            }
+            future.complete(new AtomicBoolean(error == null));
+        });
+        return future;
+    }
+
+
+
+    public static CompletableFuture<AtomicBoolean> updateBadges(String uid, HashMap<String,Integer> newbadges) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference badgesRef = databaseInstance.getReference("users/" + uid + "/badges");
+        badgesRef.setValue(newbadges, (error, ref) -> {
+            future.complete(new AtomicBoolean(error == null));
         });
         return future;
     }
