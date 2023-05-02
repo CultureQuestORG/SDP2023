@@ -220,7 +220,7 @@ public class ScanBadge {
                 case "BRITISH MUSEUM, LONDON":
                     return BRITISH_MUSEUM;
                 case "GUGGENHEIM MUSEUM":
-                case "GUUGENHEIM":
+                case "GUGGENHEIM":
                     return GUGGENHEIM;
                 case "LOUVRE":
                 case "MUSÉE DU LOUVRE":
