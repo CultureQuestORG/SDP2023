@@ -38,6 +38,18 @@ public class BasicArtDescription {
         this.score = score;
     }
 
+    public BasicArtDescription() {
+        this.artist = "";
+        this.name = "";
+        this.summary = "";
+        this.city = "";
+        this.country = "";
+        this.museum = "";
+        this.type = ArtType.OTHER;
+        this.year = "";
+        this.score = 0;
+    }
+
     public String getName() {
         return name;
     }

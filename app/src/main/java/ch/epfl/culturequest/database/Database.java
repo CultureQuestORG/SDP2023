@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
@@ -545,6 +546,50 @@ public class Database {
                 future.complete(follows);
             } else {
                 future.complete(new Follows(new ArrayList<>()));
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<BasicArtDescription> getArtwork(String artName) {
+        CompletableFuture<BasicArtDescription> future = new CompletableFuture<>();
+        DatabaseReference artRef = databaseInstance.getReference("artworks").child(artName);
+        artRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                BasicArtDescription art = task.getResult().getValue(BasicArtDescription.class);
+                if (art == null) {
+                    future.completeExceptionally(new Exception("Artwork not found"));
+                } else {
+                    future.complete(art);
+                }
+            } else {
+                future.completeExceptionally(new Exception("Artwork not found"));
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> setArtwork(BasicArtDescription artworks) {
+        System.out.println("Setting artwork: " + artworks.getName());
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference artRef = databaseInstance.getReference("artworks").child(artworks.getName());
+        artRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                if(currentData.getValue() == null) {
+                    currentData.setValue(artworks);
+                }
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                if (error != null) {
+                    future.completeExceptionally(error.toException());
+                } else {
+                    future.complete(new AtomicBoolean(committed));
+                }
             }
         });
         return future;
