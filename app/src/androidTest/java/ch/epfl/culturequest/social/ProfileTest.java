@@ -2,42 +2,40 @@ package ch.epfl.culturequest.social;
 
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import ch.epfl.culturequest.authentication.Authenticator;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileTest {
 
     private Profile profile;
     private FirebaseUser user;
-    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final String defaultUriString = "res/drawable/logo_compact.png";
-
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
     @Before
     public void setup() throws InterruptedException {
-        FirebaseAuth
-                .getInstance()
-                .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) user = mAuth.getCurrentUser();
-                });
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
 
-        Thread.sleep(5000);
-        if (user != null) {
-            profile = new Profile("joker", defaultUriString);
-        } else System.exit(0);
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
 
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
+
+        profile = new Profile("joker", defaultUriString);
+        user = Authenticator.getCurrentUser();
     }
 
     @Test
@@ -143,6 +141,4 @@ public class ProfileTest {
                 + "profilePicture url: " + profile.getProfilePicture() + "\n"
                 + "score: " + profile.getScore() + "\n"));
     }
-
-
 }

@@ -23,12 +23,11 @@ import ch.epfl.culturequest.social.Profile;
 public class ProfileUtils {
 
     public static String DEFAULT_PROFILE_PATH = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2Fbasic_profile_picture.png?alt=media&token=8e407bd6-ad5f-401a-9b2d-7852ccfb9d62";
-
+    public static int postsAdded = 0;
     public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
 
     public static int DEFAULT_POST_LIMIT = 4, DEFAULT_POST_OFFSET = 0;
-
 
 
     public static final String GALLERY_PERMISSION =
