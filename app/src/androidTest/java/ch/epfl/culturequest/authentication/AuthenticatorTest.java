@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -53,9 +54,7 @@ public class AuthenticatorTest {
         Authenticator.manualSignIn(email, password).join();
 
         ActivityScenario<SignUpActivity> activityScenario = ActivityScenario.launch(SignUpActivity.class);
-        activityScenario.onActivity(activity -> {
-            this.activity = activity;
-        });
+        activityScenario.onActivity(activity -> this.activity = activity);
     }
 
     @Test
@@ -71,7 +70,7 @@ public class AuthenticatorTest {
 
     @Test
     public void SignInWithExistingProfileRedirectsToNavigationActivity() {
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0);
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0,new HashMap<>());
 
         try {
             Database.setProfile(profile);

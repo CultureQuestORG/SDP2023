@@ -16,6 +16,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
+
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
@@ -58,7 +60,7 @@ public class SignUpActivityTest {
     public void signInTransitionsToNavActivityForSignInUserWithExistingProfile() throws InterruptedException {
         Authenticator.manualSignIn(email, password).join();
         assertNotNull(Authenticator.getCurrentUser());
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0);
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0,new HashMap<>());
         Database.setProfile(profile);
         Thread.sleep(2000);
         AndroidUtils.redirectToActivity(activity, SignUpActivity.class);

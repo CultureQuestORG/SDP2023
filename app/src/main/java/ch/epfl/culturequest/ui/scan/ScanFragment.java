@@ -72,6 +72,7 @@ public class ScanFragment extends Fragment {
 
     // ScanButtonListener is used to detect when the scan button is clicked
     private final View.OnClickListener scanButtonListener = view -> {
+        loadingAnimation.startLoading();
         if (cameraSetup != null) {
             boolean isWifiAvailable = hasConnection(this.getContext());
             if (!isWifiAvailable) {
@@ -97,13 +98,13 @@ public class ScanFragment extends Fragment {
                                             loadingAnimation.stopLoading();
                                         });
 
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-                    }
-                });
-            }
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            });
+        }
     };
 
     public View onCreateView(@NonNull LayoutInflater inflater,

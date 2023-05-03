@@ -62,6 +62,11 @@
         <activity
             android:name=".ui.profile.DisplayUserProfileActivity"
             android:exported="false"/>
+
+        <activity
+            android:name=".ui.profile.DisplayUserBadgeCollectionActivity"
+            android:exported="false"/>
+
         <activity
             android:name=".NavigationActivity"
             android:exported="false"

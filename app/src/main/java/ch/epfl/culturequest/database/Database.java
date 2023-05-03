@@ -7,6 +7,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
@@ -14,11 +15,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
@@ -266,12 +270,45 @@ public class Database {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference scoreRef = databaseInstance.getReference("users/" + uid + "/score");
         scoreRef.setValue(newScore, (error, ref) -> {
-            if (error != null) {
-                future.complete(new AtomicBoolean(false));
-            } else {
-                future.complete(new AtomicBoolean(true));
-            }
+            future.complete(new AtomicBoolean(error == null));
         });
+        return future;
+    }
+
+
+
+    public static CompletableFuture<HashMap<String,Integer>> updateBadges(String uid, List<String> newbadges) {
+        CompletableFuture<HashMap<String,Integer>> future = new CompletableFuture<>();
+        DatabaseReference badgesRef = databaseInstance.getReference("users/" + uid + "/badges");
+        badgesRef.runTransaction(
+new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        HashMap<String,Integer> badges = mutableData.getValue(new GenericTypeIndicator<HashMap<String,Integer>>() {});
+                        if (badges == null) {
+                            badges = new HashMap<>();
+                        }
+                        for (String badge : newbadges) {
+                            if (badges.containsKey(badge)) {
+                                badges.put(badge, badges.get(badge) + 1);
+                            } else {
+                                badges.put(badge, 1);
+                            }
+                        }
+                        mutableData.setValue(badges);
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+                        if (committed) {
+                            HashMap<String,Integer> badges = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String,Integer>>() {});
+                            future.complete(badges);
+                        } else {
+                            future.completeExceptionally(databaseError.toException());
+                        }
+                    }
+                });
         return future;
     }
 
@@ -551,6 +588,78 @@ public class Database {
                 future.complete(follows);
             } else {
                 future.complete(new Follows(new ArrayList<>()));
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to retrieve an artwork when scanning. It is intentionally not completing
+     * the future if the artwork is not found, so that the api fetch can succeed before this one fails.
+     *
+     * @param artName the name of the artwork to be retrieved
+     * @return a CompletableFuture that will be completed when the artwork is retrieved
+     */
+    public static CompletableFuture<BasicArtDescription> getArtworkScan(String artName) {
+        CompletableFuture<BasicArtDescription> future = new CompletableFuture<>();
+        DatabaseReference artRef = databaseInstance.getReference("artworks").child(artName);
+        artRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                BasicArtDescription art = task.getResult().getValue(BasicArtDescription.class);
+                if (art != null) {
+                    future.complete(art);
+                }
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to retrieve an artwork.
+     *
+     * @param artName the name of the artwork to be retrieved
+     * @return a CompletableFuture that will be completed when the artwork is retrieved, or will fail
+     * if the artwork is not found.
+     */
+    public static CompletableFuture<BasicArtDescription> getArtwork(String artName) {
+        CompletableFuture<BasicArtDescription> future = new CompletableFuture<>();
+        DatabaseReference artRef = databaseInstance.getReference("artworks").child(artName);
+        artRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                BasicArtDescription art = task.getResult().getValue(BasicArtDescription.class);
+                if (art == null) {
+                    future.completeExceptionally(new Exception("Artwork not found"));
+                } else {
+                    future.complete(art);
+                }
+            } else {
+                future.completeExceptionally(new Exception("Artwork not found"));
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> setArtwork(BasicArtDescription artworks) {
+        System.out.println("Setting artwork: " + artworks.getName());
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference artRef = databaseInstance.getReference("artworks").child(artworks.getName());
+        artRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                if(currentData.getValue() == null) {
+                    currentData.setValue(artworks);
+                }
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                if (error != null) {
+                    future.completeExceptionally(error.toException());
+                } else {
+                    future.complete(new AtomicBoolean(committed));
+                }
             }
         });
         return future;

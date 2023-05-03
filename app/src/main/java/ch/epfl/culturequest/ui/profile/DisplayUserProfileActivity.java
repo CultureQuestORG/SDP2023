@@ -93,6 +93,14 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         profileViewModel.getFollowed().observe(this, followButton::setFollowed);
         followButton.setOnClickListener(v -> profileViewModel.changeFollow());
 
+        progressBar.setOnClickListener(v -> {
+            // open the badges activity
+            Intent intent = new Intent(this, DisplayUserBadgeCollectionActivity.class);
+            intent.putExtra("uid", uid);
+            startActivity(intent);
+        });
+
+
 
 
         binding.settingsButton.setVisibility(View.INVISIBLE);
