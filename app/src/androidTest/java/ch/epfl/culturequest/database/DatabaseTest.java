@@ -272,7 +272,7 @@ public class DatabaseTest {
             Thread.sleep(2000);
             assertThat(Database.getArtwork("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("test"));
             assertThat(Database.getArtwork("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getArtist(), is("artist"));
-            assertThat(Database.getArtwork("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("summary"));
+            assertThat(Database.getArtwork("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getSummary(), is("summary"));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
@@ -287,8 +287,8 @@ public class DatabaseTest {
         try {
             Thread.sleep(2000);
             assertThat(Database.getArtworkScan("test2").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("test2"));
-            assertThat(Database.getArtworkScan("test2").get(5, java.util.concurrent.TimeUnit.SECONDS).getArtist(), is("artist"));
-            assertThat(Database.getArtworkScan("test2").get(5, java.util.concurrent.TimeUnit.SECONDS).getSummary(), is("summary"));
+            assertThat(Database.getArtworkScan("test2").get(5, java.util.concurrent.TimeUnit.SECONDS).getArtist(), is("artist2"));
+            assertThat(Database.getArtworkScan("test2").get(5, java.util.concurrent.TimeUnit.SECONDS).getSummary(), is("summary2"));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
