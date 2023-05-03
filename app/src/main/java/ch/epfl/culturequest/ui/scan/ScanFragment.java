@@ -76,7 +76,6 @@ public class ScanFragment extends Fragment {
     // ScanButtonListener is used to detect when the scan button is clicked
     private final View.OnClickListener scanButtonListener = view -> {
         loadingAnimation.startLoading();
-        scanningLayout.setVisibility(View.VISIBLE);
         if (cameraSetup != null) {
             cameraSetup.takePicture().thenAccept(captureTaken -> {
                 if (captureTaken) {

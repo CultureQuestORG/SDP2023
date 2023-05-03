@@ -3,17 +3,32 @@ package ch.epfl.culturequest.backend.artprocessingtest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.fail;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.backend.artprocessing.apis.GeneralDescriptionApi;
 import ch.epfl.culturequest.backend.artprocessing.apis.WikipediaDescriptionApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.database.Database;
 
 public class GeneralDescriptionApiTest {
+
+    @Before
+    public void setUp() {
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+    }
 
     @Test
     public void getArtDescriptionCorrectlyUsesOpenAiApiWhenArchitecture(){
@@ -30,6 +45,16 @@ public class GeneralDescriptionApiTest {
         assertThat(description.getCity(), is("Paris"));
         assertThat(description.getCountry(), is("France"));
         assertThat(description.isOpenAiRequired(), is(true));
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getArtwork("Arc de Triomphe").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("Arc de Triomphe"));
+            assertThat(Database.getArtwork("Arc de Triomphe").get(5, java.util.concurrent.TimeUnit.SECONDS).getArtist(), is("Jean-François-Thérèse Chalgrin"));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
     }
 
     @Test
@@ -48,6 +73,22 @@ public class GeneralDescriptionApiTest {
         assertThat(artDescription.getMuseum(), is("Louvre"));
         assertThat(artDescription.getType(), is(BasicArtDescription.ArtType.PAINTING));
         assertThat(artDescription.getScore() >= 90, is(true));
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getArtwork("Mona Lisa").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("Mona Lisa"));
+            assertThat(Database.getArtwork("Mona Lisa").get(5, java.util.concurrent.TimeUnit.SECONDS).getArtist(), is("Leonardo da Vinci"));
+            assertThat(Database.getArtwork("Mona Lisa").get(5, java.util.concurrent.TimeUnit.SECONDS).getSummary(), is(expectedSummaryMonaLisa));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
     }
 
+    @After
+    public void tearDown() {
+        // clear the database after finishing the tests
+        Database.clearDatabase();
+    }
 }
