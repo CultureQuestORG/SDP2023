@@ -1,14 +1,23 @@
 package ch.epfl.culturequest.social;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -50,7 +59,9 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 .load(pictureUrl)
                 .placeholder(android.R.drawable.progress_horizontal)
                 .into(holder.pictureImageView);
+
         holder.title.setText(post.getArtworkName());
+
         Database.getProfile(post.getUid()).thenAccept(profile -> {
             holder.username.setText(profile.getUsername());
             Picasso.get()
@@ -58,12 +69,21 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     .placeholder(android.R.drawable.progress_horizontal)
                     .into(holder.profilePicture);
         });
+
         List.of(holder.username, holder.profilePicture).forEach(view -> {
-            view.setOnClickListener(l ->{
+            view.setOnClickListener(l -> {
                 Intent intent = new Intent(holder.itemView.getContext(), DisplayUserProfileActivity.class);
                 intent.putExtra("uid", post.getUid());
                 holder.itemView.getContext().startActivity(intent);
             });
+        });
+
+        Database.getArtwork(post.getArtworkName()).thenAccept(artwork -> {
+            holder.artName.setText(artwork.getName());
+            holder.artist.setText(artwork.getArtist());
+            holder.year.setText(artwork.getYear());
+            holder.description.setText(artwork.getSummary());
+            holder.score.setText(String.valueOf(artwork.getScore()));
         });
 
         holder.location.setText("Lausanne");
@@ -72,7 +92,6 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         handleLike(holder, post);
 
         handleDelete(holder, post);
-
     }
 
     private void handleLike(@NonNull PictureViewHolder holder, Post post) {
@@ -154,10 +173,12 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView location;
         public ImageView like;
         public ImageView delete;
-
-
+        public TextView artName;
+        public TextView artist;
+        public TextView year;
+        public TextView description;
+        public TextView score;
         public boolean isLiked = false;
-
 
         public PictureViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -168,7 +189,64 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             profilePicture = itemView.findViewById(R.id.profile_picture);
             like = itemView.findViewById(R.id.like_button);
             delete = itemView.findViewById(R.id.delete_button);
+            View descriptionContainer = itemView.findViewById(R.id.descriptionContainerPost);
+            NestedScrollView scrollView = itemView.findViewById(R.id.descrtiptionContainerScrollPost);
 
+            scrollView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    // Disallow the touch request for parent scroll on touch of child view
+                    view.getParent().requestDisallowInterceptTouchEvent(false);
+                    return true;
+                }
+            });
+
+            artName = itemView.findViewById(R.id.artNamePost);
+            artist = itemView.findViewById(R.id.artistNamePost);
+            year = itemView.findViewById(R.id.artYearPost);
+            score = itemView.findViewById(R.id.artScorePost);
+            description = itemView.findViewById(R.id.artSummaryPost);
+
+            View postRecto = itemView.findViewById(R.id.post_recto);
+            View postVerso = itemView.findViewById(R.id.post_verso);
+            postVerso.setVisibility(View.INVISIBLE);
+
+            pictureImageView.setOnClickListener(v -> {
+                flip(v.getContext(), postVerso, postRecto);
+            });
+
+            descriptionContainer.setOnClickListener(v -> {
+                flip(v.getContext(), postRecto, postVerso);
+            });
+        }
+
+        private void flip(Context context, View visibleView, View inVisibleView) {
+            visibleView.setVisibility(View.VISIBLE);
+            float scale = context.getResources().getDisplayMetrics().density;
+            float cameraDist = 8000 * scale;
+            visibleView.setCameraDistance(cameraDist);
+            inVisibleView.setCameraDistance(cameraDist);
+            @SuppressLint("ResourceType") AnimatorSet flipOutAnimatorSet =
+                    (AnimatorSet) AnimatorInflater.loadAnimator(
+                            context,
+                            R.anim.flip_out
+                    );
+            flipOutAnimatorSet.setTarget(inVisibleView);
+            @SuppressLint("ResourceType") AnimatorSet flipInAnimationSet =
+                    (AnimatorSet) AnimatorInflater.loadAnimator(
+                            context,
+                            R.anim.flip_in
+                    );
+            flipInAnimationSet.setTarget(visibleView);
+            flipOutAnimatorSet.start();
+            flipInAnimationSet.start();
+
+            flipInAnimationSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    inVisibleView.setVisibility(View.INVISIBLE);
+                }
+            });
         }
 
     }
