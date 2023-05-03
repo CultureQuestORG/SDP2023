@@ -7,6 +7,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
@@ -268,12 +269,33 @@ public class Database {
 
 
 
-    public static CompletableFuture<AtomicBoolean> updateBadges(String uid, HashMap<String,Integer> newbadges) {
+    public static CompletableFuture<AtomicBoolean> updateBadges(String uid, List<String> newbadges) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference badgesRef = databaseInstance.getReference("users/" + uid + "/badges");
-        badgesRef.setValue(newbadges, (error, ref) -> {
-            future.complete(new AtomicBoolean(error == null));
-        });
+        badgesRef.runTransaction(
+new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        HashMap<String,Integer> badges = mutableData.getValue(new GenericTypeIndicator<HashMap<String,Integer>>() {});
+                        if (badges == null) {
+                            badges = new HashMap<>();
+                        }
+                        for (String badge : newbadges) {
+                            if (badges.containsKey(badge)) {
+                                badges.put(badge, badges.get(badge) + 1);
+                            } else {
+                                badges.put(badge, 1);
+                            }
+                        }
+                        mutableData.setValue(badges);
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+                        future.complete(new AtomicBoolean(committed));
+                    }
+                });
         return future;
     }
 
