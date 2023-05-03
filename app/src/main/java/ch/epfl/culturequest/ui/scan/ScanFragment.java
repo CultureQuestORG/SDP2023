@@ -132,6 +132,7 @@ public class ScanFragment extends Fragment {
         loadingAnimation = root.findViewById(R.id.scanLoadingAnimation);
 
         scanningLayout = root.findViewById(R.id.scanLoadingLayout);
+        scanningLayout.setVisibility(View.GONE);
         root.findViewById(R.id.cancelButtonScan).setOnClickListener(cancelButtonListener);
 
         // Creates the LocalStorage to store the images locally
