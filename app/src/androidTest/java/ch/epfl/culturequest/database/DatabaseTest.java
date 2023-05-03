@@ -4,6 +4,7 @@ package ch.epfl.culturequest.database;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -293,11 +294,9 @@ public class DatabaseTest {
             fail("Test failed because of an exception: " + e.getMessage());
         }
 
-        try {
-            Database.getArtworkScan("test").get(10, java.util.concurrent.TimeUnit.SECONDS);
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            assertThat(e, is(TimeoutException.class));
-        }
+        assertThrows(TimeoutException.class, () -> {
+            Database.getArtworkScan("test").get(5, java.util.concurrent.TimeUnit.SECONDS);
+        });
 
         Database.clearDatabase();
     }
