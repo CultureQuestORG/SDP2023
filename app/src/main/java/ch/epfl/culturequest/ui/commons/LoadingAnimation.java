@@ -1,11 +1,15 @@
 package ch.epfl.culturequest.ui.commons;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -81,5 +85,11 @@ public class LoadingAnimation extends View {
     private void setValue(int animatedValue) {
         animValue = animatedValue;
         invalidate();
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public boolean onTouchEvent (MotionEvent me) {
+        return true;
     }
 }
