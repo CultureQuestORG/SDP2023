@@ -65,6 +65,14 @@ public class ScanFragmentTest {
         onView(withId(R.id.scanLoadingAnimation)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.VISIBLE))));
     }
 
+    @Test
+    public void testLoadingStopsAfterCancelButtonClick() {
+        onView(withId(R.id.scan_button)).perform(click());
+        onView(withId(R.id.scanLoadingAnimation)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.VISIBLE))));
+        onView(withId(R.id.cancelButtonScan)).perform(click());
+        onView(withId(R.id.scanLoadingAnimation)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.INVISIBLE))));
+    }
+
     @After
     public void tearDown() {
         // Clear the storage after the tests

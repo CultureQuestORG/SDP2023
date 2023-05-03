@@ -14,18 +14,21 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
@@ -44,6 +47,9 @@ public class ScanFragment extends Fragment {
     private CameraSetup cameraSetup;
 
     private LoadingAnimation loadingAnimation;
+
+    private ConstraintLayout scanningLayout;
+    private CompletableFuture<Void> currentProcessing;
 
     //SurfaceTextureListener is used to detect when the TextureView is ready to be used
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
@@ -70,6 +76,7 @@ public class ScanFragment extends Fragment {
     // ScanButtonListener is used to detect when the scan button is clicked
     private final View.OnClickListener scanButtonListener = view -> {
         loadingAnimation.startLoading();
+        scanningLayout.setVisibility(View.VISIBLE);
         if (cameraSetup != null) {
             cameraSetup.takePicture().thenAccept(captureTaken -> {
                 if (captureTaken) {
@@ -78,7 +85,7 @@ public class ScanFragment extends Fragment {
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
                             Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
-                            FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
+                            currentProcessing = FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
                                         intent.putExtra("downloadUrl", url);
                                         return ProcessingApi.getArtDescriptionFromUrl(url);
                                     })
@@ -88,7 +95,11 @@ public class ScanFragment extends Fragment {
                                         intent.putExtra("artDescription", serializedArtDescription);
                                         intent.putExtra("imageUri", lastlyStoredImageUri.toString());
                                         startActivity(intent);
+
+                                        // Reset state of the scan fragment
                                         loadingAnimation.stopLoading();
+                                        scanningLayout.setVisibility(View.INVISIBLE);
+                                        currentProcessing = null;
                                     });
 
                         } catch (IOException e) {
@@ -98,6 +109,15 @@ public class ScanFragment extends Fragment {
                 }
             });
         }
+    };
+
+    private final View.OnClickListener cancelButtonListener = view -> {
+        loadingAnimation.stopLoading();
+        scanningLayout.setVisibility(View.INVISIBLE);
+
+        // Cancel the current processing if it exists
+        if(currentProcessing != null)
+            currentProcessing.cancel(true);
     };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -110,6 +130,9 @@ public class ScanFragment extends Fragment {
 
         // Creates the loading animation
         loadingAnimation = root.findViewById(R.id.scanLoadingAnimation);
+
+        scanningLayout = root.findViewById(R.id.scanLoadingLayout);
+        root.findViewById(R.id.cancelButtonScan).setOnClickListener(cancelButtonListener);
 
         // Creates the LocalStorage to store the images locally
         ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
