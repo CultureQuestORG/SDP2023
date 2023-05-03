@@ -17,8 +17,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
@@ -545,6 +547,78 @@ public class Database {
                 future.complete(follows);
             } else {
                 future.complete(new Follows(new ArrayList<>()));
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to retrieve an artwork when scanning. It is intentionally not completing
+     * the future if the artwork is not found, so that the api fetch can succeed before this one fails.
+     *
+     * @param artName the name of the artwork to be retrieved
+     * @return a CompletableFuture that will be completed when the artwork is retrieved
+     */
+    public static CompletableFuture<BasicArtDescription> getArtworkScan(String artName) {
+        CompletableFuture<BasicArtDescription> future = new CompletableFuture<>();
+        DatabaseReference artRef = databaseInstance.getReference("artworks").child(artName);
+        artRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                BasicArtDescription art = task.getResult().getValue(BasicArtDescription.class);
+                if (art != null) {
+                    future.complete(art);
+                }
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to retrieve an artwork.
+     *
+     * @param artName the name of the artwork to be retrieved
+     * @return a CompletableFuture that will be completed when the artwork is retrieved, or will fail
+     * if the artwork is not found.
+     */
+    public static CompletableFuture<BasicArtDescription> getArtwork(String artName) {
+        CompletableFuture<BasicArtDescription> future = new CompletableFuture<>();
+        DatabaseReference artRef = databaseInstance.getReference("artworks").child(artName);
+        artRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                BasicArtDescription art = task.getResult().getValue(BasicArtDescription.class);
+                if (art == null) {
+                    future.completeExceptionally(new Exception("Artwork not found"));
+                } else {
+                    future.complete(art);
+                }
+            } else {
+                future.completeExceptionally(new Exception("Artwork not found"));
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> setArtwork(BasicArtDescription artworks) {
+        System.out.println("Setting artwork: " + artworks.getName());
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference artRef = databaseInstance.getReference("artworks").child(artworks.getName());
+        artRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                if(currentData.getValue() == null) {
+                    currentData.setValue(artworks);
+                }
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                if (error != null) {
+                    future.completeExceptionally(error.toException());
+                } else {
+                    future.complete(new AtomicBoolean(committed));
+                }
             }
         });
         return future;

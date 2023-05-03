@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -15,12 +14,10 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -87,8 +84,8 @@ public class ScanFragment extends Fragment {
                                         String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
                                         intent.putExtra("artDescription", serializedArtDescription);
                                         intent.putExtra("imageUri", lastlyStoredImageUri.toString());
-                                        startActivity(intent);
                                         loadingAnimation.stopLoading();
+                                        startActivity(intent);
                                     });
 
                         } catch (IOException e) {
