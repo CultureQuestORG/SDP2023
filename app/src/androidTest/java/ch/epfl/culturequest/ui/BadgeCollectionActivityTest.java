@@ -62,10 +62,12 @@ public class BadgeCollectionActivityTest {
     }
 
     @Test
-    public void updateBadgesWorks(){
+    public void updateBadgesWorks() throws InterruptedException {
         HashMap<String, Integer> profileBadges = Database.getProfile(Profile.getActiveProfile().getUid()).join().getBadges();
         List<String> badges = List.of("france","louvres","paris");
+
         Profile.getActiveProfile().addBadges(badges);
+        Thread.sleep(3000);
         Database.setProfile(Profile.getActiveProfile()).join();
         for (String badge : badges){
             if (profileBadges.containsKey(badge)){
