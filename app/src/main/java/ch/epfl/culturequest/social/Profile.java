@@ -253,8 +253,12 @@ public class Profile extends Observable {
         return toString().equals(profile.toString());
     }
     public void addBadges(List<String> badges) {
-        Database.updateBadges(this.uid, badges);
-        badges.forEach(this::addBadge);
+        Database.updateBadges(this.uid, badges).thenAccept(newBadges -> {
+            this.badges = newBadges;
+            setChanged();
+            notifyObservers();
+        });
+
 
     }
 
