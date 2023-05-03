@@ -25,7 +25,10 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -82,8 +85,9 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             holder.artName.setText(artwork.getName());
             holder.artist.setText(artwork.getArtist());
             holder.year.setText(artwork.getYear());
-            holder.description.setText(artwork.getSummary());
-            holder.score.setText(String.valueOf(artwork.getScore()));
+            holder.description.setText(shortenDescription(artwork.getSummary()));
+            displaySeeMore(artwork, holder.seeMore);
+            holder.score.setText("+" + artwork.getScore() + " pts");
         });
 
         holder.location.setText("Lausanne");
@@ -158,6 +162,27 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         dial.show();
     }
 
+    private String shortenDescription(String description) {
+        if (description.length() > 200) {
+            return description.substring(0, 200) + "...";
+        } else {
+            return description;
+        }
+    }
+
+    private void displaySeeMore(BasicArtDescription description, TextView seeMore) {
+        /*if(description.getSummary().length() > 200) {
+            seeMore.setVisibility(View.VISIBLE);
+            seeMore.setOnClickListener(v -> {
+                seeMore.setVisibility(View.GONE);
+                Intent intent = new Intent(seeMore.getContext(), ArtDescriptionDisplayActivity.class);
+                String serializedArtDescription = DescriptionSerializer.serialize(description);
+                intent.putExtra("artDescription", serializedArtDescription);
+                seeMore.getContext().startActivity(intent);
+            });
+        }*/
+    }
+
 
     @Override
     public int getItemCount() {
@@ -178,7 +203,10 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView year;
         public TextView description;
         public TextView score;
+        public TextView seeMore;
         public boolean isLiked = false;
+
+        private boolean isFlipping = false;
 
         public PictureViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -190,37 +218,31 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             like = itemView.findViewById(R.id.like_button);
             delete = itemView.findViewById(R.id.delete_button);
             View descriptionContainer = itemView.findViewById(R.id.descriptionContainerPost);
-            NestedScrollView scrollView = itemView.findViewById(R.id.descrtiptionContainerScrollPost);
-
-            scrollView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    // Disallow the touch request for parent scroll on touch of child view
-                    view.getParent().requestDisallowInterceptTouchEvent(false);
-                    return true;
-                }
-            });
 
             artName = itemView.findViewById(R.id.artNamePost);
             artist = itemView.findViewById(R.id.artistNamePost);
             year = itemView.findViewById(R.id.artYearPost);
             score = itemView.findViewById(R.id.artScorePost);
             description = itemView.findViewById(R.id.artSummaryPost);
+            seeMore = itemView.findViewById(R.id.seeMorePost);
 
             View postRecto = itemView.findViewById(R.id.post_recto);
             View postVerso = itemView.findViewById(R.id.post_verso);
             postVerso.setVisibility(View.INVISIBLE);
 
             pictureImageView.setOnClickListener(v -> {
+                if(isFlipping) return;
                 flip(v.getContext(), postVerso, postRecto);
             });
 
             descriptionContainer.setOnClickListener(v -> {
+                if(isFlipping) return;
                 flip(v.getContext(), postRecto, postVerso);
             });
         }
 
         private void flip(Context context, View visibleView, View inVisibleView) {
+            isFlipping = true;
             visibleView.setVisibility(View.VISIBLE);
             float scale = context.getResources().getDisplayMetrics().density;
             float cameraDist = 8000 * scale;
@@ -244,6 +266,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             flipInAnimationSet.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
+                    isFlipping = false;
                     inVisibleView.setVisibility(View.INVISIBLE);
                 }
             });
