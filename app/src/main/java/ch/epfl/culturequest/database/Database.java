@@ -269,8 +269,8 @@ public class Database {
 
 
 
-    public static CompletableFuture<AtomicBoolean> updateBadges(String uid, List<String> newbadges) {
-        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+    public static CompletableFuture<HashMap<String,Integer>> updateBadges(String uid, List<String> newbadges) {
+        CompletableFuture<HashMap<String,Integer>> future = new CompletableFuture<>();
         DatabaseReference badgesRef = databaseInstance.getReference("users/" + uid + "/badges");
         badgesRef.runTransaction(
 new Transaction.Handler() {
@@ -293,7 +293,7 @@ new Transaction.Handler() {
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-                        future.complete(new AtomicBoolean(committed));
+                        future.complete((HashMap<String,Integer>)dataSnapshot.getValue());
                     }
                 });
         return future;
