@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
@@ -551,6 +552,34 @@ public class Database {
         return future;
     }
 
+    /**
+     * This method is used to retrieve an artwork when scanning. It is intentionally not completing
+     * the future if the artwork is not found, so that the api fetch can succeed before this one fails.
+     *
+     * @param artName the name of the artwork to be retrieved
+     * @return a CompletableFuture that will be completed when the artwork is retrieved
+     */
+    public static CompletableFuture<BasicArtDescription> getArtworkScan(String artName) {
+        CompletableFuture<BasicArtDescription> future = new CompletableFuture<>();
+        DatabaseReference artRef = databaseInstance.getReference("artworks").child(artName);
+        artRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                BasicArtDescription art = task.getResult().getValue(BasicArtDescription.class);
+                if (art != null) {
+                    future.complete(art);
+                }
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to retrieve an artwork.
+     *
+     * @param artName the name of the artwork to be retrieved
+     * @return a CompletableFuture that will be completed when the artwork is retrieved, or will fail
+     * if the artwork is not found.
+     */
     public static CompletableFuture<BasicArtDescription> getArtwork(String artName) {
         CompletableFuture<BasicArtDescription> future = new CompletableFuture<>();
         DatabaseReference artRef = databaseInstance.getReference("artworks").child(artName);

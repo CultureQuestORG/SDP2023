@@ -18,6 +18,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
@@ -257,6 +258,45 @@ public class DatabaseTest {
             assertTrue(Database.getFollowed("user1").get(5, java.util.concurrent.TimeUnit.SECONDS).getFollowed().contains("user3"));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void setAndGetArtworkWorks() {
+        BasicArtDescription art = new BasicArtDescription("test", "artist", "summary", BasicArtDescription.ArtType.PAINTING, "test", "test", "test", "test", 12);
+        Database.setArtwork(art);
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getArtwork("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("test"));
+            assertThat(Database.getArtwork("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getArtist(), is("artist"));
+            assertThat(Database.getArtwork("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("summary"));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+    @Test
+    public void getArtworkScanWorks() {
+        BasicArtDescription art = new BasicArtDescription("test2", "artist2", "summary2", BasicArtDescription.ArtType.PAINTING, "test", "test", "test", "test", 12);
+        Database.setArtwork(art);
+
+        try {
+            Thread.sleep(2000);
+            assertThat(Database.getArtworkScan("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("test2"));
+            assertThat(Database.getArtworkScan("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getArtist(), is("artist"));
+            assertThat(Database.getArtworkScan("test").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("summary"));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        try {
+            Database.getArtworkScan("test").get(10, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            assertThat(e, is(TimeoutException.class));
         }
 
         Database.clearDatabase();
