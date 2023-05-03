@@ -78,7 +78,7 @@ public class GeneralDescriptionApiTest {
             Thread.sleep(2000);
             assertThat(Database.getArtwork("Mona Lisa").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("Mona Lisa"));
             assertThat(Database.getArtwork("Mona Lisa").get(5, java.util.concurrent.TimeUnit.SECONDS).getArtist(), is("Leonardo da Vinci"));
-            assertThat(Database.getArtwork("Mona Lisa").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is(expectedSummaryMonaLisa));
+            assertThat(Database.getArtwork("Mona Lisa").get(5, java.util.concurrent.TimeUnit.SECONDS).getSummary(), is(expectedSummaryMonaLisa));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
