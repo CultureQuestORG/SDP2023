@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
+
 import ch.epfl.culturequest.authentication.Authenticator;
 
 @RunWith(AndroidJUnit4.class)
@@ -116,6 +118,28 @@ public class ProfileTest {
         profile.setScore(newScore);
         assertThat(profile.getScore(), is(newScore));
     }
+
+    @Test
+    public void setBadgesWorks() {
+        HashMap<String, Integer> newBadges = new HashMap<>();
+        newBadges.put("badge1", 1);
+        newBadges.put("badge2", 3);
+        profile.setBadges(newBadges);
+        assertThat(profile.getBadges(), is(newBadges));
+        assertThat(profile.getBadgeCount("badge1"), is(1));
+        assertThat(profile.getBadgeCount("badge2"), is(3));
+    }
+
+    @Test
+    public void addBadgeWorks() {
+        Integer badgeCount =profile.getBadgeCount("badgeUltraRare");
+        profile.addBadge("badgeUltraRare");
+        assertThat(profile.getBadgeCount("badgeUltraRare"), is(badgeCount + 1));
+        profile.addBadge("badgeUltraRare");
+        assertThat(profile.getBadgeCount("badgeUltraRare"), is(badgeCount + 2));
+    }
+
+
 
     @Test
     public void emptyConstructorWorks() {

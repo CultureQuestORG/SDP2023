@@ -256,6 +256,10 @@ public class Profile extends Observable {
         badges.forEach(this::addBadge);
         Database.updateBadges(this.uid, this.badges);
     }
+
+    public Integer getBadgeCount(String badge) {
+        return badges.getOrDefault(badge, 0);
+    }
 }
 
 
