@@ -293,7 +293,12 @@ new Transaction.Handler() {
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
-                        future.complete((HashMap<String,Integer>)dataSnapshot.getValue());
+                        if (committed) {
+                            HashMap<String,Integer> badges = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String,Integer>>() {});
+                            future.complete(badges);
+                        } else {
+                            future.completeExceptionally(databaseError.toException());
+                        }
                     }
                 });
         return future;

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +26,10 @@ public class BadgeDisplayAdapter extends RecyclerView.Adapter<BadgeDisplayAdapte
 
     public BadgeDisplayAdapter(HashMap<String, Integer> badges) {
         // sort the badges by decreasing order of count
+        if (badges == null) {
+            this.badges = new ArrayList<>();
+            return;
+        }
         this.badges = badges.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).sorted((p1, p2) -> Integer.compare(p2.second, p1.second)).filter(s->ScanBadge.Badge.identifyPlace(s.first)!= ScanBadge.Country.OTHER).collect(Collectors.toList());
     }
 
