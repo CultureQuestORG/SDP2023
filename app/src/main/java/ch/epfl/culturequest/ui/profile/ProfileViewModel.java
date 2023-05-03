@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -24,6 +25,8 @@ public class ProfileViewModel extends ViewModel {
 
     private final MutableLiveData<Integer> score;
 
+    private final MutableLiveData<HashMap<String, Integer>> badges;
+
     Profile profile = Profile.getActiveProfile();
 
     MutableLiveData<Profile> selectedProfile = new MutableLiveData<>();
@@ -37,6 +40,7 @@ public class ProfileViewModel extends ViewModel {
         pictures = new MutableLiveData<>();
         score = new MutableLiveData<>();
         followed = new MutableLiveData<>(false);
+        badges = new MutableLiveData<>(new HashMap<>());
 
         EspressoIdlingResource.increment();
         if (profile != null) {
@@ -45,6 +49,7 @@ public class ProfileViewModel extends ViewModel {
                     this.selectedProfile.setValue(selectedProfile);
                     username.setValue(selectedProfile.getUsername());
                     score.setValue(selectedProfile.getScore());
+                    badges.setValue(selectedProfile.getBadges());
                     profilePictureUri.setValue(selectedProfile.getProfilePicture());
                     // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
                     // a time, but it is computationally more efficient to do 1 big query:
@@ -73,6 +78,7 @@ public class ProfileViewModel extends ViewModel {
                         username.setValue(profile.getUsername());
                         profilePictureUri.setValue(profile.getProfilePicture());
                         score.setValue(profile.getScore());
+                        badges.setValue(profile.getBadges());
                         pictures.setValue(posts);
                     }
                 });
@@ -82,6 +88,7 @@ public class ProfileViewModel extends ViewModel {
                     username.postValue(p.getUsername());
                     profilePictureUri.postValue(p.getProfilePicture());
                     score.postValue(p.getScore());
+                    badges.postValue(p.getBadges());
 //                    pictures.postValue(p.getPosts());
                 });
             }
@@ -116,6 +123,13 @@ public class ProfileViewModel extends ViewModel {
      */
     public LiveData<Integer> getScore() {
         return score;
+    }
+
+    /**
+     * @return the badges of the profile
+     */
+    public LiveData<HashMap<String, Integer>> getBadges() {
+        return badges;
     }
 
     public LiveData<Boolean> getFollowed() {

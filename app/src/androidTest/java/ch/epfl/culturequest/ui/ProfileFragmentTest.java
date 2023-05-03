@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 import ch.epfl.culturequest.R;
@@ -69,7 +70,7 @@ public class ProfileFragmentTest {
 
         ProfileUtils.postsAdded = 0;
 
-        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PATH, 35);
+        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PATH, 35,new HashMap<>());
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 

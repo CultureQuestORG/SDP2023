@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -37,7 +38,7 @@ public class DatabaseTest {
     // PROFILE TESTS
     @Test
     public void setAndGetProfileWorks() {
-        Profile profile = new Profile("test", "test", "test", "test", "test", "test", 0);
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test", 0,new HashMap<>());
         try {
             Database.setProfile(profile);
             Thread.sleep(2000);
@@ -169,7 +170,7 @@ public class DatabaseTest {
 
     @Test
     public void deleteProfileRemovesAllPostsOfTheProfile() {
-        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0);
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0,new HashMap<>());
         Database.setProfile(profile);
         Post post1 = new Post("test1", "user1", "test", "test", 0, 0, new ArrayList<>());
         Post post2 = new Post("test2", "user1", "test", "test", 1, 0, new ArrayList<>());
@@ -194,7 +195,7 @@ public class DatabaseTest {
     //FOLLOWING TESTS
     @Test
     public void getFollowedWorks() {
-        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0);
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0,new HashMap<>());
         Database.setProfile(profile);
 
         try {
@@ -209,13 +210,13 @@ public class DatabaseTest {
 
     @Test
     public void addFollowedWorks() {
-        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0);
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0,new HashMap<>());
         Database.setProfile(profile);
 
-        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0);
+        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0,new HashMap<>());
         Database.setProfile(profile2);
 
-        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0);
+        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0,new HashMap<>());
         Database.setProfile(profile3);
 
         Database.addFollow("user1", "user2");
@@ -235,13 +236,13 @@ public class DatabaseTest {
 
     @Test
     public void removeFollowedWorks() {
-        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0);
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0,new HashMap<>());
         Database.setProfile(profile);
 
-        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0);
+        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0,new HashMap<>());
         Database.setProfile(profile2);
 
-        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0);
+        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0,new HashMap<>());
         Database.setProfile(profile3);
 
         Database.addFollow("user1", "user2");

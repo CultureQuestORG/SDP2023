@@ -7,6 +7,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
@@ -14,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -262,12 +264,45 @@ public class Database {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference scoreRef = databaseInstance.getReference("users/" + uid + "/score");
         scoreRef.setValue(newScore, (error, ref) -> {
-            if (error != null) {
-                future.complete(new AtomicBoolean(false));
-            } else {
-                future.complete(new AtomicBoolean(true));
-            }
+            future.complete(new AtomicBoolean(error == null));
         });
+        return future;
+    }
+
+
+
+    public static CompletableFuture<HashMap<String,Integer>> updateBadges(String uid, List<String> newbadges) {
+        CompletableFuture<HashMap<String,Integer>> future = new CompletableFuture<>();
+        DatabaseReference badgesRef = databaseInstance.getReference("users/" + uid + "/badges");
+        badgesRef.runTransaction(
+new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        HashMap<String,Integer> badges = mutableData.getValue(new GenericTypeIndicator<HashMap<String,Integer>>() {});
+                        if (badges == null) {
+                            badges = new HashMap<>();
+                        }
+                        for (String badge : newbadges) {
+                            if (badges.containsKey(badge)) {
+                                badges.put(badge, badges.get(badge) + 1);
+                            } else {
+                                badges.put(badge, 1);
+                            }
+                        }
+                        mutableData.setValue(badges);
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+                        if (committed) {
+                            HashMap<String,Integer> badges = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String,Integer>>() {});
+                            future.complete(badges);
+                        } else {
+                            future.completeExceptionally(databaseError.toException());
+                        }
+                    }
+                });
         return future;
     }
 

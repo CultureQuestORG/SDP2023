@@ -9,12 +9,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -26,7 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
+import java.util.List;
 import java.util.UUID;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
@@ -35,9 +33,6 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.ScanBadge;
-import ch.epfl.culturequest.storage.FireStorage;
-import ch.epfl.culturequest.ui.commons.LoadingAnimation;
-import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
@@ -72,7 +67,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             scannedImage = bitmap;
             ((ImageView) findViewById(R.id.artImage)).setImageBitmap(bitmap);
             displayArtInformation(artDescription);
-            postButton.setOnClickListener(v -> uploadImage(imageDownloadUrl, artDescription));
+            postButton.setOnClickListener(v -> postImage(imageDownloadUrl, artDescription,List.of(artDescription.getCountry(), artDescription.getCity(), artDescription.getMuseum())));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             finish();
@@ -209,7 +204,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
      * @param url  the image url to upload
      * @param artwork the artwork to add to the database
      */
-    private void uploadImage(String url, BasicArtDescription artwork) {
+    private void postImage(String url, BasicArtDescription artwork, List<String> badges) {
         String postId = UUID.randomUUID().toString();
         Profile activeProfile = Profile.getActiveProfile();
         String uid = activeProfile.getUid();
@@ -217,6 +212,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             if (e == null) {
                 postsAdded++;
                 activeProfile.incrementScore(artwork.getScore());
+                activeProfile.addBadges(badges);
                 finish();
             } else {
                 e.printStackTrace();

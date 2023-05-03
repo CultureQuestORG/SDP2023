@@ -72,6 +72,18 @@ public class ProfileFragment extends Fragment {
         profileViewModel.getScore().observe(getViewLifecycleOwner(), s -> ProfileUtils.handleScore(level, levelText, progressBar, s));
         // set the onClickListener for the settings button
         settingsButton.setOnClickListener(this::goToSettings);
+
+        progressBar.setOnClickListener(v -> {
+            // open the badges activity
+            Intent intent = new Intent(getActivity(), DisplayUserBadgeCollectionActivity.class);
+            intent.putExtra("uid", Profile.getActiveProfile().getUid());
+            startActivity(intent);
+        });
+
+
+
+
+
         return root;
     }
 
