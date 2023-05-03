@@ -25,7 +25,7 @@ public class BadgeDisplayAdapter extends RecyclerView.Adapter<BadgeDisplayAdapte
 
     public BadgeDisplayAdapter(HashMap<String, Integer> badges) {
         // sort the badges by decreasing order of count
-        this.badges = badges.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).sorted((p1, p2) -> Integer.compare(p2.second, p1.second)).collect(Collectors.toList());
+        this.badges = badges.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).sorted((p1, p2) -> Integer.compare(p2.second, p1.second)).filter(s->ScanBadge.Badge.identifyPlace(s.first)!= ScanBadge.Country.OTHER).collect(Collectors.toList());
     }
 
     @NonNull

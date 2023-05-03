@@ -58,8 +58,7 @@ public class BadgeCollectionActivityTest {
     @Test
     public void testBadgeCollectionActivity() {
         onView(withId(R.id.badge_collection)).check(matches(isDisplayed()));
-        //should have 3 child
-        onView(withId(R.id.badge_collection)).check(matches(hasChildCount(3)));
+        onView(withId(R.id.badge_collection)).check(matches(hasChildCount(Profile.getActiveProfile().getBadges().size())));
     }
 
     @Test

@@ -35,7 +35,6 @@ public class DisplayUserBadgeCollectionActivity extends AppCompatActivity {
         final RecyclerView recyclerView = binding.badgeCollection;
 
         profileViewModel.getBadges().observe(this, badges -> {
-            System.out.println("badges: " + badges);
             badgeDisplayAdapter = new BadgeDisplayAdapter(badges);
             recyclerView.setAdapter(badgeDisplayAdapter);
             GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
