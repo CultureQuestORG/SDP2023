@@ -6,30 +6,4 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D9C2A6"
-    tools:context=".ui.map.MapUnavailableFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-
-    <TextView
-        android:id="@+id/descriptionText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_blank_fragment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.477" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="126dp"
-        android:layout_height="55dp"
-        android:text="Go to settings"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/descriptionText"
-        app:layout_constraintVertical_bias="0.206" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    tools:context=".ui.map.MapUnavailableFragment"/>

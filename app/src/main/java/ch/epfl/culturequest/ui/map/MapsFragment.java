@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -67,11 +68,14 @@ public class MapsFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
 
+    private final static MapUnavailableFragment unavailableFragment = new MapUnavailableFragment();
+
     private FragmentMapsBinding binding;
     private MapsViewModel viewModel;
 
     private OTMProvider otmProvider;
 
+    private boolean isWifiAvailable = true;
     private GoogleMap mMap;
 
     private Location lastKnownLocation;
@@ -98,6 +102,7 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
+            if(!isWifiAvailable) return;
             mMap = googleMap;
             getProfilePicture();
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.maps_style_json));
@@ -108,12 +113,14 @@ public class MapsFragment extends Fragment {
     };
 
     private void checkInternet(){
-
-        Log.i("FRAGMENT1", getActivity().getSupportFragmentManager().toString());
+        isWifiAvailable = true;
+        this.getParentFragmentManager().beginTransaction().hide(unavailableFragment).show(this).setReorderingAllowed(true).commit();
         if(!AndroidUtils.isNetworkAvailable()) {
+            isWifiAvailable = false;
             Bundle args = new Bundle();
             args.putBoolean("no_wifi", true);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.map, MapUnavailableFragment.class, args).setReorderingAllowed(true).commit();
+            this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
+            Toast.makeText(getContext(), "It seems that you are not connected to the internet.", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -205,8 +212,8 @@ public class MapsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         checkInternet();
+        if(!isWifiAvailable) return;
         if (mMap != null) {
-            Log.i("MAP", String.valueOf(getActivity().getSupportFragmentManager().getFragments().size()));
             getLocationPermission();
         }
         getProfilePicture();
@@ -244,6 +251,7 @@ public class MapsFragment extends Fragment {
         View mapView = binding.getRoot();
 
         checkInternet();
+        if(!isWifiAvailable) return null;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
 
@@ -253,7 +261,6 @@ public class MapsFragment extends Fragment {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
             }
         });
-        Log.i("MAPS", "CREATED VIEW");
         return mapView;
     }
 
@@ -270,7 +277,6 @@ public class MapsFragment extends Fragment {
             viewModel.setIsLocationPermissionGranted(true);
             getDeviceLocation();
         } else {
-            Log.i("PERMISSION", "PERMISSION NOT GRANTED");
             permissionRequest.askPermission(launcher);
         }
     }
@@ -284,10 +290,8 @@ public class MapsFragment extends Fragment {
             getDeviceLocation();
         }
         else {
-            /*Log.i("PERMISSION", "PERMISSION DENIED");
-            Bundle args = new Bundle();
-            args.putBoolean("no_wifi", false);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.map, MapUnavailableFragment.class, args).setReorderingAllowed(true).commit();*/
+            this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
+            Toast.makeText(getContext(), "Please give access to your location to use this feature.", Toast.LENGTH_SHORT).show();
         }
     }
 
