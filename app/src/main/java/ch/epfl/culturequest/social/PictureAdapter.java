@@ -202,10 +202,10 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
         AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
                 .setPositiveButton("Yes", (dialog, which) -> {
-//                    pictures.remove(post);
-//                    notifyItemRemoved(pictures.indexOf(post));
-//                    notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
-//                    Database.removePost(post);
+                    pictures.remove(post);
+                    notifyItemRemoved(pictures.indexOf(post));
+                    notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
+                    Database.removePost(post);
                     //TODO: delete image from storage when the mock is removed
                     //FirebaseStorage storage = FirebaseStorage.getInstance();
                     //storage.getReferenceFromUrl(post.getImageUrl()).delete();
