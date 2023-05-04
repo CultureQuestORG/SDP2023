@@ -142,7 +142,7 @@ public class ProfileViewModel extends ViewModel {
         }
 
         this.followed.setValue(Boolean.FALSE.equals(followed.getValue()));
-        if(Boolean.TRUE.equals(this.followed.getValue())) {
+        if (Boolean.TRUE.equals(this.followed.getValue())) {
             Database.addFollow(profile.getUid(), selectedProfile.getValue().getUid());
         } else {
             Database.removeFollow(profile.getUid(), selectedProfile.getValue().getUid());

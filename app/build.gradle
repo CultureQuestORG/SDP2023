@@ -45,6 +45,7 @@ android {
 
         buildConfigField "String", "OTM_API_KEY", "\""+getOTMApiKey()+"\""
         buildConfigField "String", "OPEN_AI_API_KEY", "\""+getOpenAiApiKey()+"\""
+        buildConfigField "java.util.concurrent.atomic.AtomicBoolean", "IS_TESTING", "new java.util.concurrent.atomic.AtomicBoolean(false)"
     }
 
     buildTypes {
