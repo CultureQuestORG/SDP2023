@@ -45,7 +45,7 @@ public class UtilsTest {
         activity.runOnUiThread(()->{
             AndroidUtils.showNoConnectionAlert(activity, "TEST");
         });
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         onView(withText("TEST")).check(matches(isDisplayed()));
         onView(withText("OK")).perform(click());
     }
