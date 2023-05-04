@@ -29,6 +29,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
+
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
@@ -48,14 +50,14 @@ public class DisplayUserProfileActivityTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
         // Initialize the database with some test profiles
-        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400);
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>());
         Profile.setActiveProfile(activeProfile);
 
-        Profile profile1 = new Profile("fakeuid", "name", "username", "email", "phone", "photo", 3);
+        Profile profile1 = new Profile("fakeuid", "name", "username", "email", "phone", "photo", 3,new HashMap<>());
 
         Database.setProfile(profile1);
         Database.setProfile(activeProfile);
-        Thread.sleep(1000);
+
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(), DisplayUserProfileActivity.class);
         intent.putExtra("uid", "fakeuid");
         scenario = ActivityScenario.launch(intent);

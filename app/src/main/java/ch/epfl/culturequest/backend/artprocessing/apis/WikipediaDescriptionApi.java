@@ -8,12 +8,14 @@ import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.backend.exceptions.WikipediaDescriptionFailedException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -76,16 +78,28 @@ public class WikipediaDescriptionApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                pageHtmlFuture.completeExceptionally(e);
+                pageHtmlFuture.completeExceptionally(new CompletionException(new WikipediaDescriptionFailedException("Failed to reach Wikipedia page")));
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if(!response.isSuccessful()){
-                    pageHtmlFuture.completeExceptionally(new IOException("Unexpected code " + response));
+                    pageHtmlFuture.completeExceptionally(new CompletionException(new WikipediaDescriptionFailedException("Failed to retrieve Wikipedia HTTP response")));
                 }
 
-                pageHtmlFuture.complete(response.body().string());
+                String pageHtml = response.body().string();
+
+                if (wikipediaResponseIsAmbiguous(pageHtml)) {
+                    pageHtmlFuture.completeExceptionally(new CompletionException(new WikipediaDescriptionFailedException("Ambiguity detected")));
+                }
+
+                else if(wikipediaPageDoesNotExist(pageHtml)){
+                    pageHtmlFuture.completeExceptionally(new CompletionException(new WikipediaDescriptionFailedException("Wikipedia page does not exist")));
+                }
+
+                else {
+                    pageHtmlFuture.complete(pageHtml);
+                }
             }});
 
         return pageHtmlFuture;
@@ -252,5 +266,17 @@ public class WikipediaDescriptionApi {
         }
 
         return null;
+    }
+
+    private boolean wikipediaResponseIsAmbiguous(String pageHtml){
+        Pattern ambiguityDetectionPattern = Pattern.compile("<b>.*<\\/b> may refer to");
+        Matcher ambiguityDetectionMatcher = ambiguityDetectionPattern.matcher(pageHtml);
+        return ambiguityDetectionMatcher.find();
+    }
+
+    private boolean wikipediaPageDoesNotExist(String pageHtml) {
+        Pattern pageDoesNotExistPattern = Pattern.compile("The page \".*\" does not exist");
+        Matcher pageDoesNotExistMatcher = pageDoesNotExistPattern.matcher(pageHtml);
+        return pageDoesNotExistMatcher.find();
     }
 }

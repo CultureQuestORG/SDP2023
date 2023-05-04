@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class ArtDescriptionDisplayActivityTest2 {
 
-    private String nullSerializedDescription = "null|null|null|null|null|null|null|null|null";
+    private String nullSerializedDescription = "null|null|null|null|null|null|null|null|null|false";
 
     @Rule
     public ActivityScenarioRule<ArtDescriptionDisplayActivity> activityRule =
@@ -31,7 +31,7 @@ public class ArtDescriptionDisplayActivityTest2 {
     @Test
     public void activityDisplaysCorrectInformationWithNullFields(){
 
-        String nulLSerializedDescription = "null|null|null|null|null|null|null|null|null";
+        String nulLSerializedDescription = "null|null|null|null|null|null|null|null|null|false";
 
         onView(withId(R.id.artName)).check(matches(withText("No name found")));
         onView(withId(R.id.artistName)).check(matches(withText("No artist found")));
@@ -42,6 +42,11 @@ public class ArtDescriptionDisplayActivityTest2 {
         onView(withId(R.id.countryBadge)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.GONE))));
         onView(withId(R.id.cityBadge)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.GONE))));
         onView(withId(R.id.museumBadge)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.GONE))));
+    }
+
+    @Test
+    public void activityDisplayingPostButton() {
+        onView(withId(R.id.post_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
     }
 
 }

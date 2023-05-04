@@ -1,6 +1,8 @@
 checks:
   identical-code:
     enabled: false
+  similar-code:
+    enabled: false
 exclude_patterns:
   - "**/test/"
   - "**/androidTest/"

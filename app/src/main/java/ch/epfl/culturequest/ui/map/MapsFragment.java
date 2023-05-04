@@ -116,7 +116,7 @@ public class MapsFragment extends Fragment {
         if(!AndroidUtils.isNetworkAvailable()) {
             isWifiAvailable = false;
             this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
-            Toast.makeText(getContext(), "It seems that you are not connected to the internet.", Toast.LENGTH_SHORT).show();
+            AndroidUtils.showNoConnectionAlert(getContext(), "It seems that you are not connected to the internet. You can't use the map without internet connection.");
         }
         else {
             isWifiAvailable = true;
@@ -210,8 +210,9 @@ public class MapsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        checkInternet();
+        Log.i("RESUME", "RESUMED");
         if(!isWifiAvailable) return;
+        checkInternet();
         if (mMap != null) {
             getLocationPermission();
         }
@@ -249,6 +250,7 @@ public class MapsFragment extends Fragment {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         View mapView = binding.getRoot();
 
+        Log.i("ONCREATEVIEW", "CREATED VIEW");
         checkInternet();
         if(!isWifiAvailable) return null;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());

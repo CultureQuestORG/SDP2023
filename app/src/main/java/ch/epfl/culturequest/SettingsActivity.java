@@ -1,9 +1,14 @@
 package ch.epfl.culturequest;
 
+import static ch.epfl.culturequest.utils.AndroidUtils.isNetworkAvailable;
+import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,18 +23,18 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.UploadTask;
+import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 
-import java.util.Objects;
+import java.io.IOException;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
@@ -41,7 +46,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private ImageView profilePictureView;
     private String profilePicUri;
-
+    private Bitmap profilePicBitmap;
     private Profile activeProfile;
 
     private TextView username;
@@ -54,19 +59,29 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         AndroidUtils.removeStatusBar(getWindow());
         ch.epfl.culturequest.databinding.ActivitySettingsBinding binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         //handle logout
         Button logoutButton = binding.logOut;
-        Authenticator auth = new Authenticator(this, false);
-        logoutButton.setOnClickListener(v -> auth.signOut());
+        logoutButton.setOnClickListener(v -> {
+            Context context = v.getContext();
+            if (isNetworkAvailable()) Authenticator.signOut(this);
+            else {
+                View rootView = v.getRootView();
+                CustomSnackbar.showCustomSnackbar("Cannot log out. You are not connected to the internet", R.drawable.unknown_error, rootView);
+            }
+        });
 
         activeProfile = Profile.getActiveProfile();
+
+        // if the user is not logged in, we can't display the settings so we finish the activity
+        if (activeProfile == null) {
+            finish();
+            return;
+        }
 
         username = binding.username;
         username.setText(activeProfile.getUsername());
@@ -97,22 +112,33 @@ public class SettingsActivity extends AppCompatActivity {
         // if the profile picture has not been changed, we don't need to upload it again
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
+            Profile.setActiveProfile(activeProfile);
             finish();
             EspressoIdlingResource.decrement();
             return;
         }
 
-        // TODO: fix this with the emulator for next sprint
+        if (!isNetworkAvailable()) {
+            showNoConnectionAlert(this, "You have no internet connection. Your profile will be updated once you connect.");
+        }
+            FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap).whenComplete(
+                    (profile, throwable) -> {
+                        if (throwable != null) {
+                            throwable.printStackTrace();
+                        } else {
+                            Database.setProfile(profile);
+                            Profile.setActiveProfile(profile);
+                        }
+
+                        finish();
+                        EspressoIdlingResource.decrement();
+                    }
+            );
+
+        }
         // Upload the new profile picture and update the profile
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        UploadTask task = storage.getReference().child("profilePictures").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).putFile(Uri.parse(profilePicUri));
-        task.addOnSuccessListener(taskSnapshot -> storage.getReference().child("profilePictures").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).getDownloadUrl().addOnSuccessListener(uri -> {
-            activeProfile.setProfilePicture(uri.toString());
-            Database.setProfile(activeProfile);
-            finish();
-            EspressoIdlingResource.decrement();
-        }));
-    }
+
+
 
     /**
      * Displays the profile picture selected by the user
@@ -130,6 +156,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         Picasso.get().load(selectedImage).into(profilePictureView);
         profilePicUri = selectedImage.toString();
+        try {
+            profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+        } catch (IOException e) {
+            profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PATH);
+        }
     }
 
 

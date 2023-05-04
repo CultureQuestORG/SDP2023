@@ -6,10 +6,12 @@ import androidx.annotation.NonNull;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
+import ch.epfl.culturequest.backend.exceptions.RecognitionFailedException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -49,13 +51,13 @@ public class RecognitionApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                f.completeExceptionally(e);
+                f.completeExceptionally(new CompletionException(new RecognitionFailedException("Failed to reach Google Lens API")));
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if(!response.isSuccessful()){
-                    f.completeExceptionally(new IOException("Unexpected code " + response));
+                    f.completeExceptionally(new CompletionException(new RecognitionFailedException("Failed to retrieve response from Google Lens API")));
                 }
 
                 f.complete(response.body().string());
@@ -71,11 +73,17 @@ public class RecognitionApi {
         return responseBody.thenApply((String s) -> {
 
             Matcher matcherArt = patternArt.matcher(s);
-            matcherArt.find();
-            String artName = matcherArt.group(0);
-            String additionalInfo = matcherArt.group(2);
-            return new ArtRecognition(artName, additionalInfo);
 
+            if(matcherArt.find()){
+                String artName = matcherArt.group(0);
+                String additionalInfo = matcherArt.group(2);
+
+                return new ArtRecognition(artName, additionalInfo);
+            }
+
+            else{
+                throw new CompletionException(new RecognitionFailedException("Google Lens recognition failed for the given image"));
+            }
         });
     }
 }

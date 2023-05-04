@@ -30,14 +30,45 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="@string/help_button_for_scan" />
-    
-    <ch.epfl.culturequest.ui.commons.LoadingAnimation
-        android:id="@+id/scanLoadingAnimation"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/scanLoadingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#86000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:clickable="true"
+        android:visibility="invisible"
+        android:focusable="true">
+
+        <ch.epfl.culturequest.ui.commons.LoadingAnimation
+            android:id="@+id/scanLoadingAnimation"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/cancelButtonScan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="50dp"
+            android:background="@color/transparent"
+            android:fontFamily="@font/poppins_medium"
+            android:text="@string/cancel"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

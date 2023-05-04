@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.database.Database;
 
 /**
  * This class combines the results of the WikipediaDescriptionApi and the OpenAIDescriptionApi to get a complete description of the scanned art
@@ -30,30 +31,36 @@ public class GeneralDescriptionApi {
                     CompletableFuture<Integer> score = openAIDescriptionApi.getScore(recognizedArt);
 
                     if (artType == BasicArtDescription.ArtType.PAINTING || artType == BasicArtDescription.ArtType.SCULPTURE) {
-                        return score.thenApply(s -> {
-                            basicArtDescription.setScore(s);
-                            return basicArtDescription;
-                        });
+                        return score
+                                .thenApply(s -> {
+                                    basicArtDescription.setScore(s);
+                                    Database.setArtwork(basicArtDescription);
+                                    return basicArtDescription;})
+                                .exceptionally(e -> basicArtDescription);
                     }
                     else {
                         // If the art type is architecture or monument, we use the OpenAI API to get the missing data (artist, year, city, country)
 
                         CompletableFuture<ArrayList<String>> missingData = openAIDescriptionApi.getMissingData(recognizedArt);
-                        return missingData.thenCombine(score, (data, s) -> {
+                        return missingData
+                                .thenCombine(score, (data, s) -> {
 
-                            String artist = data.get(0);
-                            String year = data.get(1);
-                            String city = data.get(2);
-                            String country = data.get(3);
+                                    String artist = data.get(0);
+                                    String year = data.get(1);
+                                    String city = data.get(2);
+                                    String country = data.get(3);
 
-                            basicArtDescription.setArtist(artist);
-                            basicArtDescription.setYear(year);
-                            basicArtDescription.setCity(city);
-                            basicArtDescription.setCountry(country);
-                            basicArtDescription.setScore(s);
+                                    basicArtDescription.setArtist(artist);
+                                    basicArtDescription.setYear(year);
+                                    basicArtDescription.setCity(city);
+                                    basicArtDescription.setCountry(country);
+                                    basicArtDescription.setScore(s);
+                                    basicArtDescription.setRequiredOpenAi(true);
 
-                            return basicArtDescription;
-                        });
+                                    Database.setArtwork(basicArtDescription);
+                                    return basicArtDescription;
+
+                        }).exceptionally(e -> basicArtDescription);
                     }
                 }
         );

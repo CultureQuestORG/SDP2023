@@ -1,9 +1,15 @@
 package ch.epfl.culturequest.ui.scan;
 
+import static ch.epfl.culturequest.utils.AndroidUtils.isNetworkAvailable;
+import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
+
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -14,44 +20,58 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
-import ch.epfl.culturequest.backend.LocalStorage;
+import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
-import ch.epfl.culturequest.backend.artprocessing.utils.UploadAndProcess;
+import ch.epfl.culturequest.backend.exceptions.OpenAiFailedException;
+import ch.epfl.culturequest.backend.exceptions.RecognitionFailedException;
+import ch.epfl.culturequest.backend.exceptions.WikipediaDescriptionFailedException;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
-import ch.epfl.culturequest.utils.PermissionRequest;
+import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.ui.commons.LoadingAnimation;
+import ch.epfl.culturequest.utils.CustomSnackbar;
+import ch.epfl.culturequest.utils.PermissionRequest;
 
 public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
-    private CameraSetup cameraSetup;
+    public static CameraSetup cameraSetup;
+    public static ProcessingApi processingApi = new ProcessingApi();
     private LoadingAnimation loadingAnimation;
+
+    private ConstraintLayout scanningLayout;
+    private CompletableFuture<Void> currentProcessing;
 
     //SurfaceTextureListener is used to detect when the TextureView is ready to be used
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(@NonNull android.graphics.SurfaceTexture surfaceTexture, int i, int i1) {
-            if(permissionRequest.hasPermission(getContext()))
+            if (permissionRequest.hasPermission(getContext()))
                 cameraSetup.openCamera();
         }
+
         @Override
-        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {}
+        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int i, int i1) {
+        }
 
         @Override
         public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surfaceTexture) {
@@ -60,37 +80,88 @@ public class ScanFragment extends Fragment {
 
         @Override
         public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surfaceTexture) {
-        }};
+        }
+    };
 
     // ScanButtonListener is used to detect when the scan button is clicked
     private final View.OnClickListener scanButtonListener = view -> {
         loadingAnimation.startLoading();
+        scanningLayout.setVisibility(View.VISIBLE);
         if (cameraSetup != null) {
             cameraSetup.takePicture().thenAccept(captureTaken -> {
                 if (captureTaken) {
                     cameraSetup.getLatestImage().thenAccept(bitmap -> {
-                        boolean isWifiAvailable = false;
+                        boolean isWifiAvailable = isNetworkAvailable();
+                        if (!isWifiAvailable) {
+                            showNoConnectionAlert(this.getContext(), "Scannning postponed, you have no internet connection.\nConnect to network to load description");
+                        }
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
+                            Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
+                            currentProcessing = FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
+                                        intent.putExtra("downloadUrl", url);
+                                        return processingApi.getArtDescriptionFromUrl(url);
+                                    })
+                                    .thenAccept(artDescription -> {
+                                        Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
+                                        String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
+                                        intent.putExtra("artDescription", serializedArtDescription);
+                                        intent.putExtra("imageUri", lastlyStoredImageUri.toString());
+                                        startActivity(intent);
 
-                            UploadAndProcess.uploadAndProcess(bitmap).thenAccept(artDescription -> {
-                                Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
+                                        // Reset state of the scan fragment
+                                        loadingAnimation.stopLoading();
+                                        scanningLayout.setVisibility(View.GONE);
+                                        currentProcessing = null;
+                                    })
+                                    .exceptionally(ex -> {
+                                        loadingAnimation.stopLoading();
+                                        Throwable cause = ex.getCause();
+                                        String errorMessage;
+                                        int drawableId;
 
-                                Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
-                                String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
-                                intent.putExtra("artDescription", serializedArtDescription);
-                                intent.putExtra("imageUri", lastlyStoredImageUri.toString());
-                                startActivity(intent);
-                                loadingAnimation.stopLoading();
-                            });
+                                        if (cause instanceof OpenAiFailedException) {
+                                            errorMessage = "OpenAI failed to process the art.";
+                                            drawableId = R.drawable.openai_logo;
+                                        } else if (cause instanceof RecognitionFailedException) {
+                                            errorMessage = "Art recognition failed. Please try again.";
+                                            drawableId = R.drawable.image_recognition_error;
+                                        } else if (cause instanceof WikipediaDescriptionFailedException) {
+                                            errorMessage = "Failed to retrieve description from Wikipedia.";
+                                            drawableId = R.drawable.wikipedia_error;
+                                        } else {
+                                            errorMessage = "An unknown error occurred.";
+                                            drawableId = R.drawable.unknown_error;
+                                        }
+
+                                        View rootView = requireActivity().findViewById(android.R.id.content);
+                                        CustomSnackbar.showCustomSnackbar(errorMessage, drawableId, rootView);
+
+                                        return null;
+                                    });
 
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
+                    }).exceptionally(e -> {
+                        loadingAnimation.stopLoading();
+
+                        View rootView = requireActivity().findViewById(android.R.id.content);
+                        CustomSnackbar.showCustomSnackbar("Failed to take picture.", R.drawable.camera_error, rootView);
+                        return null;
                     });
                 }
             });
         }
+    };
+
+    private final View.OnClickListener cancelButtonListener = view -> {
+        loadingAnimation.stopLoading();
+        scanningLayout.setVisibility(View.GONE);
+
+        // Cancel the current processing if it exists
+        if(currentProcessing != null)
+            currentProcessing.cancel(true);
     };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -103,6 +174,10 @@ public class ScanFragment extends Fragment {
 
         // Creates the loading animation
         loadingAnimation = root.findViewById(R.id.scanLoadingAnimation);
+
+        scanningLayout = root.findViewById(R.id.scanLoadingLayout);
+        scanningLayout.setVisibility(View.GONE);
+        root.findViewById(R.id.cancelButtonScan).setOnClickListener(cancelButtonListener);
 
         // Creates the LocalStorage to store the images locally
         ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
@@ -164,7 +239,7 @@ public class ScanFragment extends Fragment {
         if (!permissionRequest.hasPermission(getContext())) {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
-           permissionRequest.askPermission(requestPermissionLauncher);
+            permissionRequest.askPermission(requestPermissionLauncher);
         }
     }
 }

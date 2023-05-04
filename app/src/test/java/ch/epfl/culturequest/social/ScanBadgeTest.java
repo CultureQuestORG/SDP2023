@@ -113,4 +113,13 @@ public class ScanBadgeTest {
         assertThat(ScanBadge.Museum.fromString("National Gallery"), is(ScanBadge.Museum.OTHER));
     }
 
+    @Test
+    public void identifyPlaceWorks(){
+        // test for a country
+        assertThat(ScanBadge.Badge.identifyPlace("France"), is(ScanBadge.Country.FRANCE));
+        assertThat(ScanBadge.Badge.identifyPlace("paris"), is(ScanBadge.City.PARIS));
+        assertThat(ScanBadge.Badge.identifyPlace("Louvre"), is(ScanBadge.Museum.LOUVRE));
+
+    }
+
 }
