@@ -11,13 +11,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 
+import android.view.View;
+
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +43,28 @@ import ch.epfl.culturequest.ui.home.HomeFragment;
 public class HomeFragmentTest {
 
     private HomeFragment fragment;
+
+
+        public ViewAction clickChildViewWithId(final int id) {
+            return new ViewAction() {
+                @Override
+                public Matcher<View> getConstraints() {
+                    return null;
+                }
+
+                @Override
+                public String getDescription() {
+                    return "Click on a child view with specified id.";
+                }
+
+                @Override
+                public void perform(UiController uiController, View view) {
+                    View v = view.findViewById(id);
+                    v.performClick();
+                }
+            };
+
+    }
 
 
     @Before
@@ -89,7 +116,7 @@ public class HomeFragmentTest {
     public void clickOnLikeWorks() throws InterruptedException {
         // click on the first post
         Thread.sleep(2000);
-        onView(withId(R.id.like_button)).perform(click());
+        onView(withId(R.id.feed_container)).perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.like_button)));
 
         Thread.sleep(2000);
 
