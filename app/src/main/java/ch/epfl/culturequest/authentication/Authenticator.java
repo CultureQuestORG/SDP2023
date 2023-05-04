@@ -1,7 +1,7 @@
 package ch.epfl.culturequest.authentication;
 
 import static android.app.Activity.RESULT_OK;
-import static ch.epfl.culturequest.utils.AndroidUtils.isNetworkAvailable;
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 
 import android.content.Intent;
@@ -82,7 +82,7 @@ public class Authenticator {
     public static CompletableFuture<String> signIn(ComponentActivity activity) {
         CompletableFuture<String> future = new CompletableFuture<>();
         if (getCurrentUser() == null) {
-            if (isNetworkAvailable()) {
+            if (hasConnection(activity)) {
                 signInLauncher.launch(signInIntent());
                 future.complete("User signed in after being signed out with the Firebase UI");
             } else showNoConnectionAlert(activity, "Please try to login again later");

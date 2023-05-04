@@ -1,6 +1,6 @@
 package ch.epfl.culturequest;
 
-import static ch.epfl.culturequest.utils.AndroidUtils.isNetworkAvailable;
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
@@ -68,7 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         Button logoutButton = binding.logOut;
         logoutButton.setOnClickListener(v -> {
             Context context = v.getContext();
-            if (isNetworkAvailable()) Authenticator.signOut(this);
+            if (hasConnection(context)) Authenticator.signOut(this);
             else {
                 View rootView = v.getRootView();
                 CustomSnackbar.showCustomSnackbar("Cannot log out. You are not connected to the internet", R.drawable.unknown_error, rootView);
@@ -118,7 +118,7 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
-        if (!isNetworkAvailable()) {
+        if (!hasConnection(this)) {
             showNoConnectionAlert(this, "You have no internet connection. Your profile will be updated once you connect.");
         }
             FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap).whenComplete(

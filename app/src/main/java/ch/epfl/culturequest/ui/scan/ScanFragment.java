@@ -1,6 +1,6 @@
 package ch.epfl.culturequest.ui.scan;
 
-import static ch.epfl.culturequest.utils.AndroidUtils.isNetworkAvailable;
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
@@ -91,7 +91,7 @@ public class ScanFragment extends Fragment {
             cameraSetup.takePicture().thenAccept(captureTaken -> {
                 if (captureTaken) {
                     cameraSetup.getLatestImage().thenAccept(bitmap -> {
-                        boolean isWifiAvailable = isNetworkAvailable();
+                        boolean isWifiAvailable = hasConnection(this.getContext());
                         if (!isWifiAvailable) {
                             showNoConnectionAlert(this.getContext(), "Scannning postponed, you have no internet connection.\nConnect to network to load description");
                         }
