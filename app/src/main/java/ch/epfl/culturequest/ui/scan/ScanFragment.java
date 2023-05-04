@@ -98,7 +98,7 @@ public class ScanFragment extends Fragment {
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
                             Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
-                            currentProcessing = FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
+                            currentProcessing = FireStorage.uploadAndGetUrlFromImage(bitmap, true).thenCompose(url -> {
                                         intent.putExtra("downloadUrl", url);
                                         return processingApi.getArtDescriptionFromUrl(url);
                                     })

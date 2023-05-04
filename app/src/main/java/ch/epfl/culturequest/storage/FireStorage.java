@@ -71,12 +71,17 @@ public class FireStorage {
      * @param bitmapImage the bitmap image of the profile picture
      * @return a completable future with the profile updated
      */
-    public static CompletableFuture<Profile> uploadNewProfilePictureToStorage(Profile profile, Bitmap bitmapImage) {
+    public static CompletableFuture<Profile> uploadNewProfilePictureToStorage(Profile profile, Bitmap bitmapImage, boolean compress) {
         CompletableFuture<Profile> future = new CompletableFuture<>();
         StorageReference imageRef = storage.getReference().child("profilePictures/" + profile.getUid());
         //upload image to firebase storage
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmapImage.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+
+        if(compress)
+            bitmapImage.compress(Bitmap.CompressFormat.WEBP, 50 /*ignored for PNG*/, bos);
+        else
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100 /*ignored for PNG*/, bos);
+
         byte[] bitmapdata = bos.toByteArray();
         ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
 
@@ -107,7 +112,7 @@ public class FireStorage {
      * @param bitmapImage the bitmap image of the question
      * @return a completable future with the url of the image
      */
-    public static CompletableFuture<String> uploadAndGetUrlFromImage(Bitmap bitmapImage) {
+    public static CompletableFuture<String> uploadAndGetUrlFromImage(Bitmap bitmapImage, boolean compress) {
         String path = "images/" + Authenticator.getCurrentUser().getUid() + "/" + UUID.randomUUID().toString();
 
         StorageReference imageRef = storage.getReference().child(path);
@@ -115,7 +120,12 @@ public class FireStorage {
         CompletableFuture<String> f = new CompletableFuture<>();
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmapImage.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+
+        if(compress)
+            bitmapImage.compress(Bitmap.CompressFormat.WEBP, 70 /*ignored for PNG*/, bos);
+        else
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100 /*ignored for PNG*/, bos);
+
         byte[] bitmapdata = bos.toByteArray();
         ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
 

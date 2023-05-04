@@ -4,21 +4,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
     <EditText
         android:id="@+id/search_user"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/plaintextstyle"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rounded_bg"
         android:ems="10"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:hint="Search for user"
         android:inputType="textPersonName"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/black"
+        android:textColorHint="@color/colorSecondary"
+        android:textSize="15sp"
         android:padding="10dp"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/list_view"
@@ -38,16 +43,14 @@
 
     <ImageView
         android:id="@+id/back_icon1"
-        android:layout_width="45dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="1dp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
         android:onClick="goBack"
-        app:layout_constraintBottom_toTopOf="@+id/list_view"
+        app:layout_constraintBottom_toBottomOf="@+id/search_user"
         app:layout_constraintEnd_toStartOf="@+id/search_user"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintTop_toTopOf="@+id/search_user"
         app:srcCompat="@drawable/back_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

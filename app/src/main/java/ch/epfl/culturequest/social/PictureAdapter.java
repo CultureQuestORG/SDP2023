@@ -7,19 +7,18 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.app.AlertDialog;
+import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -33,6 +32,7 @@ import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDesc
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -134,6 +134,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
      * @param post the post
      */
     private void handleLike(@NonNull PictureViewHolder holder, Post post) {
+        if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
+            holder.like.setVisibility(View.GONE);
+            return;
+        }
+
+        holder.like.setVisibility(View.VISIBLE);
+
         if (post.isLikedBy(Profile.getActiveProfile().getUid())) {
             holder.isLiked = true;
             Picasso.get().load(R.drawable.like_full).into(holder.like);
@@ -200,8 +207,11 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
                     Database.removePost(post);
                     //TODO: delete image from storage when the mock is removed
+                    //FirebaseStorage storage = FirebaseStorage.getInstance();
+                    //storage.getReferenceFromUrl(post.getImageUrl()).delete();
 
-                    Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
+                    View rootView = v.getRootView();
+                    CustomSnackbar.showCustomSnackbar("Post deleted successfully", R.drawable.image_recognition_error, rootView);
                 })
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
         dial.show();
@@ -381,21 +391,22 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
             // Enables flipping the post from recto to verso
             pictureImageView.setOnClickListener(v -> {
-                if(isFlipping) return;
+                if (isFlipping) return;
                 flip(v.getContext(), postVerso, postRecto);
             });
 
             // Enables flipping the post from verso to recto
             descriptionContainer.setOnClickListener(v -> {
-                if(isFlipping) return;
+                if (isFlipping) return;
                 flip(v.getContext(), postRecto, postVerso);
             });
         }
 
         /**
          * Flips the post from recto to verso or verso to recto.
-         * @param context the context
-         * @param visibleView the visible view to show
+         *
+         * @param context       the context
+         * @param visibleView   the visible view to show
          * @param inVisibleView the invisible view to hide
          */
         private void flip(Context context, View visibleView, View inVisibleView) {
@@ -428,7 +439,6 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 }
             });
         }
-
     }
 }
 

@@ -55,7 +55,7 @@ public class FireStorageTest {
     @Test
     public void uploadImageToStorage() {
         try {
-            String uploadedImageUrl = FireStorage.uploadAndGetUrlFromImage(imageBitmap).get(5, TimeUnit.SECONDS);
+            String uploadedImageUrl = FireStorage.uploadAndGetUrlFromImage(imageBitmap, false).get(5, TimeUnit.SECONDS);
             Bitmap uploadedImageBitmap = FireStorage.getBitmapFromURL(uploadedImageUrl);
             assertThat(uploadedImageBitmap.sameAs(imageBitmap), is(true));
         } catch (ExecutionException | InterruptedException |
@@ -67,7 +67,7 @@ public class FireStorageTest {
     @Test
     public void uploadNewProfilePictureToStorageReturnsCorrectProfilePicURLInUpdatedProfile() {
         try {
-            Profile updatedProfile = FireStorage.uploadNewProfilePictureToStorage(Profile.getActiveProfile(), imageBitmap).get(5, TimeUnit.SECONDS);
+            Profile updatedProfile = FireStorage.uploadNewProfilePictureToStorage(Profile.getActiveProfile(), imageBitmap, false).get(5, TimeUnit.SECONDS);
             Bitmap uploadedImageBitmap = FireStorage.getBitmapFromURL(updatedProfile.getProfilePicture());
             assertThat(uploadedImageBitmap.sameAs(imageBitmap), is(true));
         } catch (ExecutionException | InterruptedException |

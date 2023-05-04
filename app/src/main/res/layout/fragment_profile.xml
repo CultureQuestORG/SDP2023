@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D9C2A6"
+    android:background="@color/background"
+    android:textAlignment="center"
     android:visibility="visible"
     tools:context=".ui.profile.ProfileFragment"
     tools:visibility="visible">
@@ -25,13 +26,12 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profilePicture"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="100dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_marginStart="44dp"
+        android:layout_marginTop="100dp"
         android:src="@drawable/basic_profile_picture"
 
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -44,56 +44,56 @@
         android:background="@drawable/button_rounded_corner"
         android:elevation="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/settingsButtonText"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            app:srcCompat="@drawable/settings_button"
-            android:padding="4dp"/>
+            android:padding="4dp"
+            app:srcCompat="@drawable/settings_button" />
     </RelativeLayout>
 
     <TextView
         android:id="@+id/profileUsername"
-        android:layout_width="196dp"
-        android:layout_height="32dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-20dp"
+        android:fontFamily="@font/poppins_bold"
         android:shadowColor="#80000000"
         android:shadowDx="0"
         android:shadowDy="4"
-        android:shadowRadius="10"
+        android:shadowRadius="20"
+        android:text="username"
         android:textColor="@color/white"
-        android:textSize="24sp"
-        android:fontFamily="@font/poppins_bold"
+        android:textSize="25sp"
         app:drawableTint="@color/transparent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.75"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/profilePicture"
-        app:layout_constraintVertical_bias="0" />
+        app:layout_constraintStart_toEndOf="@+id/profilePicture"
+        app:layout_constraintTop_toTopOf="@+id/profilePicture" />
 
     <TextView
         android:id="@+id/profilePlace"
-        android:layout_width="147dp"
-        android:layout_height="28dp"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="-15dp"
+        android:fontFamily="@font/poppins"
         android:shadowColor="#80000000"
         android:shadowDx="0"
         android:shadowDy="4"
-        android:shadowRadius="10"
+        android:shadowRadius="20"
+        android:text="@string/location"
         android:textColor="@color/white"
-        android:textSize="18sp"
-        android:fontFamily="@font/poppins"
+        android:textSize="20sp"
         app:drawableTint="@color/transparent"
-        app:layout_constraintStart_toStartOf="@+id/profileUsername"
+        app:layout_constraintStart_toEndOf="@+id/profilePicture"
         app:layout_constraintTop_toBottomOf="@+id/profileUsername" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pictureGrid"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -121,14 +121,14 @@
         android:id="@+id/profileFollowButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/button_rounded_corner"
         android:elevation="8dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePicture">
+        app:layout_constraintTop_toBottomOf="@+id/progressBar">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -163,16 +163,16 @@
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="242dp"
+        android:layout_width="250dp"
         android:layout_height="13dp"
 
         android:layout_marginStart="72dp"
 
-        android:layout_marginBottom="4dp"
+        android:layout_marginTop="5dp"
         android:indeterminateDrawable="@drawable/progress_bar_shape"
         android:progressDrawable="@drawable/progress_bar_shape"
-        app:layout_constraintBottom_toBottomOf="@+id/profilePicture"
-        app:layout_constraintStart_toStartOf="@+id/profilePicture" />
+        app:layout_constraintStart_toStartOf="@+id/profilePicture"
+        app:layout_constraintTop_toBottomOf="@+id/levelText" />
 
     <TextView
         android:id="@+id/level"
@@ -198,12 +198,12 @@
     <TextView
         android:id="@+id/levelText"
         android:layout_width="112dp"
-        android:layout_height="17dp"
-        android:layout_marginBottom="5dp"
-        android:textColor="#FFF27329"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-10dp"
         android:fontFamily="@font/poppins"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar"
-        app:layout_constraintEnd_toStartOf="@+id/level" />
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toStartOf="@+id/level"
+        app:layout_constraintTop_toBottomOf="@+id/profilePlace" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

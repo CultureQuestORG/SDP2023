@@ -22,7 +22,7 @@ public class CustomSnackbar {
     public static void showCustomSnackbar(String message, int imageResourceName, View rootView) {
 
         // Inflate custom Snackbar layout
-        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+        LayoutInflater inflater = LayoutInflater.from(rootView.getContext());
         View customView = inflater.inflate(R.layout.custom_snackbar, null);
 
         // Set message and customize colors
@@ -41,21 +41,23 @@ public class CustomSnackbar {
         logo.setImageResource(imageResourceName);
 
         // Animate the logo
-        Animation rotateAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.smooth_rotation);
+        Animation rotateAnimation = AnimationUtils.loadAnimation(rootView.getContext(), R.anim.smooth_rotation);
         logo.startAnimation(rotateAnimation);
 
         // Create and show the Snackbar
         Snackbar snackbar = Snackbar.make(rootView, message, Snackbar.LENGTH_LONG);
+
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setPadding(0, 0, 0, 0); // Remove the default padding
+        snackbarLayout.setPadding(0, 0, 0, 200); // Remove the default padding
+        snackbarLayout.setBackgroundColor(Color.TRANSPARENT); // Make the background transparent
         snackbarLayout.addView(customView, 0);
 
         // Custom enter and exit animations
-        snackbarLayout.setAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.snackbar_enter));
+        snackbarLayout.setAnimation(AnimationUtils.loadAnimation(rootView.getContext(), R.anim.snackbar_enter));
         snackbar.addCallback(new Snackbar.Callback() {
             @Override
             public void onDismissed(Snackbar transientBottomBar, int event) {
-                snackbarLayout.setAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.snackbar_exit));
+                snackbarLayout.setAnimation(AnimationUtils.loadAnimation(rootView.getContext(), R.anim.snackbar_exit));
                 super.onDismissed(transientBottomBar, event);
             }
         });

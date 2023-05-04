@@ -11,30 +11,30 @@
         android:id="@+id/tittle_leaderboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/title_leaderboard"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="60dp"
         android:fontFamily="@font/poppins_bold"
+        android:text="@string/title_leaderboard"
         android:textColor="@color/colorPrimary"
         android:textSize="28sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.064"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.028" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <RelativeLayout
         android:id="@+id/current_user_relative_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/tittle_leaderboard"
-        tools:layout_editor_absoluteX="0dp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tittle_leaderboard">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/current_user_profile_picture"
             android:layout_width="110dp"
             android:layout_height="110dp"
             android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
             android:src="@drawable/basic_profile_picture" />
 
         <TextView
@@ -44,10 +44,10 @@
             android:layout_below="@+id/current_user_profile_picture"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"
-            android:textAlignment="center"
             android:fontFamily="@font/poppins_medium"
-            android:textSize="23sp"
-            android:textColor="@color/white"/>
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="23sp" />
 
         <ImageView
             android:id="@+id/trophy_icon"
@@ -56,7 +56,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"
-            android:src="@drawable/trophy_icon" />
+            android:src="@drawable/trophee" />
 
         <TextView
             android:id="@+id/current_user_score"
@@ -65,10 +65,10 @@
             android:layout_below="@+id/trophy_icon"
             android:layout_alignStart="@+id/trophy_icon"
             android:layout_marginTop="60dp"
-            android:textAlignment="center"
             android:fontFamily="@font/poppins_medium"
-            android:textSize="23sp"
-            android:textColor="@color/white"/>
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="23sp" />
 
         <ImageView
             android:id="@+id/leaderboard_icon"
@@ -86,10 +86,10 @@
             android:layout_below="@+id/leaderboard_icon"
             android:layout_alignStart="@+id/leaderboard_icon"
             android:layout_marginTop="60dp"
-            android:textAlignment="center"
             android:fontFamily="@font/poppins_medium"
-            android:textSize="23sp"
-            android:textColor="@color/white"/>
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="23sp" />
 
     </RelativeLayout>
 
@@ -98,7 +98,7 @@
         android:layout_width="350dp"
         android:layout_height="2dp"
         android:layout_marginTop="8dp"
-        android:background="#FF5722"
+        android:background="@color/colorTertiary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"

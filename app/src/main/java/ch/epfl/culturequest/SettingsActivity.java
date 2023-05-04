@@ -64,6 +64,7 @@ public class SettingsActivity extends AppCompatActivity {
         AndroidUtils.removeStatusBar(getWindow());
         ch.epfl.culturequest.databinding.ActivitySettingsBinding binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         //handle logout
         Button logoutButton = binding.logOut;
         logoutButton.setOnClickListener(v -> {
@@ -121,7 +122,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (!hasConnection(this)) {
             showNoConnectionAlert(this, "You have no internet connection. Your profile will be updated once you connect.");
         }
-            FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap).whenComplete(
+            FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap,true).whenComplete(
                     (profile, throwable) -> {
                         if (throwable != null) {
                             throwable.printStackTrace();

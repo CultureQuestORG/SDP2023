@@ -113,7 +113,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
             //if the profile picture is not the default one, we store it in the storage
             if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PATH))
-                FireStorage.uploadNewProfilePictureToStorage(profile, profilePicBitmap).whenComplete(
+                FireStorage.uploadNewProfilePictureToStorage(profile, profilePicBitmap, true).whenComplete(
                         (profile, throwable) -> {
                             if (throwable != null) {
                                 throwable.printStackTrace();
