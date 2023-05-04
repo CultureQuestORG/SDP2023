@@ -11,6 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ch.epfl.culturequest.R;
@@ -22,7 +23,7 @@ public class LikeNotificationTest {
     // Tests that the like notification is correctly created
     @Test
     public void testLikeNotification() {
-        Profile.setActiveProfile(new Profile("test", "Likee", "test", "test", "test", "test",0));
+        Profile.setActiveProfile(new Profile("test", "Likee", "test", "test", "test", "test",0,new HashMap<>()));
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         android.app.Notification likeNotification = new LikeNotification("Liker").get(context);

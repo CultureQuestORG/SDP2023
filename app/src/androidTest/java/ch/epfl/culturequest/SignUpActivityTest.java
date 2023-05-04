@@ -1,40 +1,33 @@
 package ch.epfl.culturequest;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
-import android.app.Instrumentation;
-import android.content.Intent;
-
+import androidx.activity.ComponentActivity;
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
+
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.AndroidUtils;
 
 @RunWith(AndroidJUnit4.class)
 public class SignUpActivityTest {
-    private static FirebaseUser user;
-
-    private static FirebaseAuth auth = FirebaseAuth.getInstance();
+    private ComponentActivity activity;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
     @Before
     public void setup() {
@@ -44,37 +37,35 @@ public class SignUpActivityTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
-        if (auth.getCurrentUser() != null) {
-            auth.signOut();
-        }
-        ActivityScenario.launch(SignUpActivity.class);
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
+
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        ActivityScenario<SignUpActivity> activityScenario = ActivityScenario.launch(SignUpActivity.class);
+        activityScenario.onActivity(activity -> {
+            this.activity = activity;
+        });
     }
 
     @Test
-    public void googleSignInButtonIsClickable() {
+    public void googleSignInButtonIsClickableForSignedOutUser() {
+        // Sign out any Current User that is signed in to ensure that the Google Sign In button is clickable
+        Authenticator.signOut(activity).join();
         onView(withId(R.id.sign_in_button)).check(matches(isEnabled()));
     }
 
     @Test
-    public void signInTransitionsToNavActivityForNonNullUser() {
-        auth.signInWithEmailAndPassword("test@gmail.com", "abcdefg").addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                user = auth.getCurrentUser();
-            }
-        });
-        if (user != null) {
-            Instrumentation.ActivityMonitor activityMonitor = getInstrumentation()
-                    .addMonitor(NavigationActivity.class.getName(), null, false);
-
-            onView(withId(R.id.sign_in_button)).perform(click());
-
-            NavigationActivity secondActivity = (NavigationActivity) activityMonitor
-                    .waitForActivityWithTimeout(5000);
-            assertNotNull(secondActivity);
-
-            Intent expectedIntent = new Intent(getInstrumentation().getTargetContext(), NavigationActivity.class);
-            assertEquals(expectedIntent.getComponent(), secondActivity.getIntent().getComponent());
-        }
+    public void signInTransitionsToNavActivityForSignInUserWithExistingProfile() throws InterruptedException {
+        Authenticator.manualSignIn(email, password).join();
+        assertNotNull(Authenticator.getCurrentUser());
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0,new HashMap<>());
+        Database.setProfile(profile);
+        Thread.sleep(2000);
+        AndroidUtils.redirectToActivity(activity, SignUpActivity.class);
+        Thread.sleep(2000);
+        onView(withId(R.id.navigation_scan)).check(matches(isDisplayed()));
     }
 
     @After

@@ -2,58 +2,33 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey"
-    android:scrollbarSize="0dp"
-    android:scrollbarStyle="outsideInset"
-    tools:context=".ArtDescriptionDisplayActivity">
+    android:layout_width="375dp"
+    android:background="@drawable/rounded_bg">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/artImageContainer"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/descrtiptionContainerScrollPost"
         android:layout_width="0dp"
-        android:layout_height="300dp"
-        android:elevation="10dp"
-        app:cardCornerRadius="35dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="false"
+        android:layout_height="wrap_content"
+        android:scrollbarAlwaysDrawHorizontalTrack="false"
+        android:scrollbarAlwaysDrawVerticalTrack="false"
+        android:scrollbarSize="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/artImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            tools:src="@drawable/joconde" />
-
-    </androidx.cardview.widget.CardView>
-
-    <ScrollView
-        android:id="@+id/descrtiptionContainerScroll"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scrollbarAlwaysDrawHorizontalTrack="false"
-        android:scrollbarAlwaysDrawVerticalTrack="false"
-        android:scrollbarSize="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/artImageContainer">
-
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/descrtiptionContainer"
-            android:layout_width="wrap_content"
+            android:id="@+id/descriptionContainerPost"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="7dp"
-            android:paddingBottom="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:paddingTop="7dp"
-            >
+            android:paddingBottom="10dp">
 
             <TextView
-                android:id="@+id/artName"
-                android:layout_width="371dp"
+                android:id="@+id/artNamePost"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="12dp"
@@ -65,11 +40,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.494"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/descrtiptionContainer"
+                app:layout_constraintTop_toTopOf="@id/descriptionContainerPost"
                 tools:text="Art Name" />
 
             <TextView
-                android:id="@+id/artistName"
+                android:id="@+id/artistNamePost"
                 android:layout_width="194dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -80,11 +55,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.044"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/artName"
+                app:layout_constraintTop_toBottomOf="@+id/artNamePost"
                 tools:text="Artist Name" />
 
             <TextView
-                android:id="@+id/artYear"
+                android:id="@+id/artYearPost"
                 android:layout_width="93dp"
                 android:layout_height="31dp"
                 android:layout_marginStart="8dp"
@@ -95,11 +70,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.039"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/artistName"
+                app:layout_constraintTop_toBottomOf="@+id/artistNamePost"
                 tools:text="Year" />
 
             <TextView
-                android:id="@+id/artScore"
+                android:id="@+id/artScorePost"
                 android:layout_width="102dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="8dp"
@@ -108,15 +83,15 @@
                 android:textAlignment="viewEnd"
                 android:textColor="#F27329"
                 android:textSize="24dp"
-                app:layout_constraintEnd_toStartOf="@id/rarity"
+                app:layout_constraintEnd_toStartOf="@id/rarityPost"
                 app:layout_constraintHorizontal_bias="0.959"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/artName"
+                app:layout_constraintTop_toBottomOf="@id/artNamePost"
                 tools:text="Score" />
 
             <TextView
-                android:id="@+id/artSummary"
-                android:layout_width="379dp"
+                android:id="@+id/artSummaryPost"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="10dp"
@@ -126,124 +101,104 @@
                 android:textColor="#000000"
                 android:textSize="18dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.687"
+                app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/artYear"
+                app:layout_constraintTop_toBottomOf="@+id/artYearPost"
                 tools:text="Art Summary" />
 
+
             <ImageView
-                android:id="@+id/rarity"
+                android:id="@+id/rarityPost"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="12dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/artName"
+                app:layout_constraintTop_toBottomOf="@id/artNamePost"
                 app:srcCompat="@drawable/rare" />
 
             <ImageView
-                android:id="@+id/countryBadge"
+                android:id="@+id/countryBadgePost"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/artSummary"
+                app:layout_constraintTop_toBottomOf="@+id/artSummaryPost"
                 app:srcCompat="@drawable/france" />
 
             <ImageView
-                android:id="@+id/cityBadge"
+                android:id="@+id/cityBadgePost"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginTop="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/artSummary"
+                app:layout_constraintTop_toBottomOf="@+id/artSummaryPost"
                 app:srcCompat="@drawable/paris" />
 
             <ImageView
-                android:id="@+id/museumBadge"
+                android:id="@+id/museumBadgePost"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/artSummary"
+                app:layout_constraintTop_toBottomOf="@+id/artSummaryPost"
                 app:srcCompat="@drawable/louvre" />
 
             <TextView
-                android:id="@+id/countryName"
+                android:id="@+id/countryNamePost"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_light"
                 android:text="France"
                 android:textAlignment="center"
-                android:fontFamily="@font/poppins_light"
                 android:textColor="#000000"
                 android:textSize="10dp"
-                app:layout_constraintEnd_toEndOf="@+id/countryBadge"
-                app:layout_constraintStart_toStartOf="@+id/countryBadge"
-                app:layout_constraintTop_toBottomOf="@+id/countryBadge" />
+                app:layout_constraintEnd_toEndOf="@+id/countryBadgePost"
+                app:layout_constraintStart_toStartOf="@+id/countryBadgePost"
+                app:layout_constraintTop_toBottomOf="@+id/countryBadgePost" />
 
             <TextView
-                android:id="@+id/cityName"
+                android:id="@+id/cityNamePost"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_light"
                 android:text="Paris"
                 android:textAlignment="center"
-                android:fontFamily="@font/poppins_light"
                 android:textColor="#000000"
                 android:textSize="10dp"
-                app:layout_constraintEnd_toEndOf="@+id/cityBadge"
-                app:layout_constraintStart_toStartOf="@+id/cityBadge"
-                app:layout_constraintTop_toBottomOf="@+id/cityBadge" />
+                app:layout_constraintEnd_toEndOf="@+id/cityBadgePost"
+                app:layout_constraintStart_toStartOf="@+id/cityBadgePost"
+                app:layout_constraintTop_toBottomOf="@+id/cityBadgePost" />
 
             <TextView
-                android:id="@+id/museumName"
+                android:id="@+id/museumNamePost"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_light"
                 android:text="Musée du Louvre"
                 android:textAlignment="center"
-                android:fontFamily="@font/poppins_light"
                 android:textColor="#000000"
                 android:textSize="10dp"
-                app:layout_constraintEnd_toEndOf="@+id/museumBadge"
-                app:layout_constraintStart_toStartOf="@+id/museumBadge"
-                app:layout_constraintTop_toBottomOf="@+id/museumBadge" />
+                app:layout_constraintEnd_toEndOf="@+id/museumBadgePost"
+                app:layout_constraintStart_toStartOf="@+id/museumBadgePost"
+                app:layout_constraintTop_toBottomOf="@+id/museumBadgePost" />
 
-            <Button
-                android:id="@+id/post_button"
+            <TextView
+                android:id="@+id/seeMorePost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="30dp"
-                android:background="@drawable/post_button"
-                android:fontFamily="@font/poppins_extrabold"
-                android:text="@string/Post"
-                android:textAllCaps="false"
-                app:backgroundTint="#0780B6"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/museumName"
-                app:layout_constraintTop_toTopOf="@id/museumName"
-                app:layout_constraintVertical_bias="0.0" />
+                android:text="See More"
+                android:fontFamily="@font/poppins"
+                android:textColor="@color/colorAccent"
+                android:textSize="15dp"
+                app:layout_constraintBottom_toBottomOf="@+id/artSummaryPost"
+                app:layout_constraintEnd_toEndOf="@+id/artSummaryPost"
+                android:visibility="gone"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
-
-    <ImageView
-        android:id="@+id/back_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:elevation="2dp"
-        android:src="@drawable/back_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

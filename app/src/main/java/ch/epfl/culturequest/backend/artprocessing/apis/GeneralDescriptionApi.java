@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.database.Database;
 
 /**
  * This class combines the results of the WikipediaDescriptionApi and the OpenAIDescriptionApi to get a complete description of the scanned art
@@ -30,6 +31,11 @@ public class GeneralDescriptionApi {
                     CompletableFuture<Integer> score = openAIDescriptionApi.getScore(recognizedArt);
 
                     if (artType == BasicArtDescription.ArtType.PAINTING || artType == BasicArtDescription.ArtType.SCULPTURE) {
+                        return score.thenApply(s -> {
+                            basicArtDescription.setScore(s);
+                            Database.setArtwork(basicArtDescription);
+                            return basicArtDescription;
+                        });
                         return score
                                 .thenApply(s -> {
                                     basicArtDescription.setScore(s);
@@ -55,6 +61,7 @@ public class GeneralDescriptionApi {
                                     basicArtDescription.setScore(s);
                                     basicArtDescription.setRequiredOpenAi(true);
 
+                                    Database.setArtwork(basicArtDescription);
                                     return basicArtDescription;
 
                         }).exceptionally(e -> basicArtDescription);
@@ -62,4 +69,6 @@ public class GeneralDescriptionApi {
                 }
         );
     }
+
+
 }

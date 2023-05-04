@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
@@ -43,8 +44,12 @@ public class FireStorage {
     public static void clearStorage() {
         storage.getReference().child("images").listAll().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                for (StorageReference item : Objects.requireNonNull(task.getResult()).getItems()) {
-                    item.delete();
+                for (StorageReference prefixes : Objects.requireNonNull(task.getResult()).getPrefixes()) {
+                    prefixes.listAll().addOnCompleteListener(task1 -> {
+                        for (StorageReference item : Objects.requireNonNull(task1.getResult()).getItems()) {
+                            item.delete();
+                        }
+                    });
                 }
             }
         });
@@ -103,8 +108,9 @@ public class FireStorage {
      * @return a completable future with the url of the image
      */
     public static CompletableFuture<String> uploadAndGetUrlFromImage(Bitmap bitmapImage) {
+        String path = "images/" + Authenticator.getCurrentUser().getUid() + "/" + UUID.randomUUID().toString();
 
-        StorageReference imageRef = storage.getReference().child("images/" + UUID.randomUUID().toString());
+        StorageReference imageRef = storage.getReference().child(path);
 
         CompletableFuture<String> f = new CompletableFuture<>();
 
