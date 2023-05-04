@@ -29,6 +29,9 @@ public class SignUpActivityTest {
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
 
+    static {
+        BuildConfig.IS_TESTING.set(true);
+    }
     @Before
     public void setup() {
         // Set up the database to run on the local emulator of Firebase
