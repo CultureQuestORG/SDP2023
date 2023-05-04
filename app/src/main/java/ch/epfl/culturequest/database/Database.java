@@ -43,6 +43,7 @@ public class Database {
             databaseInstance.getReference("users").keepSynced(true);
             databaseInstance.getReference("posts").keepSynced(true);
             databaseInstance.getReference("follows").keepSynced(true);
+            databaseInstance.getReference("artworks").keepSynced(true);
         }
     }
 
