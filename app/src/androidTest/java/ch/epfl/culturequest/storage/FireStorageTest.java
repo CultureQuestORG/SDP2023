@@ -24,7 +24,7 @@ import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
 public class FireStorageTest {
-    String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/'David'_by_Michelangelo_Fir_JBU005_denoised.jpg/1280px-'David'_by_Michelangelo_Fir_JBU005_denoised.jpg";
+    String imageUrl = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/images%2FHcgkDiPWRNZFPy9qRKLuDbm4Egi1%2F21c184c6-f0cc-40ee-9dcf-3861d0410c0d?alt=media&token=5a0552f1-7cdb-4d59-82ea-d67c5f1dd828";
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
     private Bitmap imageBitmap;
