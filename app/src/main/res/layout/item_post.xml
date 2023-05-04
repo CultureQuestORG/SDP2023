@@ -98,8 +98,8 @@
 
             <ImageView
                 android:id="@+id/like_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:gravity="center_horizontal"
@@ -107,8 +107,8 @@
 
             <ImageView
                 android:id="@+id/delete_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:gravity="center_horizontal"

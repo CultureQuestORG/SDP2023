@@ -76,7 +76,7 @@ public class FireStorage {
         StorageReference imageRef = storage.getReference().child("profilePictures/" + profile.getUid());
         //upload image to firebase storage
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmapImage.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+        bitmapImage.compress(Bitmap.CompressFormat.WEBP, 50 /*ignored for PNG*/, bos);
         byte[] bitmapdata = bos.toByteArray();
         ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
 
@@ -115,7 +115,7 @@ public class FireStorage {
         CompletableFuture<String> f = new CompletableFuture<>();
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmapImage.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+        bitmapImage.compress(Bitmap.CompressFormat.WEBP, 70 /*ignored for PNG*/, bos);
         byte[] bitmapdata = bos.toByteArray();
         ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
 
