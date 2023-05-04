@@ -17,7 +17,7 @@ public class ProcessingApi {
 
     /** Returns an art description object (as a future) given the URL of the image associated to the scanned piece of art */
 
-    public static CompletableFuture<BasicArtDescription> getArtDescriptionFromUrl(String imageUrl){
+    public CompletableFuture<BasicArtDescription> getArtDescriptionFromUrl(String imageUrl){
 
         RecognitionApi recognitionApi = new RecognitionApi();
         GeneralDescriptionApi descriptionApi = new GeneralDescriptionApi();

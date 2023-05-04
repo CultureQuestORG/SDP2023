@@ -1,15 +1,18 @@
 package ch.epfl.culturequest.backend.artprocessingtest;
 
-import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
 import ch.epfl.culturequest.backend.artprocessing.apis.OpenAIDescriptionApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
+import ch.epfl.culturequest.backend.exceptions.OpenAiFailedException;
 
 public class OpenAIDescriptionApiTestWithMock {
 
@@ -54,7 +57,23 @@ public class OpenAIDescriptionApiTestWithMock {
         MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API Key");
         mockOpenAiService.setMockResponse("This is not a JSON response");
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
-        assertThrows(RuntimeException.class, () -> openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information")).join());
+        CompletionException completionException = assertThrows(CompletionException.class, () -> openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information")).join());
+        assertTrue(completionException.getCause() instanceof OpenAiFailedException);
+        assertThat(completionException.getCause().getMessage(), is("OpenAI failed to provide JSON data"));
+
+    }
+
+    @Test
+    public void chatCompletionErrorThrowsException(){
+
+        MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API Key");
+        mockOpenAiService.setMockResponse("This text should not be parsed");
+        mockOpenAiService.setChatCompletionThrowsException(true);
+        OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
+        CompletionException completionException = assertThrows(CompletionException.class, () -> openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information")).join());
+        assertTrue(completionException.getCause() instanceof OpenAiFailedException);
+        assertThat(completionException.getCause().getMessage(), is("OpenAI failed to respond"));
+
 
     }
 
@@ -112,7 +131,9 @@ public class OpenAIDescriptionApiTestWithMock {
         MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API Key");
         mockOpenAiService.setMockResponse("This is not a JSON response");
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
-        assertThrows(RuntimeException.class, () -> openAPI.getScore(new ArtRecognition("Mock Art Name", "Mock additional information")).join());
+        CompletionException completionException = assertThrows(CompletionException.class, () -> openAPI.getScore(new ArtRecognition("Mock Art Name", "Mock additional information")).join());
+        assertTrue(completionException.getCause() instanceof OpenAiFailedException);
+        assertThat(completionException.getCause().getMessage(), is("OpenAI failed to provide JSON data"));
     }
 
 }
