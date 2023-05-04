@@ -17,18 +17,21 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
@@ -47,6 +50,9 @@ public class ScanFragment extends Fragment {
     private CameraSetup cameraSetup;
 
     private LoadingAnimation loadingAnimation;
+
+    private ConstraintLayout scanningLayout;
+    private CompletableFuture<Void> currentProcessing;
 
     //SurfaceTextureListener is used to detect when the TextureView is ready to be used
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
@@ -73,30 +79,34 @@ public class ScanFragment extends Fragment {
     // ScanButtonListener is used to detect when the scan button is clicked
     private final View.OnClickListener scanButtonListener = view -> {
         loadingAnimation.startLoading();
+        scanningLayout.setVisibility(View.VISIBLE);
         if (cameraSetup != null) {
-            boolean isWifiAvailable = hasConnection(this.getContext());
-            if (!isWifiAvailable) {
-                showNoConnectionAlert(this.getContext(), "Scannning postponed, you have no internet connection.\nConnect to network to load description");
-            }
-                loadingAnimation.startLoading();
-                cameraSetup.takePicture().thenAccept(captureTaken -> {
-                    if (captureTaken) {
-                        cameraSetup.getLatestImage().thenAccept(bitmap -> {
-                            try {
-                                localStorage.storeImageLocally(bitmap, isWifiAvailable);
-                                Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
-                                FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
-                                            intent.putExtra("downloadUrl", url);
-                                            return ProcessingApi.getArtDescriptionFromUrl(url);
-                                        })
-                                        .thenAccept(artDescription -> {
-                                            Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
-                                            String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
-                                            intent.putExtra("artDescription", serializedArtDescription);
-                                            intent.putExtra("imageUri", lastlyStoredImageUri.toString());
-                                            startActivity(intent);
-                                            loadingAnimation.stopLoading();
-                                        });
+            cameraSetup.takePicture().thenAccept(captureTaken -> {
+                if (captureTaken) {
+                    cameraSetup.getLatestImage().thenAccept(bitmap -> {
+                        boolean isWifiAvailable = hasConnection(this.getContext());
+                        if (!isWifiAvailable) {
+                            showNoConnectionAlert(this.getContext(), "Scannning postponed, you have no internet connection.\nConnect to network to load description");
+                        }
+                        try {
+                            localStorage.storeImageLocally(bitmap, isWifiAvailable);
+                            Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
+                            currentProcessing = FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
+                                        intent.putExtra("downloadUrl", url);
+                                        return ProcessingApi.getArtDescriptionFromUrl(url);
+                                    })
+                                    .thenAccept(artDescription -> {
+                                        Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
+                                        String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
+                                        intent.putExtra("artDescription", serializedArtDescription);
+                                        intent.putExtra("imageUri", lastlyStoredImageUri.toString());
+                                        startActivity(intent);
+
+                                        // Reset state of the scan fragment
+                                        loadingAnimation.stopLoading();
+                                        scanningLayout.setVisibility(View.GONE);
+                                        currentProcessing = null;
+                                    });
 
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -105,6 +115,15 @@ public class ScanFragment extends Fragment {
                 }
             });
         }
+    };
+
+    private final View.OnClickListener cancelButtonListener = view -> {
+        loadingAnimation.stopLoading();
+        scanningLayout.setVisibility(View.GONE);
+
+        // Cancel the current processing if it exists
+        if(currentProcessing != null)
+            currentProcessing.cancel(true);
     };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -117,6 +136,10 @@ public class ScanFragment extends Fragment {
 
         // Creates the loading animation
         loadingAnimation = root.findViewById(R.id.scanLoadingAnimation);
+
+        scanningLayout = root.findViewById(R.id.scanLoadingLayout);
+        scanningLayout.setVisibility(View.GONE);
+        root.findViewById(R.id.cancelButtonScan).setOnClickListener(cancelButtonListener);
 
         // Creates the LocalStorage to store the images locally
         ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
