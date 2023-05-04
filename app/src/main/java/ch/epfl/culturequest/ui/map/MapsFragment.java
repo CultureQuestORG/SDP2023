@@ -46,6 +46,7 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.R;
@@ -113,7 +114,7 @@ public class MapsFragment extends Fragment {
     };
 
     private void checkInternet(){
-        if(!AndroidUtils.isNetworkAvailable()) {
+        if(!AndroidUtils.hasConnection(this.getContext())) {
             isWifiAvailable = false;
             this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
             AndroidUtils.showNoConnectionAlert(getContext(), "It seems that you are not connected to the internet. You can't use the map without internet connection.");
