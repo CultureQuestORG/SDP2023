@@ -31,7 +31,7 @@ import ch.epfl.culturequest.storage.LocalStorage;
 
 public class ArtDescriptionDisplayActivityTest3 {
 
-    private final String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100|false";
+    private final String serializedMonaLisaDescription = "La Joconde (en italien: La Gioconda [la dʒoˈkonda] ou Monna Lisa [ˈmɔnna ˈliːza]), ou Portrait de Mona Lisa, est un tableau de l'artiste Léonard de Vinci, réalisé entre 1503 et 1506 ou entre 1513 et 15161|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100|false";
 
     @Rule
     public ActivityScenarioRule<ArtDescriptionDisplayActivity> activityRule =

@@ -95,6 +95,18 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             setCityBadge(holder.cityBadge, holder.cityText, artwork.getCity());
             setMuseumBadge(holder.museumBadge, holder.museumText, artwork.getMuseum());
             setRarityBadge(holder.rarityBadge, artwork.getScore());
+        }).exceptionally((throwable) -> {
+            holder.artName.setText("N/A");
+            holder.artist.setText("N/A");
+            holder.year.setText("N/A");
+            holder.description.setText(shortenDescription("N/A"));
+            holder.score.setText("+" + 0 + " pts");
+
+            setCountryBadge(holder.countryBadge, holder.countryText, "N/A");
+            setCityBadge(holder.cityBadge, holder.cityText, "N/A");
+            setMuseumBadge(holder.museumBadge, holder.museumText, "N/A");
+            setRarityBadge(holder.rarityBadge, 0);
+            return null;
         });
 
         holder.location.setText("Lausanne");
