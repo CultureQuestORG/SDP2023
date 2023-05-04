@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -33,6 +34,7 @@ import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
@@ -67,7 +69,10 @@ public class SettingsActivity extends AppCompatActivity {
         logoutButton.setOnClickListener(v -> {
             Context context = v.getContext();
             if (hasConnection(context)) Authenticator.signOut(this);
-            else Snackbar.make(v, "Cannot log out. You are not connected to the internet", Snackbar.LENGTH_LONG).show();
+            else {
+                View rootView = v.getRootView();
+                CustomSnackbar.showCustomSnackbar("Cannot log out. You are not connected to the internet", R.drawable.unknown_error, rootView);
+            }
         });
 
         activeProfile = Profile.getActiveProfile();
