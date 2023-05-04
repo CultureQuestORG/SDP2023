@@ -15,4 +15,3 @@ exclude_patterns:
   - "android/**/*.*"
   - "**/databinding/*"
   - "**/CameraSetup.java"
-  - "ch/epfl/culturequest/ui/map/MapFragment.java"

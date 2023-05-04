@@ -26,7 +26,7 @@ public class MapsViewModel extends ViewModel{
      * Constructor for the MapsViewModel
      */
     public MapsViewModel() {
-        isLocationPermissionGranted = new MutableLiveData<>(false);
+        isLocationPermissionGranted = new MutableLiveData<>(null);
         currentLocation = new MutableLiveData<>(DEFAULT);
         locations = new MutableLiveData<>(null);
         centerOfLocations = new MutableLiveData<>(null);

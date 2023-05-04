@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -45,6 +46,7 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.R;
@@ -54,6 +56,8 @@ import ch.epfl.culturequest.backend.map_collection.OTMProvider;
 import ch.epfl.culturequest.backend.map_collection.RetryingOTMProvider;
 import ch.epfl.culturequest.databinding.FragmentMapsBinding;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.leaderboard.LeaderboardFragment;
+import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -65,11 +69,14 @@ public class MapsFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
 
+    private final static MapUnavailableFragment unavailableFragment = new MapUnavailableFragment();
+
     private FragmentMapsBinding binding;
     private MapsViewModel viewModel;
 
     private OTMProvider otmProvider;
 
+    private boolean isWifiAvailable = true;
     private GoogleMap mMap;
 
     private Location lastKnownLocation;
@@ -96,8 +103,9 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
+            if(!isWifiAvailable) return;
             mMap = googleMap;
-            drawPositionMarker(viewModel.getCurrentLocation().getValue());
+            getProfilePicture();
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.maps_style_json));
             getLocationPermission();
             mMap.moveCamera(CameraUpdateFactory
@@ -105,6 +113,17 @@ public class MapsFragment extends Fragment {
         }
     };
 
+    private void checkInternet(){
+        if(!AndroidUtils.hasConnection(this.getContext())) {
+            isWifiAvailable = false;
+            this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
+            AndroidUtils.showNoConnectionAlert(getContext(), "It seems that you are not connected to the internet. You can't use the map without internet connection.");
+        }
+        else {
+            isWifiAvailable = true;
+            this.getParentFragmentManager().beginTransaction().hide(unavailableFragment).show(this).setReorderingAllowed(true).commit();
+        }
+    }
 
     private void drawPositionMarker(LatLng latestLocation){
         frame = mMap.addMarker(new MarkerOptions().zIndex(10000f).position(latestLocation).icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.map_icon_frame), 75, 75, false))));
@@ -192,6 +211,9 @@ public class MapsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.i("RESUME", "RESUMED");
+        if(!isWifiAvailable) return;
+        checkInternet();
         if (mMap != null) {
             getLocationPermission();
         }
@@ -228,10 +250,13 @@ public class MapsFragment extends Fragment {
 
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         View mapView = binding.getRoot();
-        getProfilePicture();
 
+        Log.i("ONCREATEVIEW", "CREATED VIEW");
+        checkInternet();
+        if(!isWifiAvailable) return null;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
+
         otmProvider = new RetryingOTMProvider(new BasicOTMProvider());
         viewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location -> {
             if (mMap != null) {
@@ -264,8 +289,12 @@ public class MapsFragment extends Fragment {
         if (grantResults) {
             // If request is cancelled, the result arrays are empty.
             viewModel.setIsLocationPermissionGranted(true);
+            getDeviceLocation();
         }
-        getDeviceLocation();
+        else {
+            this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
+            Toast.makeText(getContext(), "Please give access to your location to use this feature.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -302,7 +331,9 @@ public class MapsFragment extends Fragment {
                             if (lastKnownLocation != null) {
                                 viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
                                         lastKnownLocation.getLongitude()));
-                                frame.setPosition(viewModel.getCurrentLocation().getValue());
+                                if(frame != null) {
+                                    frame.setPosition(viewModel.getCurrentLocation().getValue());
+                                }
                                 if (profileMarker != null) {
                                     profileMarker.setPosition(viewModel.getCurrentLocation().getValue());
                                 }
