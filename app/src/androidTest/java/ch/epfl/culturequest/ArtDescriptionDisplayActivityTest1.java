@@ -6,6 +6,7 @@ import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
@@ -16,6 +17,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -114,6 +116,11 @@ public class ArtDescriptionDisplayActivityTest1 {
         onView(withId(R.id.countryBadge)).check(matches(isDisplayed()));
         onView(withId(R.id.cityBadge)).check(matches(isDisplayed()));
         onView(withId(R.id.museumBadge)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void activityDisplayingPostButton() {
+        onView(withId(R.id.post_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
     }
 
     @After
