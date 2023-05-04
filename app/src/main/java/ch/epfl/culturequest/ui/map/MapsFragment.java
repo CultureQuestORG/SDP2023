@@ -113,16 +113,15 @@ public class MapsFragment extends Fragment {
     };
 
     private void checkInternet(){
-        isWifiAvailable = true;
-        this.getParentFragmentManager().beginTransaction().hide(unavailableFragment).show(this).setReorderingAllowed(true).commit();
         if(!AndroidUtils.isNetworkAvailable()) {
             isWifiAvailable = false;
-            Bundle args = new Bundle();
-            args.putBoolean("no_wifi", true);
             this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
             Toast.makeText(getContext(), "It seems that you are not connected to the internet.", Toast.LENGTH_SHORT).show();
         }
-
+        else {
+            isWifiAvailable = true;
+            this.getParentFragmentManager().beginTransaction().hide(unavailableFragment).show(this).setReorderingAllowed(true).commit();
+        }
     }
 
     private void drawPositionMarker(LatLng latestLocation){
