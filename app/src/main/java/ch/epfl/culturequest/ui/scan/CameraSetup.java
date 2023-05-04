@@ -24,7 +24,6 @@ import android.view.TextureView;
 
 import androidx.annotation.NonNull;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;

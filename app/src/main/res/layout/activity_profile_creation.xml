@@ -64,7 +64,6 @@
         android:layout_width="320dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="70dp"
         android:background="@drawable/rounded_bg"
         android:backgroundTint="@color/grey"
         android:ems="10"
@@ -74,6 +73,7 @@
         android:padding="10dp"
         android:textColor="@color/black"
         android:textColorHint="@color/colorSecondary"
+        app:layout_constraintBottom_toTopOf="@+id/create_profile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_pic_text" />
