@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
@@ -34,6 +35,17 @@ import ch.epfl.culturequest.social.Profile;
 public class Database {
     private static final FirebaseDatabase databaseInstance = FirebaseDatabase.getInstance();
     private static boolean isEmulatorOn = false;
+
+    public static void setPersistenceEnabled() {
+        //!BuildConfig.IS_TESTING makes the code run only when we are not testing
+        if (!BuildConfig.IS_TESTING.get()) {
+            databaseInstance.setPersistenceEnabled(true);
+            databaseInstance.getReference("users").keepSynced(true);
+            databaseInstance.getReference("posts").keepSynced(true);
+            databaseInstance.getReference("follows").keepSynced(true);
+            databaseInstance.getReference("artworks").keepSynced(true);
+        }
+    }
 
     public static void setEmulatorOn() {
         if (!isEmulatorOn) {
@@ -270,15 +282,15 @@ public class Database {
     }
 
 
-
-    public static CompletableFuture<HashMap<String,Integer>> updateBadges(String uid, List<String> newbadges) {
-        CompletableFuture<HashMap<String,Integer>> future = new CompletableFuture<>();
+    public static CompletableFuture<HashMap<String, Integer>> updateBadges(String uid, List<String> newbadges) {
+        CompletableFuture<HashMap<String, Integer>> future = new CompletableFuture<>();
         DatabaseReference badgesRef = databaseInstance.getReference("users/" + uid + "/badges");
         badgesRef.runTransaction(
-new Transaction.Handler() {
+                new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
-                        HashMap<String,Integer> badges = mutableData.getValue(new GenericTypeIndicator<HashMap<String,Integer>>() {});
+                        HashMap<String, Integer> badges = mutableData.getValue(new GenericTypeIndicator<HashMap<String, Integer>>() {
+                        });
                         if (badges == null) {
                             badges = new HashMap<>();
                         }
@@ -296,7 +308,8 @@ new Transaction.Handler() {
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
                         if (committed) {
-                            HashMap<String,Integer> badges = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String,Integer>>() {});
+                            HashMap<String, Integer> badges = dataSnapshot.getValue(new GenericTypeIndicator<HashMap<String, Integer>>() {
+                            });
                             future.complete(badges);
                         } else {
                             future.completeExceptionally(databaseError.toException());
@@ -641,7 +654,7 @@ new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                if(currentData.getValue() == null) {
+                if (currentData.getValue() == null) {
                     currentData.setValue(artworks);
                 }
                 return Transaction.success(currentData);

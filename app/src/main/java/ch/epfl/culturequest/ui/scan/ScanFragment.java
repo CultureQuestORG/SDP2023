@@ -1,5 +1,8 @@
 package ch.epfl.culturequest.ui.scan;
 
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
+import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
+
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
 import android.Manifest;
@@ -52,7 +55,7 @@ public class ScanFragment extends Fragment {
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
     public static CameraSetup cameraSetup;
-    public static ProcessingApi processingApi;
+    public static ProcessingApi processingApi = new ProcessingApi();
     private LoadingAnimation loadingAnimation;
 
     private ConstraintLayout scanningLayout;
@@ -88,7 +91,10 @@ public class ScanFragment extends Fragment {
             cameraSetup.takePicture().thenAccept(captureTaken -> {
                 if (captureTaken) {
                     cameraSetup.getLatestImage().thenAccept(bitmap -> {
-                        boolean isWifiAvailable = false;
+                        boolean isWifiAvailable = hasConnection(this.getContext());
+                        if (!isWifiAvailable) {
+                            showNoConnectionAlert(this.getContext(), "Scannning postponed, you have no internet connection.\nConnect to network to load description");
+                        }
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
                             Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);

@@ -1,10 +1,14 @@
 package ch.epfl.culturequest;
 
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
+import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,6 +23,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -29,6 +34,7 @@ import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
@@ -53,7 +59,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         AndroidUtils.removeStatusBar(getWindow());
@@ -62,7 +67,14 @@ public class SettingsActivity extends AppCompatActivity {
 
         //handle logout
         Button logoutButton = binding.logOut;
-        logoutButton.setOnClickListener(v -> Authenticator.signOut(this));
+        logoutButton.setOnClickListener(v -> {
+            Context context = v.getContext();
+            if (hasConnection(context)) Authenticator.signOut(this);
+            else {
+                View rootView = v.getRootView();
+                CustomSnackbar.showCustomSnackbar("Cannot log out. You are not connected to the internet", R.drawable.unknown_error, rootView);
+            }
+        });
 
         activeProfile = Profile.getActiveProfile();
 
@@ -107,21 +119,27 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
-        // Upload the new profile picture and update the profile
-        FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap, true).whenComplete(
-                (profile, throwable) -> {
-                    if (throwable != null) {
-                        throwable.printStackTrace();
-                    } else {
-                        Database.setProfile(profile);
-                        Profile.setActiveProfile(profile);
-                    }
+        if (!hasConnection(this)) {
+            showNoConnectionAlert(this, "You have no internet connection. Your profile will be updated once you connect.");
+        }
+            FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap,true).whenComplete(
+                    (profile, throwable) -> {
+                        if (throwable != null) {
+                            throwable.printStackTrace();
+                        } else {
+                            Database.setProfile(profile);
+                            Profile.setActiveProfile(profile);
+                        }
 
-                    finish();
-                    EspressoIdlingResource.decrement();
-                }
-        );
-    }
+                        finish();
+                        EspressoIdlingResource.decrement();
+                    }
+            );
+
+        }
+        // Upload the new profile picture and update the profile
+
+
 
     /**
      * Displays the profile picture selected by the user

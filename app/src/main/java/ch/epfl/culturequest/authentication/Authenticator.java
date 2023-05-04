@@ -1,8 +1,11 @@
 package ch.epfl.culturequest.authentication;
 
 import static android.app.Activity.RESULT_OK;
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
+import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
@@ -79,27 +82,28 @@ public class Authenticator {
     public static CompletableFuture<String> signIn(ComponentActivity activity) {
         CompletableFuture<String> future = new CompletableFuture<>();
         if (getCurrentUser() == null) {
-            signInLauncher.launch(signInIntent());
-            future.complete("User signed in after being signed out with the Firebase UI");
+            if (hasConnection(activity)) {
+                signInLauncher.launch(signInIntent());
+                future.complete("User signed in after being signed out with the Firebase UI");
+            } else showNoConnectionAlert(activity, "Please try to login again later");
         } else {
-            Database.getProfile(getCurrentUser().getUid()).handle((profile, throwable) -> {
-                if (profile != null) {
-                    Profile.setActiveProfile(profile);
-                    AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
-                    future.complete("User signed in with an existing profile");
-                } else {
-                    AndroidUtils.redirectToActivity(activity, ProfileCreatorActivity.class);
-                    future.complete("User signed in with no existing profile");
-                }
-                return null;
-            }).exceptionally(throwable -> {
-                // If an error occurs, sign out the user
-                signOut(activity);
-                future.completeExceptionally(throwable);
-                return null;
-            });
+                Database.getProfile(getCurrentUser().getUid()).handle((profile, throwable) -> {
+                    if (profile != null) {
+                        Profile.setActiveProfile(profile);
+                        AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
+                        future.complete("User signed in with an existing profile");
+                    } else {
+                        AndroidUtils.redirectToActivity(activity, ProfileCreatorActivity.class);
+                        future.complete("User signed in with no existing profile");
+                    }
+                    return null;
+                }).exceptionally(throwable -> {
+                    // If an error occurs, sign out the user
+                    signOut(activity);
+                    future.completeExceptionally(throwable);
+                    return null;
+                });
         }
-
         return future;
     }
 
