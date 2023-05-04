@@ -102,7 +102,7 @@ public class ProfileFragmentTest {
     }
 
     @Test
-    public void deleteButtonWorks() {
+    public void deleteButtonWorks() throws InterruptedException {
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
         //long click on the first picture should open an alert dialog
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
@@ -111,10 +111,12 @@ public class ProfileFragmentTest {
         onView(withText("No")).perform(click());
         onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+        Thread.sleep(2000);
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
         onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
         onView(withText("Yes")).perform(click());
         onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
+        Thread.sleep(2000);
         assertEquals(0, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
         onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
     }
