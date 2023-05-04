@@ -108,7 +108,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         // Upload the new profile picture and update the profile
-        FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap).whenComplete(
+        FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap, true).whenComplete(
                 (profile, throwable) -> {
                     if (throwable != null) {
                         throwable.printStackTrace();

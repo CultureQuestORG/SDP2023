@@ -7,22 +7,18 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -36,6 +32,7 @@ import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDesc
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -205,15 +202,16 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
         AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
                 .setPositiveButton("Yes", (dialog, which) -> {
-                    pictures.remove(post);
-                    notifyItemRemoved(pictures.indexOf(post));
-                    notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
-                    Database.removePost(post);
+//                    pictures.remove(post);
+//                    notifyItemRemoved(pictures.indexOf(post));
+//                    notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
+//                    Database.removePost(post);
                     //TODO: delete image from storage when the mock is removed
                     //FirebaseStorage storage = FirebaseStorage.getInstance();
                     //storage.getReferenceFromUrl(post.getImageUrl()).delete();
-                    final Snackbar snackbar = createSnackbar(v);
-                    snackbar.show();
+
+                    View rootView = v.getRootView();
+                    CustomSnackbar.showCustomSnackbar("Post deleted successfully", R.drawable.image_recognition_error, rootView);
                 })
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
         dial.show();
@@ -393,21 +391,22 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
             // Enables flipping the post from recto to verso
             pictureImageView.setOnClickListener(v -> {
-                if(isFlipping) return;
+                if (isFlipping) return;
                 flip(v.getContext(), postVerso, postRecto);
             });
 
             // Enables flipping the post from verso to recto
             descriptionContainer.setOnClickListener(v -> {
-                if(isFlipping) return;
+                if (isFlipping) return;
                 flip(v.getContext(), postRecto, postVerso);
             });
         }
 
         /**
          * Flips the post from recto to verso or verso to recto.
-         * @param context the context
-         * @param visibleView the visible view to show
+         *
+         * @param context       the context
+         * @param visibleView   the visible view to show
          * @param inVisibleView the invisible view to hide
          */
         private void flip(Context context, View visibleView, View inVisibleView) {
@@ -440,37 +439,6 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 }
             });
         }
-
-    private Snackbar createSnackbar(View v) {
-        LayoutInflater inflater =  LayoutInflater.from(v.getContext());
-        final Snackbar snackbar = Snackbar.make(v, "", Snackbar.LENGTH_LONG);
-
-        // inflate the custom_snackbar_view created previously
-        View customSnackView = inflater.inflate(R.layout.custom_snackbar, null);
-
-        // set the background of the default snackbar as transparent
-        snackbar.getView().setBackgroundColor(Color.TRANSPARENT);
-
-        // now change the layout of the snackbar
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-
-        // set padding of the all corners as 0
-        snackbarLayout.setPadding(0, 0, 0, 0);
-
-        // register the button from the custom_snackbar_view layout file
-        Button bGotoWebsite = customSnackView.findViewById(R.id.gotoWebsiteButton);
-
-        // now handle the same button with onClickListener
-        bGotoWebsite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snackbar.dismiss();
-            }
-        });
-
-        // add the custom snack bar layout to snackbar layout
-        snackbarLayout.addView(customSnackView, 0);
-        return snackbar;
     }
 }
 

@@ -2,21 +2,27 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/custom_snackbar_container"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
-    app:cardCornerRadius="8dp">
+    android:layout_marginHorizontal="3dp"
+    app:cardBackgroundColor="@color/colorTertiary"
+    android:elevation="4dp"
+    app:cardCornerRadius="20dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorTertiary"
+        android:padding="8dp"
+        >
 
         <ImageView
             android:id="@+id/snackbar_image"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
 
             android:src="@drawable/image_recognition_error"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -28,11 +34,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:text="Your message here"
+            android:fontFamily="@font/poppins"
             android:textColor="@android:color/white"
-            android:textStyle="bold"
             android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/snackbar_image"
