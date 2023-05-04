@@ -55,7 +55,7 @@ public class ScanFragment extends Fragment {
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
     public static CameraSetup cameraSetup;
-    public static ProcessingApi processingApi;
+    public static ProcessingApi processingApi = new ProcessingApi();
     private LoadingAnimation loadingAnimation;
 
     private ConstraintLayout scanningLayout;
