@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.social;
 
+import static ch.epfl.culturequest.social.RarityLevel.getRarityLevel;
+
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
@@ -86,8 +88,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             holder.artist.setText(artwork.getArtist());
             holder.year.setText(artwork.getYear());
             holder.description.setText(shortenDescription(artwork.getSummary()));
-            displaySeeMore(artwork, holder.seeMore);
+            displaySeeMore(artwork, holder.seeMore, pictureUrl);
             holder.score.setText("+" + artwork.getScore() + " pts");
+
+            setCountryBadge(holder.countryBadge, holder.countryText, artwork.getCountry());
+            setCityBadge(holder.cityBadge, holder.cityText, artwork.getCity());
+            setMuseumBadge(holder.museumBadge, holder.museumText, artwork.getMuseum());
+            setRarityBadge(holder.rarityBadge, artwork.getScore());
         });
 
         holder.location.setText("Lausanne");
@@ -170,17 +177,61 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         }
     }
 
-    private void displaySeeMore(BasicArtDescription description, TextView seeMore) {
-        /*if(description.getSummary().length() > 200) {
+    private void displaySeeMore(BasicArtDescription description, TextView seeMore, String pictureUrl) {
+        if(description.getSummary().length() > 200) {
             seeMore.setVisibility(View.VISIBLE);
             seeMore.setOnClickListener(v -> {
-                seeMore.setVisibility(View.GONE);
                 Intent intent = new Intent(seeMore.getContext(), ArtDescriptionDisplayActivity.class);
                 String serializedArtDescription = DescriptionSerializer.serialize(description);
                 intent.putExtra("artDescription", serializedArtDescription);
+                intent.putExtra("scanning", false);
+                intent.putExtra("downloadUrl", pictureUrl);
                 seeMore.getContext().startActivity(intent);
             });
-        }*/
+        }
+    }
+
+    private void setRarityBadge(ImageView rarityBadge, Integer score) {
+        if (score != null) {
+            rarityBadge.setImageResource(getRarityLevel(score).getRarenessIcon());
+            rarityBadge.setTag(getRarityLevel(score).name());
+        } else {
+            rarityBadge.setImageResource(getRarityLevel(30).getRarenessIcon());
+            rarityBadge.setTag(getRarityLevel(30).name());
+        }
+    }
+
+    private void setCountryBadge(ImageView countryBadge, TextView countryText, String country) {
+        if (country != null) {
+            countryBadge.setImageResource(ScanBadge.Country.fromString(country).getBadge());
+            countryText.setText(country);
+            countryBadge.setTag(ScanBadge.Country.fromString(country).name());
+        } else {
+            countryBadge.setVisibility(ImageView.GONE);
+            countryText.setVisibility(TextView.GONE);
+        }
+    }
+
+    private void setCityBadge(ImageView cityBadge, TextView cityText, String city) {
+        if (city != null) {
+            cityBadge.setImageResource(ScanBadge.City.fromString(city).getBadge());
+            cityText.setText(city);
+            cityBadge.setTag(ScanBadge.City.fromString(city).name());
+        } else {
+            cityBadge.setVisibility(ImageView.GONE);
+            cityText.setVisibility(TextView.GONE);
+        }
+    }
+
+    private void setMuseumBadge(ImageView museumBadge, TextView museumText, String museum) {
+        if (museum != null) {
+            museumBadge.setImageResource(ScanBadge.Museum.fromString(museum).getBadge());
+            museumText.setText(museum);
+            museumBadge.setTag(ScanBadge.Museum.fromString(museum).name());
+        } else {
+            museumBadge.setVisibility(ImageView.GONE);
+            museumText.setVisibility(TextView.GONE);
+        }
     }
 
 
@@ -204,6 +255,15 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView description;
         public TextView score;
         public TextView seeMore;
+
+        public ImageView countryBadge;
+        public TextView countryText;
+        public ImageView cityBadge;
+        public TextView cityText;
+        public ImageView museumBadge;
+        public TextView museumText;
+        public ImageView rarityBadge;
+
         public boolean isLiked = false;
 
         private boolean isFlipping = false;
@@ -225,6 +285,14 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             score = itemView.findViewById(R.id.artScorePost);
             description = itemView.findViewById(R.id.artSummaryPost);
             seeMore = itemView.findViewById(R.id.seeMorePost);
+
+            countryBadge = itemView.findViewById(R.id.countryBadgePost);
+            countryText = itemView.findViewById(R.id.countryNamePost);
+            cityBadge = itemView.findViewById(R.id.cityBadgePost);
+            cityText = itemView.findViewById(R.id.cityNamePost);
+            museumBadge = itemView.findViewById(R.id.museumBadgePost);
+            museumText = itemView.findViewById(R.id.museumNamePost);
+            rarityBadge = itemView.findViewById(R.id.rarityPost);
 
             View postRecto = itemView.findViewById(R.id.post_recto);
             View postVerso = itemView.findViewById(R.id.post_verso);

@@ -90,18 +90,6 @@
                 tools:text="Score" />
 
             <TextView
-                android:id="@+id/seeMorePost"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins"
-                android:textColor="@color/colorAccent"
-                android:textSize="16dp"
-                android:textAlignment="viewEnd"
-                app:layout_constraintEnd_toEndOf="@+id/artSummaryPost"
-                app:layout_constraintTop_toBottomOf="@+id/artSummaryPost"
-                tools:text="See More"/>
-
-            <TextView
                 android:id="@+id/artSummaryPost"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -134,7 +122,7 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/artSummaryPost"
                 app:srcCompat="@drawable/france" />
@@ -143,7 +131,7 @@
                 android:id="@+id/cityBadgePost"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/artSummaryPost"
@@ -153,7 +141,7 @@
                 android:id="@+id/museumBadgePost"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/artSummaryPost"
@@ -197,6 +185,18 @@
                 app:layout_constraintEnd_toEndOf="@+id/museumBadgePost"
                 app:layout_constraintStart_toStartOf="@+id/museumBadgePost"
                 app:layout_constraintTop_toBottomOf="@+id/museumBadgePost" />
+
+            <TextView
+                android:id="@+id/seeMorePost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="See More"
+                android:fontFamily="@font/poppins"
+                android:textColor="@color/colorAccent"
+                android:textSize="15dp"
+                app:layout_constraintBottom_toBottomOf="@+id/artSummaryPost"
+                app:layout_constraintEnd_toEndOf="@+id/artSummaryPost"
+                android:visibility="gone"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
