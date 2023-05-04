@@ -31,14 +31,10 @@ public class GeneralDescriptionApi {
                     CompletableFuture<Integer> score = openAIDescriptionApi.getScore(recognizedArt);
 
                     if (artType == BasicArtDescription.ArtType.PAINTING || artType == BasicArtDescription.ArtType.SCULPTURE) {
-                        return score.thenApply(s -> {
-                            basicArtDescription.setScore(s);
-                            Database.setArtwork(basicArtDescription);
-                            return basicArtDescription;
-                        });
                         return score
                                 .thenApply(s -> {
                                     basicArtDescription.setScore(s);
+                                    Database.setArtwork(basicArtDescription);
                                     return basicArtDescription;})
                                 .exceptionally(e -> basicArtDescription);
                     }
