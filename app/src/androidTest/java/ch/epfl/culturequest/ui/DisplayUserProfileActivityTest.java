@@ -8,17 +8,28 @@ import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibilit
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
@@ -29,26 +40,28 @@ import ch.epfl.culturequest.utils.ProfileUtils;
 @RunWith(AndroidJUnit4.class)
 public class DisplayUserProfileActivityTest {
 
-    @Rule
-    public ActivityScenarioRule<DisplayUserProfileActivity> testRule = new ActivityScenarioRule<>(DisplayUserProfileActivity.class);
 
-    @BeforeClass
-    public static void setUp() {
+    public static ActivityScenario<DisplayUserProfileActivity> scenario;
+    @Before
+    public void setUp() throws InterruptedException {
+
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
-
         // clear the database before starting the following tests
         Database.clearDatabase();
-
         // Initialize the database with some test profiles
-        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400);
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>());
         Profile.setActiveProfile(activeProfile);
 
-        Profile profile1 = new Profile("uid", "name", "username", "email", "phone", "photo", 3);
-        ProfileUtils.setSelectedProfile(profile1);
+        Profile profile1 = new Profile("fakeuid", "name", "username", "email", "phone", "photo", 3,new HashMap<>());
 
         Database.setProfile(profile1);
         Database.setProfile(activeProfile);
+
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), DisplayUserProfileActivity.class);
+        intent.putExtra("uid", "fakeuid");
+        scenario = ActivityScenario.launch(intent);
+
     }
 
     @Test

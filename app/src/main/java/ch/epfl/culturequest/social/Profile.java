@@ -5,11 +5,13 @@ import androidx.annotation.NonNull;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 
 /**
@@ -20,6 +22,8 @@ public class Profile extends Observable {
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
     private Integer score;
+
+    private HashMap<String, Integer> badges;
     private static Profile activeProfile;
 
 
@@ -35,7 +39,7 @@ public class Profile extends Observable {
      * @param profilePicture Profile picture. Can be set to null
      */
     public Profile(String username, String profilePicture) {
-        FirebaseUser user = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser());
+        FirebaseUser user = Authenticator.getCurrentUser();
         this.username = username;
         this.uid = user.getUid();
         this.name = user.getDisplayName();
@@ -43,9 +47,10 @@ public class Profile extends Observable {
         this.phoneNumber = user.getPhoneNumber();
         this.profilePicture = profilePicture;
         this.score = 0;
+        this.badges = new HashMap<>();
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, Integer score) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, Integer score, HashMap<String, Integer> badges) {
         this.uid = uid;
         this.name = name;
         this.username = username;
@@ -53,6 +58,7 @@ public class Profile extends Observable {
         this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
         this.score = score;
+        this.badges = badges;
     }
 
 
@@ -69,6 +75,7 @@ public class Profile extends Observable {
         this.phoneNumber = "";
         this.profilePicture = "";
         this.score = 0;
+        this.badges = new HashMap<>();
     }
 
     public String getUid() {
@@ -99,9 +106,12 @@ public class Profile extends Observable {
         return score;
     }
 
+    public HashMap<String, Integer> getBadges() {
+        return badges;
+    }
+
     public void setUid(String uid) {
         this.uid = uid;
-
     }
 
     public void setName(String name) {
@@ -132,6 +142,22 @@ public class Profile extends Observable {
 
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
+        setChanged();
+        notifyObservers();
+    }
+
+    public void setBadges(HashMap<String, Integer> badges) {
+        this.badges = badges;
+        setChanged();
+        notifyObservers();
+    }
+
+    public void addBadge(String badge) {
+        if (badges.containsKey(badge)) {
+            badges.put(badge, badges.get(badge) + 1);
+        } else {
+            badges.put(badge, 1);
+        }
         setChanged();
         notifyObservers();
     }
@@ -172,6 +198,7 @@ public class Profile extends Observable {
         });
         return future;
     }
+
     public static Profile getActiveProfile() {
         return activeProfile;
     }
@@ -184,6 +211,13 @@ public class Profile extends Observable {
         this.score = score;
         setChanged();
         notifyObservers();
+    }
+
+    public void incrementScore(int score){
+        this.score += score;
+        setChanged();
+        notifyObservers();
+        Database.updateScore(this.uid, this.score);
     }
 
     public CompletableFuture<List<String>> retrieveFriends() {
@@ -218,7 +252,19 @@ public class Profile extends Observable {
         Profile profile = (Profile) o;
         return toString().equals(profile.toString());
     }
+    public void addBadges(List<String> badges) {
+        Database.updateBadges(this.uid, badges).thenAccept(newBadges -> {
+            this.badges = newBadges;
+            setChanged();
+            notifyObservers();
+        });
 
+
+    }
+
+    public Integer getBadgeCount(String badge) {
+        return badges.getOrDefault(badge, 0);
+    }
 }
 
 

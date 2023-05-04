@@ -2,42 +2,42 @@ package ch.epfl.culturequest.social;
 
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.HashMap;
+
+import ch.epfl.culturequest.authentication.Authenticator;
 
 @RunWith(AndroidJUnit4.class)
 public class ProfileTest {
 
     private Profile profile;
     private FirebaseUser user;
-    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final String defaultUriString = "res/drawable/logo_compact.png";
-
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
     @Before
     public void setup() throws InterruptedException {
-        FirebaseAuth
-                .getInstance()
-                .signInWithEmailAndPassword("test@gmail.com", "abcdefg")
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) user = mAuth.getCurrentUser();
-                });
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
 
-        Thread.sleep(5000);
-        if (user != null) {
-            profile = new Profile("joker", defaultUriString);
-        } else System.exit(0);
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
 
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
+
+        profile = new Profile("joker", defaultUriString);
+        user = Authenticator.getCurrentUser();
     }
 
     @Test
@@ -120,6 +120,30 @@ public class ProfileTest {
     }
 
     @Test
+    public void setBadgesWorks() {
+        HashMap<String, Integer> newBadges = new HashMap<>();
+        newBadges.put("badge1", 1);
+        newBadges.put("badge2", 3);
+        profile.setBadges(newBadges);
+        assertThat(profile.getBadges(), is(newBadges));
+        assertThat(profile.getBadgeCount("badge1"), is(1));
+        assertThat(profile.getBadgeCount("badge2"), is(3));
+    }
+
+    @Test
+    public void addBadgeWorks() {
+        Integer badgeCount =profile.getBadgeCount("badgeUltraRare");
+        profile.addBadge("badgeUltraRare");
+        assertThat(profile.getBadgeCount("badgeUltraRare"), is(badgeCount + 1));
+        profile.addBadge("badgeUltraRare");
+        assertThat(profile.getBadgeCount("badgeUltraRare"), is(badgeCount + 2));
+    }
+
+
+
+
+
+    @Test
     public void emptyConstructorWorks() {
         Profile emptyProfile = new Profile();
         assertThat(emptyProfile.getUid(), is(""));
@@ -143,6 +167,4 @@ public class ProfileTest {
                 + "profilePicture url: " + profile.getProfilePicture() + "\n"
                 + "score: " + profile.getScore() + "\n"));
     }
-
-
 }

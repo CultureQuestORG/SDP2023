@@ -3,6 +3,7 @@ package ch.epfl.culturequest.backend.artprocessing.apis;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.database.Database;
 
 
 /**
@@ -16,14 +17,23 @@ public class ProcessingApi {
 
     /** Returns an art description object (as a future) given the URL of the image associated to the scanned piece of art */
 
-    public CompletableFuture<BasicArtDescription> getArtDescriptionFromUrl(String imageUrl){
+    public static CompletableFuture<BasicArtDescription> getArtDescriptionFromUrl(String imageUrl){
 
         RecognitionApi recognitionApi = new RecognitionApi();
         GeneralDescriptionApi descriptionApi = new GeneralDescriptionApi();
 
         return recognitionApi.getArtName(imageUrl)
-                .thenCompose(descriptionApi::getArtDescription);
+                .thenCompose((artRecognition) -> {
+                    CompletableFuture<BasicArtDescription> basicArtDescription = new CompletableFuture<>();
+                    CompletableFuture<BasicArtDescription> api = descriptionApi.getArtDescription(artRecognition);
+                    api.acceptEither(Database.getArtworkScan(artRecognition.getArtName()), (description) -> {
+                        basicArtDescription.complete(description);
 
+                        // Cancel the API call if a result is found (has no effect if the API call has already completed)
+                        api.cancel(true);
+                    });
+                    return basicArtDescription;
+                });
     }
 
 }

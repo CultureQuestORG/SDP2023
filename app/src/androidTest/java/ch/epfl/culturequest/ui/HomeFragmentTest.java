@@ -9,7 +9,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.espresso.IdlingRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.After;
@@ -18,13 +17,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.home.HomeFragment;
-import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 @RunWith(AndroidJUnit4.class)
 public class HomeFragmentTest {
@@ -43,10 +42,10 @@ public class HomeFragmentTest {
         // Initialize the database with some test profiles
         ArrayList<String> myFriendsIds = new ArrayList<>();
         myFriendsIds.add("friendID");
-        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400);
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>());
         Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
-        Database.setProfile(new Profile("friendID", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", 300));
+        Database.setProfile(new Profile("friendID", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", 300,new HashMap<>()));
         Database.addFollow("currentUserUid", "friendID");
 
         Database.uploadPost(new Post("postUid1",
@@ -67,7 +66,7 @@ public class HomeFragmentTest {
             fragmentTransaction.commitNow();
         });
 
-        Thread.sleep(8000);
+        Thread.sleep(5000);
     }
 
     @Test

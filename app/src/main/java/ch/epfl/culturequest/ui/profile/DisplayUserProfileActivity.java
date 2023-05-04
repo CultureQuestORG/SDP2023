@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -36,9 +37,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class DisplayUserProfileActivity extends AppCompatActivity {
     private FragmentProfileBinding binding;
     private PictureAdapter pictureAdapter;
-    private Profile selectedProfile = ProfileUtils.getSelectedProfile();
     private ImageView backIcon, homeIcon;
     private FollowButton followButton;
+
+
 
     /**
      * Baiscally we use the viewModel for the profile fragment to display the profile in this activity.
@@ -53,12 +55,21 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidUtils.removeStatusBar(getWindow());
-        ProfileViewModel profileViewModel = new ViewModelProvider(this, new ProfileViewModelFactory(selectedProfile.getUid())).get(ProfileViewModel.class);
+        //we use the extra bc we wont always open from the search activity
+        String uid = getIntent().getStringExtra("uid");
+        ProfileViewModel profileViewModel = new ViewModelProvider(this, new ProfileViewModelFactory(uid)).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(getLayoutInflater());
         View root = binding.getRoot();
         final TextView textView = binding.profileUsername;
         final CircleImageView profilePicture = binding.profilePicture;
         final RecyclerView pictureGrid = binding.pictureGrid;
+
+        final TextView level = binding.level;
+        final TextView levelText= binding.levelText;
+        final ProgressBar progressBar = binding.progressBar;
+
+
+
         profileViewModel.getUsername().observe(this, textView::setText);
         profileViewModel.getProfilePictureUri().observe(this, uri -> Picasso.get().load(uri).into(profilePicture));
         profileViewModel.getPosts().observe(this, images -> {
@@ -67,6 +78,9 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
             GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
             pictureGrid.setLayoutManager(gridLayoutManager);
         });
+        profileViewModel.getScore().observe(this, s-> ProfileUtils.handleScore(level,levelText,progressBar,s));
+
+
         setContentView(root);
         backIcon = findViewById(R.id.back_button);
         homeIcon = findViewById(R.id.home_icon);
@@ -74,9 +88,20 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         final TextView profilePlace = binding.profilePlace;
         profilePlace.setText("Lausanne");
 
+
         followButton = new FollowButton(binding.profileFollowButton);
         profileViewModel.getFollowed().observe(this, followButton::setFollowed);
         followButton.setOnClickListener(v -> profileViewModel.changeFollow());
+
+        progressBar.setOnClickListener(v -> {
+            // open the badges activity
+            Intent intent = new Intent(this, DisplayUserBadgeCollectionActivity.class);
+            intent.putExtra("uid", uid);
+            startActivity(intent);
+        });
+
+
+
 
         binding.settingsButton.setVisibility(View.INVISIBLE);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.pictureGrid.getLayoutParams();
