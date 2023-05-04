@@ -50,9 +50,13 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_art_description_display);
         findViewById(R.id.back_button).setOnClickListener(view -> finish());
         postButton = findViewById(R.id.post_button);
+
+        // Get serialized artDescription and images from intent
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
         String imageUriExtra = getIntent().getStringExtra("imageUri");
         String imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
+
+        // Check if the activity was started from the scanning activity
         boolean scan = getIntent().getBooleanExtra("scanning", true);
 
         if(scan) {
@@ -78,22 +82,28 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
                 finish();
             }
         } else {
+            // Deserialize artDescription
             BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
+
             // Get SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
             boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
+
             // Check if artDescription.openAIRequired is true and doNotShowAgain is false
             if (artDescription.isOpenAiRequired() && !doNotShowAgain) {
                 showOpenAIPopup();
             }
 
+            // Display art information on the page
             displayArtInformation(artDescription);
 
+            // Display image on the page from the server
             Picasso.get()
                     .load(imageDownloadUrl)
                     .placeholder(android.R.drawable.progress_horizontal)
                     .into((ImageView) findViewById(R.id.artImage));
 
+            // Remove post button as the image was not scanned
             postButton.setVisibility(View.GONE);
         }
     }

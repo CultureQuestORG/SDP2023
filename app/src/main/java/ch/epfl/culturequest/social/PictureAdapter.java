@@ -35,6 +35,9 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * Adapter for the RecyclerView in the social feed.
+ */
 public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureViewHolder> {
 
     private final List<Post> pictures;
@@ -59,14 +62,16 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         Post post = pictures.get(position);
         String pictureUrl = post.getImageUrl();
 
-        // Load the picture into the ImageView using a library like Glide or Picasso
+        // Load the picture into the ImageView using Picasso
         Picasso.get()
                 .load(pictureUrl)
                 .placeholder(android.R.drawable.progress_horizontal)
                 .into(holder.pictureImageView);
 
+        // Set the text of the title
         holder.title.setText(post.getArtworkName());
 
+        // Get the profile picture and username of the user who posted the picture
         Database.getProfile(post.getUid()).thenAccept(profile -> {
             holder.username.setText(profile.getUsername());
             Picasso.get()
@@ -75,6 +80,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     .into(holder.profilePicture);
         });
 
+        // Set listeners for the username and profile picture to open the profile of the user
         List.of(holder.username, holder.profilePicture).forEach(view -> {
             view.setOnClickListener(l -> {
                 Intent intent = new Intent(holder.itemView.getContext(), DisplayUserProfileActivity.class);
@@ -83,19 +89,25 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             });
         });
 
+        // Set the text of the details on the verso of the post card
         Database.getArtwork(post.getArtworkName()).thenAccept(artwork -> {
+            // Set the text of the info in their respective TextViews
             holder.artName.setText(artwork.getName());
             holder.artist.setText(artwork.getArtist());
             holder.year.setText(artwork.getYear());
             holder.description.setText(shortenDescription(artwork.getSummary()));
-            displaySeeMore(artwork, holder.seeMore, pictureUrl);
             holder.score.setText("+" + artwork.getScore() + " pts");
 
+            // Put a see more button if the description is too long
+            displaySeeMore(artwork, holder.seeMore, pictureUrl);
+
+            // Set the badges
             setCountryBadge(holder.countryBadge, holder.countryText, artwork.getCountry());
             setCityBadge(holder.cityBadge, holder.cityText, artwork.getCity());
             setMuseumBadge(holder.museumBadge, holder.museumText, artwork.getMuseum());
             setRarityBadge(holder.rarityBadge, artwork.getScore());
         }).exceptionally((throwable) -> {
+            // If the artwork is not found, set the text to N/A
             holder.artName.setText("N/A");
             holder.artist.setText("N/A");
             holder.year.setText("N/A");
@@ -111,12 +123,16 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
         holder.location.setText("Lausanne");
 
-
+        // Set handlers for the like and delete buttons
         handleLike(holder, post);
-
         handleDelete(holder, post);
     }
 
+    /**
+     * Handles the like of a post.
+     * @param holder the holder view of the post
+     * @param post the post
+     */
     private void handleLike(@NonNull PictureViewHolder holder, Post post) {
         if (post.isLikedBy(Profile.getActiveProfile().getUid())) {
             holder.isLiked = true;
@@ -126,7 +142,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             Picasso.get().load(R.drawable.like_empty).into(holder.like);
         }
 
-
+        // Set the listener for the like button
         holder.like.setOnClickListener(v -> {
             if (holder.isLiked) {
                 holder.isLiked = false;
@@ -152,6 +168,11 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     }
 
 
+    /**
+     * Handles the deletion of a post.
+     * @param holder the holder view of the post
+     * @param post the post
+     */
     private void handleDelete(@NonNull PictureViewHolder holder, Post post) {
         if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
             holder.delete.setVisibility(View.VISIBLE);
@@ -165,6 +186,11 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         }
     }
 
+    /**
+     * Displays a pop up to confirm the deletion of a post.
+     * @param v the view
+     * @param post the post
+     */
     private void handleDeletePopUp(View v, Post post) {
 
         AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
@@ -181,6 +207,11 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         dial.show();
     }
 
+    /**
+     * Shortens the description of an artwork if it is too long (> 200 chars).
+     * @param description the description
+     * @return the shortened description
+     */
     private String shortenDescription(String description) {
         if (description.length() > 200) {
             return description.substring(0, 200) + "...";
@@ -189,9 +220,17 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         }
     }
 
+    /**
+     * Displays a see more button if the description is too long.
+     * @param description the description
+     * @param seeMore the see more button
+     * @param pictureUrl the picture url of the post
+     */
     private void displaySeeMore(BasicArtDescription description, TextView seeMore, String pictureUrl) {
         if(description.getSummary().length() > 200) {
             seeMore.setVisibility(View.VISIBLE);
+
+            // Set the listener for the see more button to open the description activity
             seeMore.setOnClickListener(v -> {
                 Intent intent = new Intent(seeMore.getContext(), ArtDescriptionDisplayActivity.class);
                 String serializedArtDescription = DescriptionSerializer.serialize(description);
@@ -203,6 +242,11 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         }
     }
 
+    /**
+     * Sets the rarity badge of a post.
+     * @param rarityBadge the rarity badge
+     * @param score the score of the post
+     */
     private void setRarityBadge(ImageView rarityBadge, Integer score) {
         if (score != null) {
             rarityBadge.setImageResource(getRarityLevel(score).getRarenessIcon());
@@ -213,6 +257,12 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         }
     }
 
+    /**
+     * Sets the country badge of a post.
+     * @param countryBadge the country badge
+     * @param countryText the country text
+     * @param country the country
+     */
     private void setCountryBadge(ImageView countryBadge, TextView countryText, String country) {
         if (country != null) {
             countryBadge.setImageResource(ScanBadge.Country.fromString(country).getBadge());
@@ -224,6 +274,12 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         }
     }
 
+    /**
+     * Sets the city badge of a post.
+     * @param cityBadge the city badge
+     * @param cityText the city text
+     * @param city the city
+     */
     private void setCityBadge(ImageView cityBadge, TextView cityText, String city) {
         if (city != null) {
             cityBadge.setImageResource(ScanBadge.City.fromString(city).getBadge());
@@ -235,6 +291,12 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         }
     }
 
+    /**
+     * Sets the museum badge of a post.
+     * @param museumBadge the museum badge
+     * @param museumText the museum text
+     * @param museum the museum
+     */
     private void setMuseumBadge(ImageView museumBadge, TextView museumText, String museum) {
         if (museum != null) {
             museumBadge.setImageResource(ScanBadge.Museum.fromString(museum).getBadge());
@@ -246,12 +308,17 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         }
     }
 
-
+    /**
+     * Gets the number of items in the list in the recycler view.
+     */
     @Override
     public int getItemCount() {
         return pictures.size();
     }
 
+    /***
+     * Class Representing a PictureViewHolder (A post in the feed)
+     */
     public class PictureViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView pictureImageView;
@@ -282,6 +349,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
         public PictureViewHolder(@NonNull View itemView) {
             super(itemView);
+            // Get the views on the recto
             pictureImageView = itemView.findViewById(R.id.image_view);
             title = itemView.findViewById(R.id.title);
             username = itemView.findViewById(R.id.username);
@@ -291,6 +359,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             delete = itemView.findViewById(R.id.delete_button);
             View descriptionContainer = itemView.findViewById(R.id.descriptionContainerPost);
 
+            // Get the views on the verso
             artName = itemView.findViewById(R.id.artNamePost);
             artist = itemView.findViewById(R.id.artistNamePost);
             year = itemView.findViewById(R.id.artYearPost);
@@ -310,17 +379,25 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             View postVerso = itemView.findViewById(R.id.post_verso);
             postVerso.setVisibility(View.INVISIBLE);
 
+            // Enables flipping the post from recto to verso
             pictureImageView.setOnClickListener(v -> {
                 if(isFlipping) return;
                 flip(v.getContext(), postVerso, postRecto);
             });
 
+            // Enables flipping the post from verso to recto
             descriptionContainer.setOnClickListener(v -> {
                 if(isFlipping) return;
                 flip(v.getContext(), postRecto, postVerso);
             });
         }
 
+        /**
+         * Flips the post from recto to verso or verso to recto.
+         * @param context the context
+         * @param visibleView the visible view to show
+         * @param inVisibleView the invisible view to hide
+         */
         private void flip(Context context, View visibleView, View inVisibleView) {
             isFlipping = true;
             visibleView.setVisibility(View.VISIBLE);

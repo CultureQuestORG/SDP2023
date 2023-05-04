@@ -54,7 +54,7 @@ public class ArtDescriptionDisplayActivityTest3 {
         onView(withId(R.id.artName)).check(matches(withText("Mona Lisa")));
         onView(withId(R.id.artistName)).check(matches(withText("Da Vinci")));
         onView(withId(R.id.artYear)).check(matches(withText("1519")));
-        onView(withId(R.id.artSummary)).check(matches(withText("Pure Masterclass")));
+        onView(withId(R.id.artSummary)).check(matches(withText("La Joconde (en italien: La Gioconda [la dʒoˈkonda] ou Monna Lisa [ˈmɔnna ˈliːza]), ou Portrait de Mona Lisa, est un tableau de l'artiste Léonard de Vinci, réalisé entre 1503 et 1506 ou entre 1513 et 15161")));
         onView(withId(R.id.artScore)).check(matches(withText("+100 pts")));
         onView(withId(R.id.artImage)).check(matches(isDisplayed()));
         onView(withId(R.id.rarity)).check(matches(isDisplayed()));
