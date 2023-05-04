@@ -21,6 +21,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,29 +50,61 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_art_description_display);
         findViewById(R.id.back_button).setOnClickListener(view -> finish());
         postButton = findViewById(R.id.post_button);
+
+        // Get serialized artDescription and images from intent
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
         String imageUriExtra = getIntent().getStringExtra("imageUri");
         String imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
-        Uri imageUri = Uri.parse(imageUriExtra);
-        BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
-        // Get SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
-        boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
-        // Check if artDescription.openAIRequired is true and doNotShowAgain is false
-        if (artDescription.isOpenAiRequired() && !doNotShowAgain) {
-            showOpenAIPopup();
-        }
-        // get bitmap from imageUri with the ContentResolver
-        try {
+
+        // Check if the activity was started from the scanning activity
+        boolean scan = getIntent().getBooleanExtra("scanning", true);
+
+        if(scan) {
+            Uri imageUri = Uri.parse(imageUriExtra);
+            BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
+            // Get SharedPreferences
+            SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
+            boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
+            // Check if artDescription.openAIRequired is true and doNotShowAgain is false
+            if (artDescription.isOpenAiRequired() && !doNotShowAgain) {
+                showOpenAIPopup();
+            }
             // get bitmap from imageUri with the ContentResolver
-            Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
-            scannedImage = bitmap;
-            ((ImageView) findViewById(R.id.artImage)).setImageBitmap(bitmap);
+            try {
+                // get bitmap from imageUri with the ContentResolver
+                Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+                scannedImage = bitmap;
+                ((ImageView) findViewById(R.id.artImage)).setImageBitmap(bitmap);
+                displayArtInformation(artDescription);
+                postButton.setOnClickListener(v -> postImage(imageDownloadUrl, artDescription, List.of(artDescription.getCountry(), artDescription.getCity(), artDescription.getMuseum())));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                finish();
+            }
+        } else {
+            // Deserialize artDescription
+            BasicArtDescription artDescription = DescriptionSerializer.deserialize(serializedArtDescription);
+
+            // Get SharedPreferences
+            SharedPreferences sharedPreferences = getSharedPreferences("openAI_popup_pref", MODE_PRIVATE);
+            boolean doNotShowAgain = sharedPreferences.getBoolean("do_not_show_again", false);
+
+            // Check if artDescription.openAIRequired is true and doNotShowAgain is false
+            if (artDescription.isOpenAiRequired() && !doNotShowAgain) {
+                showOpenAIPopup();
+            }
+
+            // Display art information on the page
             displayArtInformation(artDescription);
-            postButton.setOnClickListener(v -> postImage(imageDownloadUrl, artDescription,List.of(artDescription.getCountry(), artDescription.getCity(), artDescription.getMuseum())));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            finish();
+
+            // Display image on the page from the server
+            Picasso.get()
+                    .load(imageDownloadUrl)
+                    .placeholder(android.R.drawable.progress_horizontal)
+                    .into((ImageView) findViewById(R.id.artImage));
+
+            // Remove post button as the image was not scanned
+            postButton.setVisibility(View.GONE);
         }
     }
 

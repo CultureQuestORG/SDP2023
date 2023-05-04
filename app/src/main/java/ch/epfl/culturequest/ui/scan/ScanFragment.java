@@ -3,10 +3,13 @@ package ch.epfl.culturequest.ui.scan;
 import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -37,18 +40,22 @@ import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
+import ch.epfl.culturequest.backend.exceptions.OpenAiFailedException;
+import ch.epfl.culturequest.backend.exceptions.RecognitionFailedException;
+import ch.epfl.culturequest.backend.exceptions.WikipediaDescriptionFailedException;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.ui.commons.LoadingAnimation;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.PermissionRequest;
 
 public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
     public LocalStorage localStorage;
-    private CameraSetup cameraSetup;
-
+    public static CameraSetup cameraSetup;
+    public static ProcessingApi processingApi;
     private LoadingAnimation loadingAnimation;
 
     private ConstraintLayout scanningLayout;
@@ -93,7 +100,7 @@ public class ScanFragment extends Fragment {
                             Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
                             currentProcessing = FireStorage.uploadAndGetUrlFromImage(bitmap).thenCompose(url -> {
                                         intent.putExtra("downloadUrl", url);
-                                        return ProcessingApi.getArtDescriptionFromUrl(url);
+                                        return processingApi.getArtDescriptionFromUrl(url);
                                     })
                                     .thenAccept(artDescription -> {
                                         Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
@@ -106,11 +113,42 @@ public class ScanFragment extends Fragment {
                                         loadingAnimation.stopLoading();
                                         scanningLayout.setVisibility(View.GONE);
                                         currentProcessing = null;
+                                    })
+                                    .exceptionally(ex -> {
+                                        loadingAnimation.stopLoading();
+                                        Throwable cause = ex.getCause();
+                                        String errorMessage;
+                                        int drawableId;
+
+                                        if (cause instanceof OpenAiFailedException) {
+                                            errorMessage = "OpenAI failed to process the art.";
+                                            drawableId = R.drawable.openai_logo;
+                                        } else if (cause instanceof RecognitionFailedException) {
+                                            errorMessage = "Art recognition failed. Please try again.";
+                                            drawableId = R.drawable.image_recognition_error;
+                                        } else if (cause instanceof WikipediaDescriptionFailedException) {
+                                            errorMessage = "Failed to retrieve description from Wikipedia.";
+                                            drawableId = R.drawable.wikipedia_error;
+                                        } else {
+                                            errorMessage = "An unknown error occurred.";
+                                            drawableId = R.drawable.unknown_error;
+                                        }
+
+                                        View rootView = requireActivity().findViewById(android.R.id.content);
+                                        CustomSnackbar.showCustomSnackbar(errorMessage, drawableId, rootView);
+
+                                        return null;
                                     });
 
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
+                    }).exceptionally(e -> {
+                        loadingAnimation.stopLoading();
+
+                        View rootView = requireActivity().findViewById(android.R.id.content);
+                        CustomSnackbar.showCustomSnackbar("Failed to take picture.", R.drawable.camera_error, rootView);
+                        return null;
                     });
                 }
             });

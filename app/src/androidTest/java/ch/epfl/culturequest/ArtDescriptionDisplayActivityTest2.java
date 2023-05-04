@@ -44,4 +44,9 @@ public class ArtDescriptionDisplayActivityTest2 {
         onView(withId(R.id.museumBadge)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.GONE))));
     }
 
+    @Test
+    public void activityDisplayingPostButton() {
+        onView(withId(R.id.post_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+    }
+
 }

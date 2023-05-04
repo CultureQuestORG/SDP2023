@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import ch.epfl.culturequest.backend.artprocessing.apis.WikipediaDescriptionApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.backend.exceptions.WikipediaDescriptionFailedException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
@@ -43,6 +45,33 @@ public class WikipediaDescriptionApiTestWithMock {
         // getArtDescription should return a future that is completed exceptionally
         CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);
         assertThrows(CompletionException.class, () -> descriptionFuture.join());
+    }
+
+    @Test
+    public void exceptionWhenAmbiguity(){
+        mockWebServer.enqueue(new MockResponse().setBody("<html><body><p><b>Mona Lisa or Joconde</b> may refer to X</p></body></html>").setResponseCode(200));
+        ArtRecognition artRecognition = new ArtRecognition("Mona Lisa", "Painting");
+        CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);
+
+        //verify that the future is completed exceptionally with a CompletionException and that the cause of the exception is WikipediaDescriptionFailedException
+        CompletionException completionException = assertThrows(CompletionException.class, () -> descriptionFuture.join());
+        assertTrue(completionException.getCause() instanceof WikipediaDescriptionFailedException);
+
+        //check that the exception message is correct
+        assertThat(completionException.getCause().getMessage(), is("Ambiguity detected"));
+    }
+
+    @Test
+    public void exceptionWhenNoResult(){
+        mockWebServer.enqueue(new MockResponse().setBody("<html><body><p><b>The page \"Mamamia\" does not exist</b></p></body></html>").setResponseCode(200));
+        ArtRecognition artRecognition = new ArtRecognition("Mona Lisa", "Painting");
+        CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);
+
+        //verify that the future is completed exceptionally with a CompletionException and that the cause of the exception is WikipediaDescriptionFailedException
+        CompletionException completionException = assertThrows(CompletionException.class, () -> descriptionFuture.join());
+        assertTrue(completionException.getCause() instanceof WikipediaDescriptionFailedException);
+        //check that the exception message is correct
+        assertThat(completionException.getCause().getMessage(), is("Wikipedia page does not exist"));
     }
 
     // test that summary, city, country, museum, year are null when the wikipedia api returns empty strings

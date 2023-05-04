@@ -20,7 +20,7 @@ public class ArtProcessingTest {
     @Test
     public void artProcessingOutputsCorrectDescription() {
         try {
-            BasicArtDescription artDescription = ProcessingApi.getArtDescriptionFromUrl(imageUrl).get(40, TimeUnit.SECONDS);
+            BasicArtDescription artDescription = new ProcessingApi().getArtDescriptionFromUrl(imageUrl).get(40, TimeUnit.SECONDS);
             assertThat(artDescription.getName(), is("David of Michelangelo"));
             assertThat(artDescription.getType(), is(BasicArtDescription.ArtType.SCULPTURE));
         } catch (ExecutionException | InterruptedException |
