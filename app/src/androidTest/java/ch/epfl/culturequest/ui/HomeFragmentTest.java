@@ -1,14 +1,21 @@
 package ch.epfl.culturequest.ui;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.After;
@@ -18,6 +25,8 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
@@ -74,6 +83,34 @@ public class HomeFragmentTest {
         // the recycler view should contains 1 element (id is feed_container)
         Thread.sleep(2000);
         onView(withId(R.id.feed_container)).check(matches(hasChildCount(1)));
+    }
+
+    @Test
+    public void clickOnLikeWorks() throws InterruptedException {
+        // click on the first post
+        Thread.sleep(2000);
+        onView(withId(R.id.like_button)).perform(click());
+
+        Thread.sleep(2000);
+
+        try {
+            assertThat(Database.getPosts("friendID").get(5, java.util.concurrent.TimeUnit.SECONDS).get(0).isLikedBy("currentUserUid"), is(true));
+        } catch (ExecutionException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void clickOnPostDisplaysInfos() throws InterruptedException {
+        // click on the first post
+        Thread.sleep(2000);
+        onView(withId(R.id.post_recto)).check(matches(isDisplayed()));
+        onView(withId(R.id.feed_container)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+
+        Thread.sleep(1000);
+
+        // check that the post is displayed
+        onView(withId(R.id.post_verso)).check(matches(isDisplayed()));
     }
 
     @After
