@@ -35,7 +35,8 @@ public class AndroidUtils {
 
     public static void showNoConnectionAlert(Context context, String msg){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage(msg)
+        builder.setTitle("No Connection")
+                .setMessage(msg)
                 .setCancelable(false)
                 .setPositiveButton("OK", (dialog, id) -> dialog.dismiss());
         builder.create().show();

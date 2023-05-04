@@ -57,22 +57,17 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         AndroidUtils.removeStatusBar(getWindow());
         ch.epfl.culturequest.databinding.ActivitySettingsBinding binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         //handle logout
         Button logoutButton = binding.logOut;
         logoutButton.setOnClickListener(v -> {
             Context context = v.getContext();
-            if (hasConnection(context)){
-                Authenticator.signOut(this);
-            } else {
-                Snackbar.make(v, "Cannot log out. You are not connected to the internet", Snackbar.LENGTH_LONG).show();
-            }
+            if (hasConnection(context)) Authenticator.signOut(this);
+            else Snackbar.make(v, "Cannot log out. You are not connected to the internet", Snackbar.LENGTH_LONG).show();
         });
 
         activeProfile = Profile.getActiveProfile();

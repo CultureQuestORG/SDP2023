@@ -85,9 +85,7 @@ public class Authenticator {
             if (hasConnection(activity)) {
                 signInLauncher.launch(signInIntent());
                 future.complete("User signed in after being signed out with the Firebase UI");
-            } else {
-                showNoConnectionAlert(activity, "No connection, please try to login again later");
-            }
+            } else showNoConnectionAlert(activity, "Please try to login again later");
         } else {
                 Database.getProfile(getCurrentUser().getUid()).handle((profile, throwable) -> {
                     if (profile != null) {
@@ -106,7 +104,6 @@ public class Authenticator {
                     return null;
                 });
         }
-
         return future;
     }
 
