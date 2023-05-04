@@ -4,6 +4,7 @@ import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -21,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -64,7 +66,14 @@ public class SettingsActivity extends AppCompatActivity {
 
         //handle logout
         Button logoutButton = binding.logOut;
-        logoutButton.setOnClickListener(v -> Authenticator.signOut(this));
+        logoutButton.setOnClickListener(v -> {
+            Context context = v.getContext();
+            if (hasConnection(context)){
+                Authenticator.signOut(this);
+            } else {
+                Snackbar.make(v, "Cannot log out. You are not connected to the internet", Snackbar.LENGTH_LONG).show();
+            }
+        });
 
         activeProfile = Profile.getActiveProfile();
 
