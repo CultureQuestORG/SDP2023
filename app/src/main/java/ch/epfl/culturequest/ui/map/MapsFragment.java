@@ -185,6 +185,8 @@ public class MapsFragment extends Fragment {
             places = otmProvider.getLocations(upperLeft, lowerRight).thenApply(x -> {
                 viewModel.setCenterOfLocations(latestLocation);
                 viewModel.setLocations(x);
+                mMap.moveCamera(CameraUpdateFactory
+                        .newLatLngZoom(latestLocation, DEFAULT_ZOOM));
                 return x;
             });
         }
@@ -211,7 +213,6 @@ public class MapsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.i("RESUME", "RESUMED");
         if(!isWifiAvailable) return;
         checkInternet();
         if (mMap != null) {
@@ -251,18 +252,12 @@ public class MapsFragment extends Fragment {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         View mapView = binding.getRoot();
 
-        Log.i("ONCREATEVIEW", "CREATED VIEW");
         checkInternet();
         if(!isWifiAvailable) return null;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
 
         otmProvider = new RetryingOTMProvider(new BasicOTMProvider());
-        viewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location -> {
-            if (mMap != null) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
-            }
-        });
         return mapView;
     }
 
@@ -318,7 +313,7 @@ public class MapsFragment extends Fragment {
         try {
             if (viewModel.isLocationPermissionGranted()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    locationRequest = new LocationRequest.Builder(200000).build(); //Unfrequent updates needed for now but will be fixed later
+                    locationRequest = new LocationRequest.Builder(10000).build();
                 }
                 LocationCallback locationCallback = new LocationCallback() {
                     @Override
@@ -341,8 +336,6 @@ public class MapsFragment extends Fragment {
                                     getProfilePicture();
                                 }
                             }
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
 
                             getMarkers(viewModel.getCurrentLocation().getValue());
                         }
