@@ -258,6 +258,11 @@ public class MapsFragment extends Fragment {
         viewModel = new MapsViewModel();
 
         otmProvider = new RetryingOTMProvider(new BasicOTMProvider());
+        viewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location -> {
+            if (mMap != null) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
+            }
+        });
         return mapView;
     }
 
@@ -336,6 +341,8 @@ public class MapsFragment extends Fragment {
                                     getProfilePicture();
                                 }
                             }
+                            mMap.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
 
                             getMarkers(viewModel.getCurrentLocation().getValue());
                         }
