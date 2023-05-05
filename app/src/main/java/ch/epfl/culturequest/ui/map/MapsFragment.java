@@ -216,10 +216,6 @@ public class MapsFragment extends Fragment {
         super.onResume();
         if(!isWifiAvailable) return;
         checkInternet();
-        if (mMap != null) {
-            getLocationPermission();
-        }
-        // getProfilePicture();
     }
 
     private void getProfilePicture(){
