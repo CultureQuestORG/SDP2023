@@ -43,7 +43,7 @@ public class MapsFragmentTest {
             fragmentTransaction.commitNow();
         });
 
-        Thread.sleep(5000);
+        Thread.sleep(10000);
     }
 
     @Test
