@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.ui.map;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+
 import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,6 +35,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -211,13 +214,8 @@ public class MapsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.i("RESUME", "RESUMED");
         if(!isWifiAvailable) return;
         checkInternet();
-        if (mMap != null) {
-            getLocationPermission();
-        }
-        getProfilePicture();
     }
 
     private void getProfilePicture(){
@@ -251,7 +249,6 @@ public class MapsFragment extends Fragment {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         View mapView = binding.getRoot();
 
-        Log.i("ONCREATEVIEW", "CREATED VIEW");
         checkInternet();
         if(!isWifiAvailable) return null;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -318,7 +315,7 @@ public class MapsFragment extends Fragment {
         try {
             if (viewModel.isLocationPermissionGranted()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    locationRequest = new LocationRequest.Builder(200000).build(); //Unfrequent updates needed for now but will be fixed later
+                    locationRequest = new LocationRequest.Builder(200000).build();
                 }
                 LocationCallback locationCallback = new LocationCallback() {
                     @Override

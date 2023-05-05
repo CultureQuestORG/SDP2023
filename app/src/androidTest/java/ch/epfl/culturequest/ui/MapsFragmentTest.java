@@ -30,7 +30,7 @@ public class MapsFragmentTest {
     @Before
     public void setUp() throws InterruptedException {
 
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PATH, 35, new HashMap<>());
+        Profile profile = new Profile("test", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PATH, 35, new HashMap<>());
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 
