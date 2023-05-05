@@ -90,6 +90,7 @@ public class AuthenticatorTest {
         try {
             assertTrue(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
             assertNull(Authenticator.getCurrentUser());
+            Thread.sleep(3000);
             onView(withId(R.id.sign_in_button)).check(matches(isDisplayed()));
             String signInState = Authenticator.signIn(activity).get(5, TimeUnit.SECONDS);
             assertEquals(signInState, "User signed in after being signed out with the Firebase UI");
@@ -105,6 +106,7 @@ public class AuthenticatorTest {
         try {
             assertTrue(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
             assertNull(Authenticator.getCurrentUser());
+            Thread.sleep(3000);
             onView(withId(R.id.sign_in_button)).check(matches(isDisplayed()));
             // Signs in the user again for the other tests
             assertTrue(Authenticator.manualSignIn(email, password).get(5, TimeUnit.SECONDS).get());
