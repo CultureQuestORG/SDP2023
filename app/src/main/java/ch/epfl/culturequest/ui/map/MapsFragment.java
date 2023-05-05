@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.ui.map;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+
 import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,6 +35,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -216,7 +219,7 @@ public class MapsFragment extends Fragment {
         if (mMap != null) {
             getLocationPermission();
         }
-        getProfilePicture();
+        // getProfilePicture();
     }
 
     private void getProfilePicture(){
