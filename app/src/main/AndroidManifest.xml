@@ -32,6 +32,9 @@
             android:exported="false" >
         </activity>
 
+        <activity
+            android:name=".ui.SightseeingActivity"
+            android:exported="false" />
 
         <activity
             android:name=".SettingsActivity"

@@ -74,4 +74,9 @@ public class RetryingOTMProvider implements OTMProvider{
     public CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight) {
        return getLocationsNTimes(upperLeft, lowerRight, numberOfRetries);
     }
+
+    @Override
+    public CompletableFuture<List<OTMLocation>> getLocations(String city) {
+        return null;
+    }
 }
