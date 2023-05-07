@@ -3,9 +3,7 @@ package ch.epfl.culturequest;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
 import static org.junit.Assert.assertThrows;
 
 import android.content.Context;
@@ -14,7 +12,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -26,7 +23,6 @@ import org.junit.Test;
 
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.storage.LocalStorage;
-import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ArtDescriptionDisplayActivityOpenAiWarningTest {
 
@@ -55,7 +51,7 @@ public class ArtDescriptionDisplayActivityOpenAiWarningTest {
             localStorage.storeImageLocally(bitmap, true);
             Uri imageUri = localStorage.lastlyStoredImageUri;
             intent.putExtra("imageUri", imageUri.toString());
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -64,23 +60,17 @@ public class ArtDescriptionDisplayActivityOpenAiWarningTest {
 
     @Before
     public void setUp() {
-        // register IdlingResource
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource);
         applicationContext = ApplicationProvider.getApplicationContext();
     }
 
     @After
     public void tearDown() {
-        // unregister IdlingResource
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource);
         // clear the shared preferences
         applicationContext.getSharedPreferences("openAI_popup_pref", Context.MODE_PRIVATE).edit().clear().apply();
     }
 
     @Test
     public void popUpWindowCorrectlyAppearsOnScreen() {
-
-
         // Check that the TextView with the OpenAI message is displayed
         onView(withText(openAiWarningMessage)).check(matches(ViewMatchers.isDisplayed()));
 
@@ -96,7 +86,7 @@ public class ArtDescriptionDisplayActivityOpenAiWarningTest {
         });
 
         // check that the shared preferences have been updated
-        assert(applicationContext.getSharedPreferences("openAI_popup_pref", Context.MODE_PRIVATE).getBoolean("openAI_popup", true));
+        assert (applicationContext.getSharedPreferences("openAI_popup_pref", Context.MODE_PRIVATE).getBoolean("openAI_popup", true));
 
     }
 

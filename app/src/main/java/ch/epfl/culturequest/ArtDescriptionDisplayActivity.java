@@ -40,7 +40,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     private Bitmap scannedImage;
 
-    private static final int POPUP_DELAY = 3000;
+    private static final int POPUP_DELAY = 5000;
 
     private Button postButton;
 
