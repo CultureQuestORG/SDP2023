@@ -2,6 +2,7 @@ package ch.epfl.culturequest.social.notifications;
 
 import static androidx.core.content.ContextCompat.getSystemService;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -14,7 +15,7 @@ import java.util.Objects;
 /**
  * Interface that represents notifications
  */
-public interface Notification {
+public interface NotificationInterface {
 
     /**
      * Creates the notification channels. This method can be called multiple times, it will only
@@ -32,6 +33,8 @@ public interface Notification {
             channels.add(FollowNotification.getNotificationChannel());
             channels.add(ScanNotification.getNotificationChannel());
             channels.add(LikeNotification.getNotificationChannel());
+            channels.add(CompetitionNotification.getNotificationChannel());
+            channels.add(SightSeeingNotification.getNotificationChannel());
 
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
@@ -46,5 +49,5 @@ public interface Notification {
      * @param context the context of the notification
      * @return the notification
      */
-    android.app.Notification get(Context context);
+    Notification get(Context context);
 }

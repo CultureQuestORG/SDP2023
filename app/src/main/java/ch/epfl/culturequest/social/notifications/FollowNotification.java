@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.social.notifications;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -13,13 +14,12 @@ import ch.epfl.culturequest.social.Profile;
 /**
  * Class that represents a notification for a new follower
  */
-public final class FollowNotification implements Notification {
-
+public final class FollowNotification implements NotificationInterface {
     private final String newFollower;
-    private static final String CHANNEL_ID = "FOLLOW";
+    public static final String CHANNEL_ID = "FOLLOW";
 
     /**
-     * Constructor for the Follow Notification
+     * Constructor for the FollowNotification
      *
      * @param newFollower the username of the new follower
      */
@@ -28,10 +28,10 @@ public final class FollowNotification implements Notification {
     }
 
     @Override
-    public android.app.Notification get(Context context) {
+    public Notification get(Context context) {
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getName() + ", you have a new follower!")
+                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new follower!")
                 .setContentText(newFollower + " is now following you!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
     }

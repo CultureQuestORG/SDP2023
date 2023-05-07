@@ -1,15 +1,14 @@
 package ch.epfl.culturequest;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.notifications.NotificationInterface;
 import ch.epfl.culturequest.utils.AndroidUtils;
-import ch.epfl.culturequest.social.notifications.Notification;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -23,7 +22,7 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Create the notification channels on login
-        Notification.createNotificationChannels(this);
+        NotificationInterface.createNotificationChannels(this);
 
         // If the user is not logged in, display the sign in activity
         AndroidUtils.removeStatusBar(getWindow());

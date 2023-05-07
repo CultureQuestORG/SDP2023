@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.social.notifications;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -12,15 +13,14 @@ import ch.epfl.culturequest.social.Profile;
 /**
  * Class that represents notifications for a new offline scan
  */
-public class ScanNotification implements Notification {
-
-    private static final String CHANNEL_ID = "SCAN";
+public class ScanNotification implements NotificationInterface {
+    public static final String CHANNEL_ID = "SCAN";
 
     @Override
-    public android.app.Notification get(Context context) {
+    public Notification get(Context context) {
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getName() + ", you have a new scan!")
+                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new scan!")
                 .setContentText("We found a new offline scan result!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
     }

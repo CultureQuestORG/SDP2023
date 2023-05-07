@@ -4,36 +4,21 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
 
-/**
- * Class that represents a notification for a new like
- */
-public class LikeNotification implements NotificationInterface {
-    private final String liker;
-
-    public static final String CHANNEL_ID = "LIKE";
-
-    /**
-     * Constructor for the LikeNotification
-     *
-     * @param liker the username of the liker
-     */
-    public LikeNotification(String liker) {
-        this.liker = liker;
-    }
+public class CompetitionNotification implements NotificationInterface {
+    public static final String CHANNEL_ID = "COMPETITION";
 
     @Override
     public Notification get(Context context) {
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new like!")
-                .setContentText(liker + " liked your post!")
+                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new competition!")
+                .setContentText("Click here to see your new competition!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
     }
 
@@ -43,9 +28,9 @@ public class LikeNotification implements NotificationInterface {
      * @return the notification channel
      */
     public static NotificationChannel getNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "LikeNotification";
-            String description = "LikeNotification";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            CharSequence name = "CompetitionNotification";
+            String description = "CompetitionNotification";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
@@ -53,4 +38,5 @@ public class LikeNotification implements NotificationInterface {
         }
         return null;
     }
+
 }
