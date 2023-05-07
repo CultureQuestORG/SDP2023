@@ -6,10 +6,10 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 
 import android.view.View;
 
@@ -46,24 +46,24 @@ public class HomeFragmentTest {
     private HomeFragment fragment;
 
 
-        public ViewAction clickChildViewWithId(final int id) {
-            return new ViewAction() {
-                @Override
-                public Matcher<View> getConstraints() {
-                    return null;
-                }
+    public ViewAction clickChildViewWithId(final int id) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return null;
+            }
 
-                @Override
-                public String getDescription() {
-                    return "Click on a child view with specified id.";
-                }
+            @Override
+            public String getDescription() {
+                return "Click on a child view with specified id.";
+            }
 
-                @Override
-                public void perform(UiController uiController, View view) {
-                    View v = view.findViewById(id);
-                    v.performClick();
-                }
-            };
+            @Override
+            public void perform(UiController uiController, View view) {
+                View v = view.findViewById(id);
+                v.performClick();
+            }
+        };
 
     }
 
@@ -79,15 +79,15 @@ public class HomeFragmentTest {
         // Initialize the database with some test profiles
         ArrayList<String> myFriendsIds = new ArrayList<>();
         myFriendsIds.add("friendID");
-        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>());
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400, new HashMap<>());
         Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
-        Database.setProfile(new Profile("friendID", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", 300,new HashMap<>()));
+        Database.setProfile(new Profile("friendID", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", 300, new HashMap<>()));
         Database.addFollow("currentUserUid", "friendID");
 
         Database.uploadPost(new Post("postUid1",
                 "friendID",
-                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/images%2F08064ffd-b463-4a99-9ee3-00446168e167?alt=media&token=9084b547-1058-4d16-8721-90adc10d867b",
+                DEFAULT_PROFILE_PIC_PATH,
                 "David of Michelangelo",
                 0,
                 0,
@@ -95,7 +95,7 @@ public class HomeFragmentTest {
 
         Database.uploadPost(new Post("postUid1",
                 "friendID",
-                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/images%2F08064ffd-b463-4a99-9ee3-00446168e167?alt=media&token=9084b547-1058-4d16-8721-90adc10d867b",
+                DEFAULT_PROFILE_PIC_PATH,
                 "Mona Lisa",
                 1,
                 0,

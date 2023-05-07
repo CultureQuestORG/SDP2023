@@ -19,11 +19,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
@@ -112,7 +110,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         if (!Authenticator.getCurrentUser().isAnonymous()) {
 
             //if the profile picture is not the default one, we store it in the storage
-            if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PATH))
+            if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PIC_PATH))
                 FireStorage.uploadNewProfilePictureToStorage(profile, profilePicBitmap, true).whenComplete(
                         (profile, throwable) -> {
                             if (throwable != null) {
@@ -145,7 +143,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
     private void setDefaultPicIfNoneSelected() {
         if (profileView.getDrawable().equals(initialDrawable)) {
-            profilePicUri = ProfileUtils.DEFAULT_PROFILE_PATH;
+            profilePicUri = ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
             profile.setProfilePicture(profilePicUri);
         }
     }
@@ -166,7 +164,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
             try {
                 profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), profilePicture);
             } catch (IOException e) {
-                profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PATH);
+                profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PIC_PATH);
             }
         }
     }

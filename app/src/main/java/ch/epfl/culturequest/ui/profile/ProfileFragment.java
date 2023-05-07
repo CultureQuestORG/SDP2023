@@ -1,7 +1,7 @@
 package ch.epfl.culturequest.ui.profile;
 
 
-import static ch.epfl.culturequest.utils.ProfileUtils.postsAdded;
+import static ch.epfl.culturequest.utils.ProfileUtils.POSTS_ADDED;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -96,7 +96,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        int limit = postsAdded;
+        int limit = POSTS_ADDED;
         List<Post> images = this.images.getValue();
         if (limit > 0) {
             Profile.getActiveProfile().retrievePosts(limit, 0)
@@ -106,7 +106,7 @@ public class ProfileFragment extends Fragment {
                         images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
                         pictureAdapter.notifyItemRangeInserted(0, limit);
                     });
-            postsAdded = 0;
+            POSTS_ADDED = 0;
         }
     }
 
