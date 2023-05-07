@@ -34,7 +34,7 @@ public interface NotificationInterface {
             channels.add(ScanNotification.getNotificationChannel());
             channels.add(LikeNotification.getNotificationChannel());
             channels.add(CompetitionNotification.getNotificationChannel());
-            channels.add(SightSeeingNotification.getNotificationChannel());
+            channels.add(SightseeingNotification.getNotificationChannel());
 
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this

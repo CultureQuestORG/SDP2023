@@ -19,7 +19,7 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
-public class SightSeeingNotificationTest {
+public class SightseeingNotificationTest {
     private final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     private final Profile profile = new Profile("test", "test", "SightSeer", "test", "test", "test", 0, new HashMap<>());
 
@@ -31,11 +31,11 @@ public class SightSeeingNotificationTest {
 
     @Test
     public void testSightSeeingNotification() {
-        Notification sightSeeingNotification = new SightSeeingNotification("John").get(context);
-        assertThat(sightSeeingNotification.extras.get(Notification.EXTRA_TITLE).toString(), is(profile.getUsername() + ", you have a new sightseeing event!"));
-        assertThat(sightSeeingNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("John invited you to a new sightseeing event!"));
-        assertThat(sightSeeingNotification.priority, is(Notification.PRIORITY_DEFAULT));
-        assertThat(sightSeeingNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
-        assertThat(sightSeeingNotification.getChannelId(), is(SightSeeingNotification.CHANNEL_ID));
+        Notification sightseeingNotification = new SightseeingNotification("John").get(context);
+        assertThat(sightseeingNotification.extras.get(Notification.EXTRA_TITLE).toString(), is(profile.getUsername() + ", you have a new sightseeing event!"));
+        assertThat(sightseeingNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("John invited you to a new sightseeing event!"));
+        assertThat(sightseeingNotification.priority, is(Notification.PRIORITY_DEFAULT));
+        assertThat(sightseeingNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
+        assertThat(sightseeingNotification.getChannelId(), is(SightseeingNotification.CHANNEL_ID));
     }
 }

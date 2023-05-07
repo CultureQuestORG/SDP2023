@@ -10,16 +10,16 @@ import androidx.core.app.NotificationCompat;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
 
-public class SightSeeingNotification implements NotificationInterface {
+public class SightseeingNotification implements NotificationInterface {
     private final String friend;
     public static final String CHANNEL_ID = "SIGHTSEEING";
 
     /**
-     * Constructor for the SightSeeingNotification
+     * Constructor for the SightseeingNotification
      *
      * @param friend the friend that invites to a new sightseeing
      */
-    public SightSeeingNotification(String friend) {
+    public SightseeingNotification(String friend) {
         this.friend = friend;
     }
 
@@ -39,8 +39,8 @@ public class SightSeeingNotification implements NotificationInterface {
      */
     public static NotificationChannel getNotificationChannel() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            CharSequence name = "SightSeeingNotification";
-            String description = "SightSeeingNotification";
+            CharSequence name = "SightseeingNotification";
+            String description = "SightseeingNotification";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);

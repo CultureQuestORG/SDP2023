@@ -30,7 +30,7 @@ import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class ArtDescriptionDisplayActivityOpenAiWarningTest {
 
-    private Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    private final Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     private String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100|true";
 
