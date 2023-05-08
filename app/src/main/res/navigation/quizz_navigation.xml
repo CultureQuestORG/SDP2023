@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/quizz_navigation">
+
+    <fragment
+        android:id="@+id/quizzFragment"
+        android:name="ch.epfl.culturequest.ui.quiz.QuizWelcomeFragment"
+        android:label="QuizzFragment"
+        tools:layout="@layout/fragment_quiz_welcome" />
+
+    <fragment
+        android:id="@+id/quizzInterFragment"
+        android:name="ch.epfl.culturequest.ui.quiz.QuizInterFragment"
+        android:label="QuizzInterFragment"
+        tools:layout="@layout/fragment_quiz_inter" />
+
+    <fragment
+        android:id="@+id/quizzQuestionFragment"
+        android:name="ch.epfl.culturequest.ui.quiz.QuizQuestionFragment"
+        android:label="QuizzQuestionFragment"
+        tools:layout="@layout/fragment_quiz_question" />
+
+</navigation>
