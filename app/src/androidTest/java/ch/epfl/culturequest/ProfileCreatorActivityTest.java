@@ -12,7 +12,7 @@ import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentat
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
 import android.Manifest;
@@ -127,8 +127,7 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(8000);
         assertEquals("JohnDoe", profile.getUsername());
-        // assert  that the URL contains https://firebasestorage.googleapis.com and contains
-        assertEquals(DEFAULT_PROFILE_PATH, activity.getProfilePicUri());
+        assertEquals(DEFAULT_PROFILE_PIC_PATH, activity.getProfilePicUri());
     }
 
 

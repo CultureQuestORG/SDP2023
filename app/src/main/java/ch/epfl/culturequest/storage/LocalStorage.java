@@ -1,9 +1,11 @@
 package ch.epfl.culturequest.storage;
 
 import static android.graphics.Bitmap.CompressFormat.JPEG;
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -13,8 +15,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class LocalStorage {
-    public final ContentResolver resolver;
-    public final Uri contentUri;
+    private final ContentResolver resolver;
+    private final Uri contentUri;
 
     public Uri lastlyStoredImageUri;
 
@@ -84,6 +86,33 @@ public class LocalStorage {
                 throw new IOException("Failed to save image.");
             }
         }
+    }
+
+    /**
+     * Counts the number of selected images in the shared storage.
+     *
+     * @param selection     the selection clause
+     * @param selectionArgs the selection arguments
+     * @return the number of selected images in the shared storage
+     **/
+    public int countSelectedImagesInLocalStorage(String selection, String[] selectionArgs) {
+        // Counts the number of ready images (not pending) in the shared storage
+        try (Cursor cursor = getApplicationContext().getContentResolver().query(
+                contentUri,
+                null,
+                selection,
+                selectionArgs,
+                null)) {
+            return cursor.getCount();
+        }
+    }
+
+    /**
+     * Deletes all the images in the shared storage.
+     **/
+    public void clearLocalStorage() {
+        ContentResolver contentResolver = getApplicationContext().getContentResolver();
+        contentResolver.delete(contentUri, null, null);
     }
 
 }

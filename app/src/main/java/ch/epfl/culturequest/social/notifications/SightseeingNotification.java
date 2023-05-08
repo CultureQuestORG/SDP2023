@@ -4,36 +4,31 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
 
-/**
- * Class that represents a notification for a new like
- */
-public class LikeNotification implements NotificationInterface {
-    private final String liker;
-
-    public static final String CHANNEL_ID = "LIKE";
+public class SightseeingNotification implements NotificationInterface {
+    private final String friend;
+    public static final String CHANNEL_ID = "SIGHTSEEING";
 
     /**
-     * Constructor for the LikeNotification
+     * Constructor for the SightseeingNotification
      *
-     * @param liker the username of the liker
+     * @param friend the friend that invites to a new sightseeing
      */
-    public LikeNotification(String liker) {
-        this.liker = liker;
+    public SightseeingNotification(String friend) {
+        this.friend = friend;
     }
 
     @Override
     public Notification get(Context context) {
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new like!")
-                .setContentText(liker + " liked your post!")
+                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new sightseeing event!")
+                .setContentText(friend + " invited you to a new sightseeing event!")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
     }
 
@@ -43,9 +38,9 @@ public class LikeNotification implements NotificationInterface {
      * @return the notification channel
      */
     public static NotificationChannel getNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "LikeNotification";
-            String description = "LikeNotification";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            CharSequence name = "SightseeingNotification";
+            String description = "SightseeingNotification";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
