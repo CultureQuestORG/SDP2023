@@ -48,7 +48,7 @@ public class BasicOTMProvider implements OTMProvider {
 
     @Override
     public CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight){
-        OTMFetchInterface service = getOTMFetchServic(new Gson());
+        OTMFetchInterface service = getOTMFetchService(new Gson());
         CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
         service.fetchOTMPlaces(BuildConfig.OTM_API_KEY, upperLeft.longitude, lowerRight.longitude, lowerRight.latitude, upperLeft.latitude).enqueue(callback(future));
         return future;
@@ -60,13 +60,13 @@ public class BasicOTMProvider implements OTMProvider {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(new TypeToken<List<OTMLocation>>(){}.getType(), new OTMLocationDeserializer())
                 .create();
-        OTMFetchInterface service = getOTMFetchServic(gson);
+        OTMFetchInterface service = getOTMFetchService(gson);
         CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
         service.fetchPlacesInCity(latLon[1], latLon[0], BuildConfig.OTM_API_KEY).enqueue(callback(future));
         return future;
     }
 
-    private OTMFetchInterface getOTMFetchServic(Gson gson){
+    private OTMFetchInterface getOTMFetchService(Gson gson){
         Retrofit req = new Retrofit.Builder()
                 .baseUrl(base_url)
                 .addConverterFactory(GsonConverterFactory.create(gson))

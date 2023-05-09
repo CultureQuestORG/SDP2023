@@ -34,7 +34,7 @@ public interface OTMFetchInterface {
      * @param key API key
      * @return a
      */
-    @GET("places/radius?radius=20000&kinds=museums,historic_architecture,monuments,towers,tourist_object&limit=40&rate=3.9")
+    @GET("places/radius?radius=10000&rate=3h&kinds=museums,historic_architecture,monuments,towers,tourist_object&limit=200")
     Call<List<OTMLocation>> fetchPlacesInCity(@Query("lon") double lon, @Query("lat") double lat, @Query("apikey") String key);
 
 }

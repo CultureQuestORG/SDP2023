@@ -10,16 +10,13 @@
     <TextView
         android:id="@+id/city_text"
         android:layout_width="wrap_content"
-        android:layout_height="27dp"
-        android:layout_marginStart="205dp"
-        android:layout_marginTop="42dp"
-        android:layout_marginEnd="206dp"
-        android:layout_marginBottom="845dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
         android:fontFamily="@font/poppins_extrabold"
         android:text="What to do"
         android:textColor="@color/colorPrimary"
         android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/places_to_see"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,11 +33,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/city_text" />
 
+
     <Button
         android:id="@+id/invite_friends"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="228dp"
+        android:layout_marginStart="244dp"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="16dp"
         android:width="150dp"
@@ -50,6 +48,7 @@
         android:fontFamily="@font/poppins"
         android:text="Invite Friends"
         android:textAllCaps="false"
+        android:background="@drawable/rounded_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toLeftOf="@id/preview"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,15 +60,18 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible" />
-
+        android:visibility="invisible"
+        tools:layout_editor_absoluteX="48dp"
+        tools:layout_editor_absoluteY="158dp" />
 
     <Button
         android:id="@+id/preview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins"
         android:layout_marginStart="16dp"
         android:layout_marginTop="30dp"
+        android:background="@drawable/rounded_button"
         android:layout_marginRight="60dp"
         android:width="150dp"
         android:height="25dp"
@@ -86,17 +88,15 @@
     <ImageView
         android:id="@+id/back_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
-        android:layout_marginTop="29dp"
-        android:layout_marginEnd="344dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/places_to_see"
+        android:layout_height="0dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="40dp"
+        app:layout_constraintBottom_toTopOf="@id/places_to_see"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.973"
-        app:layout_constraintStart_toEndOf="@+id/map_fragment"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintEnd_toStartOf="@id/city_text"
+        app:layout_constraintHorizontal_bias="0.005"
+        app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/back_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

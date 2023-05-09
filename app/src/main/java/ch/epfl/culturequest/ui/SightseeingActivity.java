@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.ui;
 
+import static androidx.test.InstrumentationRegistry.getContext;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +26,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -47,12 +50,15 @@ public class SightseeingActivity extends AppCompatActivity {
     private Button inviteFriends, preview;
     private View mapFragment;
 
+    private ListView listView;
+    private SightSeeingArrayAdapter adapter;
+
     @SuppressLint({"SetTextI18n", "ResourceAsColor"})
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sightseeing_activity);
-        ListView listView = findViewById(R.id.places_to_see);
+        listView = findViewById(R.id.places_to_see);
         String city = getIntent().getStringExtra("city");
         ((TextView) findViewById(R.id.city_text)).setText("What to do in " + city.split(",")[0] + "?");
         inviteFriends = findViewById(R.id.invite_friends);
@@ -64,12 +70,12 @@ public class SightseeingActivity extends AppCompatActivity {
                 OTMLocation::getName,
                 location -> location,
                 (existing, replacement) -> existing));
-        SightSeeingArrayAdapter adapter =
-                new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<>(placeToLocation.keySet()), List.of(preview, inviteFriends));
+        adapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<>(placeToLocation.keySet()), List.of(preview, inviteFriends));
         listView.setAdapter(adapter);
         List<String> selected = adapter.getSelectedPlaces();
 
         preview.setOnClickListener(l -> {
+            inviteFriends.setVisibility(View.INVISIBLE);
             openMap(placeToLocation, selected);
         });
 
@@ -89,18 +95,26 @@ public class SightseeingActivity extends AppCompatActivity {
      * if the map fragment is open, we hide it instead of going back (which means going back to searching for cities)
      * other wise if a user wants to go back, their free to do so
      */
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBackPressed() {
         if (mapFragment.getVisibility() == View.VISIBLE) {
+            inviteFriends.setVisibility(View.VISIBLE);
             mapFragment.setVisibility(View.INVISIBLE);
-        } else super.onBackPressed();
+        } else if (inviteFriends.getText().equals("Send Invite")) {
+            listView.setAdapter(adapter);
+            inviteFriends.setText("Invite Friends");
+        } else {
+            super.onBackPressed();
+        }
     }
 
     /**
      * This function will open a google map fragment, displaying all the selected places a user
      * chose to visit
+     *
      * @param placeToLocation map of places' names and their respective OTMLocation
-     * @param selected the list of selected place's name
+     * @param selected        the list of selected place's name
      */
     public void openMap(Map<String, OTMLocation> placeToLocation, List<String> selected) {
         Map<String, OTMLocation> selectedPlaces = placeToLocation.entrySet()
@@ -113,6 +127,7 @@ public class SightseeingActivity extends AppCompatActivity {
         });
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(googleMap -> {
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.maps_style_json));
             backButton.setOnClickListener(l2 -> {
                 onBackPressed();
                 googleMap.clear();

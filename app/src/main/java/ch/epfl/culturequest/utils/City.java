@@ -36,7 +36,7 @@ public class City {
      */
     public static void load(Context context) {
         String jsonString = null;
-        InputStream inputStream = context.getResources().openRawResource(R.raw.output3);
+        InputStream inputStream = context.getResources().openRawResource(R.raw.european_cities);
         try {
             byte[] buffer = new byte[inputStream.available()];
             inputStream.read(buffer);
