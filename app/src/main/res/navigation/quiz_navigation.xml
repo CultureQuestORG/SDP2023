@@ -2,24 +2,26 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/quizz_navigation">
+    android:id="@+id/quiz_navigation"
+    app:startDestination="@id/quizInterFragment">
+
 
     <fragment
-        android:id="@+id/quizzFragment"
+        android:id="@+id/quizFragment"
         android:name="ch.epfl.culturequest.ui.quiz.QuizWelcomeFragment"
-        android:label="QuizzFragment"
+        android:label="QuizFragment"
         tools:layout="@layout/fragment_quiz_welcome" />
 
     <fragment
-        android:id="@+id/quizzInterFragment"
+        android:id="@+id/quizInterFragment"
         android:name="ch.epfl.culturequest.ui.quiz.QuizInterFragment"
-        android:label="QuizzInterFragment"
+        android:label="QuizInterFragment"
         tools:layout="@layout/fragment_quiz_inter" />
 
     <fragment
-        android:id="@+id/quizzQuestionFragment"
+        android:id="@+id/quizQuestionFragment"
         android:name="ch.epfl.culturequest.ui.quiz.QuizQuestionFragment"
-        android:label="QuizzQuestionFragment"
+        android:label="QuizQuestionFragment"
         tools:layout="@layout/fragment_quiz_question" />
 
 </navigation>

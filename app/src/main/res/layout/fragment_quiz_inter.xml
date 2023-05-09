@@ -97,10 +97,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginStart="0dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="0dp"
         android:layout_marginBottom="-1dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/fortuneWheel" />
+        android:src="@drawable/fortune_wheel" />
 
     <ImageView
         android:id="@+id/wheelBlockerImageView"
@@ -110,14 +109,15 @@
         android:layout_alignEnd="@id/fortuneWheelImageView"
         android:layout_alignBottom="@id/fortuneWheelImageView"
         android:layout_marginTop="0dp"
-        android:layout_marginEnd="-10dp"
+
+        android:layout_marginEnd="3dp"
         android:layout_marginBottom="0dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/wheelBlocker" />
+        android:src="@drawable/wheel_blocker" />
 
     <Button
         android:id="@+id/spinButton"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/fortuneWheelImageView"
@@ -125,6 +125,18 @@
         android:layout_marginTop="20dp"
         android:textSize="30sp"
         android:text="@string/spin" />
+
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/fortuneWheelImageView"
+        android:background="@drawable/button_rounded_corner"
+        android:layout_marginTop="20dp"
+        android:textSize="30sp"
+        android:text="@string/next"
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/stopButton"
@@ -134,7 +146,7 @@
         android:layout_below="@id/spinButton"
         android:layout_marginTop="30dp"
         android:textSize="15sp"
-        android:text="@string/stop" />
+        android:text="@string/quit" />
 
 
 

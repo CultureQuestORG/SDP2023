@@ -45,4 +45,7 @@
     <string name="your_score_is">Your score is :</string>
     <string name="could_be">Could be :</string>
     <string name="unknown">\?</string>
+    <string name="quit">QUIT</string>
+    <string name="next">NEXT</string>
+    <string name="disclaimer">Between each question, you can either cash out or all in for the next one</string>
 </resources>
