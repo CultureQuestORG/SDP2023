@@ -150,7 +150,6 @@ public class SearchUserActivity extends AppCompatActivity {
     public void findStuffToDoIn(String city) {
         ArrayList<String> serializedLocations = new ArrayList<>();
         new BasicOTMProvider().getLocations(city).whenComplete((locations, t) -> {
-            Log.d("LOCATION", locations.toString());
             if (t != null) t.printStackTrace();
             // we need to serialize the locations to pass them through the intent for when we open the next activity.
             serializedLocations.addAll(locations.stream().map(OTMLocationSerializer::serialize).collect(Collectors.toList()));
@@ -203,11 +202,11 @@ public class SearchUserActivity extends AppCompatActivity {
     @SuppressLint("ResourceAsColor")
     private void swapColors() {
         if (Boolean.TRUE.equals(searchingForUsers.getValue())){
-            searchUsers.setBackgroundColor(Color.parseColor("#F27329"));
-            searchCities.setBackgroundColor(Color.TRANSPARENT);
+            searchUsers.setBackgroundResource(R.drawable.rounded_button);
+            searchCities.setBackgroundResource(R.drawable.rounded_button_transparent);
         } else {
-            searchCities.setBackgroundColor(Color.parseColor("#F27329"));
-            searchUsers.setBackgroundColor(Color.TRANSPARENT);
+            searchCities.setBackgroundResource(R.drawable.rounded_button);
+            searchUsers.setBackgroundResource(R.drawable.rounded_button_transparent);
         }
     }
 
