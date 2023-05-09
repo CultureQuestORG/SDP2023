@@ -113,7 +113,9 @@ public class SearchUserActivityTest {
     @Test
     public void searchingForUsersWhenClickingOnCitiesAndOnUsersAgain() throws InterruptedException {
         onView(withId(R.id.search_cities)).perform(click());
-        onView(withId(R.id.search_users)).perform(click(), typeText("allen"));
+        onView(withId(R.id.search_users)).perform(click());
+        onView(withId(R.id.search)).perform(typeText("allen"));
+
         Thread.sleep(1000);
         onData(hasToString(containsString("allen")))
                 .inAdapterView(withId(R.id.list_view))

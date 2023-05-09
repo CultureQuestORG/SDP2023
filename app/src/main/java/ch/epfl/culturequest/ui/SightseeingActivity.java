@@ -80,11 +80,9 @@ public class SightseeingActivity extends AppCompatActivity {
         });
 
         inviteFriends.setOnClickListener(l -> {
-            if (mapFragment.getVisibility() == View.VISIBLE) {
-                mapFragment.setVisibility(View.INVISIBLE);
-            }
             Profile.getActiveProfile().retrieveFriends().whenComplete((friends, t) -> {
                 inviteFriends.setText("Send Invite");
+
                 SightSeeingArrayAdapter arrayAdapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, friends, List.of(inviteFriends));
                 listView.setAdapter(arrayAdapter);
             });
