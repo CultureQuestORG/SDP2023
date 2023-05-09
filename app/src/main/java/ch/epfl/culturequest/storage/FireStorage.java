@@ -93,12 +93,12 @@ public class FireStorage {
                         profile.setProfilePicture(taskSnapshot1.getResult().toString());
                         future.complete(profile);
                     } else {
-                        profile.setProfilePicture(ProfileUtils.DEFAULT_PROFILE_PATH);
+                        profile.setProfilePicture(ProfileUtils.DEFAULT_PROFILE_PIC_PATH);
                         future.complete(profile);
                     }
                 });
             } else {
-                profile.setProfilePicture(ProfileUtils.DEFAULT_PROFILE_PATH);
+                profile.setProfilePicture(ProfileUtils.DEFAULT_PROFILE_PIC_PATH);
                 future.complete(profile);
             }
         });

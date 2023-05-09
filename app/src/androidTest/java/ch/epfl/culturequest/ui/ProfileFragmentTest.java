@@ -11,7 +11,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
-import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -64,13 +64,13 @@ public class ProfileFragmentTest {
         // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
 
-        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PATH
+        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PIC_PATH
                 , "Piece of Art", 0, 0, new ArrayList<>());
         Database.uploadPost(post);
 
-        ProfileUtils.postsAdded = 0;
+        ProfileUtils.POSTS_ADDED = 0;
 
-        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PATH, 35,new HashMap<>());
+        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PIC_PATH, 35,new HashMap<>());
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 

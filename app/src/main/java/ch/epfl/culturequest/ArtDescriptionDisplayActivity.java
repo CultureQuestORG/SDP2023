@@ -1,7 +1,7 @@
 package ch.epfl.culturequest;
 
 import static ch.epfl.culturequest.social.RarityLevel.getRarityLevel;
-import static ch.epfl.culturequest.utils.ProfileUtils.postsAdded;
+import static ch.epfl.culturequest.utils.ProfileUtils.POSTS_ADDED;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -40,7 +40,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     private Bitmap scannedImage;
 
-    private static final int POPUP_DELAY = 3000;
+    private static final int POPUP_DELAY = 5000;
 
     private Button postButton;
 
@@ -244,7 +244,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         String uid = activeProfile.getUid();
         Database.uploadPost(new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>())).whenComplete((lambda, e) -> {
             if (e == null) {
-                postsAdded++;
+                POSTS_ADDED++;
                 activeProfile.incrementScore(artwork.getScore());
                 activeProfile.addBadges(badges);
                 finish();

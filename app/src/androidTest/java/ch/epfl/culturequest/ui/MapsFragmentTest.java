@@ -5,7 +5,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
-import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -20,7 +20,6 @@ import org.junit.runner.RunWith;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
-import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.map.MapsFragment;
@@ -30,7 +29,7 @@ public class MapsFragmentTest {
     @Before
     public void setUp() throws InterruptedException {
 
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PATH, 35, new HashMap<>());
+        Profile profile = new Profile("test", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PIC_PATH, 35, new HashMap<>());
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 

@@ -53,7 +53,7 @@ import ch.epfl.culturequest.utils.PermissionRequest;
 public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
-    public LocalStorage localStorage;
+    private LocalStorage localStorage;
     public static CameraSetup cameraSetup;
     public static ProcessingApi processingApi = new ProcessingApi();
     private LoadingAnimation loadingAnimation;
