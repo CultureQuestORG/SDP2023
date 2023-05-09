@@ -25,7 +25,7 @@
         android:layout_below="@id/progressBar"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="Quizz 1"
+        android:text="@string/quizz_1"
         android:textColor="@color/colorPrimary"
         android:textSize="36sp"
         android:textStyle="bold" />
@@ -37,7 +37,7 @@
         android:layout_below="@id/titleTextView"
         android:layout_marginTop="6dp"
         android:gravity="center"
-        android:text="Name of the painting"
+        android:text="@string/name_of_the_painting"
         android:textColor="#000000"
         android:textSize="24sp"
         android:textStyle="bold" />
