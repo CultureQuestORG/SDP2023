@@ -1,6 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="@string/quizz_1"
+        android:textColor="@color/colorPrimary"
+        android:textSize="36sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/blackTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titleTextView"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:text="@string/name_of_the_painting"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/scoreText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/score"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="20dp"
+        android:textSize="20sp"
+
+        android:text="@string/your_score_is"
+
+        />
+
+    <TextView
+        android:id="@+id/score"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/blackTextView"
+
+        android:background="@drawable/score_quizz_background"
+        android:padding="4dp"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:gravity="center"
+
+        android:textSize="20sp"
+        android:layout_marginTop="20dp"
+
+        />
+
+    <TextView
+        android:id="@+id/newScoreText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/could_be"
+        android:textSize="20sp"
+
+        android:layout_marginStart="20dp"
+        android:layout_alignTop="@id/newscore"
+
+        />
+
+    <TextView
+        android:id="@+id/newscore"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/score"
+        android:text="@string/unknown"
+        android:padding="4dp"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:background="@drawable/score_quizz_background"
+        android:textSize="20sp"
+        android:layout_marginTop="20dp"
+
+
+        />
+
+
+    <ImageView
+        android:id="@+id/fortuneWheelImageView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_below="@id/newscore"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="-1dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/fortuneWheel" />
+
+    <ImageView
+        android:id="@+id/wheelBlockerImageView"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignTop="@id/fortuneWheelImageView"
+        android:layout_alignEnd="@id/fortuneWheelImageView"
+        android:layout_alignBottom="@id/fortuneWheelImageView"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="-10dp"
+        android:layout_marginBottom="0dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/wheelBlocker" />
+
+    <Button
+        android:id="@+id/spinButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/fortuneWheelImageView"
+        android:background="@drawable/button_rounded_corner"
+        android:layout_marginTop="20dp"
+        android:textSize="30sp"
+        android:text="@string/spin" />
+
+    <TextView
+        android:id="@+id/stopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/spinButton"
+        android:layout_marginTop="30dp"
+        android:textSize="15sp"
+        android:text="@string/stop" />
+
+
+
+    <!-- Additional Views and Widgets can be added here -->
+
+</RelativeLayout>

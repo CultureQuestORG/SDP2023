@@ -37,4 +37,12 @@
     <string name="image_name">Image Name</string>
     <string name="Post">Post</string>
     <string name="cancel">Cancel</string>
+    <string name="spin">SPIN</string>
+    <string name="stop">STOP</string>
+    <string name="name_of_the_painting">Name of the painting</string>
+    <string name="quizz_1">Quizz 1</string>
+    <string name="start">Start</string>
+    <string name="your_score_is">Your score is :</string>
+    <string name="could_be">Could be :</string>
+    <string name="unknown">\?</string>
 </resources>
