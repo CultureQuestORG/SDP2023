@@ -41,42 +41,45 @@
         android:visibility="invisible"
         tools:layout_editor_absoluteX="48dp"
         tools:layout_editor_absoluteY="158dp" />
+
+
     <Button
         android:id="@+id/invite_friends"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="244dp"
         android:layout_marginTop="3dp"
+        android:layout_marginEnd="50dp"
         android:layout_marginBottom="16dp"
         android:width="150dp"
         android:height="25dp"
         android:alpha="0.5"
+        android:background="@drawable/rounded_button"
         android:clickable="false"
         android:fontFamily="@font/poppins"
         android:text="Invite Friends"
         android:textAllCaps="false"
-        android:background="@drawable/rounded_button"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.862"
         app:layout_constraintRight_toLeftOf="@id/preview"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/places_to_see"
-        app:layout_constraintVertical_bias="0.818" />
+        app:layout_constraintVertical_bias="1.0" />
+
     <Button
         android:id="@+id/preview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="30dp"
-        android:background="@drawable/rounded_button"
         android:layout_marginRight="60dp"
         android:layout_marginBottom="10dp"
         android:width="150dp"
         android:height="25dp"
-        android:clickable="false"
         android:alpha="0.5"
+        android:background="@drawable/rounded_button"
+        android:clickable="false"
+        android:fontFamily="@font/poppins"
         android:text="Preview"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -84,7 +87,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/places_to_see"
         app:layout_constraintVertical_bias="0.0" />
-
 
     <ImageView
         android:id="@+id/back_button"
