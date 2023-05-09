@@ -38,6 +38,7 @@ import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.AutoComplete;
+import ch.epfl.culturequest.utils.City;
 
 /**
  * This class represents the activity that is opened from the home fragment when we
@@ -79,6 +80,7 @@ public class SearchUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        City.load(this);
         binding = SearchActivityBinding.inflate(getLayoutInflater());
         AndroidUtils.removeStatusBar(getWindow());
         setContentView(binding.getRoot());
@@ -95,7 +97,7 @@ public class SearchUserActivity extends AppCompatActivity {
      *
      * @param query username to look for.
      */
-    public void searchUserDynamically(String query) {
+    private void searchUserDynamically(String query) {
         ListView listView = findViewById(R.id.list_view);
         listView.setForegroundGravity(Gravity.TOP);
         if (!query.isEmpty()) {
@@ -124,7 +126,7 @@ public class SearchUserActivity extends AppCompatActivity {
      * Parses all the cities that are in res/raw/cities.json and returns the top matching cities
      * @param query the city the user is searching for
      */
-    public void searchForCityDynamically(String query) {
+    private void searchForCityDynamically(String query) {
         ListView listView = findViewById(R.id.list_view);
         listView.setForegroundGravity(Gravity.TOP);
         if (!query.isEmpty()) {
@@ -147,7 +149,7 @@ public class SearchUserActivity extends AppCompatActivity {
      * So we look for things to do based on those.
      * @param city the city to find stuff to do in.
      */
-    public void findStuffToDoIn(String city) {
+    private void findStuffToDoIn(String city) {
         ArrayList<String> serializedLocations = new ArrayList<>();
         new BasicOTMProvider().getLocations(city).whenComplete((locations, t) -> {
             if (t != null) t.printStackTrace();

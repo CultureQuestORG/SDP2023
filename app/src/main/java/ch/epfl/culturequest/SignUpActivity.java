@@ -21,8 +21,6 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        City.load(this);
-
         // If the user is not logged in, display the sign in activity
         AndroidUtils.removeStatusBar(getWindow());
         if (Authenticator.getCurrentUser() == null) {
