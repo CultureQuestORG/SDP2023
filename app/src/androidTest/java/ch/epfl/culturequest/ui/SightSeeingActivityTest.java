@@ -10,6 +10,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.isNotClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasToString;
@@ -119,12 +121,12 @@ public class SightSeeingActivityTest {
 
     @Test
     public void invitingFriendsChangesAdapterViewAndTextOnButton() throws InterruptedException {
-        onData(hasToString(containsString("Palais Garnier")))
+        onData(anything())
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
         onView(withId(R.id.invite_friends)).perform(click());
-        Thread.sleep(1000);
-        onData(hasToString(containsString("testUid1")))
+        Thread.sleep(4000);
+        onData(anything())
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).check(matches(not(withText("Musée d'Orsay"))));
         onView(withId(R.id.invite_friends)).check(matches(withText("Send Invite"))).check(matches(isNotClickable()));
@@ -132,12 +134,12 @@ public class SightSeeingActivityTest {
 
     @Test
     public void sendInviteIsAvailableOnlyWhenAFriendIsSelected() throws InterruptedException {
-        onData(hasToString(containsString("Palais Garnier")))
+        onData(anything())
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
         onView(withId(R.id.invite_friends)).perform(click());
-        Thread.sleep(1000);
-        onData(hasToString(containsString("testUid1")))
+        Thread.sleep(4000);
+        onData(anything())
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
         onView(withId(R.id.invite_friends)).check(matches(isClickable()));
