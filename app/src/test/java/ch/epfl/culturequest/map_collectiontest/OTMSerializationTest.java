@@ -19,6 +19,7 @@ import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMLocationDeserializer;
 import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
+import ch.epfl.culturequest.utils.City;
 
 public class OTMSerializationTest {
 
@@ -81,6 +82,8 @@ public class OTMSerializationTest {
 
     @Test
     public void locationsSerializedCorrectly(){
+        OTMLocationSerializer serializer = new OTMLocationSerializer();
+        City c = new City();
         OTMLocation location = new OTMLocation("test", new OTMLatLng(-1,1), "art,architecture");
         String serialized = OTMLocationSerializer.serialize(location);
         assertThat(serialized, is("test|-1.0|1.0|[art, architecture]"));

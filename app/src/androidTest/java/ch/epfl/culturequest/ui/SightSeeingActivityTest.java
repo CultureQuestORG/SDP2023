@@ -109,15 +109,6 @@ public class SightSeeingActivityTest {
     }
 
     @Test
-    public void invitingFriendsChangesAdapterViewAndTextOnButton() throws InterruptedException {
-        onData(anything())
-                .inAdapterView(withId(R.id.places_to_see))
-                .atPosition(0).perform(click());
-        Thread.sleep(1000);
-        onView(withId(R.id.invite_friends)).perform(click());
-    }
-
-    @Test
     public void sendInviteIsAvailableOnlyWhenAFriendIsSelected() throws InterruptedException {
         onData(anything())
                 .inAdapterView(withId(R.id.places_to_see))
@@ -158,6 +149,15 @@ public class SightSeeingActivityTest {
                 .atPosition(0).perform(click());
         onView(withId(R.id.invite_friends)).perform(click());
         onView(withId(R.id.back_button)).perform(click());
+    }
+
+    @Test
+    public void invitingFriendsChangesAdapterViewAndTextOnButton() throws InterruptedException {
+        onData(anything())
+                .inAdapterView(withId(R.id.places_to_see))
+                .atPosition(0).perform(click());
+        Thread.sleep(1000);
+        onView(withId(R.id.invite_friends)).perform(click());
     }
 
     @After

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -87,6 +88,11 @@ public class RetryingOTMProviderTest {
         assertThat(locations.get(0).getCoordinates().longitude(), is(20.23));
         assertThat(locations.get(0).getCoordinates().latitude(), is(47.39));
         assertThat(locations.get(0).getKinds(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
+    }
+
+    @Test
+    public void assertGettingCityLocationsIsNull(){
+        assertNull(provider.getLocations("city"));
     }
 
     @After
