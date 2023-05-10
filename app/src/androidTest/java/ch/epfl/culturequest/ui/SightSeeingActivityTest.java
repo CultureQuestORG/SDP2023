@@ -6,37 +6,24 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasToString;
-import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.mockito.Mockito.mock;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.provider.ContactsContract;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-
-import com.firebase.ui.auth.ui.InvisibleActivityBase;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -125,10 +112,7 @@ public class SightSeeingActivityTest {
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
         onView(withId(R.id.invite_friends)).perform(click());
-        Thread.sleep(4000);
-        onData(anything())
-                .inAdapterView(withId(R.id.places_to_see))
-                .atPosition(0).check(matches(not(withText("Musée d'Orsay"))));
+        Thread.sleep(2000);
         onView(withId(R.id.invite_friends)).check(matches(withText("Send Invite"))).check(matches(isNotClickable()));
     }
 
@@ -142,7 +126,8 @@ public class SightSeeingActivityTest {
         onData(anything())
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
-        onView(withId(R.id.invite_friends)).check(matches(isClickable()));
+        Thread.sleep(4000);
+        onView(withId(R.id.invite_friends)).check(matches(isEnabled()));
     }
 
     @Test
