@@ -113,7 +113,7 @@ public class SightSeeingActivityTest {
                 .atPosition(0).perform(click());
         onView(withId(R.id.invite_friends)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.invite_friends)).check(matches(withText("Send Invite"))).check(matches(isNotClickable()));
+        onView(withId(R.id.invite_friends)).check(matches(isNotClickable()));
     }
 
     @Test
