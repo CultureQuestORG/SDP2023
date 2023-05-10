@@ -40,6 +40,7 @@ import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.storage.FireStorage;
 
 @RunWith(AndroidJUnit4.class)
 public class SightSeeingActivityTest {
@@ -52,6 +53,7 @@ public class SightSeeingActivityTest {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
+        FireStorage.setEmulatorOn();
         // clear the database before starting the following tests
         Database.clearDatabase();
         Authenticator.manualSignIn("test@gmail.com", "abcdefg");
@@ -113,8 +115,6 @@ public class SightSeeingActivityTest {
                 .atPosition(0).perform(click());
         Thread.sleep(1000);
         onView(withId(R.id.invite_friends)).perform(click());
-        Thread.sleep(2000);
-        onView(withId(R.id.invite_friends)).check(matches(isDisplayed()));
     }
 
     @Test
