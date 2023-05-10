@@ -119,7 +119,7 @@ public class SightSeeingActivityTest {
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
         Thread.sleep(4000);
-        onView(withId(R.id.invite_friends)).check(matches(isEnabled()));
+        onView(withId(R.id.invite_friends)).check(matches(isEnabled())).perform(click());
     }
 
     @Test
@@ -156,7 +156,7 @@ public class SightSeeingActivityTest {
         onData(anything())
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         onView(withId(R.id.invite_friends)).perform(click());
     }
 

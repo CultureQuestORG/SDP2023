@@ -27,6 +27,7 @@ import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDesc
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.SightSeeingArrayAdapter;
 
 
 /**

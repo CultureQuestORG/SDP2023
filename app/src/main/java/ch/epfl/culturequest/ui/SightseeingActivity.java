@@ -30,10 +30,12 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.R;
@@ -80,10 +82,13 @@ public class SightseeingActivity extends AppCompatActivity {
         });
 
         inviteFriends.setOnClickListener(l -> {
-            Profile.getActiveProfile().retrieveFriends().whenComplete((friends, t) -> {
+            Profile.getActiveProfile().retrieveFriends()
+                    .thenApply(friends -> friends.stream().map(Database::getProfile).collect(Collectors.toList()))
+                    .thenCompose(futures -> CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                            .thenApply(v -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList())))
+                    .whenComplete((profiles, t) -> {
                 inviteFriends.setText("Send Invite");
-
-                SightSeeingArrayAdapter arrayAdapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, friends, List.of(inviteFriends));
+                SightSeeingArrayAdapter arrayAdapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, profiles.stream().map(Profile::getUsername).collect(Collectors.toList()), List.of(inviteFriends));
                 listView.setAdapter(arrayAdapter);
             });
         });
