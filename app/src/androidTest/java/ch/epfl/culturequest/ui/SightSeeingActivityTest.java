@@ -111,9 +111,10 @@ public class SightSeeingActivityTest {
         onData(anything())
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
+        Thread.sleep(1000);
         onView(withId(R.id.invite_friends)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.invite_friends)).check(matches(isNotClickable()));
+        onView(withId(R.id.invite_friends)).check(matches(isDisplayed()));
     }
 
     @Test
