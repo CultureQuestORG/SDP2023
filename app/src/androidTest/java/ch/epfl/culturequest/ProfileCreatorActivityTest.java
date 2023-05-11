@@ -5,7 +5,11 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
@@ -18,6 +22,7 @@ import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 import android.Manifest;
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.net.Uri;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.intent.Intents;
@@ -152,6 +157,25 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+    }
+
+    @Test
+    public void profilePictureButtonSendsPickerIntent() {
+        onView(withId(R.id.profile_picture)).perform(click());
+
+        intended(hasAction(Intent.ACTION_PICK));
+    }
+
+    @Test
+    public void afterPictureChosenGoToCrop() {
+        Intent intent = new Intent();
+        intent.setData(Uri.parse("content://media/external/images/media/1"));
+        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(0, intent);
+        intending(hasAction(Intent.ACTION_PICK)).respondWith(result);
+
+        onView(withId(R.id.profile_picture)).perform(click());
+
+        intended(toPackage("com.yalantis.ucrop"));
     }
 
     @After
