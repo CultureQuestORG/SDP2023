@@ -4,6 +4,7 @@ import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,8 +24,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.squareup.picasso.Picasso;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
@@ -42,6 +46,8 @@ import ch.epfl.culturequest.utils.ProfileUtils;
  */
 public class SettingsActivity extends AppCompatActivity {
 
+    private static final int TAKE_PICTURE = 10;
+
     private ImageView profilePictureView;
     private String profilePicUri;
     private Bitmap profilePicBitmap;
@@ -49,8 +55,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     private TextView username;
 
+    private UCrop.Options options;
 
-    private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
+    private View rootView;
+
     private final ActivityResultLauncher<String> requestPermissionLauncher = this.registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
         if (isGranted) openGallery();
     });
@@ -93,6 +101,20 @@ public class SettingsActivity extends AppCompatActivity {
         // handle the update profile button
         Button updateProfileButton = binding.updateProfile;
         updateProfileButton.setOnClickListener(this::UpdateProfile);
+
+        rootView = binding.getRoot();
+
+        // Create crop options
+        options = new UCrop.Options();
+        options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
+        options.setCompressionQuality(100);
+        options.setCircleDimmedLayer(true);
+        options.setShowCropGrid(false);
+        options.setActiveControlsWidgetColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        options.setToolbarColor(ContextCompat.getColor(this, R.color.background));
+        options.setStatusBarColor(ContextCompat.getColor(this, R.color.background));
+        options.setToolbarWidgetColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        options.setToolbarTitle("Adjust your profile picture");
     }
 
 
@@ -135,7 +157,6 @@ public class SettingsActivity extends AppCompatActivity {
             );
 
         }
-        // Upload the new profile picture and update the profile
 
 
 
@@ -144,19 +165,11 @@ public class SettingsActivity extends AppCompatActivity {
      *
      * @param result the result of the activity launched to select the profile picture
      */
-    private void displayProfilePic(ActivityResult result) {
-        if (result.getResultCode() != RESULT_OK) return;
-
-        Intent data = result.getData();
-        if (data == null) return;
-
-        Uri selectedImage = data.getData();
-        if (selectedImage == null) return;
-
-        Picasso.get().load(selectedImage).into(profilePictureView);
-        profilePicUri = selectedImage.toString();
+    private void displayProfilePic(Uri result) {
+        Picasso.get().load(result).into(profilePictureView);
+        profilePicUri = result.toString();
         try {
-            profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+            profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), result);
         } catch (IOException e) {
             profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PIC_PATH);
         }
@@ -177,7 +190,35 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void openGallery() {
-        profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+        // start the gallery activity to select a picture with result code TAKE_PICTURE
+        startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI), TAKE_PICTURE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // handle the result of the crop activity
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            final Uri resultUri = UCrop.getOutput(data);
+            if (resultUri != null) {
+                displayProfilePic(resultUri);
+            }
+            // handle the result of the gallery activity
+        } else if (requestCode == TAKE_PICTURE && resultCode == RESULT_OK) {
+            Uri result = data.getData();
+            if (result != null) {
+                String destinationFileName = UUID.randomUUID().toString() + ".jpg";
+
+                // start the crop activity
+                UCrop.of(result, Uri.fromFile(new File(getCacheDir() + "/" + destinationFileName)))
+                        .withAspectRatio(1, 1)
+                        .withOptions(options)
+                        .withMaxResultSize(500, 500)
+                        .start(this);
+            }
+        } else {
+            CustomSnackbar.showCustomSnackbar("Error while choosing a picture,please retry", R.drawable.unknown_error, rootView);
+        }
     }
 
 
