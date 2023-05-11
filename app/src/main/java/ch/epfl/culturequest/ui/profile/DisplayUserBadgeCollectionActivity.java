@@ -40,7 +40,16 @@ public class DisplayUserBadgeCollectionActivity extends AppCompatActivity {
             GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
             recyclerView.setLayoutManager(gridLayoutManager);
 });
+        
 
 
+
+    }
+
+    /**
+     * Returns to the home fragment
+     */
+    public void goBack(View view) {
+        super.onBackPressed();
     }
 }

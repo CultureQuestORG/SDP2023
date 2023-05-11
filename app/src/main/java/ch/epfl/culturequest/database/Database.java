@@ -38,13 +38,13 @@ public class Database {
 
     public static void setPersistenceEnabled() {
         //!BuildConfig.IS_TESTING makes the code run only when we are not testing
-        if (!BuildConfig.IS_TESTING.get()) {
+//        if (!BuildConfig.IS_TESTING.get()) {
             databaseInstance.setPersistenceEnabled(true);
             databaseInstance.getReference("users").keepSynced(true);
             databaseInstance.getReference("posts").keepSynced(true);
             databaseInstance.getReference("follows").keepSynced(true);
             databaseInstance.getReference("artworks").keepSynced(true);
-        }
+//        }
     }
 
     public static void setEmulatorOn() {
