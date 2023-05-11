@@ -14,12 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-import android.app.Application;
 import android.app.Instrumentation;
-import android.content.Context;
 import android.content.Intent;
 
-import androidx.test.espresso.IdlingRegistry;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -30,21 +27,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
-import ch.epfl.culturequest.utils.City;
-import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 @RunWith(AndroidJUnit4.class)
-public class SearchUserActivityTest {
+public class SearchActivityTest {
     @Rule
-    public ActivityScenarioRule<SearchUserActivity> testRule = new ActivityScenarioRule<>(SearchUserActivity.class);
+    public ActivityScenarioRule<SearchActivity> testRule = new ActivityScenarioRule<>(SearchActivity.class);
 
     @Before
     public void setUp() {

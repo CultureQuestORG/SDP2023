@@ -16,12 +16,10 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class SightSeeingArrayAdapter extends ArrayAdapter<String> {
     private final ArrayList<Boolean> selectedItems;
-    private final ArrayList<String> selectedPlaces = new ArrayList<>();
+    private final ArrayList<String> selected = new ArrayList<>();
     private final List<Button> buttons;
 
     public SightSeeingArrayAdapter(Context context, int resource, List<String> items, List<Button> buttons) {
@@ -38,13 +36,13 @@ public class SightSeeingArrayAdapter extends ArrayAdapter<String> {
         if (selectedItems.get(position)) {
             textView.setTypeface(null, Typeface.BOLD);
             textView.setTextColor(Color.parseColor("#F27329"));
-            selectedPlaces.add((String) textView.getText());
+            selected.add((String) textView.getText());
             buttons.forEach(b -> b.setAlpha(1f));
             buttons.forEach(b -> b.setClickable(true));
         } else {
             textView.setTypeface(null, Typeface.NORMAL);
             textView.setTextColor(Color.parseColor("#000000"));
-            selectedPlaces.remove((String) textView.getText());
+            selected.remove((String) textView.getText());
             if (selectedItems.stream().allMatch(Boolean.FALSE::equals)) {
                 buttons.forEach(b -> b.setAlpha(0.5f));
                 buttons.forEach(b -> b.setClickable(false));
@@ -58,7 +56,7 @@ public class SightSeeingArrayAdapter extends ArrayAdapter<String> {
         return view;
     }
 
-    public List<String> getSelectedPlaces(){
-        return selectedPlaces;
+    public List<String> getSelected(){
+        return selected;
     }
 }

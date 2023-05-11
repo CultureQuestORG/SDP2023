@@ -1,6 +1,7 @@
 package ch.epfl.culturequest.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
@@ -30,6 +32,8 @@ import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.SightseeingActivityBinding;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.SightSeeingArrayAdapter;
 
 public class SightseeingActivity extends AppCompatActivity {
@@ -56,10 +60,12 @@ public class SightseeingActivity extends AppCompatActivity {
         backButton = binding.backButton;
         mapFragment = binding.mapFragment;
         backButton.setOnClickListener(l -> onBackPressed());
-        Map<String, OTMLocation> placeToLocation = getIntent().getStringArrayListExtra("locations").stream().map(OTMLocationSerializer::deserialize).collect(Collectors.toMap(OTMLocation::getName, location -> location));
+        Map<String, OTMLocation> placeToLocation = getIntent().getStringArrayListExtra("locations").stream()
+                .map(OTMLocationSerializer::deserialize)
+                .collect(Collectors.toMap(OTMLocation::getName, location -> location, (existing, newValue) -> existing));
         adapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<>(placeToLocation.keySet()), List.of(preview, inviteFriends));
         listView.setAdapter(adapter);
-        List<String> selected = adapter.getSelectedPlaces();
+        List<String> selected = adapter.getSelected();
         preview.setOnClickListener(l -> {
             inviteFriends.setVisibility(View.INVISIBLE);
             openMap(placeToLocation, selected);
@@ -85,6 +91,11 @@ public class SightseeingActivity extends AppCompatActivity {
         }
     }
 
+    public void onBackPressed(int a){
+
+        onBackPressed();
+    }
+
     private void handleFriendsLogic(){
         Profile.getActiveProfile().retrieveFriends()
                 .thenApply(friends -> friends.stream().map(Database::getProfile).collect(Collectors.toList()))
@@ -92,8 +103,13 @@ public class SightseeingActivity extends AppCompatActivity {
                         .thenApply(v -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList())))
                 .whenComplete((profiles, t) -> {
                     inviteFriends.setText("Send Invite");
-                    SightSeeingArrayAdapter arrayAdapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, profiles.stream().map(Profile::getUsername).collect(Collectors.toList()), List.of(inviteFriends));
-                    listView.setAdapter(arrayAdapter);
+                    adapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, profiles.stream().map(Profile::getUsername).collect(Collectors.toList()), List.of(inviteFriends));
+                    listView.setAdapter(adapter);
+                    inviteFriends.setOnClickListener(v -> {
+                        //TODO DEAL WITH NOTIFICATIONS
+                        List<Profile> selectedFriends = profiles;
+                        CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v);
+                    });
                 });
     }
 
@@ -107,13 +123,12 @@ public class SightseeingActivity extends AppCompatActivity {
     private void openMap(Map<String, OTMLocation> placeToLocation, List<String> selected) {
         Map<String, OTMLocation> selectedPlaces = placeToLocation.entrySet().stream().filter(entry -> selected.contains(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         mapFragment.setVisibility(View.VISIBLE);
-        backButton.setOnClickListener(l2 -> onBackPressed());
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(googleMap -> {
             googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.maps_style_json));
             backButton.setOnClickListener(l2 -> {
-                onBackPressed();
                 googleMap.clear();
+                onBackPressed();
             });
             for (OTMLocation location : selectedPlaces.values()) {
                 OTMLatLng coord = location.getCoordinates();

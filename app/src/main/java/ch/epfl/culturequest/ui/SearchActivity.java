@@ -4,11 +4,9 @@ import static ch.epfl.culturequest.utils.City.CITY_COORDINATES;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,11 +14,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
+
+import org.mockito.internal.matchers.And;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +30,7 @@ import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.map_collection.BasicOTMProvider;
+import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.SearchActivityBinding;
@@ -44,7 +44,7 @@ import ch.epfl.culturequest.utils.City;
  * This class represents the activity that is opened from the home fragment when we
  * want to search for a user.
  */
-public class SearchUserActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity {
     //the following watcher allows us to search for users dynamically without having to enter
     //the whole username to search for users
 
@@ -151,16 +151,19 @@ public class SearchUserActivity extends AppCompatActivity {
      */
     private void findStuffToDoIn(String city) {
         ArrayList<String> serializedLocations = new ArrayList<>();
-        new BasicOTMProvider().getLocations(city).whenComplete((locations, t) -> {
-            if (t != null) t.printStackTrace();
-            // we need to serialize the locations to pass them through the intent for when we open the next activity.
-            serializedLocations.addAll(locations.stream().map(OTMLocationSerializer::serialize).collect(Collectors.toList()));
-            Intent intent = new Intent(this, SightseeingActivity.class);
-            intent.putStringArrayListExtra("locations", serializedLocations);
-            intent.putExtra("city", city);
-            startActivity(intent);
-        });
-
+        if (AndroidUtils.hasConnection(this)) {
+            new BasicOTMProvider().getLocations(city).whenComplete((locations, t) -> {
+                if (t != null) t.printStackTrace();
+                // we need to serialize the locations to pass them through the intent for when we open the next activity.
+                serializedLocations.addAll(locations.stream().map(OTMLocationSerializer::serialize).collect(Collectors.toList()));
+                Intent intent = new Intent(this, SightseeingActivity.class);
+                intent.putStringArrayListExtra("locations", serializedLocations);
+                intent.putExtra("city", city);
+                startActivity(intent);
+            });
+        } else {
+            AndroidUtils.showNoConnectionAlert(this, "You have no connection, please try again later.");
+        }
         //AndroidUtils.redirectToActivity(this, SightseeingActivity.class);
     }
 

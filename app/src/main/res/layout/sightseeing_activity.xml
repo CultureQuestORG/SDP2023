@@ -31,13 +31,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintVertical_bias="1.0" />
+
+
     <Button
         android:id="@+id/invite_friends"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="10dp"
         android:width="150dp"
         android:height="25dp"
         android:alpha="0.5"
@@ -48,18 +50,17 @@
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.862"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintRight_toLeftOf="@id/preview"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/places_to_see"
-        app:layout_constraintVertical_bias="1.0" />
-
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/preview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="28dp"
         android:layout_marginTop="30dp"
         android:layout_marginRight="60dp"
         android:layout_marginBottom="10dp"
@@ -77,8 +78,6 @@
         app:layout_constraintTop_toBottomOf="@id/places_to_see"
         app:layout_constraintVertical_bias="0.0" />
 
-
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map_fragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -91,14 +90,16 @@
 
     <ImageView
         android:id="@+id/back_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginBottom="12dp"
-        app:layout_constraintBottom_toTopOf="@id/places_to_see"
-        app:layout_constraintEnd_toStartOf="@id/city_text"
-        app:layout_constraintHorizontal_bias="0.358"
+        android:layout_width="59dp"
+        android:layout_height="31dp"
+        android:layout_marginStart="10dp"
+        android:onClick="goBack"
+        app:layout_constraintBottom_toBottomOf="@+id/city_text"
+        app:layout_constraintEnd_toStartOf="@+id/city_text"
+        app:layout_constraintHorizontal_bias="0.061"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/city_text"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/back_button" />
 
 
