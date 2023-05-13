@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.backend.artprocessing.processingobjects;
 
+import java.util.List;
+
 /**
  * A basic description of a piece of art (name, summary, type, year, city, country, museum)
  */
@@ -110,5 +112,18 @@ public class BasicArtDescription {
     public void setRequiredOpenAi(Boolean requiredOpenAi) {
         this.requiredOpenAi = requiredOpenAi;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(ArtType type) {
+        this.type = type;
+    }
+
+    public void setMuseum(String museum) {
+        this.museum = museum;
+    }
+
 
 }

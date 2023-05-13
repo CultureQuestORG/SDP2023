@@ -159,7 +159,7 @@ public class WikipediaDescriptionApi {
         return summary;
     }
 
-    private BasicArtDescription.ArtType getArtType(ArtRecognition recognizedArt) {
+    public static BasicArtDescription.ArtType getArtType(ArtRecognition recognizedArt) {
 
         String additionalInfo = recognizedArt.getAdditionalInfo();
         String firstWord = additionalInfo.split(" ")[0].toUpperCase();
