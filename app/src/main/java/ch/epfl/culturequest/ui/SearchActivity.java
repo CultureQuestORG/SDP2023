@@ -52,7 +52,7 @@ public class SearchActivity extends AppCompatActivity {
     private Button searchUsers, searchCities;
     private EditText search;
     private MutableLiveData<Boolean> searchingForUsers = new MutableLiveData<>(true);
-    public static final int NUMBER_USERS_TO_DISPLAY = 5;
+    public static final int NUMBER_USERS_TO_DISPLAY = 5, NUMBER_CITIES_TO_DISPLAY = 10;
 
     TextWatcher watcher = new TextWatcher() {
         @Override
@@ -131,7 +131,7 @@ public class SearchActivity extends AppCompatActivity {
         listView.setForegroundGravity(Gravity.TOP);
         if (!query.isEmpty()) {
             Set<String> cities = CITY_COORDINATES.keySet();
-            List<String> topMatches = AutoComplete.topNMatches(query, cities, 20);
+            List<String> topMatches = AutoComplete.topNMatches(query, cities, NUMBER_CITIES_TO_DISPLAY);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, topMatches);
             listView.setAdapter(adapter);
             listView.setOnItemClickListener((parent, view, position, ignored2) -> {

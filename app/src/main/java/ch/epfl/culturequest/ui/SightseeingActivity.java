@@ -1,8 +1,9 @@
 package ch.epfl.culturequest.ui;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -32,6 +33,7 @@ import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.SightseeingActivityBinding;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.social.SightseeingEvent;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.SightSeeingArrayAdapter;
@@ -65,12 +67,15 @@ public class SightseeingActivity extends AppCompatActivity {
                 .collect(Collectors.toMap(OTMLocation::getName, location -> location, (existing, newValue) -> existing));
         adapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<>(placeToLocation.keySet()), List.of(preview, inviteFriends));
         listView.setAdapter(adapter);
-        List<String> selected = adapter.getSelected();
+        List<String> selectedPlaces = adapter.getSelected();
         preview.setOnClickListener(l -> {
             inviteFriends.setVisibility(View.INVISIBLE);
-            openMap(placeToLocation, selected);
+            openMap(placeToLocation, selectedPlaces);
         });
-        inviteFriends.setOnClickListener(l -> handleFriendsLogic());
+        inviteFriends.setOnClickListener(l ->
+                handleFriendsLogic(placeToLocation.entrySet().stream()
+                        .filter(entry -> selectedPlaces.contains(entry.getKey()))
+                        .map(Map.Entry::getValue).collect(Collectors.toList())));
     }
 
     /**
@@ -91,12 +96,12 @@ public class SightseeingActivity extends AppCompatActivity {
         }
     }
 
-    public void onBackPressed(int a){
-
-        onBackPressed();
-    }
-
-    private void handleFriendsLogic(){
+    /**
+     * In this function, we map the users friends to their profiles to display users usernames.
+     * We also use this to send out notifications to particular profiles and to create a new event
+     * @param selectedPlaces the list of selected places
+     */
+    private void handleFriendsLogic(List<OTMLocation> selectedPlaces){
         Profile.getActiveProfile().retrieveFriends()
                 .thenApply(friends -> friends.stream().map(Database::getProfile).collect(Collectors.toList()))
                 .thenCompose(futures -> CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
@@ -106,16 +111,23 @@ public class SightseeingActivity extends AppCompatActivity {
                     adapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, profiles.stream().map(Profile::getUsername).collect(Collectors.toList()), List.of(inviteFriends));
                     listView.setAdapter(adapter);
                     inviteFriends.setOnClickListener(v -> {
+                        List<String> usernamesSelected = adapter.getSelected();
+                        List<Profile> selectedFriends = profiles.stream().filter(profile -> usernamesSelected.contains(profile.getUsername())).collect(Collectors.toList());
                         //TODO DEAL WITH NOTIFICATIONS
-                        List<Profile> selectedFriends = profiles;
+                        SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces);
                         CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v);
+                        CompletableFuture.runAsync(() -> {
+                            //we do this to wait for the snackbar to be visible for 1 second before going back to the nav activity.
+                            SystemClock.sleep(1000);
+                            AndroidUtils.redirectToActivity(this, NavigationActivity.class);
+                        });
                     });
                 });
     }
 
     /**
      * This function will open a google map fragment, displaying all the selected places a user
-     * chose to visit
+     * chooses to visit
      *
      * @param placeToLocation map of places' names and their respective OTMLocation
      * @param selected        the list of selected place's name
