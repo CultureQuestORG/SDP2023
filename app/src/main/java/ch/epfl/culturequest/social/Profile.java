@@ -1,10 +1,13 @@
 package ch.epfl.culturequest.social;
 
+import static com.google.android.gms.common.util.CollectionUtils.listOf;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.notifications.FirebaseNotification;
 
 /**
  * Creates a profile for users
@@ -22,8 +26,8 @@ public class Profile extends Observable {
     private String uid, name, username, email, phoneNumber;
     private String profilePicture;
     private Integer score;
-
     private HashMap<String, Integer> badges;
+    private List<String> deviceTokens;
     private static Profile activeProfile;
 
 
@@ -48,9 +52,10 @@ public class Profile extends Observable {
         this.profilePicture = profilePicture;
         this.score = 0;
         this.badges = new HashMap<>();
+        this.deviceTokens = new ArrayList<>();
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, Integer score, HashMap<String, Integer> badges) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, Integer score, HashMap<String, Integer> badges, List<String> deviceTokens) {
         this.uid = uid;
         this.name = name;
         this.username = username;
@@ -59,6 +64,7 @@ public class Profile extends Observable {
         this.profilePicture = profilePicture;
         this.score = score;
         this.badges = badges;
+        this.deviceTokens = deviceTokens;
     }
 
 
@@ -76,6 +82,7 @@ public class Profile extends Observable {
         this.profilePicture = "";
         this.score = 0;
         this.badges = new HashMap<>();
+        this.deviceTokens = new ArrayList<>();
     }
 
     public String getUid() {
@@ -108,6 +115,10 @@ public class Profile extends Observable {
 
     public HashMap<String, Integer> getBadges() {
         return badges;
+    }
+
+    public List<String> getDeviceTokens() {
+        return deviceTokens;
     }
 
     public void setUid(String uid) {
@@ -148,6 +159,12 @@ public class Profile extends Observable {
 
     public void setBadges(HashMap<String, Integer> badges) {
         this.badges = badges;
+        setChanged();
+        notifyObservers();
+    }
+
+    public void setDeviceTokens(List<String> deviceTokens) {
+        this.deviceTokens = deviceTokens;
         setChanged();
         notifyObservers();
     }

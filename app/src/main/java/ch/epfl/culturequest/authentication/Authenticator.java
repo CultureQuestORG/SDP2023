@@ -24,6 +24,7 @@ import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.social.notifications.FirebaseNotification;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 /**
@@ -89,9 +90,18 @@ public class Authenticator {
         } else {
                 Database.getProfile(getCurrentUser().getUid()).handle((profile, throwable) -> {
                     if (profile != null) {
-                        Profile.setActiveProfile(profile);
-                        AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
-                        future.complete("User signed in with an existing profile");
+                        // check if the device token is already in the database
+                        List<String> deviceTokens = profile.getDeviceTokens();
+                        FirebaseNotification.getDeviceToken().whenComplete((token, throwable1) -> {
+                            if (!deviceTokens.contains(token)) {
+                                deviceTokens.add(token);
+                                profile.setDeviceTokens(deviceTokens);
+                                Database.setDeviceTokens(profile.getUid(), deviceTokens);
+                            }
+                            Profile.setActiveProfile(profile);
+                            AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
+                            future.complete("User signed in with an existing profile");
+                        });
                     } else {
                         AndroidUtils.redirectToActivity(activity, ProfileCreatorActivity.class);
                         future.complete("User signed in with no existing profile");

@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.concurrent.TimeUnit;
+
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.notifications.NotificationInterface;
@@ -17,6 +19,7 @@ public class SignUpActivity extends AppCompatActivity {
     static {
         Database.setPersistenceEnabled();
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -37,13 +37,14 @@ public class Database {
     private static boolean isEmulatorOn = false;
 
     public static void setPersistenceEnabled() {
-        //!BuildConfig.IS_TESTING makes the code run only when we are not testing
+        // !BuildConfig.IS_TESTING makes the code run only when we are not testing
         if (!BuildConfig.IS_TESTING.get()) {
             databaseInstance.setPersistenceEnabled(true);
             databaseInstance.getReference("users").keepSynced(true);
             databaseInstance.getReference("posts").keepSynced(true);
             databaseInstance.getReference("follows").keepSynced(true);
             databaseInstance.getReference("artworks").keepSynced(true);
+            databaseInstance.getReference("notifications").keepSynced(true);
         }
     }
 
@@ -667,6 +668,34 @@ public class Database {
                 } else {
                     future.complete(new AtomicBoolean(committed));
                 }
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> setDeviceTokens(String UId, List<String> deviceTokens) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        databaseInstance.getReference("users").child(UId).child("deviceTokens").setValue(deviceTokens).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<List<String>> getDeviceTokens(String UId) {
+        CompletableFuture<List<String>> future = new CompletableFuture<>();
+        databaseInstance.getReference("users").child(UId).child("deviceTokens").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<String> deviceTokens = new ArrayList<>();
+                for (DataSnapshot token : task.getResult().getChildren()) {
+                    deviceTokens.add(token.getValue(String.class));
+                }
+                future.complete(deviceTokens);
+            } else {
+                future.completeExceptionally(task.getException());
             }
         });
         return future;

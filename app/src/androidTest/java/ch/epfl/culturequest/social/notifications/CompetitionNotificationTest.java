@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
@@ -21,7 +22,7 @@ import ch.epfl.culturequest.social.Profile;
 @RunWith(AndroidJUnit4.class)
 public class CompetitionNotificationTest {
     private final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    private final Profile profile = new Profile("test", "test", "Competitor", "test", "test", "test", 0, new HashMap<>());
+    private final Profile profile = new Profile("test", "test", "Competitor", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
 
     @Before
     public void setup() {

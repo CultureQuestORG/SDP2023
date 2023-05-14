@@ -24,7 +24,7 @@ import ch.epfl.culturequest.social.Profile;
 @RunWith(AndroidJUnit4.class)
 public class LikeNotificationTest {
     private final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    private final Profile profile = new Profile("test", "test", "Likee", "test", "test", "test",0,new HashMap<>());
+    private final Profile profile = new Profile("test", "test", "Likee", "test", "test", "test",0,new HashMap<>(), new ArrayList<>());
 
     @Before
     public void setup() {
