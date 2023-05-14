@@ -11,9 +11,10 @@ public class SightseeingEvent {
     private final List<OTMLocation> locations;
 
     public SightseeingEvent(Profile owner, List<Profile> invited, List<OTMLocation> locations) {
+        if (owner == null || invited.isEmpty() || locations.isEmpty())
+            throw new IllegalArgumentException("Owner is null");
         this.owner = owner;
         this.invited = invited;
-        owner.getProfilePicture();
         this.locations = locations;
     }
 
