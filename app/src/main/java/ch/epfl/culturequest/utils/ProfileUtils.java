@@ -37,10 +37,10 @@ public class ProfileUtils {
     private static USERNAME_PB usernameIsValid(String username) {
         int length = username.length();
         if (username.isEmpty()) return USERNAME_PB.USERNAME_IS_EMPTY;
-        if (length < 3) return USERNAME_PB.USERNAME_TOO_SHORT;
-        if (length > 20) return USERNAME_PB.USERNAME_TOO_LONG;
-        if (username.contains(" ")) return USERNAME_PB.USERNAME_HAS_WHITESPACE;
-        if (!username.matches(USERNAME_REGEX)) return  USERNAME_PB.USERNAME_HAS_WRONG_REGEX;
+        else if (length < 3) return USERNAME_PB.USERNAME_TOO_SHORT;
+        else if (length > 20) return USERNAME_PB.USERNAME_TOO_LONG;
+        else if (username.contains(" ")) return USERNAME_PB.USERNAME_HAS_WHITESPACE;
+        else if (!username.matches(USERNAME_REGEX)) return  USERNAME_PB.USERNAME_HAS_WRONG_REGEX;
         return USERNAME_PB.USERNAME_VALID;
     }
 
