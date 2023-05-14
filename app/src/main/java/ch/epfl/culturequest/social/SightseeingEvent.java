@@ -12,7 +12,7 @@ public class SightseeingEvent {
 
     public SightseeingEvent(Profile owner, List<Profile> invited, List<OTMLocation> locations) {
         if (owner == null || invited.isEmpty() || locations.isEmpty())
-            throw new IllegalArgumentException("Owner is null");
+            throw new IllegalArgumentException();
         this.owner = owner;
         this.invited = invited;
         this.locations = locations;

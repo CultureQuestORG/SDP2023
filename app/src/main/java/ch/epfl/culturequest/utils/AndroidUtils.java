@@ -42,7 +42,7 @@ public class AndroidUtils {
         return false;
     }
 
-    public static AlertDialog showNoConnectionAlert(Context context, String msg){
+    public static void showNoConnectionAlert(Context context, String msg){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("No Connection")
                 .setIcon(R.drawable.unknown_error)
@@ -50,6 +50,5 @@ public class AndroidUtils {
                 .setCancelable(false)
                 .setPositiveButton("OK", (dialog, id) -> dialog.dismiss());
         builder.create().show();
-        return builder.create();
-    }
+        }
 }
