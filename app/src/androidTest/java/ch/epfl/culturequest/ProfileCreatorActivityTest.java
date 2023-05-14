@@ -13,7 +13,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
-import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
 import android.Manifest;
 import android.app.Instrumentation;
@@ -109,10 +108,10 @@ public class ProfileCreatorActivityTest {
 
     @Test
     public void wrongUserNameSetsHintText() throws InterruptedException {
-        onView(withId(R.id.username)).perform(typeText("  !+ "));
+        onView(withId(R.id.username)).perform(typeText("!!!!!!!"));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("Only letters and digits allowed")));
     }
 
     @Test
@@ -136,22 +135,22 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.username)).perform(typeText(""));
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("Username is empty")));
 
         onView(withId(R.id.username)).perform(typeText("lol"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("Username is too short")));
 
         onView(withId(R.id.username)).perform(typeText("abcdefghijklmnopqrstuvxyz"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("Username is too long")));
 
         onView(withId(R.id.username)).perform(typeText("john Doe"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("Username cannot have spaces")));
     }
 
     @After
