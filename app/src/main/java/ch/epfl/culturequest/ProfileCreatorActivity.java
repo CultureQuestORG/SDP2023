@@ -1,6 +1,6 @@
 package ch.epfl.culturequest;
 
-import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
+import static ch.epfl.culturequest.utils.ProfileUtils.setProblemHintTextIfAny;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -40,6 +40,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     private String profilePicUri;
 
     private Bitmap profilePicBitmap;
+
+    private TextView textView;
     private final Profile profile = new Profile(null, "");
     private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
@@ -60,6 +62,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile_creation);
         //the following attributes are used to check whether the user actually selected a profile pic
         profileView = findViewById(R.id.profile_picture);
+        textView = findViewById(R.id.textView);
         initialDrawable = profileView.getDrawable();
     }
 
@@ -91,16 +94,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      * @param view
      */
     public void createProfile(View view) {
-        EditText textView = findViewById(R.id.username);
-        String username = textView.getText().toString();
-
         //check if username is valid
-        if (!ProfileUtils.isValid(profile, username)) {
-            textView.setText("");
-            textView.setHint(INCORRECT_USERNAME_FORMAT);
-            return;
-        }
-
+        if (setProblemHintTextIfAny(textView)) return;
+        String username = textView.getText().toString();
         setDefaultPicIfNoneSelected();
 
         profile.setUsername(username);

@@ -16,7 +16,6 @@ public class ProfileUtils {
 
     public static String DEFAULT_PROFILE_PIC_PATH = "https://drive.google.com/uc?id=1gA_7AkkcoW4PJggzBvJYY2JT0dXbsr6Y";
     public static int POSTS_ADDED = 0;
-    public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
 
     public static int DEFAULT_POST_LIMIT = 4, DEFAULT_POST_OFFSET = 0;
@@ -35,30 +34,16 @@ public class ProfileUtils {
      * @param username the username to check
      * @return true if the username is valid, false otherwise
      */
-    public static boolean usernameIsValid(String username) {
+    private static USERNAME_PB usernameIsValid(String username) {
         int length = username.length();
-        return !username.isEmpty()
-                && length > 3
-                && length < 20
-                && username.matches(USERNAME_REGEX)
-                && !username.contains(" ");
+        if (username.isEmpty()) return USERNAME_PB.USERNAME_IS_EMPTY;
+        if (length < 3) return USERNAME_PB.USERNAME_TOO_SHORT;
+        if (length > 20) return USERNAME_PB.USERNAME_TOO_LONG;
+        if (username.contains(" ")) return USERNAME_PB.USERNAME_HAS_WHITESPACE;
+        if (!username.matches(USERNAME_REGEX)) return  USERNAME_PB.USERNAME_HAS_WRONG_REGEX;
+        return USERNAME_PB.USERNAME_VALID;
     }
 
-
-    /**
-     * Checks if the username is valid and sets it to the profile if it is
-     *
-     * @param profile the profile to set the username to
-     * @param username the username to check
-     * @return true if the username is valid, false otherwise
-     */
-    public static boolean isValid(Profile profile, String username) {
-        if (usernameIsValid(username)) {
-            profile.setUsername(username);
-            return true;
-        }
-        return false;
-    }
     public static void handleScore(TextView level,TextView levelText, ProgressBar progressBar, int score){
 
 
@@ -79,5 +64,36 @@ public class ProfileUtils {
         progressBar.setProgress(progress);
     }
 
+    public static boolean setProblemHintTextIfAny(TextView username) {
+        switch (usernameIsValid(username.getText().toString())) {
+            case USERNAME_VALID:
+                return false;
+            case USERNAME_IS_EMPTY:
+                username.setText("");
+                username.setHint("Username is empty");
+                break;
+            case USERNAME_HAS_WHITESPACE:
+                username.setText("");
+                username.setHint("Username cannot have spaces");
+                break;
+            case USERNAME_HAS_WRONG_REGEX:
+                username.setText("");
+                username.setHint("Only letters and digits allowed");
+                break;
+            case USERNAME_TOO_LONG:
+                username.setText("");
+                username.setHint("Username is too long");
+                break;
+            case USERNAME_TOO_SHORT:
+                username.setText("");
+                username.setHint("Username is too short");
+                break;
+        }
+        return true;
+    }
+
+    enum USERNAME_PB{
+        USERNAME_IS_EMPTY, USERNAME_TOO_LONG, USERNAME_TOO_SHORT, USERNAME_HAS_WHITESPACE, USERNAME_HAS_WRONG_REGEX, USERNAME_VALID;
+    }
 
 }
