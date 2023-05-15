@@ -137,11 +137,13 @@ public class SightSeeingActivityTest {
     }
 
     @Test
-    public void mapCanBeOpenedWhenClickingOnPreview(){
+    public void mapCanBeOpenedWhenClickingOnPreview() throws InterruptedException {
         onData(hasToString(containsString("Palais Garnier")))
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
+        Thread.sleep(1000);
         onView(withId(R.id.preview)).perform(click());
+        Thread.sleep(3000);
         onView(withId(R.id.map_fragment)).check(matches(isDisplayed()));
     }
 

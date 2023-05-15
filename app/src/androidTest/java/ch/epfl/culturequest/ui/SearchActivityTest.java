@@ -51,6 +51,8 @@ public class SearchActivityTest {
         Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", 0,new HashMap<>()));
         Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", 0,new HashMap<>()));
         Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0,new HashMap<>()));
+        //set the same profile twice for more cov
+        Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0,new HashMap<>()));
 
     }
 
@@ -71,8 +73,9 @@ public class SearchActivityTest {
 
 
     @Test
-    public void emptyCityQueryDisplaysNothing(){
+    public void emptyCityQueryDisplaysNothing() throws InterruptedException {
         onView(withId(R.id.search_cities)).perform(click());
+        Thread.sleep(2000);
         onView(withId(R.id.search)).perform(typeText(""));
         onView(withId(R.id.list_view))
                 .check(matches(Matchers.not(hasMinimumChildCount(1))));
