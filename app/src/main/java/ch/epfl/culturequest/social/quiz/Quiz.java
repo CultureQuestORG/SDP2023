@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.social.quizz;
+package ch.epfl.culturequest.social.quiz;
 
 import java.util.List;
 
@@ -124,13 +124,5 @@ public class Quiz {
 
     public void updateScore() {
         this.score = this.nextScore;
-    }
-
-    public Question nextQuestion() {
-        return this.questions.get(++this.currentQuestion);
-    }
-
-    public Question currentQuestion() {
-        return this.questions.get(this.currentQuestion);
     }
 }

@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.social.quizz;
+package ch.epfl.culturequest.social.quiz;
 
 import java.util.List;
 
@@ -48,4 +48,7 @@ public class Question {
     }
 
 
+    public boolean isCorrect(String selectedAnswer) {
+        return selectedAnswer.equals(answer);
+    }
 }

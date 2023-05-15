@@ -3,11 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/quiz_navigation"
-    app:startDestination="@id/quizInterFragment">
+    app:startDestination="@+id/QuizWelcomeFragment"
+    >
 
 
     <fragment
-        android:id="@+id/quizFragment"
+        android:id="@+id/QuizWelcomeFragment"
         android:name="ch.epfl.culturequest.ui.quiz.QuizWelcomeFragment"
         android:label="QuizFragment"
         tools:layout="@layout/fragment_quiz_welcome" />

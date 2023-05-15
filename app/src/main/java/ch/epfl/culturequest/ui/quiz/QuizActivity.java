@@ -11,13 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.ActivityQuizBinding;
-import ch.epfl.culturequest.social.quizz.Question;
-import ch.epfl.culturequest.social.quizz.Quiz;
+import ch.epfl.culturequest.social.quiz.Question;
+import ch.epfl.culturequest.social.quiz.Quiz;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class QuizActivity extends AppCompatActivity {
@@ -31,8 +28,9 @@ public class QuizActivity extends AppCompatActivity {
         // To make the status bar transparent
         AndroidUtils.removeStatusBar(getWindow());
 
+
+
         binding = ActivityQuizBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
 
         List<Question> questions = new ArrayList<>();
         // create 5 questions about "La Joconde"
@@ -44,17 +42,50 @@ public class QuizActivity extends AppCompatActivity {
         Quiz quiz = new Quiz("La Joconde", questions,"1234",0,"tournament1",100,0,false,false);
 
 
-
-        //QuizInterFragment fragment = new QuizInterFragment(quizViewModel);
-        //fragment.setQuizViewModel(quizViewModel);
-        //getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_activity_quiz, fragment).commit();
-
-
-
-
-
+        QuizViewModel.addQuiz(quiz, this);
+        //send data to the fragment
+        Bundle bundle = new Bundle();
+        bundle.putString("uid", "1234");
+        bundle.putString("tournament", "tournament1");
+        bundle.putString("artName", "La Joconde");
+        QuizWelcomeFragment fragment = new QuizWelcomeFragment();
+        fragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.nav_host_fragment_activity_quiz, fragment)
+                .commit();
+        setContentView(binding.getRoot());
 
 
     }
+
+
+
+    public void startQuiz() {
+        Bundle bundle = new Bundle();
+        bundle.putString("uid", "1234");
+        bundle.putString("tournament", "tournament1");
+        bundle.putString("artName", "La Joconde");
+        bundle.putInt("questionNumber", 0);
+        QuizQuestionFragment fragment = new QuizQuestionFragment();
+        fragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.nav_host_fragment_activity_quiz, fragment)
+                .commit();
+    }
+
+    public void FinishQuestion(boolean success) {
+        Bundle bundle = new Bundle();
+        bundle.putString("uid", "1234");
+        bundle.putString("tournament", "tournament1");
+        bundle.putString("artName", "La Joconde");
+
+        bundle.putBoolean("success", success);
+        QuizQuestionFragment fragment = new QuizQuestionFragment();
+        fragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.nav_host_fragment_activity_quiz, fragment)
+                .commit();
+    }
+
 
 }
