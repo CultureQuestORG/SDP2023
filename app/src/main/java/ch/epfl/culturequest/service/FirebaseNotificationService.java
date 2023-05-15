@@ -38,7 +38,6 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
                 remoteMessage.getData().get("text"), remoteMessage.getData().get("channelId"));
 
         Notification notification = pushNotification.buildNotification(this);
-        Database.addNotification(Authenticator.getCurrentUser().getUid(), pushNotification);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

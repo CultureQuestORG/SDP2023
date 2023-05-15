@@ -84,7 +84,6 @@ public class ProfileFragment extends Fragment {
             // open the badges activity
             Intent intent = new Intent(getActivity(), DisplayUserBadgeCollectionActivity.class);
             intent.putExtra("uid", Profile.getActiveProfile().getUid());
-            FireMessaging.sendNotification(Authenticator.getCurrentUser().getUid(), new CompetitionNotification());
             startActivity(intent);
         });
 

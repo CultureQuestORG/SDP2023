@@ -5,7 +5,9 @@ import static androidx.core.content.ContextCompat.getSystemService;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
@@ -76,11 +78,31 @@ public class PushNotification {
      * @return the notification
      */
     public Notification buildNotification(Context context){
+        PendingIntent pendingIntent = selectPendingIntent(context, channelId);
         return new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.logo_compact)
                 .setContentTitle(title)
                 .setContentText(text)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .build();
+    }
+
+    public PendingIntent selectPendingIntent(Context context, String channelId) {
+        switch (channelId) {
+            case FollowNotification.CHANNEL_ID:
+                return FollowNotification.getPendingIntent(context);
+            case ScanNotification.CHANNEL_ID:
+                return ScanNotification.getPendingIntent(context);
+            case LikeNotification.CHANNEL_ID:
+                return LikeNotification.getPendingIntent(context);
+            case CompetitionNotification.CHANNEL_ID:
+                return CompetitionNotification.getPendingIntent(context);
+            case SightseeingNotification.CHANNEL_ID:
+                return SightseeingNotification.getPendingIntent(context);
+            default:
+                return null;
+        }
     }
 
     public String getNotificationId() {

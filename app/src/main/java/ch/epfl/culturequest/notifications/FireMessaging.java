@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.notifications_api.ApiClient;
 import ch.epfl.culturequest.database.Database;
 import retrofit2.Call;
@@ -33,6 +34,7 @@ public class FireMessaging {
     public static CompletableFuture<AtomicBoolean> sendNotification(String uid, PushNotification notification) {
         // TODO: create instead an array of futures and return a future of array of booleans
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        Database.addNotification(uid, notification);
         Database.getDeviceTokens(uid).whenComplete((deviceTokens, throwable) -> {
             if (throwable != null || deviceTokens.isEmpty()) {
                 future.complete(new AtomicBoolean(false));
