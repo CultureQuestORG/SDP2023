@@ -18,6 +18,7 @@ import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.utils.City;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -48,7 +49,7 @@ public class BasicOTMProvider implements OTMProvider {
 
     @Override
     public CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight){
-        OTMFetchInterface service = getOTMFetchService(new Gson());
+        OTMFetchInterface service = getOTMFetchService();
         CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
         service.fetchOTMPlaces(BuildConfig.OTM_API_KEY, upperLeft.longitude, lowerRight.longitude, lowerRight.latitude, upperLeft.latitude).enqueue(callback(future));
         return future;
@@ -57,19 +58,16 @@ public class BasicOTMProvider implements OTMProvider {
     @Override
     public CompletableFuture<List<OTMLocation>> getLocations(String city) {
         double[] latLon = City.getCoordinates(city);
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(new TypeToken<List<OTMLocation>>(){}.getType(), new OTMLocationDeserializer())
-                .create();
-        OTMFetchInterface service = getOTMFetchService(gson);
+        OTMFetchInterface service = getOTMFetchService();
         CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
         service.fetchPlacesInCity(latLon[1], latLon[0], BuildConfig.OTM_API_KEY).enqueue(callback(future));
         return future;
     }
 
-    private OTMFetchInterface getOTMFetchService(Gson gson){
+    private OTMFetchInterface getOTMFetchService(){
         Retrofit req = new Retrofit.Builder()
                 .baseUrl(base_url)
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
         return req.create(OTMFetchInterface.class);
     }
