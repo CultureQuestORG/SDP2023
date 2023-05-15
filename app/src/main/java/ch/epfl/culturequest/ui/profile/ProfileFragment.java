@@ -33,6 +33,8 @@ import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.notifications.CompetitionNotification;
+import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -82,6 +84,7 @@ public class ProfileFragment extends Fragment {
             // open the badges activity
             Intent intent = new Intent(getActivity(), DisplayUserBadgeCollectionActivity.class);
             intent.putExtra("uid", Profile.getActiveProfile().getUid());
+            FireMessaging.sendNotification(Authenticator.getCurrentUser().getUid(), new CompetitionNotification());
             startActivity(intent);
         });
 

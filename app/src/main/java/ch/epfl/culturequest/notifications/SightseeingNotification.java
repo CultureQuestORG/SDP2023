@@ -1,27 +1,21 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 
-import androidx.core.app.NotificationCompat;
-
-import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
 
-/**
- * Class that represents notifications for a new offline scan
- */
-public class ScanNotification extends AbstractNotification {
-    public static final String CHANNEL_ID = "SCAN";
+public class SightseeingNotification extends PushNotification {
+    public static final String CHANNEL_ID = "SIGHTSEEING";
 
     /**
-     * Constructor for the ScanNotification
+     * Constructor for the SightseeingNotification
+     *
+     * @param friend the friend that invites to a new sightseeing
      */
-    public ScanNotification() {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new scan!",
-                "We found a new offline scan result!",
+    public SightseeingNotification(String friend) {
+        super(Profile.getActiveProfile().getUsername() + ", you have a new sightseeing event!",
+                friend + " invited you to a new sightseeing event!",
                 CHANNEL_ID);
     }
 
@@ -32,8 +26,8 @@ public class ScanNotification extends AbstractNotification {
      */
     public static NotificationChannel getNotificationChannel() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            CharSequence name = "ScanNotification";
-            String description = "ScanNotification";
+            CharSequence name = "SightseeingNotification";
+            String description = "SightseeingNotification";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);

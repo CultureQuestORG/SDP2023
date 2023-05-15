@@ -28,7 +28,7 @@ import java.util.List;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.social.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.PermissionRequest;

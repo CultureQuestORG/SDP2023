@@ -1,20 +1,15 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.os.Build;
 
-import androidx.core.app.NotificationCompat;
-
-import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
 
 /**
  * Class that represents a notification for a new like
  */
-public class LikeNotification extends AbstractNotification {
+public class LikeNotification extends PushNotification {
     public static final String CHANNEL_ID = "LIKE";
 
     /**

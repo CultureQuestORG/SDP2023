@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
 import static androidx.core.content.ContextCompat.getSystemService;
 
@@ -20,14 +20,14 @@ import ch.epfl.culturequest.R;
 /**
  * Interface that represents notifications
  */
-public abstract class AbstractNotification {
+public class PushNotification {
     private String notificationId;
     private String channelId;
     private String title;
     private String text;
     private long time;
 
-    public AbstractNotification() {
+    public PushNotification() {
         this.title = "";
         this.text = "";
         this.channelId = "";
@@ -35,7 +35,7 @@ public abstract class AbstractNotification {
         this.time = 0;
     }
 
-    public AbstractNotification(String title, String text, String channelId) {
+    public PushNotification(String title, String text, String channelId) {
         this.title = title;
         this.text = text;
         this.channelId = channelId;

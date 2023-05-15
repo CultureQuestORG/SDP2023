@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -27,7 +27,7 @@ public class ScanNotificationTest {
 
     @Before
     public void setup() {
-        AbstractNotification.createNotificationChannels(context);
+        PushNotification.createNotificationChannels(context);
         Profile.setActiveProfile(profile);
     }
 

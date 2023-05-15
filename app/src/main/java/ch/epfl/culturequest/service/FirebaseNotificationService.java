@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.backend.services;
+package ch.epfl.culturequest.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -11,8 +11,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.social.notifications.AbstractNotification;
-import ch.epfl.culturequest.social.notifications.CompetitionNotification;
+import ch.epfl.culturequest.notifications.PushNotification;
 
 public class FirebaseNotificationService extends FirebaseMessagingService {
 
@@ -35,14 +34,14 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
     }
 
     private void sendNotification(RemoteMessage remoteMessage) {
+        PushNotification pushNotification = new PushNotification(remoteMessage.getData().get("title"),
+                remoteMessage.getData().get("text"), remoteMessage.getData().get("channelId"));
 
-        AbstractNotification abstractNotification = new CompetitionNotification();
-
-        Notification notification = abstractNotification.buildNotification(this);
-        Database.addNotification(Authenticator.getCurrentUser().getUid(), abstractNotification);
+        Notification notification = pushNotification.buildNotification(this);
+        Database.addNotification(Authenticator.getCurrentUser().getUid(), pushNotification);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(abstractNotification.getNotificationId().hashCode(), notification);
+        notificationManager.notify(pushNotification.getNotificationId().hashCode(), notification);
     }
 }

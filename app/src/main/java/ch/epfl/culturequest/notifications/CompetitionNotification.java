@@ -1,21 +1,16 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 
 import ch.epfl.culturequest.social.Profile;
 
-public class SightseeingNotification extends AbstractNotification {
-    public static final String CHANNEL_ID = "SIGHTSEEING";
+public class CompetitionNotification extends PushNotification {
+    public static final String CHANNEL_ID = "COMPETITION";
 
-    /**
-     * Constructor for the SightseeingNotification
-     *
-     * @param friend the friend that invites to a new sightseeing
-     */
-    public SightseeingNotification(String friend) {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new sightseeing event!",
-                friend + " invited you to a new sightseeing event!",
+    public CompetitionNotification() {
+        super(Profile.getActiveProfile().getUsername() + ", you have a new competition!",
+                "Click here to see your new competition!",
                 CHANNEL_ID);
     }
 
@@ -26,8 +21,8 @@ public class SightseeingNotification extends AbstractNotification {
      */
     public static NotificationChannel getNotificationChannel() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            CharSequence name = "SightseeingNotification";
-            String description = "SightseeingNotification";
+            CharSequence name = "CompetitionNotification";
+            String description = "CompetitionNotification";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
@@ -35,4 +30,5 @@ public class SightseeingNotification extends AbstractNotification {
         }
         return null;
     }
+
 }

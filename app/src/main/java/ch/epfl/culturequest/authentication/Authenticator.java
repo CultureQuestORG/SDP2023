@@ -23,7 +23,7 @@ import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.social.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 /**
