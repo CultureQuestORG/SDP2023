@@ -32,6 +32,7 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.map_collection.BasicOTMProvider;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
+import ch.epfl.culturequest.backend.map_collection.RetryingOTMProvider;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.SearchActivityBinding;
 import ch.epfl.culturequest.social.Profile;
@@ -152,7 +153,7 @@ public class SearchActivity extends AppCompatActivity {
     private void findStuffToDoIn(String city) {
         ArrayList<String> serializedLocations = new ArrayList<>();
         if (AndroidUtils.hasConnection(this)) {
-            new BasicOTMProvider().getLocations(city).whenComplete((locations, t) -> {
+            new RetryingOTMProvider(new BasicOTMProvider()).getLocations(city).whenComplete((locations, t) -> {
                 if (t != null) t.printStackTrace();
                 // we need to serialize the locations to pass them through the intent for when we open the next activity.
                 serializedLocations.addAll(locations.stream().map(OTMLocationSerializer::serialize).collect(Collectors.toList()));

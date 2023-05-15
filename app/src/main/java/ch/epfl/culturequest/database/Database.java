@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.BuildConfig;
@@ -27,7 +26,6 @@ import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDesc
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.utils.SightSeeingArrayAdapter;
 
 
 /**
