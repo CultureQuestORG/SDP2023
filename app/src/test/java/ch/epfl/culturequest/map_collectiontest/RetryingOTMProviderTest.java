@@ -2,8 +2,11 @@ package ch.epfl.culturequest.map_collectiontest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
@@ -91,8 +94,10 @@ public class RetryingOTMProviderTest {
     }
 
     @Test
-    public void assertGettingCityLocationsIsNull(){
-        assertNull(provider.getLocations("city"));
+    public void assertThatWeCanFetchPlaces(){
+        List<OTMLocation> places = provider.getLocations("Paris").join();
+        assertNotNull(places);
+        assertThat(places, is(not(empty())));
     }
 
     @After
