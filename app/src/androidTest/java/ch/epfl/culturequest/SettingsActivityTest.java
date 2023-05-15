@@ -1,5 +1,6 @@
 package ch.epfl.culturequest;
 
+import static android.app.Activity.RESULT_OK;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -9,6 +10,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -27,6 +29,8 @@ import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
+import com.yalantis.ucrop.UCropActivity;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -42,6 +46,8 @@ import ch.epfl.culturequest.storage.FireStorage;
 public class SettingsActivityTest {
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
+    @Rule
+    public GrantPermissionRule grantPermissionRule2 = GrantPermissionRule.grant(Manifest.permission.READ_MEDIA_IMAGES);
 
     private static SettingsActivity activity;
     private final String email = "test@gmail.com";
@@ -111,12 +117,12 @@ public class SettingsActivityTest {
     public void afterPictureChosenGoToCrop() {
         Intent intent = new Intent();
         intent.setData(Uri.parse("content://media/external/images/media/1"));
-        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(0, intent);
+        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(RESULT_OK, intent);
         intending(hasAction(Intent.ACTION_PICK)).respondWith(result);
 
         onView(withId(R.id.profile_picture)).perform(click());
 
-        intended(toPackage("com.yalantis.ucrop"));
+        intended(hasComponent(UCropActivity.class.getName()));
     }
 
     @After

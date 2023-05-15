@@ -1,5 +1,6 @@
 package ch.epfl.culturequest;
 
+import static android.app.Activity.RESULT_OK;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressBack;
@@ -29,6 +30,8 @@ import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
+import com.yalantis.ucrop.UCropActivity;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,6 +47,8 @@ import ch.epfl.culturequest.storage.FireStorage;
 public class ProfileCreatorActivityTest {
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
+    @Rule
+    public GrantPermissionRule grantPermissionRule2 = GrantPermissionRule.grant(Manifest.permission.READ_MEDIA_IMAGES);
 
     private static Profile profile;
     private static ProfileCreatorActivity activity;
@@ -160,9 +165,8 @@ public class ProfileCreatorActivityTest {
     }
 
     @Test
-    public void profilePictureButtonSendsPickerIntent() {
+    public void profilePictureButtonSendsPickerIntent() throws InterruptedException {
         onView(withId(R.id.profile_picture)).perform(click());
-
         intended(hasAction(Intent.ACTION_PICK));
     }
 
@@ -170,12 +174,12 @@ public class ProfileCreatorActivityTest {
     public void afterPictureChosenGoToCrop() {
         Intent intent = new Intent();
         intent.setData(Uri.parse("content://media/external/images/media/1"));
-        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(0, intent);
+        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(RESULT_OK, intent);
         intending(hasAction(Intent.ACTION_PICK)).respondWith(result);
 
         onView(withId(R.id.profile_picture)).perform(click());
 
-        intended(toPackage("com.yalantis.ucrop"));
+        intended(hasComponent(UCropActivity.class.getName()));
     }
 
     @After
