@@ -28,7 +28,7 @@ import java.util.List;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.social.notifications.FirebaseNotification;
+import ch.epfl.culturequest.social.notifications.FireMessaging;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.PermissionRequest;
@@ -108,7 +108,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
         profile.setUsername(username);
         profile.setUid(Authenticator.getCurrentUser().getUid());
-        FirebaseNotification.getDeviceToken().whenComplete((token, ex) -> {
+        FireMessaging.getDeviceToken().whenComplete((token, ex) -> {
             if (ex == null) {
                 List<String> deviceTokens = new ArrayList<>();
                 deviceTokens.add(token);

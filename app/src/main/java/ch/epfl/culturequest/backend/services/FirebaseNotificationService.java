@@ -11,6 +11,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.notifications.AbstractNotification;
 import ch.epfl.culturequest.social.notifications.CompetitionNotification;
 
 public class FirebaseNotificationService extends FirebaseMessagingService {
@@ -34,10 +35,14 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
     }
 
     private void sendNotification(RemoteMessage remoteMessage) {
-        Notification notification = new CompetitionNotification().get(this);
+
+        AbstractNotification abstractNotification = new CompetitionNotification();
+
+        Notification notification = abstractNotification.buildNotification(this);
+        Database.addNotification(Authenticator.getCurrentUser().getUid(), abstractNotification);
+
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(1, notification);
+        notificationManager.notify(abstractNotification.getNotificationId().hashCode(), notification);
     }
 }

@@ -26,13 +26,13 @@ public class CompetitionNotificationTest {
 
     @Before
     public void setup() {
-        NotificationInterface.createNotificationChannels(context);
+        AbstractNotification.createNotificationChannels(context);
         Profile.setActiveProfile(profile);
     }
 
     @Test
     public void testCompetitionNotification() {
-        Notification competitionNotification = new CompetitionNotification().get(context);
+        Notification competitionNotification = new CompetitionNotification().buildNotification(context);
         assertThat(competitionNotification.extras.get(Notification.EXTRA_TITLE).toString(), is(profile.getUsername() + ", you have a new competition!"));
         assertThat(competitionNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("Click here to see your new competition!"));
         assertThat(competitionNotification.priority, is(Notification.PRIORITY_DEFAULT));

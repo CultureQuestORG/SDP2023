@@ -14,9 +14,7 @@ import ch.epfl.culturequest.social.Profile;
 /**
  * Class that represents a notification for a new like
  */
-public class LikeNotification implements NotificationInterface {
-    private final String liker;
-
+public class LikeNotification extends AbstractNotification {
     public static final String CHANNEL_ID = "LIKE";
 
     /**
@@ -25,16 +23,9 @@ public class LikeNotification implements NotificationInterface {
      * @param liker the username of the liker
      */
     public LikeNotification(String liker) {
-        this.liker = liker;
-    }
-
-    @Override
-    public Notification get(Context context) {
-        return new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new like!")
-                .setContentText(liker + " liked your post!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
+        super(Profile.getActiveProfile().getUsername() + ", you have a new like!",
+                liker + " liked your post!",
+                CHANNEL_ID);
     }
 
     /**

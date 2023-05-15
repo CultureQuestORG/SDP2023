@@ -27,13 +27,13 @@ public class FollowNotificationTest {
 
     @Before
     public void setup() {
-        NotificationInterface.createNotificationChannels(context);
+        AbstractNotification.createNotificationChannels(context);
         Profile.setActiveProfile(profile);
     }
 
     @Test
     public void FollowNotificationIsCorrectlyCreated() {
-        Notification followNotification = new FollowNotification("Follower").get(context);
+        Notification followNotification = new FollowNotification("Follower").buildNotification(context);
         assertThat(followNotification.extras.get(Notification.EXTRA_TITLE).toString(), is(profile.getUsername() + ", you have a new follower!"));
         assertThat(followNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("Follower is now following you!"));
         assertThat(followNotification.priority, is(Notification.PRIORITY_DEFAULT));

@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
@@ -28,13 +27,13 @@ public class LikeNotificationTest {
 
     @Before
     public void setup() {
-        NotificationInterface.createNotificationChannels(context);
+        AbstractNotification.createNotificationChannels(context);
         Profile.setActiveProfile(profile);
     }
 
     @Test
     public void likeNotificationIsCorrectlyCreated() {
-        Notification likeNotification = new LikeNotification("Liker").get(context);
+        Notification likeNotification = new LikeNotification("Liker").buildNotification(context);
         assertThat(likeNotification.extras.get(Notification.EXTRA_TITLE).toString(), is(profile.getUsername() + ", you have a new like!"));
         assertThat(likeNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("Liker liked your post!"));
         assertThat(likeNotification.priority, is(Notification.PRIORITY_DEFAULT));

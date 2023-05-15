@@ -8,14 +8,40 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 
+import androidx.core.app.NotificationCompat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+
+import ch.epfl.culturequest.R;
 
 /**
  * Interface that represents notifications
  */
-public interface NotificationInterface {
+public abstract class AbstractNotification {
+    private String notificationId;
+    private String channelId;
+    private String title;
+    private String text;
+    private long time;
+
+    public AbstractNotification() {
+        this.title = "";
+        this.text = "";
+        this.channelId = "";
+        this.notificationId = "";
+        this.time = 0;
+    }
+
+    public AbstractNotification(String title, String text, String channelId) {
+        this.title = title;
+        this.text = text;
+        this.channelId = channelId;
+        this.notificationId = UUID.randomUUID().toString();
+        this.time = System.currentTimeMillis();
+    }
 
     /**
      * Creates the notification channels. This method can be called multiple times, it will only
@@ -23,7 +49,7 @@ public interface NotificationInterface {
      *
      * @param context the context of the notification
      */
-    static void createNotificationChannels(Context context) {
+    public static void createNotificationChannels(Context context) {
         // Create the NotificationChannels, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -49,5 +75,51 @@ public interface NotificationInterface {
      * @param context the context of the notification
      * @return the notification
      */
-    Notification get(Context context);
+    public Notification buildNotification(Context context){
+        return new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.logo_compact)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
+    }
+
+    public String getNotificationId() {
+        return notificationId;
+    }
+
+    public String getChannelId() {
+        return channelId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
 }

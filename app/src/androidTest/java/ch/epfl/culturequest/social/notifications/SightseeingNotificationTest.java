@@ -26,13 +26,13 @@ public class SightseeingNotificationTest {
 
     @Before
     public void setup() {
-        NotificationInterface.createNotificationChannels(context);
+        AbstractNotification.createNotificationChannels(context);
         Profile.setActiveProfile(profile);
     }
 
     @Test
     public void testSightSeeingNotification() {
-        Notification sightseeingNotification = new SightseeingNotification("John").get(context);
+        Notification sightseeingNotification = new SightseeingNotification("John").buildNotification(context);
         assertThat(sightseeingNotification.extras.get(Notification.EXTRA_TITLE).toString(), is(profile.getUsername() + ", you have a new sightseeing event!"));
         assertThat(sightseeingNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("John invited you to a new sightseeing event!"));
         assertThat(sightseeingNotification.priority, is(Notification.PRIORITY_DEFAULT));

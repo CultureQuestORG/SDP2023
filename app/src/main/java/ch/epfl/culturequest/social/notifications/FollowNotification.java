@@ -14,8 +14,7 @@ import ch.epfl.culturequest.social.Profile;
 /**
  * Class that represents a notification for a new follower
  */
-public final class FollowNotification implements NotificationInterface {
-    private final String newFollower;
+public final class FollowNotification extends AbstractNotification {
     public static final String CHANNEL_ID = "FOLLOW";
 
     /**
@@ -24,16 +23,9 @@ public final class FollowNotification implements NotificationInterface {
      * @param newFollower the username of the new follower
      */
     public FollowNotification(String newFollower) {
-        this.newFollower = newFollower;
-    }
-
-    @Override
-    public Notification get(Context context) {
-        return new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new follower!")
-                .setContentText(newFollower + " is now following you!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
+        super(Profile.getActiveProfile().getUsername() + ", you have a new follower!",
+                newFollower + " is now following you!",
+                CHANNEL_ID);
     }
 
     /**

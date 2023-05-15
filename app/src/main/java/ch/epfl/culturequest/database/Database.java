@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.BuildConfig;
@@ -27,6 +26,7 @@ import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDesc
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.social.notifications.AbstractNotification;
 
 
 /**
@@ -696,6 +696,49 @@ public class Database {
                 future.complete(deviceTokens);
             } else {
                 future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<List<AbstractNotification>> getNotifications(String UId){
+        CompletableFuture<List<AbstractNotification>> future = new CompletableFuture<>();
+        databaseInstance.getReference("notifications").child(UId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<AbstractNotification> notificationsList = new ArrayList<>();
+                for (DataSnapshot notification : task.getResult().getChildren()) {
+                    notificationsList.add(notification.getValue(AbstractNotification.class));
+                }
+                notificationsList.sort(Comparator.comparing(AbstractNotification::getTime).reversed());
+                future.complete(notificationsList);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> addNotification(String UId, AbstractNotification notification) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference notificationRef = databaseInstance.getReference("notifications").child(UId).child(notification.getNotificationId());
+        notificationRef.setValue(notification).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> deleteNotification(String Uid, AbstractNotification notification) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference notificationRef = databaseInstance.getReference("notifications").child(Uid).child(notification.getNotificationId());
+        notificationRef.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
             }
         });
         return future;

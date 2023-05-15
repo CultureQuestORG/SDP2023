@@ -1,25 +1,17 @@
 package ch.epfl.culturequest.social.notifications;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 
-import androidx.core.app.NotificationCompat;
-
-import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
 
-public class CompetitionNotification implements NotificationInterface {
+public class CompetitionNotification extends AbstractNotification {
     public static final String CHANNEL_ID = "COMPETITION";
 
-    @Override
-    public Notification get(Context context) {
-        return new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new competition!")
-                .setContentText("Click here to see your new competition!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
+    public CompetitionNotification() {
+        super(Profile.getActiveProfile().getUsername() + ", you have a new competition!",
+                "Click here to see your new competition!",
+                CHANNEL_ID);
     }
 
     /**

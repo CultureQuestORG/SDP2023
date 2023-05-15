@@ -5,7 +5,6 @@ import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,7 +23,7 @@ import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.social.notifications.FirebaseNotification;
+import ch.epfl.culturequest.social.notifications.FireMessaging;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 /**
@@ -92,7 +91,7 @@ public class Authenticator {
                     if (profile != null) {
                         // check if the device token is already in the database
                         List<String> deviceTokens = profile.getDeviceTokens();
-                        FirebaseNotification.getDeviceToken().whenComplete((token, throwable1) -> {
+                        FireMessaging.getDeviceToken().whenComplete((token, throwable1) -> {
                             if (!deviceTokens.contains(token)) {
                                 deviceTokens.add(token);
                                 profile.setDeviceTokens(deviceTokens);

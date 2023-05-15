@@ -10,7 +10,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import ch.epfl.culturequest.databinding.ActivityNavigationBinding;
-import ch.epfl.culturequest.social.notifications.NotificationInterface;
+import ch.epfl.culturequest.social.notifications.AbstractNotification;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class NavigationActivity extends AppCompatActivity {
@@ -22,7 +22,7 @@ public class NavigationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Create the notification channels on NavigationActivity creation
-        NotificationInterface.createNotificationChannels(this);
+        AbstractNotification.createNotificationChannels(this);
 
         // To make the status bar transparent
         AndroidUtils.removeStatusBar(getWindow());

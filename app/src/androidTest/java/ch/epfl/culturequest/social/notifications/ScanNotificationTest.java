@@ -27,13 +27,13 @@ public class ScanNotificationTest {
 
     @Before
     public void setup() {
-        NotificationInterface.createNotificationChannels(context);
+        AbstractNotification.createNotificationChannels(context);
         Profile.setActiveProfile(profile);
     }
 
     @Test
     public void ScanNotificationIsCorrectlyCreated() {
-        Notification scanNotification = new ScanNotification().get(context);
+        Notification scanNotification = new ScanNotification().buildNotification(context);
         assertThat(scanNotification.extras.get(Notification.EXTRA_TITLE).toString(), is(profile.getUsername() + ", you have a new scan!"));
         assertThat(scanNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("We found a new offline scan result!"));
         assertThat(scanNotification.priority, is(Notification.PRIORITY_DEFAULT));

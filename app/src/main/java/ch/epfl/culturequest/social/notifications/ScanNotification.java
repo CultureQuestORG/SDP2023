@@ -13,16 +13,16 @@ import ch.epfl.culturequest.social.Profile;
 /**
  * Class that represents notifications for a new offline scan
  */
-public class ScanNotification implements NotificationInterface {
+public class ScanNotification extends AbstractNotification {
     public static final String CHANNEL_ID = "SCAN";
 
-    @Override
-    public Notification get(Context context) {
-        return new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new scan!")
-                .setContentText("We found a new offline scan result!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
+    /**
+     * Constructor for the ScanNotification
+     */
+    public ScanNotification() {
+        super(Profile.getActiveProfile().getUsername() + ", you have a new scan!",
+                "We found a new offline scan result!",
+                CHANNEL_ID);
     }
 
     /**
