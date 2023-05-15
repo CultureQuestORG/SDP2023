@@ -9,6 +9,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.mock;
+
+import android.content.Context;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -26,6 +29,7 @@ import ch.epfl.culturequest.backend.map_collection.BasicOTMProvider;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMProvider;
 import ch.epfl.culturequest.backend.map_collection.RetryingOTMProvider;
+import ch.epfl.culturequest.utils.City;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
@@ -69,34 +73,6 @@ public class RetryingOTMProviderTest {
     public void testProviderRetriesIfServerIsNotReachable() throws IOException {
         // Make request before response is available, which should force a retry
         CompletableFuture<List<OTMLocation>> results = provider.getLocations(new LatLng(1., 0.), new LatLng(0., 1.));
-        String jsonBody = "[\n" +
-                "  {\n" +
-                "    \"xid\": \"R10699460\",\n" +
-                "    \"name\": \"Château de La Côte-Saint-André\",\n" +
-                "    \"rate\": 7,\n" +
-                "    \"osm\": \"relation/10699460\",\n" +
-                "    \"wikidata\": \"Q22966950\",\n" +
-                "    \"kinds\": \"fortifications,interesting_places,castles\",\n" +
-                "    \"point\": {\n" +
-                "      \"lon\": 20.23,\n" +
-                "      \"lat\": 47.39\n" +
-                "    }\n" +
-                "  }\n" +
-                "]";
-        server.enqueue(new MockResponse().setBody(jsonBody).setBodyDelay(2, TimeUnit.SECONDS)); // Delay response to force a retry further
-        List<OTMLocation> locations = results.orTimeout(5, TimeUnit.SECONDS).join();
-
-        assertThat(locations.size(), is(1));
-        assertThat(locations.get(0).getName(), is("Château de La Côte-Saint-André"));
-        assertThat(locations.get(0).getCoordinates().longitude(), is(20.23));
-        assertThat(locations.get(0).getCoordinates().latitude(), is(47.39));
-        assertThat(locations.get(0).getKinds(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
-    }
-
-    @Test
-    public void providerRetriesIfServerNotReachableForCities(){
-        // Make request before response is available, which should force a retry
-        CompletableFuture<List<OTMLocation>> results = provider.getLocations("Paris");
         String jsonBody = "[\n" +
                 "  {\n" +
                 "    \"xid\": \"R10699460\",\n" +
