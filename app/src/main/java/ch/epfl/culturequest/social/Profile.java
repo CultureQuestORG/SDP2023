@@ -24,6 +24,7 @@ public class Profile extends Observable {
     private String profilePicture;
     private Integer score;
     private HashMap<String, Integer> badges;
+    // List of all the token of each device the user installed the app on
     private List<String> deviceTokens;
     private static Profile activeProfile;
 

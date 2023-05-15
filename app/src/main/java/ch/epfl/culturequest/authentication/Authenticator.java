@@ -78,6 +78,8 @@ public class Authenticator {
 
     /**
      * Automatically Sign Up and In the user to the app by using a tier party service with the Firebase UI
+     *
+     * @param activity the activity from which the sign in is launched
      */
     public static CompletableFuture<String> signIn(ComponentActivity activity) {
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -89,9 +91,12 @@ public class Authenticator {
         } else {
                 Database.getProfile(getCurrentUser().getUid()).handle((profile, throwable) -> {
                     if (profile != null) {
-                        // check if the device token is already in the database
+                        // the following part is used to check at every login if the user has a
+                        // new device token
                         List<String> deviceTokens = profile.getDeviceTokens();
                         FireMessaging.getDeviceToken().whenComplete((token, throwable1) -> {
+                            // if the current device token is not already in the list, add it
+                            // and update the database
                             if (!deviceTokens.contains(token)) {
                                 deviceTokens.add(token);
                                 profile.setDeviceTokens(deviceTokens);
@@ -118,6 +123,9 @@ public class Authenticator {
 
     /**
      * Signs up (creates) new user to the app manually by using the email and password
+     *
+     * @param email
+     * @param password
      */
     public static CompletableFuture<AtomicBoolean> manualSignUp(String email, String password) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
@@ -134,6 +142,9 @@ public class Authenticator {
 
     /**
      * Signs in the user to the app manually by using the email and password
+     *
+     * @param email
+     * @param password
      */
     public static CompletableFuture<AtomicBoolean> manualSignIn(String email, String password) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();

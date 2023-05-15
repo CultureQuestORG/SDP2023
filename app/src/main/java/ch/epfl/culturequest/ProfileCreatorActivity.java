@@ -108,6 +108,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
         profile.setUsername(username);
         profile.setUid(Authenticator.getCurrentUser().getUid());
+
+        // Get first the device token, then store the profile in the database if it is not anonymous
         FireMessaging.getDeviceToken().whenComplete((token, ex) -> {
             if (ex == null) {
                 List<String> deviceTokens = new ArrayList<>();

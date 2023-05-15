@@ -8,6 +8,10 @@ import retrofit2.http.Body;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
+/**
+ * Interface that defines the Retrofit POST request to the Firebase Cloud
+ * Messaging API that will then send the notification to the user.
+ */
 public interface ApiInterface {
     String BASE_URL = "https://fcm.googleapis.com";
     String SERVER_KEY = BuildConfig.FIREBASE_MESSAGING_KEY;

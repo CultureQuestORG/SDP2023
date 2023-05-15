@@ -8,6 +8,10 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Class that provides the Retrofit Rest client to send a POST request to the Firebase Cloud
+ * Messaging API that will then send the notification to the user.
+ */
 public class ApiClient {
     public static ApiInterface getApiService() {
         return new Retrofit.Builder()

@@ -12,6 +12,9 @@ import ch.epfl.culturequest.social.Profile;
 public class CompetitionNotification extends PushNotification {
     public static final String CHANNEL_ID = "COMPETITION";
 
+    /**
+     * Constructor for the CompetitionNotification
+     */
     public CompetitionNotification() {
         super(Profile.getActiveProfile().getUsername() + ", you have a new competition!",
                 "Click here to see your new competition!",

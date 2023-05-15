@@ -7,7 +7,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
@@ -20,7 +19,7 @@ import java.util.UUID;
 import ch.epfl.culturequest.R;
 
 /**
- * Interface that represents notifications
+ * Super class that represents notifications stored in the database and sent by cloud messaging.
  */
 public class PushNotification {
     private String notificationId;
@@ -29,6 +28,9 @@ public class PushNotification {
     private String text;
     private long time;
 
+    /**
+     * Empty constructor used by Firebase
+     */
     public PushNotification() {
         this.title = "";
         this.text = "";
@@ -37,6 +39,13 @@ public class PushNotification {
         this.time = 0;
     }
 
+    /**
+     * Constructor
+     *
+     * @param title     the title of the notification
+     * @param text      the text of the notification
+     * @param channelId the channel id of the notification
+     */
     public PushNotification(String title, String text, String channelId) {
         this.title = title;
         this.text = text;
@@ -77,7 +86,7 @@ public class PushNotification {
      * @param context the context of the notification
      * @return the notification
      */
-    public Notification buildNotification(Context context){
+    public Notification buildNotification(Context context) {
         PendingIntent pendingIntent = selectPendingIntent(context, channelId);
         return new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.logo_compact)
@@ -88,6 +97,13 @@ public class PushNotification {
                 .build();
     }
 
+    /**
+     * Returns the pending intent associated with the notification
+     *
+     * @param context   the context of the notification
+     * @param channelId the channel id of the notification
+     * @return the pending intent
+     */
     public PendingIntent selectPendingIntent(Context context, String channelId) {
         switch (channelId) {
             case FollowNotification.CHANNEL_ID:
