@@ -69,6 +69,15 @@ public class SearchActivityTest {
                 .check(matches(Matchers.not(hasMinimumChildCount(1))));
     }
 
+
+    @Test
+    public void emptyCityQueryDisplaysNothing(){
+        onView(withId(R.id.search_cities)).perform(click());
+        onView(withId(R.id.search)).perform(typeText(""));
+        onView(withId(R.id.list_view))
+                .check(matches(Matchers.not(hasMinimumChildCount(1))));
+    }
+
     @Test
     public void pressback() {
         onView(withId(R.id.back_icon1)).perform(click());

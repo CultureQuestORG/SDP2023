@@ -13,6 +13,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasToString;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 import android.app.Activity;
@@ -64,6 +65,7 @@ public class SightSeeingActivityTest {
         Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", 0,new HashMap<>()));
         Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", 0,new HashMap<>()));
         Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0,new HashMap<>()));
+
         Database.addFollow("cT93LtGk2dT9Jvg46pOpbBP69Kx1", "testUid1");
         Intent mockIntent = new Intent(ApplicationProvider.getApplicationContext(),
                 SightseeingActivity.class);
@@ -123,6 +125,18 @@ public class SightSeeingActivityTest {
     }
 
     @Test
+    public void clickingOnInviteFriendsDisplaysUsername() throws InterruptedException {
+        onData(anything())
+                .inAdapterView(withId(R.id.places_to_see))
+                .atPosition(0).perform(click());
+        onView(withId(R.id.invite_friends)).perform(click());
+        Thread.sleep(2000);
+        onData(anything())
+                .inAdapterView(withId(R.id.places_to_see))
+                .atPosition(0).check(matches(withText("alice")));
+    }
+
+    @Test
     public void mapCanBeOpenedWhenClickingOnPreview(){
         onData(hasToString(containsString("Palais Garnier")))
                 .inAdapterView(withId(R.id.places_to_see))
@@ -157,6 +171,11 @@ public class SightSeeingActivityTest {
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
         Thread.sleep(3000);
+        onView(withId(R.id.invite_friends)).perform(click());
+        Thread.sleep(3000);
+        onData(anything())
+                .inAdapterView(withId(R.id.places_to_see))
+                .atPosition(0).perform(click());
         onView(withId(R.id.invite_friends)).perform(click());
     }
 
