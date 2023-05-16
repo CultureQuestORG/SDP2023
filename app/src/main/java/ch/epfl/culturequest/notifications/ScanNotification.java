@@ -19,7 +19,7 @@ public class ScanNotification extends PushNotification {
      * Constructor for the ScanNotification
      */
     public ScanNotification() {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new scan!",
+        super("You have a new scan!",
                 "We found a new offline scan result!",
                 CHANNEL_ID);
     }

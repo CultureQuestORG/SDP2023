@@ -22,8 +22,8 @@ public final class FollowNotification extends PushNotification {
      * @param newFollower the username of the new follower
      */
     public FollowNotification(String newFollower) {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new follower!",
-                newFollower + " is now following you!",
+        super(newFollower + ", you have a new follower!",
+                Profile.getActiveProfile().getUsername() + " is now following you!",
                 CHANNEL_ID);
     }
 

@@ -18,8 +18,8 @@ public class SightseeingNotification extends PushNotification {
      * @param friend the friend that invites to a new sightseeing
      */
     public SightseeingNotification(String friend) {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new sightseeing event!",
-                friend + " invited you to a new sightseeing event!",
+        super(friend + ", you have a new sightseeing event!",
+                Profile.getActiveProfile().getUsername() + " invited you to a new sightseeing event!",
                 CHANNEL_ID);
     }
 

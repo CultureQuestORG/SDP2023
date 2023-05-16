@@ -22,8 +22,8 @@ public class LikeNotification extends PushNotification {
      * @param liker the username of the liker
      */
     public LikeNotification(String liker) {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new like!",
-                liker + " liked your post!",
+        super(liker + ", you have a new like!",
+                Profile.getActiveProfile().getUsername() + " liked your post!",
                 CHANNEL_ID);
     }
 
