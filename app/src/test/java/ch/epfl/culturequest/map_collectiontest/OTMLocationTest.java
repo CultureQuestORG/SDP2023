@@ -4,8 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import org.junit.Test;
 
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
@@ -35,8 +33,8 @@ public class OTMLocationTest {
     @Test
     public void testCoordinatesAreCorrectlySet() {
         OTMLocation location = new OTMLocation("name", new OTMLatLng(0.,0.), "tag1,tag2");
-        assertThat(location.getCoordinates().latitude(), is(0.));
-        assertThat(location.getCoordinates().longitude(), is(0.));
+        assertThat(location.getCoordinates().getLat(), is(0.));
+        assertThat(location.getCoordinates().getLon(), is(0.));
     }
 
     // Test if kinds are correctly set

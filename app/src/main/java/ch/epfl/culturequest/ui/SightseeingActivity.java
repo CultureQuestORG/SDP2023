@@ -3,7 +3,6 @@ package ch.epfl.culturequest.ui;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -115,6 +114,7 @@ public class SightseeingActivity extends AppCompatActivity {
                         List<Profile> selectedFriends = profiles.stream().filter(profile -> usernamesSelected.contains(profile.getUsername())).collect(Collectors.toList());
                         //TODO DEAL WITH NOTIFICATIONS
                         SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces);
+                        Database.setSightseeingEvent(newEvent);
                         CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v);
                         CompletableFuture.runAsync(() -> {
                             //we do this to wait for the snackbar to be visible for 1 second before going back to the nav activity.
@@ -144,14 +144,14 @@ public class SightseeingActivity extends AppCompatActivity {
             });
             for (OTMLocation location : selectedPlaces.values()) {
                 OTMLatLng coord = location.getCoordinates();
-                LatLng mapCoord = new LatLng(coord.latitude(), coord.longitude());
+                LatLng mapCoord = new LatLng(coord.getLat(), coord.getLon());
                 MarkerOptions markerOptions = new MarkerOptions().position(mapCoord).title(location.getName());
                 googleMap.addMarker(markerOptions);
             }
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (OTMLocation location : selectedPlaces.values()) {
                 OTMLatLng coord = location.getCoordinates();
-                builder.include(new LatLng(coord.latitude(), coord.longitude()));
+                builder.include(new LatLng(coord.getLat(), coord.getLon()));
             }
             LatLngBounds bounds = builder.build();
             googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));

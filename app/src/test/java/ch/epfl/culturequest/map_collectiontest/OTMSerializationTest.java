@@ -1,13 +1,7 @@
 package ch.epfl.culturequest.map_collectiontest;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 import org.junit.Test;
 
-import java.lang.reflect.Type;
-import java.sql.Array;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
@@ -36,8 +30,8 @@ public class OTMSerializationTest {
     public void deserializationIsCorrect(){
         String serialized = "test|-1|1|art,architecture";
         OTMLocation location = OTMLocationSerializer.deserialize(serialized);
-        assertEquals(-1, location.getCoordinates().longitude(), 0);
-        assertEquals(1, location.getCoordinates().latitude(), 0);
+        assertEquals(-1, location.getCoordinates().getLon(), 0);
+        assertEquals(1, location.getCoordinates().getLat(), 0);
         assertEquals("test", location.getName());
         assertEquals(List.of("art", "architecture"), location.getKinds());
     }
