@@ -144,14 +144,14 @@ public class SightseeingActivity extends AppCompatActivity {
             });
             for (OTMLocation location : selectedPlaces.values()) {
                 OTMLatLng coord = location.getCoordinates();
-                LatLng mapCoord = new LatLng(coord.latitude(), coord.longitude());
+                LatLng mapCoord = new LatLng(coord.getLat(), coord.getLon());
                 MarkerOptions markerOptions = new MarkerOptions().position(mapCoord).title(location.getName());
                 googleMap.addMarker(markerOptions);
             }
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (OTMLocation location : selectedPlaces.values()) {
                 OTMLatLng coord = location.getCoordinates();
-                builder.include(new LatLng(coord.latitude(), coord.longitude()));
+                builder.include(new LatLng(coord.getLat(), coord.getLon()));
             }
             LatLngBounds bounds = builder.build();
             googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));

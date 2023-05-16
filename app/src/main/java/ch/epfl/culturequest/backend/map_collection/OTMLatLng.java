@@ -2,8 +2,6 @@ package ch.epfl.culturequest.backend.map_collection;
 
 import androidx.annotation.NonNull;
 
-import com.google.firebase.database.PropertyName;
-
 /**
  * Represents a point on the map
  *
@@ -27,27 +25,17 @@ public final class OTMLatLng {
     /**
      * @return the latitude of the point
      */
-    public double latitude() {
+    public double getLat() {
         return lat;
     }
 
     /**
      * @return the longitude of the point
      */
-    public double longitude() {
+    public double getLon() {
         return lon;
     }
 
-
-    //the following getters and setters are necessary unfortunately for us to be able to store this object
-    //in the database. this is because firebase reads the function name to store stuff. Refactoring the above functions makes many modifs to the porject
-    public double getLat() {
-        return latitude();
-    }
-
-    public double getLon() {
-        return longitude();
-    }
 
     public void setLat(double lat){
         this.lat =  lat;

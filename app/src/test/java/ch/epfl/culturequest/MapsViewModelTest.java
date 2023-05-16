@@ -92,8 +92,8 @@ public class MapsViewModelTest {
         mapsViewModel.setLocations(List.of(new OTMLocation("test", new OTMLatLng(0.0, 0.0), "kind1,kind2")));
         assertThat(mapsViewModel.getLocations().size(), is(1));
         assertThat(mapsViewModel.getLocations().get(0).getName(), is("test"));
-        assertThat(mapsViewModel.getLocations().get(0).getCoordinates().latitude(), is(0.0));
-        assertThat(mapsViewModel.getLocations().get(0).getCoordinates().longitude(), is(0.0));
+        assertThat(mapsViewModel.getLocations().get(0).getCoordinates().getLat(), is(0.0));
+        assertThat(mapsViewModel.getLocations().get(0).getCoordinates().getLon(), is(0.0));
         assertThat(mapsViewModel.getLocations().get(0).getKinds().size(), is(2));
         assertThat(mapsViewModel.getLocations().get(0).getKinds(), containsInAnyOrder("kind1", "kind2"));
     }
