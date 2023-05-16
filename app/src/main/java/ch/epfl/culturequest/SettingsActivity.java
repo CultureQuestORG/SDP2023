@@ -104,6 +104,7 @@ public class SettingsActivity extends AppCompatActivity {
             EspressoIdlingResource.decrement();
             return;
         }
+        activeProfile.setUsername(username.getText().toString());
         // if the profile picture has not been changed, we don't need to upload it again
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
