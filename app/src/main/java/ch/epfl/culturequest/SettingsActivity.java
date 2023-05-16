@@ -100,9 +100,10 @@ public class SettingsActivity extends AppCompatActivity {
         EspressoIdlingResource.increment();
 
         // Check if the username is valid
-        if (setProblemHintTextIfAny(username)) return;
-
-
+        if (setProblemHintTextIfAny(username)) {
+            EspressoIdlingResource.decrement();
+            return;
+        }
         // if the profile picture has not been changed, we don't need to upload it again
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
@@ -128,7 +129,6 @@ public class SettingsActivity extends AppCompatActivity {
                         EspressoIdlingResource.decrement();
                     }
             );
-
         }
         // Upload the new profile picture and update the profile
 

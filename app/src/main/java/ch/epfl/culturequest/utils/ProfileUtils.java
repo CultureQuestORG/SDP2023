@@ -5,12 +5,9 @@ import android.os.Build;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import ch.epfl.culturequest.social.Profile;
-
 
 /**
  * Class that contains methods that are used in activities where a profile is created or modified
- *
  */
 public class ProfileUtils {
 
@@ -36,18 +33,27 @@ public class ProfileUtils {
      */
     private static USERNAME_PB usernameIsValid(String username) {
         int length = username.length();
-        if (username.isEmpty()) return USERNAME_PB.USERNAME_IS_EMPTY;
-        else if (length < 3) return USERNAME_PB.USERNAME_TOO_SHORT;
-        else if (length > 20) return USERNAME_PB.USERNAME_TOO_LONG;
-        else if (username.contains(" ")) return USERNAME_PB.USERNAME_HAS_WHITESPACE;
-        else if (!username.matches(USERNAME_REGEX)) return  USERNAME_PB.USERNAME_HAS_WRONG_REGEX;
-        return USERNAME_PB.USERNAME_VALID;
+        USERNAME_PB result;
+        if (username.isEmpty())
+            result = USERNAME_PB.USERNAME_IS_EMPTY;
+        else if (length < 3)
+            result = USERNAME_PB.USERNAME_TOO_SHORT;
+        else if (length > 20)
+            result = USERNAME_PB.USERNAME_TOO_LONG;
+        else if (username.contains(" "))
+            result = USERNAME_PB.USERNAME_HAS_WHITESPACE;
+        else if (!username.matches(USERNAME_REGEX))
+            result = USERNAME_PB.USERNAME_HAS_WRONG_REGEX;
+        else
+            result = USERNAME_PB.USERNAME_VALID;
+        return result;
     }
 
-    public static void handleScore(TextView level,TextView levelText, ProgressBar progressBar, int score){
+
+    public static void handleScore(TextView level, TextView levelText, ProgressBar progressBar, int score) {
 
 
-        int levelNumber = (int) Math.floor(Math.pow(score, 1.0/3.0));
+        int levelNumber = (int) Math.floor(Math.pow(score, 1.0 / 3.0));
 
 
         int pointsfromlastlevel = (int) (Math.pow(levelNumber, 3));
@@ -92,7 +98,7 @@ public class ProfileUtils {
         return true;
     }
 
-    enum USERNAME_PB{
+    enum USERNAME_PB {
         USERNAME_IS_EMPTY, USERNAME_TOO_LONG, USERNAME_TOO_SHORT, USERNAME_HAS_WHITESPACE, USERNAME_HAS_WRONG_REGEX, USERNAME_VALID;
     }
 
