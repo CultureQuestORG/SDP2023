@@ -27,6 +27,7 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Profile;
@@ -178,6 +179,12 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void openGallery() {
         profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TournamentManagerApi.handleTournaments();
     }
 
 

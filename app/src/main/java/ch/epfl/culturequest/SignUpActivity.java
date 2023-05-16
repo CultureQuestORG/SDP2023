@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.notifications.NotificationInterface;
 import ch.epfl.culturequest.utils.AndroidUtils;
@@ -37,5 +38,11 @@ public class SignUpActivity extends AppCompatActivity {
         else {
             Authenticator.signIn(this);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TournamentManagerApi.handleTournaments();
     }
 }
