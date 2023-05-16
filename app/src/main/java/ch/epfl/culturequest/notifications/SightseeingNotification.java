@@ -1,17 +1,15 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 
-import androidx.core.app.NotificationCompat;
-
-import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.social.Profile;
 
-public class SightseeingNotification implements NotificationInterface {
-    private final String friend;
+public class SightseeingNotification extends PushNotification {
     public static final String CHANNEL_ID = "SIGHTSEEING";
 
     /**
@@ -20,16 +18,9 @@ public class SightseeingNotification implements NotificationInterface {
      * @param friend the friend that invites to a new sightseeing
      */
     public SightseeingNotification(String friend) {
-        this.friend = friend;
-    }
-
-    @Override
-    public Notification get(Context context) {
-        return new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new sightseeing event!")
-                .setContentText(friend + " invited you to a new sightseeing event!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
+        super(Profile.getActiveProfile().getUsername() + ", you have a new sightseeing event!",
+                friend + " invited you to a new sightseeing event!",
+                CHANNEL_ID);
     }
 
     /**
@@ -47,5 +38,17 @@ public class SightseeingNotification implements NotificationInterface {
             return channel;
         }
         return null;
+    }
+
+    /**
+     * Returns the pending intent for the notification
+     *
+     * @param context the context of the notification
+     * @return the pending intent for the notification
+     */
+    public static PendingIntent getPendingIntent(Context context) {
+        Intent intent = new Intent(context, NavigationActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        return  PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
     }
 }

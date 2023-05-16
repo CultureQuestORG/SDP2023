@@ -22,10 +22,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.PermissionRequest;
@@ -106,34 +109,44 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         profile.setUsername(username);
         profile.setUid(Authenticator.getCurrentUser().getUid());
 
-        //if user is anonymous, we don't want to store the profile in the database
-        if (!Authenticator.getCurrentUser().isAnonymous()) {
+        // Get first the device token, then store the profile in the database if it is not anonymous
+        FireMessaging.getDeviceToken().whenComplete((token, ex) -> {
+            if (ex == null) {
+                List<String> deviceTokens = new ArrayList<>();
+                deviceTokens.add(token);
+                profile.setDeviceTokens(deviceTokens);
+            }
 
-            //if the profile picture is not the default one, we store it in the storage
-            if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PIC_PATH))
-                FireStorage.uploadNewProfilePictureToStorage(profile, profilePicBitmap, true).whenComplete(
-                        (profile, throwable) -> {
-                            if (throwable != null) {
-                                throwable.printStackTrace();
-                            } else {
-                                Database.setProfile(profile);
-                                Profile.setActiveProfile(profile);
+            //if user is anonymous, we don't want to store the profile in the database
+            if (!Authenticator.getCurrentUser().isAnonymous()) {
+
+                //if the profile picture is not the default one, we store it in the storage
+                if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PIC_PATH))
+                    FireStorage.uploadNewProfilePictureToStorage(profile, profilePicBitmap, true).whenComplete(
+                            (profile, throwable) -> {
+                                if (throwable != null) {
+                                    throwable.printStackTrace();
+                                } else {
+                                    Database.setProfile(profile);
+                                    Profile.setActiveProfile(profile);
+                                }
                             }
-                        }
-                );
-                // if the profile picture is the default one, we don't need to store it in the storage
-            else {
-                Database.setProfile(profile);
+                    );
+                    // if the profile picture is the default one, we don't need to store it in the storage
+                else {
+                    Database.setProfile(profile);
+                    Profile.setActiveProfile(profile);
+                }
+
+            } else {
+                //if user is anonymous, we don't want to store the profile in the database
                 Profile.setActiveProfile(profile);
             }
 
-        } else {
-            //if user is anonymous, we don't want to store the profile in the database
-            Profile.setActiveProfile(profile);
-        }
+            Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
+            startActivity(successfulProfileCreation);
 
-        Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
-        startActivity(successfulProfileCreation);
+        });
     }
 
     private void openGallery() {

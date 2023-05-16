@@ -1,22 +1,19 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 
-import androidx.core.app.NotificationCompat;
-
-import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.social.Profile;
 
 /**
  * Class that represents a notification for a new like
  */
-public class LikeNotification implements NotificationInterface {
-    private final String liker;
-
+public class LikeNotification extends PushNotification {
     public static final String CHANNEL_ID = "LIKE";
 
     /**
@@ -25,16 +22,9 @@ public class LikeNotification implements NotificationInterface {
      * @param liker the username of the liker
      */
     public LikeNotification(String liker) {
-        this.liker = liker;
-    }
-
-    @Override
-    public Notification get(Context context) {
-        return new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.logo_compact)
-                .setContentTitle(Profile.getActiveProfile().getUsername() + ", you have a new like!")
-                .setContentText(liker + " liked your post!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
+        super(Profile.getActiveProfile().getUsername() + ", you have a new like!",
+                liker + " liked your post!",
+                CHANNEL_ID);
     }
 
     /**
@@ -52,5 +42,17 @@ public class LikeNotification implements NotificationInterface {
             return channel;
         }
         return null;
+    }
+
+    /**
+     * Returns the pending intent for the notification
+     *
+     * @param context the context of the notification
+     * @return the pending intent for the notification
+     */
+    public static PendingIntent getPendingIntent(Context context) {
+        Intent intent = new Intent(context, NavigationActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        return  PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
     }
 }

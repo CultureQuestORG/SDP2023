@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
@@ -21,17 +22,17 @@ import ch.epfl.culturequest.social.Profile;
 @RunWith(AndroidJUnit4.class)
 public class SightseeingNotificationTest {
     private final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    private final Profile profile = new Profile("test", "test", "SightSeer", "test", "test", "test", 0, new HashMap<>());
+    private final Profile profile = new Profile("test", "test", "SightSeer", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
 
     @Before
     public void setup() {
-        NotificationInterface.createNotificationChannels(context);
+        PushNotification.createNotificationChannels(context);
         Profile.setActiveProfile(profile);
     }
 
     @Test
     public void testSightSeeingNotification() {
-        Notification sightseeingNotification = new SightseeingNotification("John").get(context);
+        Notification sightseeingNotification = new SightseeingNotification("John").buildNotification(context);
         assertThat(sightseeingNotification.extras.get(Notification.EXTRA_TITLE).toString(), is(profile.getUsername() + ", you have a new sightseeing event!"));
         assertThat(sightseeingNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("John invited you to a new sightseeing event!"));
         assertThat(sightseeingNotification.priority, is(Notification.PRIORITY_DEFAULT));
