@@ -37,4 +37,15 @@ public class OTMLatLngTest {
         assertThat(latLng.longitude(), is(25.));
     }
 
+    @Test
+    public void duplicateGetAndSetAreCorrect(){
+        OTMLatLng latLng = new OTMLatLng(25.,0.);
+        assertThat(latLng.getLon(), is(25.));
+        assertThat(latLng.getLat(), is(0.));
+        latLng.setLat(1.);
+        latLng.setLon(2.);
+        assertThat(latLng.getLon(), is(2.));
+        assertThat(latLng.getLat(), is(1.));
+    }
+
 }

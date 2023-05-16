@@ -3,7 +3,6 @@ package ch.epfl.culturequest.ui;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -115,6 +114,7 @@ public class SightseeingActivity extends AppCompatActivity {
                         List<Profile> selectedFriends = profiles.stream().filter(profile -> usernamesSelected.contains(profile.getUsername())).collect(Collectors.toList());
                         //TODO DEAL WITH NOTIFICATIONS
                         SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces);
+                        Database.setSightseeingEvent(newEvent);
                         CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v);
                         CompletableFuture.runAsync(() -> {
                             //we do this to wait for the snackbar to be visible for 1 second before going back to the nav activity.

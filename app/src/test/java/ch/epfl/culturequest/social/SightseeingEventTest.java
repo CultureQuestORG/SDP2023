@@ -2,6 +2,7 @@ package ch.epfl.culturequest.social;
 
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 
@@ -51,6 +52,27 @@ public class SightseeingEventTest {
         assertThrows(IllegalArgumentException.class, () -> new SightseeingEvent(null, invited, locations));
         assertThrows(IllegalArgumentException.class, () -> new SightseeingEvent(owner, List.of(), locations));
         assertThrows(IllegalArgumentException.class, () -> new SightseeingEvent(owner, invited, List.of()));
+    }
+
+    @Test
+    public void assertSettingAttributesModifiesEvent(){
+        Profile newOwner = new Profile();
+        event.setOwner(newOwner);
+        assertThat(event.getOwner(), is(newOwner));
+
+        Profile a = new Profile(), b = new Profile();
+        event.setInvited(List.of(a,b));
+        assertThat(event.getInvited(), is(List.of(a,b)));
+
+        OTMLocation l = locations.get(0);
+        event.setLocations(List.of(l));
+        assertThat(event.getLocations(), is(List.of(l)));
+    }
+
+    @Test
+    public void creatingEventWithIdCanBeModified(){
+        event.setEventId("1");
+        assertThat(event.getEventId(), is("1"));
     }
 }
 

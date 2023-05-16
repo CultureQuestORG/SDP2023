@@ -26,6 +26,7 @@ import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDesc
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.social.SightseeingEvent;
 
 
 /**
@@ -666,6 +667,20 @@ public class Database {
                 } else {
                     future.complete(new AtomicBoolean(committed));
                 }
+            }
+        });
+        return future;
+    }
+
+
+    public static CompletableFuture<AtomicBoolean> setSightseeingEvent(SightseeingEvent event){
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = databaseInstance.getReference("sightseeing_event").child(event.getOwner().getUid()).child(String.valueOf(event.getEventId()));
+        usersRef.setValue(event).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
             }
         });
         return future;
