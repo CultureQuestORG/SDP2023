@@ -32,6 +32,9 @@
             android:exported="false" >
         </activity>
 
+        <activity
+            android:name=".ui.SightseeingActivity"
+            android:exported="false" />
 
         <activity
             android:name=".SettingsActivity"
@@ -57,7 +60,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".ui.SearchUserActivity"
+            android:name=".ui.SearchActivity"
             android:exported="true"/>
         <activity
             android:name=".ui.profile.DisplayUserProfileActivity"
