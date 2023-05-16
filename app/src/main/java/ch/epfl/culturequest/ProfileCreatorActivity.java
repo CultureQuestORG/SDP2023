@@ -62,7 +62,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile_creation);
         //the following attributes are used to check whether the user actually selected a profile pic
         profileView = findViewById(R.id.profile_picture);
-        textView = findViewById(R.id.textView);
+        textView = findViewById(R.id.username);
         initialDrawable = profileView.getDrawable();
     }
 

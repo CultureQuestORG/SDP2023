@@ -137,7 +137,7 @@ public class ProfileCreatorActivityTest {
         Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint("Username is empty")));
 
-        onView(withId(R.id.username)).perform(typeText("lol"), pressBack());
+        onView(withId(R.id.username)).perform(typeText("lo"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
         onView(withId(R.id.username)).check(matches(withHint("Username is too short")));
