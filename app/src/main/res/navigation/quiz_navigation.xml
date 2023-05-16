@@ -31,4 +31,10 @@
         android:label="QuizGameOverFragment"
         tools:layout="@layout/fragment_quiz_game_over" />
 
+    <fragment
+        android:id="@+id/quizVictoryFragment"
+        android:name="ch.epfl.culturequest.ui.quiz.QuizGameOverFragment"
+        android:label="QuizGameOverFragment"
+        tools:layout="@layout/fragment_quiz_game_over" />
+
 </navigation>

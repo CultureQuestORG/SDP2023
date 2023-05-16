@@ -21,10 +21,19 @@ public class QuizViewModel extends ViewModel {
 
     private final MutableLiveData<QuizActivity> quizActivity = new MutableLiveData<>();
 
+    private final MutableLiveData<Integer> score = new MutableLiveData<>();
+    private final MutableLiveData<Integer> nextScore = new MutableLiveData<>();
+
+    private final MutableLiveData<Integer> questionNumber = new MutableLiveData<>();
+
+
 
     public QuizViewModel(Quiz quiz, QuizActivity quizActivity) {
         this.quiz.setValue(quiz);
         this.quizActivity.setValue(quizActivity);
+        score.setValue(0);
+        nextScore.setValue(100);
+
 
     }
     public void setQuiz(Quiz quiz) {
@@ -36,15 +45,42 @@ public class QuizViewModel extends ViewModel {
     }
 
     public void startQuiz() {
-        System.out.println("start quiz");
-        System.out.println(quizActivity.getValue());
-        Objects.requireNonNull(quizActivity.getValue()).startQuiz();
+        Objects.requireNonNull(quizActivity.getValue()).goToQuestion(0, Objects.requireNonNull(quiz.getValue()).getQuestions().get(0));
+    }
+
+    public void answerQuestion(int questionNumber, String answer) {
+        boolean correct = Objects.requireNonNull(quiz.getValue()).getQuestions().get(questionNumber).isCorrect(answer);
+        if (!correct) {
+            Objects.requireNonNull(quizActivity.getValue()).FailQuiz();
+            return;
+        }
+
+        score.setValue(nextScore.getValue());
+        this.questionNumber.setValue(questionNumber + 1);
+        if (this.questionNumber.getValue() == Objects.requireNonNull(quiz.getValue()).getQuestions().size()) {
+            Objects.requireNonNull(quizActivity.getValue()).endQuiz(score.getValue());
+            return;
+        }
+
+        Objects.requireNonNull(quizActivity.getValue()).interQuestion(nextScore.getValue());
+
+
+    }
+
+    public void nextQuestion(int nextScore) {
+        this.nextScore.setValue(nextScore);
+        Objects.requireNonNull(quizActivity.getValue()).goToQuestion(questionNumber.getValue(), getQuestion(questionNumber.getValue()));
+
+    }
+
+    public void finishQuiz(int score) {
+        Objects.requireNonNull(quizActivity.getValue()).endQuiz(score);
     }
 
 
 
-    public static void addQuiz(Quiz quiz,QuizActivity activity) {
-        Triple<String, String, String> key = new Triple<>(quiz.getUid(), quiz.getTournament(), quiz.getArtName());
+    public static void addQuiz(Quiz quiz,QuizActivity activity,String uid) {
+        Triple<String, String, String> key = new Triple<>(uid, quiz.getTournament(), quiz.getArtName());
         quizHashMap.put(key, new QuizViewModel(quiz, activity));
     }
 
@@ -57,9 +93,8 @@ public class QuizViewModel extends ViewModel {
         return Objects.requireNonNull(quiz.getValue()).getQuestions().get(questionNumber);
     }
 
-    public void answerQuestion(int questionNumber, boolean correct) {
-        Objects.requireNonNull(quizActivity.getValue()).FinishQuestion(questionNumber, correct);
-    }
+
+
 
 
 }

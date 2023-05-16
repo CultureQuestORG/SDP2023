@@ -1,38 +1,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="@color/backgroundVictory"
     android:orientation="vertical"
     android:gravity="center">
 
     <TextView
-        android:id="@+id/tvGameOver"
+        android:id="@+id/congratulations"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/game_over"
-        android:textColor="#FFFFFF"
+        android:text="@string/congratulations"
+
         android:textSize="36sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tvPoints"
+        android:id="@+id/pointsEarned"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/you_lost_all_your_points"
-        android:textColor="#FFFFFF"
         android:textSize="24sp" />
 
-    <TextView
+    <Button
         android:id="@+id/btnBackToTournament"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:background="@drawable/rounded_button_secondary"
-        android:padding="16dp"
-        android:textSize="18sp"
-        android:fontFamily="@font/poppins_bold"
-        android:textAllCaps="true"
+        android:background="@drawable/rounded_button"
+
+
+
         android:text="@string/back_to_the_tournament" />
 
 </LinearLayout>

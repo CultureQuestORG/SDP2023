@@ -33,7 +33,7 @@ public class QuizInterFragment extends Fragment {
         MINUS_50,
     }
 
-    private WheelLocation[] wheelLocations= {
+    private final WheelLocation[] wheelLocations= {
             WheelLocation.X2,
             WheelLocation.PLUS_100,
             WheelLocation.MINUS_50,
@@ -48,13 +48,25 @@ public class QuizInterFragment extends Fragment {
 
 
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentQuizInterBinding.inflate(inflater, container, false);
 
+        if (getArguments() == null) {
+            throw new RuntimeException("No arguments passed to QuizInterFragment");
+        }
+        String uid = getArguments().getString("uid");
+        String tournament = getArguments().getString("tournament");
+        String artName = getArguments().getString("artName");
+        int score = getArguments().getInt("score");
+
+        QuizViewModel quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
+
+
+
         View root = binding.getRoot();
-        binding.score.setText("100");
+        binding.score.setText(String.format("%d", score));
 
 
         binding.spinButton.setOnClickListener( a-> {
@@ -93,9 +105,7 @@ public class QuizInterFragment extends Fragment {
                             AlertDialog dial = new AlertDialog.Builder(getContext())
                                     .setTitle("You can have " + binding.newscore.getText().toString() + " points if you answer the next question correctly!")
                                     .setMessage("You can now go to the next question")
-                                    .setPositiveButton("OK", (dialog, which) -> {
-                                        binding.nextButton.setVisibility(View.VISIBLE);
-                                    })
+                                    .setPositiveButton("OK", (dialog, which) -> binding.nextButton.setVisibility(View.VISIBLE))
                                     .create();
                             dial.show();
                         }
@@ -113,6 +123,13 @@ public class QuizInterFragment extends Fragment {
         });
 
 
+        binding.nextButton.setOnClickListener(a-> {
+            quizViewModel.nextQuestion(Integer.parseInt(binding.newscore.getText().toString()));
+        });
+
+        binding.stopButton.setOnClickListener(a-> {
+            quizViewModel.finishQuiz(score);
+        });
 
         return root;
 

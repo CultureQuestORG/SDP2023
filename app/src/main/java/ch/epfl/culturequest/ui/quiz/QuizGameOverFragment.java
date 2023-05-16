@@ -19,6 +19,10 @@ public class QuizGameOverFragment extends Fragment {
 
         View root = binding.getRoot();
 
+        binding.btnBackToTournament.setOnClickListener(a-> {
+            //handle back to tournament
+        });
+
         return root;
     }
 

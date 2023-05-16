@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.FragmentQuizQuestionBinding;
@@ -23,25 +24,32 @@ public class QuizQuestionFragment extends Fragment {
 
     List<RadioButton> possibleAnswers=new ArrayList<>();
 
-    Question question;
+    String question;
+
+    List<String> possibilities;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentQuizQuestionBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        if (getArguments() == null) {
+            throw new RuntimeException("QuizQuestionFragment needs arguments");
+        }
         String uid = getArguments().getString("uid");
         String tournament = getArguments().getString("tournament");
         String artName = getArguments().getString("artName");
         int questionNumber = getArguments().getInt("questionNumber");
+        question = getArguments().getString("question");
+        possibilities = getArguments().getStringArrayList("possibleAnswers");
+
 
         quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
 
-        question = quizViewModel.getQuestion(questionNumber);
+        binding.questionTextView.setText(question);
 
-        binding.questionTextView.setText(question.getQuestion());
+        binding.progressBar.setProgress(100*questionNumber/ Objects.requireNonNull(quizViewModel.getQuiz().getValue()).getQuestions().size());
 
-        List<String> possibilities = question.getPossibilities();
 
        possibleAnswers.add(binding.answer1RadioButton);
        possibleAnswers.add(binding.answer2RadioButton);
@@ -50,6 +58,7 @@ public class QuizQuestionFragment extends Fragment {
 
          for (int i = 0; i < possibilities.size(); i++)
               possibleAnswers.get(i).setText(possibilities.get(i));
+
 
 
 
@@ -66,7 +75,7 @@ public class QuizQuestionFragment extends Fragment {
                 dialog.show();
                 return;
             }
-            quizViewModel.answerQuestion(questionNumber, checkAnswer());
+            quizViewModel.answerQuestion(questionNumber, possibleAnswers.stream().filter(RadioButton::isChecked).findFirst().get().getText().toString());
 
         });
 
@@ -75,19 +84,5 @@ public class QuizQuestionFragment extends Fragment {
         return root;
 
     }
-
-    public boolean checkAnswer(){
-        String selectedAnswer = "";
-        for (RadioButton possibleAnswer : possibleAnswers) {
-            if (possibleAnswer.isChecked()) {
-                selectedAnswer = possibleAnswer.getText().toString();
-                break;
-            }
-        }
-        return question.isCorrect(selectedAnswer);
-
-
-    }
-
 
 }

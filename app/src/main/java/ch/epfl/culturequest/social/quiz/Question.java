@@ -1,16 +1,17 @@
 package ch.epfl.culturequest.social.quiz;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Question {
 
     String question;
-    List<String> possibilities;
+    ArrayList<String> possibilities;
     String answer;
 
 
 
-    public Question(String question, List<String> possibilities, String answer) {
+    public Question(String question, ArrayList<String> possibilities, String answer) {
         assert possibilities.contains(answer);
         this.question = question;
         this.possibilities = possibilities;
@@ -27,7 +28,7 @@ public class Question {
         return question;
     }
 
-    public List<String> getPossibilities() {
+    public ArrayList<String> getPossibilities() {
         return possibilities;
     }
 
@@ -39,7 +40,7 @@ public class Question {
         this.question = question;
     }
 
-    public void setPossibilities(List<String> possibilities) {
+    public void setPossibilities(ArrayList<String> possibilities) {
         this.possibilities = possibilities;
     }
 
