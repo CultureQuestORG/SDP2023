@@ -1,13 +1,16 @@
 package ch.epfl.culturequest.ui.quiz;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.culturequest.R;
@@ -17,6 +20,8 @@ import ch.epfl.culturequest.social.quiz.Question;
 public class QuizQuestionFragment extends Fragment {
     FragmentQuizQuestionBinding binding;
     QuizViewModel quizViewModel;
+
+    List<RadioButton> possibleAnswers=new ArrayList<>();
 
     Question question;
 
@@ -38,21 +43,30 @@ public class QuizQuestionFragment extends Fragment {
 
         List<String> possibilities = question.getPossibilities();
 
-        binding.answer1RadioButton.setText(possibilities.get(0));
-        binding.answer2RadioButton.setText(possibilities.get(1));
-        binding.answer3RadioButton.setText(possibilities.get(2));
-        binding.answer4RadioButton.setText(possibilities.get(3));
+       possibleAnswers.add(binding.answer1RadioButton);
+       possibleAnswers.add(binding.answer2RadioButton);
+       possibleAnswers.add(binding.answer3RadioButton);
+       possibleAnswers.add(binding.answer4RadioButton);
+
+         for (int i = 0; i < possibilities.size(); i++)
+              possibleAnswers.get(i).setText(possibilities.get(i));
+
 
 
         root.findViewById(R.id.nextButton).setOnClickListener(a-> {
             // check that at least one answer has been selected
-            if (binding.answer1RadioButton.isChecked() || binding.answer2RadioButton.isChecked() || binding.answer3RadioButton.isChecked() || binding.answer4RadioButton.isChecked()) {
-
-
+            if (!possibleAnswers.stream().reduce(false, (acc, possibleAnswer) -> acc || possibleAnswer.isChecked(), (acc1, acc2) -> acc1 || acc2)){
+                AlertDialog dialog = new AlertDialog.Builder(getContext())
+                        .setTitle("Error")
+                        .setMessage("Please select an answer")
+                        .setPositiveButton("OK", (dialog1, which) -> {
+                            dialog1.dismiss();
+                        })
+                        .create();
+                dialog.show();
+                return;
             }
-            else{
-
-            }
+            quizViewModel.answerQuestion(questionNumber, checkAnswer());
 
         });
 
@@ -64,19 +78,12 @@ public class QuizQuestionFragment extends Fragment {
 
     public boolean checkAnswer(){
         String selectedAnswer = "";
-        if (binding.answer1RadioButton.isChecked()) {
-            selectedAnswer = binding.answer1RadioButton.getText().toString();
+        for (RadioButton possibleAnswer : possibleAnswers) {
+            if (possibleAnswer.isChecked()) {
+                selectedAnswer = possibleAnswer.getText().toString();
+                break;
+            }
         }
-        else if (binding.answer2RadioButton.isChecked()) {
-            selectedAnswer = binding.answer2RadioButton.getText().toString();
-        }
-        else if (binding.answer3RadioButton.isChecked()) {
-            selectedAnswer = binding.answer3RadioButton.getText().toString();
-        }
-        else if (binding.answer4RadioButton.isChecked()) {
-            selectedAnswer = binding.answer4RadioButton.getText().toString();
-        }
-
         return question.isCorrect(selectedAnswer);
 
 

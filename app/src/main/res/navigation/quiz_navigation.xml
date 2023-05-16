@@ -25,4 +25,10 @@
         android:label="QuizQuestionFragment"
         tools:layout="@layout/fragment_quiz_question" />
 
+    <fragment
+        android:id="@+id/quizGameOverFragment"
+        android:name="ch.epfl.culturequest.ui.quiz.QuizGameOverFragment"
+        android:label="QuizGameOverFragment"
+        tools:layout="@layout/fragment_quiz_game_over" />
+
 </navigation>

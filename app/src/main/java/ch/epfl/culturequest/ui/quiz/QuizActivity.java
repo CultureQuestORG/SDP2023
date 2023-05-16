@@ -20,6 +20,7 @@ import ch.epfl.culturequest.utils.AndroidUtils;
 public class QuizActivity extends AppCompatActivity {
 
     private ActivityQuizBinding binding;
+    public final static int NUMBER_OF_QUESTIONS = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +74,22 @@ public class QuizActivity extends AppCompatActivity {
                 .commit();
     }
 
-    public void FinishQuestion(boolean success) {
+    public void FinishQuestion(int questionNumber ,boolean success) {
+        if (!success){
+            // go to the game over screen
+            QuizGameOverFragment fragment = new QuizGameOverFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.nav_host_fragment_activity_quiz, fragment)
+                    .commit();
+            return;
+        }
+        if (questionNumber==NUMBER_OF_QUESTIONS-1){
+            //handle the end of the quiz
+        }
         Bundle bundle = new Bundle();
         bundle.putString("uid", "1234");
         bundle.putString("tournament", "tournament1");
         bundle.putString("artName", "La Joconde");
-
-        bundle.putBoolean("success", success);
         QuizQuestionFragment fragment = new QuizQuestionFragment();
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()

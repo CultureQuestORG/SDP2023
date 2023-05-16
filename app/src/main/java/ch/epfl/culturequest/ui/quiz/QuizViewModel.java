@@ -57,5 +57,9 @@ public class QuizViewModel extends ViewModel {
         return Objects.requireNonNull(quiz.getValue()).getQuestions().get(questionNumber);
     }
 
+    public void answerQuestion(int questionNumber, boolean correct) {
+        Objects.requireNonNull(quizActivity.getValue()).FinishQuestion(questionNumber, correct);
+    }
+
 
 }

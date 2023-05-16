@@ -48,4 +48,7 @@
     <string name="quit">QUIT</string>
     <string name="next">NEXT</string>
     <string name="disclaimer">Between each question, you can either cash out or all in for the next one</string>
+    <string name="game_over">GAME OVER</string>
+    <string name="you_lost_all_your_points">You lost all your points</string>
+    <string name="back_to_the_tournament">Back to the tournament</string>
 </resources>
