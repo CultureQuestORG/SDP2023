@@ -60,11 +60,11 @@ public class SightSeeingActivityTest {
         Authenticator.manualSignIn("test@gmail.com", "abcdefg");
 
 
-        Profile.setActiveProfile(new Profile("cT93LtGk2dT9Jvg46pOpbBP69Kx1", "name", "Test", "test@gmail.com", "num", "profile", 0, new HashMap<>()));
-        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0,new HashMap<>()));
-        Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", 0,new HashMap<>()));
-        Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", 0,new HashMap<>()));
-        Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0,new HashMap<>()));
+        Profile.setActiveProfile(new Profile("cT93LtGk2dT9Jvg46pOpbBP69Kx1", "name", "Test", "test@gmail.com", "num", "profile", 0, new HashMap<>(), new ArrayList<>()));
+        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0,new HashMap<>(), new ArrayList<>()));
+        Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", 0,new HashMap<>(), new ArrayList<>()));
+        Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", 0,new HashMap<>(), new ArrayList<>()));
+        Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0,new HashMap<>(), new ArrayList<>()));
 
         Database.addFollow("cT93LtGk2dT9Jvg46pOpbBP69Kx1", "testUid1");
         Intent mockIntent = new Intent(ApplicationProvider.getApplicationContext(),
