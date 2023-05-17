@@ -160,4 +160,9 @@ public class PushNotification {
     public void setTime(long time) {
         this.time = time;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof PushNotification && ((PushNotification) o).getNotificationId().equals(notificationId);
+    }
 }

@@ -74,14 +74,12 @@ public class FireMessaging {
                             future.complete(new AtomicBoolean(true));
                         } else {
                             future.complete(new AtomicBoolean(false));
-                            // TODO: remove old token from database
                         }
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
                         future.complete(new AtomicBoolean(false));
-                        // TODO: remove old token from database
                     }
                 });
             }
