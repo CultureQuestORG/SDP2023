@@ -16,7 +16,7 @@ public class CompetitionNotification extends PushNotification {
      * Constructor for the CompetitionNotification
      */
     public CompetitionNotification() {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new competition!",
+        super("You have a new competition!",
                 "Click here to see your new competition!",
                 CHANNEL_ID);
     }
