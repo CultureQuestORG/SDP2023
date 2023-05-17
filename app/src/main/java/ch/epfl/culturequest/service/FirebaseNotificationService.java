@@ -38,6 +38,9 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
      */
     @Override
     public void onNewToken(@NonNull String token) {
+        if (Authenticator.getCurrentUser() == null) {
+            return;
+        }
         String currentUserUid = Authenticator.getCurrentUser().getUid();
         Database.getDeviceTokens(currentUserUid).whenComplete((deviceTokens, throwable) -> {
             if (throwable != null || deviceTokens.contains(token)) {
