@@ -8,22 +8,26 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 
+@RunWith(AndroidJUnit4.class)
 public class DatabaseTest {
 
     @Before
@@ -38,7 +42,7 @@ public class DatabaseTest {
     // PROFILE TESTS
     @Test
     public void setAndGetProfileWorks() {
-        Profile profile = new Profile("test", "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
         try {
             Database.setProfile(profile);
             Thread.sleep(2000);
@@ -170,7 +174,7 @@ public class DatabaseTest {
 
     @Test
     public void deleteProfileRemovesAllPostsOfTheProfile() {
-        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
         Database.setProfile(profile);
         Post post1 = new Post("test1", "user1", "test", "test", 0, 0, new ArrayList<>());
         Post post2 = new Post("test2", "user1", "test", "test", 1, 0, new ArrayList<>());
@@ -195,7 +199,7 @@ public class DatabaseTest {
     //FOLLOWING TESTS
     @Test
     public void getFollowedWorks() {
-        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
         Database.setProfile(profile);
 
         try {
@@ -210,13 +214,13 @@ public class DatabaseTest {
 
     @Test
     public void addFollowedWorks() {
-        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
         Database.setProfile(profile);
 
-        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
         Database.setProfile(profile2);
 
-        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
         Database.setProfile(profile3);
 
         Database.addFollow("user1", "user2");
@@ -236,13 +240,13 @@ public class DatabaseTest {
 
     @Test
     public void removeFollowedWorks() {
-        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile = new Profile("user1", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
         Database.setProfile(profile);
 
-        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile2 = new Profile("user2", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
         Database.setProfile(profile2);
 
-        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile3 = new Profile("user3", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
         Database.setProfile(profile3);
 
         Database.addFollow("user1", "user2");
@@ -281,6 +285,7 @@ public class DatabaseTest {
 
         Database.clearDatabase();
     }
+
     @Test
     public void getArtworkScanWorks() {
         BasicArtDescription art = new BasicArtDescription("test2", "artist2", "summary2", BasicArtDescription.ArtType.PAINTING, "test", "test", "test", "test", 12);
@@ -298,6 +303,95 @@ public class DatabaseTest {
         assertThrows(TimeoutException.class, () -> {
             Database.getArtworkScan("test").get(5, java.util.concurrent.TimeUnit.SECONDS);
         });
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void setDeviceTokensWorks() {
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
+        try {
+            Database.setProfile(profile);
+            Thread.sleep(2000);
+            String deviceToken = FireMessaging.getDeviceToken().get(5, java.util.concurrent.TimeUnit.SECONDS);
+            List<String> deviceTokens = new ArrayList<>();
+            deviceTokens.add(deviceToken);
+            Database.setDeviceTokens("test", deviceTokens);
+            Thread.sleep(2000);
+            assertThat(Database.getDeviceTokens("test").get(5, java.util.concurrent.TimeUnit.SECONDS), is(deviceTokens));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void getDeviceTokenWorks() {
+        List<String> deviceTokens = new ArrayList<>();
+        deviceTokens.add("test");
+        Profile profile = new Profile("test", "test", "test", "test", "test", "test", 0, new HashMap<>(), deviceTokens);
+
+        try {
+            Database.setProfile(profile);
+            Thread.sleep(2000);
+            assertThat(Database.getDeviceTokens("test").get(5, java.util.concurrent.TimeUnit.SECONDS), is(deviceTokens));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void addNotificationWorks(){
+        PushNotification notification = new PushNotification("test", "test", "test");
+
+        try {
+            Database.addNotification("test", notification);
+            Thread.sleep(2000);
+            assertThat(Database.getNotifications("test").get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(notification));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void getNotificationsRetrievesNotificationsWithMostRecentFirst() throws InterruptedException {
+        PushNotification notification1 = new PushNotification("test1", "test1", "test1");
+        Thread.sleep(100);
+        PushNotification notification2 = new PushNotification("test2", "test2", "test2");
+
+        try {
+            Database.addNotification("test", notification1);
+            Database.addNotification("test", notification2);
+            Thread.sleep(2000);
+            List<PushNotification> notifications = Database.getNotifications("test").get(5, java.util.concurrent.TimeUnit.SECONDS);
+            assertThat(notifications.get(0), is(notification2));
+            assertThat(notifications.get(1), is(notification1));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+
+        Database.clearDatabase();
+    }
+
+    @Test
+    public void deleteNotificationWorks(){
+        PushNotification notification = new PushNotification("test", "test", "test");
+
+        try {
+            Database.addNotification("test", notification);
+            Thread.sleep(2000);
+            assertThat(Database.getNotifications("test").get(5, java.util.concurrent.TimeUnit.SECONDS).size(), is(1));
+            Database.deleteNotification("test", notification);
+            Thread.sleep(2000);
+            assertThat(Database.getNotifications("test").get(5, java.util.concurrent.TimeUnit.SECONDS).size(), is(0));
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
 
         Database.clearDatabase();
     }
