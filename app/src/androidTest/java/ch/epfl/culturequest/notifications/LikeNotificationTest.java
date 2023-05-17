@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.notifications.LikeNotification;
+import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Profile;
 
 

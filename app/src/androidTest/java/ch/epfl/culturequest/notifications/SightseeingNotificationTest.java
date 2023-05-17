@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.notifications;
+package ch.epfl.culturequest.social.notifications;
 
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.notifications.PushNotification;
+import ch.epfl.culturequest.notifications.SightseeingNotification;
 import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)

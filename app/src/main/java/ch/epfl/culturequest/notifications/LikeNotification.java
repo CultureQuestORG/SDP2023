@@ -11,6 +11,7 @@ import androidx.navigation.NavDeepLinkBuilder;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Profile;
 
 /**

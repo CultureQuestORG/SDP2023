@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import ch.epfl.culturequest.NavigationActivity;
-import ch.epfl.culturequest.social.Profile;
 
 /**
  * Class that represents notifications for a new offline scan

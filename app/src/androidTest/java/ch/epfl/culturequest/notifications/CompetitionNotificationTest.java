@@ -27,7 +27,6 @@ public class CompetitionNotificationTest {
     @Before
     public void setup() {
         PushNotification.createNotificationChannels(context);
-        Profile.setActiveProfile(profile);
     }
 
     @Test

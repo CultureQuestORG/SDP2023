@@ -7,9 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
+
 
 /**
  * Class that represents a notification for a new follower
@@ -20,7 +20,7 @@ public final class FollowNotification extends PushNotification {
     /**
      * Constructor for the FollowNotification
      *
-     * @param newFollowee the username of the new follower
+     * @param newFollowee the username of the new followed
      */
     public FollowNotification(String newFollowee) {
         super(newFollowee + ", you have a new follower!",

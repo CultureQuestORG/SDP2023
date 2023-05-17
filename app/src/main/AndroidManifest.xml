@@ -29,7 +29,7 @@
 
         <activity
             android:name=".ArtDescriptionDisplayActivity"
-            android:exported="false" >
+            android:exported="false">
         </activity>
 
         <activity
@@ -62,13 +62,14 @@
         <activity
             android:name=".ui.SearchActivity"
             android:exported="true"/>
+
         <activity
             android:name=".ui.profile.DisplayUserProfileActivity"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity
             android:name=".ui.profile.DisplayUserBadgeCollectionActivity"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity
             android:name=".NavigationActivity"
@@ -86,6 +87,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.FirebaseNotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
     </application>
 
