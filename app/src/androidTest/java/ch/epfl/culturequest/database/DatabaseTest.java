@@ -359,8 +359,9 @@ public class DatabaseTest {
     }
 
     @Test
-    public void getNotificationsRetrievesNotificationsWithMostRecentFirst(){
+    public void getNotificationsRetrievesNotificationsWithMostRecentFirst() throws InterruptedException {
         PushNotification notification1 = new PushNotification("test1", "test1", "test1");
+        Thread.sleep(100);
         PushNotification notification2 = new PushNotification("test2", "test2", "test2");
 
         try {
