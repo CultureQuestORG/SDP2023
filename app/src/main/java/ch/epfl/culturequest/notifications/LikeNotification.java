@@ -55,8 +55,6 @@ public class LikeNotification extends PushNotification {
      */
     public static PendingIntent getPendingIntent(Context context) {
         PendingIntent pendingIntent = new NavDeepLinkBuilder(context).setGraph(R.navigation.mobile_navigation).setDestination(R.id.navigation_profile).createPendingIntent();
-        /*Intent intent = new Intent(context, NavigationActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);*/
-        return pendingIntent;// PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        return pendingIntent;
     }
 }
