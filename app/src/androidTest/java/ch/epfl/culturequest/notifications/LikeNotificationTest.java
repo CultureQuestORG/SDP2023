@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
@@ -24,17 +23,17 @@ import ch.epfl.culturequest.social.Profile;
 @RunWith(AndroidJUnit4.class)
 public class LikeNotificationTest {
     private final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    private final Profile profile = new Profile("test", "test", "Likee", "test", "test", "test",0,new HashMap<>());
+    private final Profile profile = new Profile("test", "test", "Likee", "test", "test", "test",0,new HashMap<>(), new ArrayList<>());
 
     @Before
     public void setup() {
-        NotificationInterface.createNotificationChannels(context);
+        PushNotification.createNotificationChannels(context);
         Profile.setActiveProfile(profile);
     }
 
     @Test
     public void likeNotificationIsCorrectlyCreated() {
-        Notification likeNotification = new LikeNotification("Liker").get(context);
+        Notification likeNotification = new LikeNotification("Liker").buildNotification(context);
         assertThat(likeNotification.extras.get(Notification.EXTRA_TITLE).toString(), is(profile.getUsername() + ", you have a new like!"));
         assertThat(likeNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("Liker liked your post!"));
         assertThat(likeNotification.priority, is(Notification.PRIORITY_DEFAULT));

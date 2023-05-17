@@ -54,19 +54,27 @@ public class SightSeeingActivityTest {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
-        FireStorage.setEmulatorOn();
         // clear the database before starting the following tests
         Database.clearDatabase();
+
+        // Set up the online storage to run on the local emulator of Firebase
+        FireStorage.setEmulatorOn();
+
+        // Clear the storage before starting the tests
+        FireStorage.clearStorage();
+
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
+
         Authenticator.manualSignIn("test@gmail.com", "abcdefg");
 
+        Profile.setActiveProfile(new Profile(Authenticator.getCurrentUser().getUid(), "name", "Test", "test@gmail.com", "num", "profile", 0, new HashMap<>(), new ArrayList<>()));
+        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0,new HashMap<>(), new ArrayList<>()));
+        Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", 0,new HashMap<>(), new ArrayList<>()));
+        Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", 0,new HashMap<>(), new ArrayList<>()));
+        Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0,new HashMap<>(), new ArrayList<>()));
 
-        Profile.setActiveProfile(new Profile("cT93LtGk2dT9Jvg46pOpbBP69Kx1", "name", "Test", "test@gmail.com", "num", "profile", 0, new HashMap<>()));
-        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0,new HashMap<>()));
-        Database.setProfile(new Profile("testUid2", "testName2", "allen", "testEmail2", "testPhone2", "testProfilePicture2", 0,new HashMap<>()));
-        Database.setProfile(new Profile("testUid3", "testName3", "bob", "testEmail3", "testPhone3", "testProfilePicture3", 0,new HashMap<>()));
-        Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0,new HashMap<>()));
-
-        Database.addFollow("cT93LtGk2dT9Jvg46pOpbBP69Kx1", "testUid1");
+        Database.addFollow(Authenticator.getCurrentUser().getUid(), "testUid1");
         Intent mockIntent = new Intent(ApplicationProvider.getApplicationContext(),
                 SightseeingActivity.class);
         mockIntent.putExtra("city", "Paris, France");
@@ -185,5 +193,8 @@ public class SightSeeingActivityTest {
     public void teardown() {
         // clear the database after finishing the tests
         Database.clearDatabase();
+
+        // Clear the storage before starting the tests
+        FireStorage.clearStorage();
     }
 }

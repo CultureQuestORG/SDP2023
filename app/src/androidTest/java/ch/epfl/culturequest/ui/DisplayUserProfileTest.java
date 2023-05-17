@@ -39,7 +39,7 @@ public class DisplayUserProfileTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
-        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0,new HashMap<>()));
+        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0,new HashMap<>(), new ArrayList<>()));
     }
 
     @After
