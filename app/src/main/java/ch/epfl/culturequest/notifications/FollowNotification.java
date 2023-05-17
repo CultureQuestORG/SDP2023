@@ -7,8 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
+
 
 /**
  * Class that represents a notification for a new follower
@@ -19,11 +20,11 @@ public final class FollowNotification extends PushNotification {
     /**
      * Constructor for the FollowNotification
      *
-     * @param newFollower the username of the new follower
+     * @param newFollowee the username of the new followed
      */
-    public FollowNotification(String newFollower) {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new follower!",
-                newFollower + " is now following you!",
+    public FollowNotification(String newFollowee) {
+        super(newFollowee + ", you have a new follower!",
+                Profile.getActiveProfile().getUsername() + " is now following you!",
                 CHANNEL_ID);
     }
 
@@ -51,7 +52,8 @@ public final class FollowNotification extends PushNotification {
      * @return the pending intent for the notification
      */
     public static PendingIntent getPendingIntent(Context context) {
-        Intent intent = new Intent(context, NavigationActivity.class);
+        Intent intent = new Intent(context, DisplayUserProfileActivity.class);
+        intent.putExtra("uid", Profile.getActiveProfile().getUid());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return  PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
     }

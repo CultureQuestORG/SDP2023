@@ -7,7 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import androidx.navigation.NavDeepLinkBuilder;
+
 import ch.epfl.culturequest.NavigationActivity;
+import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Profile;
 
 /**
@@ -19,11 +23,11 @@ public class LikeNotification extends PushNotification {
     /**
      * Constructor for the LikeNotification
      *
-     * @param liker the username of the liker
+     * @param likee the username of the likee
      */
-    public LikeNotification(String liker) {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new like!",
-                liker + " liked your post!",
+    public LikeNotification(String likee) {
+        super(likee + ", you have a new like!",
+                Profile.getActiveProfile().getUsername() + " liked your post!",
                 CHANNEL_ID);
     }
 
@@ -51,8 +55,7 @@ public class LikeNotification extends PushNotification {
      * @return the pending intent for the notification
      */
     public static PendingIntent getPendingIntent(Context context) {
-        Intent intent = new Intent(context, NavigationActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        return  PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = new NavDeepLinkBuilder(context).setGraph(R.navigation.mobile_navigation).setDestination(R.id.navigation_profile).createPendingIntent();
+        return pendingIntent;
     }
 }

@@ -22,6 +22,7 @@ import ch.epfl.culturequest.social.Profile;
 @RunWith(AndroidJUnit4.class)
 public class CompetitionNotificationTest {
     private final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    private final Profile profile = new Profile("test", "test", "Competitor", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
 
     @Before
     public void setup() {
@@ -31,7 +32,7 @@ public class CompetitionNotificationTest {
     @Test
     public void testCompetitionNotification() {
         Notification competitionNotification = new CompetitionNotification().buildNotification(context);
-        assertThat(competitionNotification.extras.get(Notification.EXTRA_TITLE).toString(), is("You have a new competition!"));
+        assertThat(competitionNotification.extras.get(Notification.EXTRA_TITLE).toString(), is("A new competition has started!"));
         assertThat(competitionNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("Click here to see your new competition!"));
         assertThat(competitionNotification.priority, is(Notification.PRIORITY_DEFAULT));
         assertThat(competitionNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));

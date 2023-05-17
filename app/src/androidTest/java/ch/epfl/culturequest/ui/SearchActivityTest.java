@@ -54,6 +54,7 @@ public class SearchActivityTest {
         Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0,new HashMap<>(), new ArrayList<>()));
         //set the same profile twice for more cov
         Database.setProfile(new Profile("testUid4", "testName4", "john", "testEmail4", "testPhone4", "testProfilePicture4", 0,new HashMap<>(), new ArrayList<>()));
+
     }
 
 

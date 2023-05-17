@@ -110,7 +110,7 @@ public class PushNotification {
         Intent default_intent = new Intent(context, NavigationActivity.class);
         default_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent default_pending_intent = PendingIntent.getActivity(context, 0, default_intent, PendingIntent.FLAG_IMMUTABLE);
-
+        
         switch (channelId) {
             case FollowNotification.CHANNEL_ID:
                 return FollowNotification.getPendingIntent(context);

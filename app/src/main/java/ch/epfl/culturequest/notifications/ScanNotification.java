@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import ch.epfl.culturequest.NavigationActivity;
-import ch.epfl.culturequest.social.Profile;
 
 /**
  * Class that represents notifications for a new offline scan
@@ -19,7 +18,7 @@ public class ScanNotification extends PushNotification {
      * Constructor for the ScanNotification
      */
     public ScanNotification() {
-        super(Profile.getActiveProfile().getUsername() + ", you have a new scan!",
+        super("You have a new scan!",
                 "We found a new offline scan result!",
                 CHANNEL_ID);
     }

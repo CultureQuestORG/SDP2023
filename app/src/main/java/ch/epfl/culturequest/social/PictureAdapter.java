@@ -31,6 +31,8 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.LikeNotification;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.CustomSnackbar;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -166,6 +168,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 Database.addLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
                     if (throwable != null) {
                         post.setLikers(aVoid.getLikers());
+                    }
+                });
+                // send the like notification
+                Database.getProfile(post.getUid()).thenAccept(profile -> {
+                    if (profile != null) {
+                        LikeNotification notif = new LikeNotification(profile.getUsername());
+                        FireMessaging.sendNotification(profile.getUid(), notif);
                     }
                 });
                 Picasso.get().load(R.drawable.like_full).into(holder.like);

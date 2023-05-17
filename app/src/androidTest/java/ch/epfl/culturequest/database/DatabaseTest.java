@@ -351,7 +351,7 @@ public class DatabaseTest {
             Database.addNotification("test", notification);
             Thread.sleep(2000);
             assertThat(Database.getNotifications("test").get(5, java.util.concurrent.TimeUnit.SECONDS).get(0), is(notification));
-           } catch (ExecutionException | InterruptedException | TimeoutException e) {
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
 
@@ -371,7 +371,7 @@ public class DatabaseTest {
             List<PushNotification> notifications = Database.getNotifications("test").get(5, java.util.concurrent.TimeUnit.SECONDS);
             assertThat(notifications.get(0), is(notification2));
             assertThat(notifications.get(1), is(notification1));
-           } catch (ExecutionException | InterruptedException | TimeoutException e) {
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
 

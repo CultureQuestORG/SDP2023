@@ -23,6 +23,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.LikeNotification;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
