@@ -32,6 +32,8 @@ import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.SightseeingActivityBinding;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.SightseeingNotification;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
 import ch.epfl.culturequest.utils.AndroidUtils;
@@ -113,9 +115,13 @@ public class SightseeingActivity extends AppCompatActivity {
                     inviteFriends.setOnClickListener(v -> {
                         List<String> usernamesSelected = adapter.getSelected();
                         List<Profile> selectedFriends = profiles.stream().filter(profile -> usernamesSelected.contains(profile.getUsername())).collect(Collectors.toList());
-                        //TODO DEAL WITH NOTIFICATIONS
                         SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces);
                         CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v);
+                        // send out notifications to the selected friends
+                        for (Profile profile : selectedFriends) {
+                            SightseeingNotification notif = new SightseeingNotification(profile.getUsername());
+                            FireMessaging.sendNotification(profile.getUid(), notif);
+                        }
                         CompletableFuture.runAsync(() -> {
                             //we do this to wait for the snackbar to be visible for 1 second before going back to the nav activity.
                             SystemClock.sleep(1000);

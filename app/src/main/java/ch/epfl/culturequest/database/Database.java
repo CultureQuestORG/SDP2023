@@ -23,6 +23,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.LikeNotification;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
@@ -488,7 +490,15 @@ public class Database {
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
     public static CompletableFuture<Post> addLike(Post post, String UId) {
-        return changeLike(post, UId, true);
+        CompletableFuture<Post> likeFuture = changeLike(post, UId, true);
+        // send the like notification
+        getProfile(post.getUid()).thenAccept(profile -> {
+            if (profile != null) {
+                LikeNotification notif = new LikeNotification(profile.getUsername());
+                FireMessaging.sendNotification(profile.getUid(), notif);
+            }
+        });
+        return likeFuture;
     }
 
     /**
