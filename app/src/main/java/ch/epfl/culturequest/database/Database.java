@@ -29,6 +29,7 @@ import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.social.SightseeingEvent;
 
 
 /**
@@ -739,10 +740,12 @@ public class Database {
         databaseInstance.getReference("notifications").child(UId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 List<PushNotification> notificationsList = new ArrayList<>();
-                for (DataSnapshot notification : task.getResult().getChildren()) {
-                    notificationsList.add(notification.getValue(PushNotification.class));
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    notificationsList.add(snapshot.getValue(PushNotification.class));
                 }
-                notificationsList.sort(Comparator.comparing(PushNotification::getTime).reversed());
+
+                // sort by time such that we get the latest notification first
+                notificationsList.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
                 future.complete(notificationsList);
             } else {
                 future.completeExceptionally(task.getException());
@@ -783,6 +786,19 @@ public class Database {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
         DatabaseReference notificationRef = databaseInstance.getReference("notifications").child(UId).child(notification.getNotificationId());
         notificationRef.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> setSightseeingEvent(SightseeingEvent event) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = databaseInstance.getReference("sightseeing_event").child(event.getOwner().getUid()).child(String.valueOf(event.getEventId()));
+        usersRef.setValue(event).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 future.complete(new AtomicBoolean(true));
             } else {
