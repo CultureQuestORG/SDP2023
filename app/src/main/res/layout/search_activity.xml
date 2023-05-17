@@ -8,7 +8,7 @@
     android:background="@color/background">
 
     <EditText
-        android:id="@+id/search_user"
+        android:id="@+id/search"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -18,13 +18,13 @@
         android:ems="10"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:hint="Search for user"
-        android:inputType="textPersonName"
         android:fontFamily="@font/poppins"
+        android:hint="Search"
+        android:inputType="textPersonName"
+        android:padding="10dp"
         android:textColor="@color/black"
         android:textColorHint="@color/colorSecondary"
         android:textSize="15sp"
-        android:padding="10dp"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/list_view"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,11 +35,12 @@
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="70dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_user" />
+        app:layout_constraintTop_toBottomOf="@+id/search" />
 
     <ImageView
         android:id="@+id/back_icon1"
@@ -47,10 +48,48 @@
         android:layout_height="0dp"
         android:layout_marginStart="10dp"
         android:onClick="goBack"
-        app:layout_constraintBottom_toBottomOf="@+id/search_user"
-        app:layout_constraintEnd_toStartOf="@+id/search_user"
+        app:layout_constraintBottom_toBottomOf="@+id/search"
+        app:layout_constraintEnd_toStartOf="@+id/search"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/search_user"
+        app:layout_constraintTop_toTopOf="@+id/search"
         app:srcCompat="@drawable/back_button" />
+
+    <Button
+        android:id="@+id/search_users"
+        android:layout_width="132dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/rounded_button"
+        android:layout_marginBottom="10dp"
+        android:onClick="lookForUsers"
+        android:text="Users"
+
+        app:layout_constraintBottom_toTopOf="@+id/list_view"
+        app:layout_constraintEnd_toStartOf="@+id/search_cities"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/search_cities"
+        android:layout_width="138dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/rounded_button_transparent"
+        android:backgroundTint="@color/transparent"
+        android:bottomRightRadius="50dp"
+        android:bottomLeftRadius="50dp"
+        android:topRightRadius="50dp"
+        android:topLeftRadius="50dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="10dp"
+        android:onClick="lookForCities"
+        android:text="Cities"
+        app:layout_constraintBottom_toTopOf="@+id/list_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

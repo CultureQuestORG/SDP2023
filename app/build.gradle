@@ -108,7 +108,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.google.code.gson:gson:2.8.9'
 
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'com.theokanning.openai-gpt3-java:service:0.11.0'
     implementation 'org.jsoup:jsoup:1.15.4'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
