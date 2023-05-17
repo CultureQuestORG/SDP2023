@@ -7,6 +7,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 
 /**
@@ -105,6 +107,10 @@ public class PushNotification {
      * @return the pending intent
      */
     public PendingIntent selectPendingIntent(Context context, String channelId) {
+        Intent default_intent = new Intent(context, NavigationActivity.class);
+        default_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent default_pending_intent = PendingIntent.getActivity(context, 0, default_intent, PendingIntent.FLAG_IMMUTABLE);
+
         switch (channelId) {
             case FollowNotification.CHANNEL_ID:
                 return FollowNotification.getPendingIntent(context);
@@ -117,7 +123,7 @@ public class PushNotification {
             case SightseeingNotification.CHANNEL_ID:
                 return SightseeingNotification.getPendingIntent(context);
             default:
-                return null;
+                return default_pending_intent;
         }
     }
 
