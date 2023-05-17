@@ -36,10 +36,8 @@ public class ProfileUtils {
         USERNAME_PB result;
         if (username.isEmpty())
             result = USERNAME_PB.USERNAME_IS_EMPTY;
-        else if (length < 3)
-            result = USERNAME_PB.USERNAME_TOO_SHORT;
-        else if (length > 20)
-            result = USERNAME_PB.USERNAME_TOO_LONG;
+        else if (length < 3 || length > 20)
+            result = USERNAME_PB.USERNAME_LENGTH_PB;
         else if (username.contains(" "))
             result = USERNAME_PB.USERNAME_HAS_WHITESPACE;
         else if (!username.matches(USERNAME_REGEX))
@@ -86,20 +84,16 @@ public class ProfileUtils {
                 username.setText("");
                 username.setHint("Only letters and digits allowed");
                 break;
-            case USERNAME_TOO_LONG:
+            case USERNAME_LENGTH_PB:
                 username.setText("");
-                username.setHint("Username is too long");
-                break;
-            case USERNAME_TOO_SHORT:
-                username.setText("");
-                username.setHint("Username is too short");
+                username.setHint("3 to 20 characters allowed");
                 break;
         }
         return true;
     }
 
     enum USERNAME_PB {
-        USERNAME_IS_EMPTY, USERNAME_TOO_LONG, USERNAME_TOO_SHORT, USERNAME_HAS_WHITESPACE, USERNAME_HAS_WRONG_REGEX, USERNAME_VALID;
+        USERNAME_IS_EMPTY, USERNAME_LENGTH_PB, USERNAME_HAS_WHITESPACE, USERNAME_HAS_WRONG_REGEX, USERNAME_VALID;
     }
 
 }

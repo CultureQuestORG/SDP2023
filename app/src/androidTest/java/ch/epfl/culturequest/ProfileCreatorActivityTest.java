@@ -140,12 +140,12 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.username)).perform(typeText("lo"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint("Username is too short")));
+        onView(withId(R.id.username)).check(matches(withHint("3 to 20 characters allowed")));
 
         onView(withId(R.id.username)).perform(typeText("abcdefghijklmnopqrstuvxyz"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint("Username is too long")));
+        onView(withId(R.id.username)).check(matches(withHint("3 to 20 characters allowed")));
 
         onView(withId(R.id.username)).perform(typeText("john Doe"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
