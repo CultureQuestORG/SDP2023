@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.social.notifications;
+package ch.epfl.culturequest.notifications;
 
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static org.hamcrest.Matchers.is;

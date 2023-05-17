@@ -491,15 +491,7 @@ public class Database {
      * @return a CompletableFuture that will be completed when the posts are retrieved
      */
     public static CompletableFuture<Post> addLike(Post post, String UId) {
-        CompletableFuture<Post> likeFuture = changeLike(post, UId, true);
-        // send the like notification
-        getProfile(post.getUid()).thenAccept(profile -> {
-            if (profile != null) {
-                LikeNotification notif = new LikeNotification(profile.getUsername());
-                FireMessaging.sendNotification(profile.getUid(), notif);
-            }
-        });
-        return likeFuture;
+        return changeLike(post, UId, true);
     }
 
     /**

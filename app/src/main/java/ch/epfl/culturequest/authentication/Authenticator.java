@@ -90,14 +90,14 @@ public class Authenticator {
             } else showNoConnectionAlert(activity, "Please try to login again later");
         } else {
                 Database.getProfile(getCurrentUser().getUid()).handle((profile, throwable) -> {
-                    if (profile != null) {
+                    if (profile != null && throwable == null) {
                         // the following part is used to check at every login if the user has a
                         // new device token
                         List<String> deviceTokens = profile.getDeviceTokens();
                         FireMessaging.getDeviceToken().whenComplete((token, throwable1) -> {
                             // if the current device token is not already in the list, add it
                             // and update the database
-                            if (!deviceTokens.contains(token)) {
+                            if (throwable1 == null && token != null && !deviceTokens.contains(token)) {
                                 deviceTokens.add(token);
                                 profile.setDeviceTokens(deviceTokens);
                                 Database.setDeviceTokens(profile.getUid(), deviceTokens);

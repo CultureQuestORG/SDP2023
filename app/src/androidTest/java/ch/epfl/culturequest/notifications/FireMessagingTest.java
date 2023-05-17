@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
