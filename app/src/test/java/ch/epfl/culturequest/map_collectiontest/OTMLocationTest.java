@@ -5,7 +5,11 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import androidx.core.widget.ListViewAutoScrollHelper;
+
 import org.junit.Test;
+
+import java.util.List;
 
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
@@ -21,9 +25,9 @@ public class OTMLocationTest {
     public void emptyConstructorHasDefaultValues(){
         OTMLocation l = new OTMLocation();
         assertEquals("", l.getName());
-        assertThat(l.getCoordinates().getLon(), is(0));
-        assertThat(l.getCoordinates().getLat(), is(0));
-        assertThat(l.getKinds(), is("art"));
+        assertThat(l.getCoordinates().getLon(), is(0.0));
+        assertThat(l.getCoordinates().getLat(), is(0.0));
+        assertEquals(l.getKinds(), "art");
     }
 
     // Test that the constructor throws an IllegalArgumentException if the kinds are empty

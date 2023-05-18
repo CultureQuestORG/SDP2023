@@ -30,7 +30,9 @@ public final class OTMLocation {
 
 
     public OTMLocation(){
-        this("", new OTMLatLng(), "art");
+        this.name = "";
+        this.point = new OTMLatLng();
+        this.kinds = "art";
     }
 
     /**
