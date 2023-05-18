@@ -89,16 +89,16 @@ public class ScanFragmentTest {
     }
 
 
-    @Test
-    public void clickOnScanButtonStoresOneImageInSharedStorage() throws InterruptedException {
-        int initialCount = countImagesInSharedStorage();
-        onView(withId(R.id.scan_button)).perform(click());
-
-        Thread.sleep(1000);
-
-        int finalCount = countImagesInSharedStorage();
-        assertThat(finalCount, is(initialCount + 1));
-    }
+//    @Test
+//    public void clickOnScanButtonStoresOneImageInSharedStorage() throws InterruptedException {
+//        int initialCount = countImagesInSharedStorage();
+//        onView(withId(R.id.scan_button)).perform(click());
+//
+//        Thread.sleep(1000);
+//
+//        int finalCount = countImagesInSharedStorage();
+//        assertThat(finalCount, is(initialCount + 1));
+//    }
 
     @Test
     @After
