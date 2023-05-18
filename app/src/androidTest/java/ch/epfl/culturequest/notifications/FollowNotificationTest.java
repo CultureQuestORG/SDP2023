@@ -39,7 +39,7 @@ public class FollowNotificationTest {
         Notification followNotification = new FollowNotification("Follower").buildNotification(context);
         assertThat(followNotification.extras.get(Notification.EXTRA_TITLE).toString(), is("Follower, you have a new follower!"));
         assertThat(followNotification.extras.get(Notification.EXTRA_TEXT).toString(), is(profile.getUsername() + " is now following you!"));
-        assertThat(followNotification.priority, is(Notification.PRIORITY_DEFAULT));
+        assertThat(followNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(followNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(followNotification.getChannelId(), is(FollowNotification.CHANNEL_ID));
         Intent intent = new Intent(context, DisplayUserProfileActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK).putExtra("uid", profile.getUid());

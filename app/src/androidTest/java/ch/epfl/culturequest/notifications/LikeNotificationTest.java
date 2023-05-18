@@ -39,7 +39,7 @@ public class LikeNotificationTest {
         Notification likeNotification = new LikeNotification("Likee").buildNotification(context);
         assertThat(likeNotification.extras.get(Notification.EXTRA_TITLE).toString(), is("Likee, you have a new like!"));
         assertThat(likeNotification.extras.get(Notification.EXTRA_TEXT).toString(), is(profile.getUsername() + " liked your post!"));
-        assertThat(likeNotification.priority, is(Notification.PRIORITY_DEFAULT));
+        assertThat(likeNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(likeNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(likeNotification.getChannelId(), is(LikeNotification.CHANNEL_ID));
         assertThat(likeNotification.contentIntent, is(new NavDeepLinkBuilder(context).setGraph(R.navigation.mobile_navigation).setDestination(R.id.navigation_profile).createPendingIntent()));

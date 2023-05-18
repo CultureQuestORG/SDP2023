@@ -94,7 +94,8 @@ public class PushNotification {
                 .setSmallIcon(R.drawable.logo_compact)
                 .setContentTitle(title)
                 .setContentText(text)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(Notification.DEFAULT_ALL)
                 .setContentIntent(pendingIntent)
                 .build();
     }
