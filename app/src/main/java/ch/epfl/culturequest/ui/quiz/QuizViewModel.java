@@ -33,16 +33,16 @@ public class QuizViewModel extends ViewModel {
 
 
     public QuizViewModel(Quiz quiz, QuizActivity quizActivity, String uid) {
-        this.quiz.setValue(quiz);
-        this.quizActivity.setValue(quizActivity);
-        score.setValue(0);
-        nextScore.setValue(100);
-        this.uid.setValue(uid);
+        this.quiz.postValue(quiz);
+        this.quizActivity.postValue(quizActivity);
+        score.postValue(0);
+        nextScore.postValue(100);
+        this.uid.postValue(uid);
 
 
     }
     public void setQuiz(Quiz quiz) {
-        this.quiz.setValue(quiz);
+        this.quiz.postValue(quiz);
     }
 
     public MutableLiveData<Quiz> getQuiz() {
@@ -61,8 +61,8 @@ public class QuizViewModel extends ViewModel {
 
         }
 
-        score.setValue(nextScore.getValue());
-        this.questionNumber.setValue(questionNumber + 1);
+        score.postValue(nextScore.getValue());
+        this.questionNumber.postValue(questionNumber + 1);
         if (this.questionNumber.getValue() == Objects.requireNonNull(quiz.getValue()).getQuestions().size()) {
             return Objects.requireNonNull(quizActivity.getValue()).endQuiz(score.getValue());
 
@@ -74,7 +74,7 @@ public class QuizViewModel extends ViewModel {
     }
 
     public QuizQuestionFragment nextQuestion(int nextScore) {
-        this.nextScore.setValue(nextScore);
+        this.nextScore.postValue(nextScore);
         return Objects.requireNonNull(quizActivity.getValue()).goToQuestion(questionNumber.getValue(), getQuestion(questionNumber.getValue()));
     }
 
