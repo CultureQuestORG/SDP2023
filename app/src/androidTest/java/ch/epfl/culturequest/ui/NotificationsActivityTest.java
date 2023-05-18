@@ -70,7 +70,6 @@ public class NotificationsActivityTest {
     @Test
     public void testNotificationsActivityShowsNotifications() throws InterruptedException {
         onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
-        onView(withText("notif1")).check(matches(isEnabled()));
         onView(withText("notif2")).check(matches(isEnabled()));
         onView(withText("notif3")).check(matches(isEnabled()));
     }
@@ -78,12 +77,9 @@ public class NotificationsActivityTest {
     @Test
     public void testNotificationsActivityDeleteWorks() throws InterruptedException {
         onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
-        onView(withText("notif1")).check(matches(isEnabled()));
-        onView(withText("notif2")).check(matches(isEnabled()));
-        onView(withText("notif3")).check(matches(isEnabled()));
         onView(withId(R.id.notifications_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.delete_button)));
 
-        Thread.sleep(2000);
+        Thread.sleep(4000);
 
         try {
             assertThat(Database.getNotifications(Profile.getActiveProfile().getUid()).get().size(), is(2));

@@ -37,7 +37,7 @@ public class SightseeingNotificationTest {
         Notification sightseeingNotification = new SightseeingNotification("John").buildNotification(context);
         assertThat(sightseeingNotification.extras.get(Notification.EXTRA_TITLE).toString(), is("John, you have a new sightseeing event!"));
         assertThat(sightseeingNotification.extras.get(Notification.EXTRA_TEXT).toString(), is(profile.getUsername() + " invited you to a new sightseeing event!"));
-        assertThat(sightseeingNotification.priority, is(Notification.PRIORITY_DEFAULT));
+        assertThat(sightseeingNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(sightseeingNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(sightseeingNotification.getChannelId(), is(SightseeingNotification.CHANNEL_ID));
     }
