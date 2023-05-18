@@ -135,49 +135,62 @@ public class QuizActivityTest {
 
     }
 
-    private void answerQuestion() {
+    private void answerQuestion() throws InterruptedException {
+        Thread.sleep(2000);
         onView(withText("answer")).check(matches(isDisplayed()));
         onView(withText("wrongAnswer1")).check(matches(isDisplayed()));
         onView(withText("wrongAnswer2")).check(matches(isDisplayed()));
         onView(withText("wrongAnswer3")).check(matches(isDisplayed()));
         onView(withText("answer")).perform(ViewActions.click());
+        Thread.sleep(2000);
         onView(withText("Next")).perform(ViewActions.click());
+        Thread.sleep(2000);
 
     }
 
-    private void answerWrongly(){
+    private void answerWrongly() throws InterruptedException {
+        Thread.sleep(2000);
         onView(withText("answer")).check(matches(isDisplayed()));
         onView(withText("wrongAnswer1")).check(matches(isDisplayed()));
         onView(withText("wrongAnswer2")).check(matches(isDisplayed()));
         onView(withText("wrongAnswer3")).check(matches(isDisplayed()));
         onView(withText("wrongAnswer1")).perform(ViewActions.click());
+        Thread.sleep(2000);
         onView(withText("Next")).perform(ViewActions.click());
+        Thread.sleep(2000);
 
     }
 
-    private void startQuiz() {
+    private void startQuiz() throws InterruptedException {
+        Thread.sleep(2000);
         onView(withText("Start")).check(matches(isDisplayed()));
         onView(withText("La Joconde")).check(matches(isDisplayed())); //check that the name of the art is displayed
         onView(withText("Start")).perform(ViewActions.click());
-
+        Thread.sleep(2000);
     }
 
-    private void quitQuiz() {
+    private void quitQuiz() throws InterruptedException {
+        Thread.sleep(2000);
         onView(withText(String.format("%d", quizViewModel.getScore().getValue()))).check(matches(isDisplayed()));
         onView(withText("SPIN")).check(matches(isDisplayed()));
         onView(withText("QUIT")).check(matches(isDisplayed()));
+        Thread.sleep(2000);
         onView(withText("QUIT")).perform(ViewActions.click());
+        Thread.sleep(2000);
     }
 
-    private void turnWheel(){
+    private void turnWheel() throws InterruptedException {
+        Thread.sleep(2000);
         onView(withText(String.format("%d", quizViewModel.getScore().getValue()))).check(matches(isDisplayed()));
         onView(withText("SPIN")).check(matches(isDisplayed()));
         onView(withText("QUIT")).check(matches(isDisplayed()));
         onView(withText("SPIN")).perform(ViewActions.click());
+        Thread.sleep(2000);
         onView(withText("OK")).perform(ViewActions.click());
-
+        Thread.sleep(2000);
         onView(withText(String.format("%d", quizViewModel.getNextScore().getValue()))).check(matches(isDisplayed()));
         onView(withText("NEXT")).perform(ViewActions.click());
+        Thread.sleep(2000);
 
     }
 
