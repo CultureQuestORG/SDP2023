@@ -6,15 +6,26 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
+import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.notifications.PushNotification;
+import ch.epfl.culturequest.social.Profile;
+
 public class NotificationsViewModel extends ViewModel {
-    private final MutableLiveData<List<String>> notificationTexts;
+    private final MutableLiveData<List<PushNotification>> notificationTexts;
 
     public NotificationsViewModel() {
         notificationTexts = new MutableLiveData<>();
-        notificationTexts.setValue(List.of("Notification 1", "Notification 2", "Notification 3"));
+        String currentUserUid = Profile.getActiveProfile().getUid();
+        Database.getNotifications(currentUserUid).whenComplete((notifications, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+                return;
+            }
+            notificationTexts.setValue(notifications);
+        });
     }
 
-    public LiveData<List<String>> getNotificationTexts() {
+    public LiveData<List<PushNotification>> getNotificationTexts() {
         return notificationTexts;
     }
 }
