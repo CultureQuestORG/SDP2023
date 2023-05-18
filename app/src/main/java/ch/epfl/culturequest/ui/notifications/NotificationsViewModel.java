@@ -15,8 +15,7 @@ public class NotificationsViewModel extends ViewModel {
 
     public NotificationsViewModel() {
         notificationTexts = new MutableLiveData<>();
-        String currentUserUid = Profile.getActiveProfile().getUid();
-        Database.getNotifications(currentUserUid).whenComplete((notifications, throwable) -> {
+        Database.getNotifications(Profile.getActiveProfile().getUid()).whenComplete((notifications, throwable) -> {
             if (throwable != null) {
                 throwable.printStackTrace();
                 return;

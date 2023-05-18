@@ -1,7 +1,5 @@
 package ch.epfl.culturequest.ui.home;
 
-import static android.view.View.VISIBLE;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;

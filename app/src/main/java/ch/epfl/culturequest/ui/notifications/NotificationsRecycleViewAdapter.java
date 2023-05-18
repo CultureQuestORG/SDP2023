@@ -25,16 +25,13 @@ import ch.epfl.culturequest.social.Profile;
 
 public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<NotificationsRecycleViewAdapter.NotificationViewHolder> {
 
-    private List<PushNotification> notificationTexts;
-    private final String UID;
+    private List<PushNotification> notificationTexts = List.of();
 
     public NotificationsRecycleViewAdapter(NotificationsViewModel notificationsViewModel) {
         notificationsViewModel.getNotificationTexts().observeForever(notificationTexts -> {
             this.notificationTexts = notificationTexts;
-            System.out.println("Notifications: " + notificationTexts.stream().map(PushNotification::getText).collect(Collectors.toList()));
             notifyItemRangeChanged(0, getItemCount());
         });
-        UID = Profile.getActiveProfile().getUid();
     }
 
     @NonNull
@@ -49,7 +46,7 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
         holder.getNotificationText().setText(notificationTexts.get(position).getText());
         setIconNotification(holder.getNotificationIcon(), notificationTexts.get(position).getChannelId());
         holder.getDeleteButton().setOnClickListener(view -> {
-            Database.deleteNotification(UID, notificationTexts.get(position));
+            Database.deleteNotification(Profile.getActiveProfile().getUid(), notificationTexts.get(position));
             notificationTexts.remove(position);
             notifyItemRemoved(position);
         });

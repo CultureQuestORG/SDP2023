@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 
 import android.view.View;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.contrib.RecyclerViewActions;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Profile;
@@ -36,10 +38,6 @@ import ch.epfl.culturequest.ui.notifications.NotificationsActivity;
 
 @RunWith(AndroidJUnit4.class)
 public class NotificationsActivityTest {
-
-    @Rule
-    public ActivityScenarioRule<NotificationsActivity> testRule = new ActivityScenarioRule<>(NotificationsActivity.class);
-
     @Before
     public void setUp() throws InterruptedException {
         // Set up the database to run on the local emulator of Firebase
@@ -51,6 +49,10 @@ public class NotificationsActivityTest {
         // Initialize the database with some test profiles
         ArrayList<String> myFriendsIds = new ArrayList<>();
         myFriendsIds.add("friendID");
+
+        Authenticator.manualSignUp("test@gmail.com", "abcdefg");
+        Authenticator.manualSignIn("test@gmail.com", "abcdefg");
+
         Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400, new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
@@ -64,6 +66,8 @@ public class NotificationsActivityTest {
         PushNotification notif3 = new PushNotification("notif3", "notif3", "SCAN");
         Database.addNotification(activeProfile.getUid(), notif3);
 
+        ActivityScenario<NotificationsActivity> testRule = ActivityScenario.launch(NotificationsActivity.class);
+
         Thread.sleep(5000);
     }
 
@@ -71,7 +75,7 @@ public class NotificationsActivityTest {
     public void testNotificationsActivityShowsNotifications() throws InterruptedException {
         onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
         onView(withText("notif2")).check(matches(isEnabled()));
-        onView(withText("notif3")).check(matches(isEnabled()));
+        onView(withText("notif1")).check(matches(isEnabled()));
     }
 
     @Test
@@ -88,7 +92,7 @@ public class NotificationsActivityTest {
         }
 
         onView(withText("notif2")).check(matches(isEnabled()));
-        onView(withText("notif3")).check(matches(isEnabled()));
+        onView(withText("notif1")).check(matches(isEnabled()));
     }
 
     public ViewAction clickChildViewWithId(final int id) {
