@@ -63,12 +63,25 @@ public class QuizInterFragment extends Fragment {
 
         QuizViewModel quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
 
-
-
         View root = binding.getRoot();
         binding.score.setText(String.format("%d", score));
 
+        setSpinWheel();
 
+        binding.nextButton.setOnClickListener(a-> {
+            quizViewModel.nextQuestion(Integer.parseInt(binding.newscore.getText().toString()));
+        });
+
+        binding.stopButton.setOnClickListener(a-> {
+            quizViewModel.finishQuiz(score);
+        });
+
+        return root;
+
+    }
+
+
+    private void setSpinWheel() {
         binding.spinButton.setOnClickListener( a-> {
             binding.spinButton.setVisibility(View.INVISIBLE);
             binding.stopButton.setVisibility(View.INVISIBLE);
@@ -117,22 +130,10 @@ public class QuizInterFragment extends Fragment {
                     }
             );
 
-        binding.fortuneWheelImageView.startAnimation(rotate);
+            binding.fortuneWheelImageView.startAnimation(rotate);
 
 
         });
-
-
-        binding.nextButton.setOnClickListener(a-> {
-            quizViewModel.nextQuestion(Integer.parseInt(binding.newscore.getText().toString()));
-        });
-
-        binding.stopButton.setOnClickListener(a-> {
-            quizViewModel.finishQuiz(score);
-        });
-
-        return root;
-
     }
 
 

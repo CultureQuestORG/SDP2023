@@ -24,6 +24,7 @@ public class QuizQuestionFragment extends Fragment {
     List<RadioButton> possibleAnswers=new ArrayList<>();
 
     String question;
+    int questionNumber;
 
     List<String> possibilities;
 
@@ -38,7 +39,7 @@ public class QuizQuestionFragment extends Fragment {
         String uid = getArguments().getString("uid");
         String tournament = getArguments().getString("tournament");
         String artName = getArguments().getString("artName");
-        int questionNumber = getArguments().getInt("questionNumber");
+        questionNumber = getArguments().getInt("questionNumber");
         question = getArguments().getString("question");
         possibilities = getArguments().getStringArrayList("possibleAnswers");
 
@@ -57,11 +58,15 @@ public class QuizQuestionFragment extends Fragment {
 
          for (int i = 0; i < possibilities.size(); i++)
               possibleAnswers.get(i).setText(possibilities.get(i));
+        setupAnswer();
+
+        return root;
+
+    }
 
 
-
-
-        root.findViewById(R.id.nextButton).setOnClickListener(a-> {
+    private void setupAnswer(){
+        binding.nextButton.setOnClickListener(a-> {
             // check that at least one answer has been selected
             if (!possibleAnswers.stream().reduce(false, (acc, possibleAnswer) -> acc || possibleAnswer.isChecked(), (acc1, acc2) -> acc1 || acc2)){
                 AlertDialog dialog = new AlertDialog.Builder(getContext())
@@ -77,11 +82,6 @@ public class QuizQuestionFragment extends Fragment {
             int selectedAnswer = possibleAnswers.indexOf(possibleAnswers.stream().filter(RadioButton::isChecked).findFirst().get());
             quizViewModel.answerQuestion(questionNumber, selectedAnswer);
         });
-
-
-
-        return root;
-
     }
 
 }
