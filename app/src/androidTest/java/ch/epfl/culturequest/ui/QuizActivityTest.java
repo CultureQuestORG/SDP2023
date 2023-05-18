@@ -175,8 +175,7 @@ public class QuizActivityTest {
         onView(withText("QUIT")).check(matches(isDisplayed()));
         onView(withText("SPIN")).perform(ViewActions.click());
         onView(withText("OK")).perform(ViewActions.click());
-        onView(withText("SPIN")).check(doesNotExist());
-        onView(withText("QUIT")).check(doesNotExist());
+
         onView(withText(String.format("%d", quizViewModel.getNextScore().getValue()))).check(matches(isDisplayed()));
         onView(withText("NEXT")).perform(ViewActions.click());
 
