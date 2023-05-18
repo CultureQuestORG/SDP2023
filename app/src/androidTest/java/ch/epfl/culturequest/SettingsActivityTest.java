@@ -11,7 +11,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 
 import android.Manifest;
 
@@ -63,7 +63,7 @@ public class SettingsActivityTest {
         // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
 
-        Profile.setActiveProfile(new Profile("userName", DEFAULT_PROFILE_PATH));
+        Profile.setActiveProfile(new Profile("userName", DEFAULT_PROFILE_PIC_PATH));
 
         ActivityScenario.launch(SettingsActivity.class).onActivity(a -> activity = a);
         Intents.init();

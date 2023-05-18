@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
@@ -50,10 +51,10 @@ public class DisplayUserProfileActivityTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
         // Initialize the database with some test profiles
-        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>());
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(activeProfile);
 
-        Profile profile1 = new Profile("fakeuid", "name", "username", "email", "phone", "photo", 3,new HashMap<>());
+        Profile profile1 = new Profile("fakeuid", "name", "username", "email", "phone", "photo", 3,new HashMap<>(), new ArrayList<>());
 
         Database.setProfile(profile1);
         Database.setProfile(activeProfile);

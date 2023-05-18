@@ -9,10 +9,6 @@
     <string name="title_map">Map</string>
     <string name="title_scan">Scan</string>
 
-    <string name="followNotifChannelID">FOLLOW</string>
-    <string name="likeNotifChannelID">LIKE</string>
-    <string name="scanNotifChannelID">SCAN</string>
-
     <string name="firebase">FireBase</string>
     <string name="set">SET</string>
     <string name="get">GET</string>

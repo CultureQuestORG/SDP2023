@@ -30,6 +30,18 @@ String getOpenAiApiKey() {
     return properties.getProperty("OPEN_AI_API_KEY");
 }
 
+String getFirebaseMessagingKey() {
+
+    def api_key = System.getenv("FIREBASE_MESSAGING_KEY")
+    if (api_key != null) {
+        return api_key;
+    }
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+    return properties.getProperty("FIREBASE_MESSAGING_KEY");
+}
+
 android {
     namespace 'ch.epfl.culturequest'
     compileSdk 33
@@ -45,6 +57,7 @@ android {
 
         buildConfigField "String", "OTM_API_KEY", "\""+getOTMApiKey()+"\""
         buildConfigField "String", "OPEN_AI_API_KEY", "\""+getOpenAiApiKey()+"\""
+        buildConfigField "String", "FIREBASE_MESSAGING_KEY", "\""+getFirebaseMessagingKey()+"\""
         buildConfigField "java.util.concurrent.atomic.AtomicBoolean", "IS_TESTING", "new java.util.concurrent.atomic.AtomicBoolean(false)"
     }
 
@@ -95,7 +108,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.google.code.gson:gson:2.8.9'
 
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'com.theokanning.openai-gpt3-java:service:0.11.0'
     implementation 'org.jsoup:jsoup:1.15.4'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -105,7 +120,6 @@ dependencies {
     testImplementation "com.squareup.okhttp3:mockwebserver:4.9.3"
     androidTestImplementation 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
 
-    implementation platform('com.google.firebase:firebase-bom:31.2.3')
     testImplementation 'junit:junit:4.13.2'
     implementation group: 'org.mockito', name: 'mockito-android', version: '5.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -122,6 +136,15 @@ dependencies {
     debugImplementation 'com.21buttons:fragment-test-rule-extras:2.0.1'
 
     testImplementation "org.mockito:mockito-core:5.1.1"
+
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+
+    // Add the dependencies for the Firebase Cloud Messaging and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation "com.squareup.okhttp3:logging-interceptor:4.3.1"
 }
 
 configurations.all {

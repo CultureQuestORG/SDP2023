@@ -3,14 +3,11 @@ package ch.epfl.culturequest.ui.scan;
 import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
-
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -20,15 +17,12 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -53,7 +47,7 @@ import ch.epfl.culturequest.utils.PermissionRequest;
 public class ScanFragment extends Fragment {
 
     private FragmentScanBinding binding;
-    public LocalStorage localStorage;
+    private LocalStorage localStorage;
     public static CameraSetup cameraSetup;
     public static ProcessingApi processingApi = new ProcessingApi();
     private LoadingAnimation loadingAnimation;
@@ -93,7 +87,7 @@ public class ScanFragment extends Fragment {
                     cameraSetup.getLatestImage().thenAccept(bitmap -> {
                         boolean isWifiAvailable = hasConnection(this.getContext());
                         if (!isWifiAvailable) {
-                            showNoConnectionAlert(this.getContext(), "Scannning postponed, you have no internet connection.\nConnect to network to load description");
+                            showNoConnectionAlert(this.getContext(), "Scannning postponed. Connect to network to load description");
                         }
                         try {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
@@ -156,12 +150,29 @@ public class ScanFragment extends Fragment {
     };
 
     private final View.OnClickListener cancelButtonListener = view -> {
-        loadingAnimation.stopLoading();
-        scanningLayout.setVisibility(View.GONE);
-
-        // Cancel the current processing if it exists
-        if(currentProcessing != null)
-            currentProcessing.cancel(true);
+        if (!hasConnection(getContext())) {
+            //in case we dont have time to do the whole storage thing with _pending
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("No Connection")
+                    .setIcon(R.drawable.unknown_error)
+                    .setMessage("Cancelling will interrupt the scan. You will not be able to post if you connect later")
+                    .setCancelable(true)
+                    .setNegativeButton("Wait", ((dialog, which) -> dialog.cancel()))
+                    .setPositiveButton("Cancel scan", (dialog, id) -> {
+                        loadingAnimation.stopLoading();
+                        scanningLayout.setVisibility(View.GONE);
+                        if (currentProcessing != null)
+                            currentProcessing.cancel(true);
+                        dialog.dismiss();
+                    });
+            builder.create().show();
+        } else {
+            loadingAnimation.stopLoading();
+            scanningLayout.setVisibility(View.GONE);
+            // Cancel the current processing if it exists
+            if (currentProcessing != null)
+                currentProcessing.cancel(true);
+        }
     };
 
     public View onCreateView(@NonNull LayoutInflater inflater,

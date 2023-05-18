@@ -1,13 +1,13 @@
 package ch.epfl.culturequest;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -17,9 +17,13 @@ public class SignUpActivity extends AppCompatActivity {
     static {
         Database.setPersistenceEnabled();
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Create the notification channels on login
+        PushNotification.createNotificationChannels(this);
 
         // If the user is not logged in, display the sign in activity
         AndroidUtils.removeStatusBar(getWindow());
