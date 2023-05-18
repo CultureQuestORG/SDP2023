@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -39,7 +38,7 @@ public class QuizWelcomeFragment extends Fragment {
 
 
 
-        root.findViewById(R.id.nextButton).setOnClickListener(a-> {
+        binding.startButton.setOnClickListener(a-> {
             quizViewModel.startQuiz();
         });
 

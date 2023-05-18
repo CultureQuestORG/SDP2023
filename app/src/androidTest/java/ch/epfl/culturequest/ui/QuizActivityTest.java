@@ -1,9 +1,7 @@
 package ch.epfl.culturequest.ui;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -142,9 +140,9 @@ public class QuizActivityTest {
         onView(withText("wrongAnswer2")).check(matches(isEnabled()));
         onView(withText("wrongAnswer3")).check(matches(isEnabled()));
         Thread.sleep(2000);
-        onView(withText("answer")).perform(ViewActions.click());
+        onView(withId(R.id.answer1RadioButton)).perform(ViewActions.click());
         Thread.sleep(2000);
-        onView(withText("Next")).perform(ViewActions.click());
+        onView(withId(R.id.nextButton)).perform(ViewActions.click());
         Thread.sleep(2000);
 
     }
@@ -156,9 +154,9 @@ public class QuizActivityTest {
         onView(withText("wrongAnswer2")).check(matches(isEnabled()));
         onView(withText("wrongAnswer3")).check(matches(isEnabled()));
         Thread.sleep(2000);
-        onView(withText("wrongAnswer1")).perform(ViewActions.click());
+        onView(withId(R.id.answer2RadioButton)).perform(ViewActions.click());
         Thread.sleep(2000);
-        onView(withText("Next")).perform(ViewActions.click());
+        onView(withId(R.id.nextButton)).perform(ViewActions.click());
         Thread.sleep(2000);
 
     }
@@ -168,7 +166,7 @@ public class QuizActivityTest {
         onView(withText("Start")).check(matches(isEnabled()));
         onView(withText("La Joconde")).check(matches(isEnabled())); //check that the name of the art is displayed
         Thread.sleep(2000);
-        onView(withText("Start")).perform(ViewActions.click());
+        onView(withId(R.id.startButton)).perform(ViewActions.click());
         Thread.sleep(2000);
     }
 
@@ -178,7 +176,7 @@ public class QuizActivityTest {
         onView(withText("SPIN")).check(matches(isEnabled()));
         onView(withText("QUIT")).check(matches(isEnabled()));
         Thread.sleep(2000);
-        onView(withText("QUIT")).perform(ViewActions.click());
+        onView(withId(R.id.stopButton)).perform(ViewActions.click());
         Thread.sleep(2000);
     }
 
@@ -188,13 +186,14 @@ public class QuizActivityTest {
         onView(withText("SPIN")).check(matches(isEnabled()));
         onView(withText("QUIT")).check(matches(isEnabled()));
         Thread.sleep(2000);
-        onView(withText("SPIN")).perform(ViewActions.click());
+        onView(withId(R.id.spinButton)).perform(ViewActions.click());
         Thread.sleep(2000);
         onView(withText("OK")).perform(ViewActions.click());
         Thread.sleep(2000);
         onView(withText(String.format("%d", quizViewModel.getNextScore().getValue()))).check(matches(isEnabled()));
         Thread.sleep(2000);
         onView(withText("NEXT")).perform(ViewActions.click());
+        onView(withId(R.id.nextButton)).perform(ViewActions.click());
         Thread.sleep(2000);
 
     }
