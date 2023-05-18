@@ -3,7 +3,9 @@ package ch.epfl.culturequest.ui.profile;
 
 import static ch.epfl.culturequest.utils.ProfileUtils.POSTS_ADDED;
 
+import android.Manifest;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
@@ -29,6 +33,9 @@ import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.notifications.CompetitionNotification;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -80,10 +87,7 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
 
-
-
-
-
+        requestPermissions();
         return root;
     }
 
@@ -123,6 +127,29 @@ public class ProfileFragment extends Fragment {
      */
     public void goToSettings(View view) {
         startActivity(new Intent(this.getContext(), SettingsActivity.class));
+    }
+
+    /////////////////////////// PERMISSIONS ///////////////////////////
+
+    // The callback for the permission request
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (!isGranted) {
+                    requestPermissions();
+                }
+            });
+
+    // Method to request the permissions
+    private void requestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            PermissionRequest permissionRequest = new PermissionRequest(Manifest.permission.POST_NOTIFICATIONS);
+
+            if (!permissionRequest.hasPermission(getContext())) {
+                // You can directly ask for the permission.
+                // The registered ActivityResultCallback gets the result of this request.
+                permissionRequest.askPermission(requestPermissionLauncher);
+            }
+        }
     }
 
 }

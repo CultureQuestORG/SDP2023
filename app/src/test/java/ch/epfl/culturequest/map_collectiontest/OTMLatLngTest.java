@@ -27,14 +27,23 @@ public class OTMLatLngTest {
     @Test
     public void testLatitudeIsCorrectlySet() {
         OTMLatLng latLng = new OTMLatLng(0.,24.);
-        assertThat(latLng.latitude(), is(24.));
+        assertThat(latLng.getLat(), is(24.));
     }
 
     // Test if longitude is correctly set
     @Test
     public void testLongitudeIsCorrectlySet() {
         OTMLatLng latLng = new OTMLatLng(25.,0.);
-        assertThat(latLng.longitude(), is(25.));
+        assertThat(latLng.getLon(), is(25.));
+    }
+
+    @Test
+    public void duplicateGetAndSetAreCorrect(){
+        OTMLatLng latLng = new OTMLatLng(25.,0.);
+        latLng.setLat(1.);
+        latLng.setLon(2.);
+        assertThat(latLng.getLon(), is(2.));
+        assertThat(latLng.getLat(), is(1.));
     }
 
 }

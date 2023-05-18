@@ -2,7 +2,7 @@ package ch.epfl.culturequest;
 
 import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
-import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
+import static ch.epfl.culturequest.utils.ProfileUtils.setProblemHintTextIfAny;
 
 import android.content.Context;
 import android.content.Intent;
@@ -100,14 +100,11 @@ public class SettingsActivity extends AppCompatActivity {
         EspressoIdlingResource.increment();
 
         // Check if the username is valid
-        if (!ProfileUtils.isValid(activeProfile, username.getText().toString())) {
-            username.setText("");
-            username.setHint(INCORRECT_USERNAME_FORMAT);
+        if (setProblemHintTextIfAny(username)) {
             EspressoIdlingResource.decrement();
             return;
         }
-
-
+        activeProfile.setUsername(username.getText().toString());
         // if the profile picture has not been changed, we don't need to upload it again
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
@@ -133,7 +130,6 @@ public class SettingsActivity extends AppCompatActivity {
                         EspressoIdlingResource.decrement();
                     }
             );
-
         }
         // Upload the new profile picture and update the profile
 

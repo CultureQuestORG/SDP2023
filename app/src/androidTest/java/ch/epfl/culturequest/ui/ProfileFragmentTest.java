@@ -70,7 +70,7 @@ public class ProfileFragmentTest {
 
         ProfileUtils.POSTS_ADDED = 0;
 
-        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PIC_PATH, 35,new HashMap<>());
+        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PIC_PATH, 35,new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 

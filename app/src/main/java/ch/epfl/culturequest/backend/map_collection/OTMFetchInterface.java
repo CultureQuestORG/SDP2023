@@ -26,4 +26,15 @@ public interface OTMFetchInterface {
     @GET("places/bbox?kinds=museums,urban_environment,monuments_and_memorials&format=json&limit=50")
     Call<List<OTMLocation>> fetchOTMPlaces(@Query("apikey") String key, @Query("lon_min") double lo_min, @Query("lon_max") double lo_max, @Query("lat_min") double la_min, @Query("lat_max") double la_max);
 
+    /**
+     * Returns an array of locations in a city (defined by lat and lon)
+     *
+     * @param lon longitude
+     * @param lat latitude
+     * @param key API key
+     * @return a
+     */
+    @GET("places/radius?radius=10000&rate=3h&kinds=museums,historic_architecture,monuments,towers&limit=200&format=json")
+    Call<List<OTMLocation>> fetchPlacesInCity(@Query("lon") double lon, @Query("lat") double lat, @Query("apikey") String key);
+
 }

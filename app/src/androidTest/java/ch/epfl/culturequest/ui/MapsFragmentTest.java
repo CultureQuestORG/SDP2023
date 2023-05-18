@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
@@ -29,7 +30,7 @@ public class MapsFragmentTest {
     @Before
     public void setUp() throws InterruptedException {
 
-        Profile profile = new Profile("test", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PIC_PATH, 35, new HashMap<>());
+        Profile profile = new Profile("test", "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PIC_PATH, 35, new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 

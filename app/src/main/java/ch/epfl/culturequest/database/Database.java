@@ -19,14 +19,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.LikeNotification;
+import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.social.SightseeingEvent;
 
 
 /**
@@ -37,14 +40,15 @@ public class Database {
     private static boolean isEmulatorOn = false;
 
     public static void setPersistenceEnabled() {
-        //!BuildConfig.IS_TESTING makes the code run only when we are not testing
-//        if (!BuildConfig.IS_TESTING.get()) {
+        // !BuildConfig.IS_TESTING makes the code run only when we are not testing
+        if (!BuildConfig.IS_TESTING.get()) {
             databaseInstance.setPersistenceEnabled(true);
             databaseInstance.getReference("users").keepSynced(true);
             databaseInstance.getReference("posts").keepSynced(true);
             databaseInstance.getReference("follows").keepSynced(true);
             databaseInstance.getReference("artworks").keepSynced(true);
-//        }
+            databaseInstance.getReference("notifications").keepSynced(true);
+        }
     }
 
     public static void setEmulatorOn() {
@@ -667,6 +671,130 @@ public class Database {
                 } else {
                     future.complete(new AtomicBoolean(committed));
                 }
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to set the device tokens of a user. It is used to update the list of
+     * devices to which the notifications of a user should be sent.
+     *
+     * @param UId          of the user for which the device tokens are going to be set
+     * @param deviceTokens the list of device tokens to be set
+     * @return a CompletableFuture that will be completed with an AtomicBoolean when the device tokens are set
+     */
+    public static CompletableFuture<AtomicBoolean> setDeviceTokens(String UId, List<String> deviceTokens) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        databaseInstance.getReference("users").child(UId).child("deviceTokens").setValue(deviceTokens).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to get the device tokens of a user. It is used to know to which devices
+     * of a user a notification should be sent.
+     *
+     * @param UId of the user for which the device tokens are going to be retrieved
+     * @return a CompletableFuture that will be completed with a list of device tokens when the device tokens are retrieved
+     */
+    public static CompletableFuture<List<String>> getDeviceTokens(String UId) {
+        CompletableFuture<List<String>> future = new CompletableFuture<>();
+        databaseInstance.getReference("users").child(UId).child("deviceTokens").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<String> deviceTokens = new ArrayList<>();
+                for (DataSnapshot token : task.getResult().getChildren()) {
+                    deviceTokens.add(token.getValue(String.class));
+                }
+                future.complete(deviceTokens);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to get the notifications of a user, ordered in reverse chronological order (i.e
+     * the most recent notification is the first one in the list). It is used to display the notifications
+     * in the app.
+     *
+     * @param UId of the user for which the notifications are going to be retrieved
+     * @return a CompletableFuture that will be completed with a list of notifications when the notifications are retrieved
+     */
+    public static CompletableFuture<List<PushNotification>> getNotifications(String UId) {
+        CompletableFuture<List<PushNotification>> future = new CompletableFuture<>();
+        databaseInstance.getReference("notifications").child(UId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<PushNotification> notificationsList = new ArrayList<>();
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    notificationsList.add(snapshot.getValue(PushNotification.class));
+                }
+
+                // sort by time such that we get the latest notification first
+                notificationsList.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
+                future.complete(notificationsList);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to add a notification to a user. It is used when someone sends a
+     * notification to a user.
+     *
+     * @param UId          of the user for which the notification is going to be added
+     * @param notification the notification to be added
+     * @return a CompletableFuture that will be completed with an AtomicBoolean when the notification is added
+     */
+    public static CompletableFuture<AtomicBoolean> addNotification(String UId, PushNotification notification) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference notificationRef = databaseInstance.getReference("notifications").child(UId).child(notification.getNotificationId());
+        notificationRef.setValue(notification).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    /**
+     * This method is used to delete a notification from a user. It is used to delete old notifications.
+     *
+     * @param UId          of the user for which the notification is going to be deleted
+     * @param notification the notification to be deleted
+     * @return a CompletableFuture that will be completed with an AtomicBoolean when the notification is deleted
+     */
+    public static CompletableFuture<AtomicBoolean> deleteNotification(String UId, PushNotification notification) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference notificationRef = databaseInstance.getReference("notifications").child(UId).child(notification.getNotificationId());
+        notificationRef.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> setSightseeingEvent(SightseeingEvent event) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = databaseInstance.getReference("sightseeing_event").child(event.getOwner().getUid()).child(String.valueOf(event.getEventId()));
+        usersRef.setValue(event).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
             }
         });
         return future;
