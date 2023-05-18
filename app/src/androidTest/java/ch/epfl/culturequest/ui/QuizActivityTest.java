@@ -124,13 +124,15 @@ public class QuizActivityTest {
 
     }
 
-    private void checkGameOverScreen() {
+    private void checkGameOverScreen() throws InterruptedException  {
+        Thread.sleep(2000);
         onView(withText("GAME OVER")).check(matches(isDisplayed()));
         onView(withText("BACK TO THE TOURNAMENT")).check(matches(isDisplayed()));
     }
 
-    private void checkFinalScreen() {
-        //onView(withText(String.format("You earned %d points", quizViewModel.getScore().getValue()))).check(matches(isDisplayed()));
+    private void checkFinalScreen() throws InterruptedException  {
+        Thread.sleep(2000);
+        onView(withText(String.format("You earned %d points", quizViewModel.getScore().getValue()))).check(matches(isDisplayed()));
         onView(withText("BACK TO THE TOURNAMENT")).perform(ViewActions.click());
 
     }
