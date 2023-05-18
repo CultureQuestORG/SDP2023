@@ -104,16 +104,13 @@ public class ScanFragmentTest {
     @After
     public void deleteAllImagesInSharedStorage() {
         localStorage.clearLocalStorage();
-        int totalImageCount = localStorage.countSelectedImagesInLocalStorage(null, null);
+        int totalImageCount = countImagesInSharedStorage();
         ViewMatchers.assertThat(totalImageCount, is(0));
         FireStorage.clearStorage();
     }
 
     private int countImagesInSharedStorage() {
-        String selection = MediaStore.Images.Media.DISPLAY_NAME + " NOT LIKE ?";
-        String[] selectionArgs = new String[]{"pending_%"};
-
         // Counts the number of ready images (not pending) in the shared storage
-        return localStorage.countSelectedImagesInLocalStorage(selection, selectionArgs);
+        return localStorage.countSelectedImagesInLocalStorage(null, null);
     }
 }
