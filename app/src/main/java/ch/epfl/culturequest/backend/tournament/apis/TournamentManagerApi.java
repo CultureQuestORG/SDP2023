@@ -9,6 +9,7 @@ import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.isT
 import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.lockTournamentGeneration;
 import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.unlockTournamentGeneration;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -29,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -61,23 +63,28 @@ import ch.epfl.culturequest.backend.tournament.utils.RandomApi;
 
 public class TournamentManagerApi {
 
-    public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY);
+    @SuppressLint("NewApi")
+    public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY, Duration.ofSeconds(60));
 
     // Main function #1: To be called when most of activities are being resumed
-    public static void handleTournaments() {
+    public static CompletableFuture<Void> handleTournaments() {
 
         if (tournamentRemainingTime() == 0) { // Tournament hasn't been scheduled yet (date not pseudo-randomly generated yet)
             // schedule the tournament generation and store it in shared preferences
             generateAndStoreTournamentDate();
+
         } else if (tournamentRemainingTime() < 0) { // Tournament is over
 
             // Clear shared preferences, unlock all concurrency related variables, schedule the next tournament
             setWeeklyTournamentOver();
+
         } else if (isTimeToGenerateTournament() && !tournamentAlreadyStoredInSharedPref()) {
 
             // generate or fetch tournament once and store it in Shared Preferences to access it easily later
-            generateOrFetchTournamentThenStore();
+            return generateOrFetchTournamentThenStore();
         }
+
+        return CompletableFuture.completedFuture(null);
     }
 
     // Main function #2: To be called to retrieve the tournament after it has been generated or fetched
@@ -103,14 +110,19 @@ public class TournamentManagerApi {
     }
 
 
-    private static void generateOrFetchTournamentThenStore() {
+    private static CompletableFuture<Void> generateOrFetchTournamentThenStore() {
+
+        CompletableFuture<Void> future = new CompletableFuture<>();
 
         // Generate or fetch tournament once and store it in Shared Preferences to access it easily later
         generateOrFetchTournament().thenAccept(tournament -> {
             if (tournament != null) {
                 storeTournamentInSharedPref(tournament);
             }
+            future.complete(null);
         });
+
+        return future;
     }
 
     private static void generateAndStoreTournamentDate() {
@@ -240,7 +252,7 @@ public class TournamentManagerApi {
                             Tournament tournament = new Tournament(artQuizzes);
                             uploadTournamentToDatabase(tournament);
 
-                            return new Tournament(artQuizzes);
+                            return tournament;
                         });
             }
         });

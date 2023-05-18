@@ -11,9 +11,12 @@ public class Tournament {
 
     private Map<String, ArtQuiz> artQuizzes = new HashMap<String, ArtQuiz>();
 
+    private Tournament(){
+        // For Serialization
+    }
     public Tournament(Map<String, ArtQuiz> artQuizzes){
-
         tournamentId = RandomApi.getWeeklyTournamentPseudoRandomUUID();
+        this.artQuizzes = artQuizzes;
     }
 
     public String getTournamentId(){

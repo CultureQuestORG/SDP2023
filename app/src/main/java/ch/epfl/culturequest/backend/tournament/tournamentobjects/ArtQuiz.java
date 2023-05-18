@@ -8,6 +8,11 @@ public class ArtQuiz {
 
     ArrayList<QuizQuestion> questions;
 
+
+    private ArtQuiz(){
+        // For Serialization
+    }
+
     public ArtQuiz(ArrayList<QuizQuestion> questions){
         this.questions = questions;
     }

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
@@ -24,17 +25,15 @@ public class QuizGeneratorApi {
 
     private OpenAiService service;
 
-
-    private final String quizGenerationPrompt = "Given the sculpture called David, generate a quiz of 5 questions in JSON.";
-    private final String testPrompx = "Hello, what's your name";
-
-
     /*
-    private String quizGenerationPrompt = "Given the art: \"%s\", write a quiz of 5 questions including 3 wrong and 1 correct possible answer in each. The true answer is indicated by its index. Return in JSON.";
+    private final String quizGenerationPrompt = "Given the art \"David (Michelangelo)\", generate a quiz of 5 difficult questions in JSON. ";
+    private String quizGenerationPromptX = "Given the art: \"%s\", write a quiz of 5 questions including 3 wrong and 1 correct possible answer in each. The true answer is indicated by its index. Return in JSON.";
     private final String testPrompt3 = "Given the art: \"Mona Lisa\", write a quiz of 5 questions with 4 options in each, with the correct answer indicated by its index. Return your response in JSON.";
     private final String testPrompt4 = "Given the art: \"Mona Lisa\", write a quiz (in JSON) of 5 questions with 4 options in each, with the correct answer indicated by its index.";
     private final String testPrompt5 = "Given the art: \"Mona Lisa\", write a quiz (in JSON) of 5 questions with 4 options in each, with the correct answer indicated by its index. Directly return the array including all the questions without beginning with any title key.";
     */
+
+    private final static String quizGenerationPrompt ="Given the art \"David (Michelangelo)\", generate a quiz of 5 difficult questions in JSON, with 4 options in each, 3 wrong and 1 correct answer. As the \"options\" list four questions, the answer should always be among them!!";
 
 
     public QuizGeneratorApi(OpenAiService service){
@@ -89,7 +88,7 @@ public class QuizGeneratorApi {
         }
 
         catch (Exception e){
-            throw new CompletionException(new OpenAiFailedException("Quiz parsing failed"));
+            throw new CompletionException(new OpenAiFailedException("Quiz parsing failed - Questions not parsed correctly"));
         }
 
         return new ArtQuiz(quizQuestions);
@@ -106,27 +105,25 @@ public class QuizGeneratorApi {
         }
 
         ArrayList<String> randomizedOptions = randomizeOptions(options);
-        int correctAnswerIndex = getCorrectAnswerIndex(options, questionObject.getString("answer"));
+        int correctAnswerIndex = getCorrectAnswerIndex(randomizedOptions, questionObject.getString("answer"));
 
         QuizQuestion quizQuestion = new QuizQuestion(question, randomizedOptions, correctAnswerIndex);
 
         return quizQuestion;
     }
 
-    private JSONArray parseJsonArrayFromString(String jsonResponse){
+    private JSONArray parseJsonArrayFromString(String jsonResponse) throws JSONException {
 
         Pattern pattern = Pattern.compile("\\[\\s*\\{.*\\s*\\]", Pattern.DOTALL);
-        String jsonArrayString = pattern.matcher(jsonResponse).group();
+        Matcher matcher = pattern.matcher(jsonResponse);
 
-        try{
-            JSONArray jsonArray = new JSONArray(jsonArrayString);
-            return jsonArray;
+        if(matcher.find()){
+            String jsonArrayString = matcher.group(0);
+            return new JSONArray(jsonArrayString);
         }
-        catch (Exception e){
-            throw new CompletionException(new OpenAiFailedException("Quiz parsing failed"));
-        }
+
+        throw new CompletionException(new OpenAiFailedException("Quiz parsing failed - JSON array not found"));
     }
-
 
     private ArrayList<String> randomizeOptions(ArrayList<String> options){
 
@@ -149,6 +146,7 @@ public class QuizGeneratorApi {
             }
         }
 
-        throw new CompletionException(new OpenAiFailedException("Quiz parsing failed"));
+        return 0; // If the correct answer is not found, we return 0 as the correct answer index (so that we're not penalized too much by ChatGPT stupidity ...)
+
     }
 }

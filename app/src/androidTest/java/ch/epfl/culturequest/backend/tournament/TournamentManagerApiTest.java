@@ -5,6 +5,7 @@ import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 
 import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.getDeviceSynchronizationRef;
 import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.indicateTournamentGenerated;
@@ -26,6 +27,7 @@ import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi;
 import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 
@@ -115,26 +117,23 @@ public class TournamentManagerApiTest {
 
 
         // Launch the main method
-        TournamentManagerApi.handleTournaments();
+        TournamentManagerApi.handleTournaments().join();
 
-
-        // Sleep 10 seconds
-        try {
-            Thread.sleep(1000000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        //// CHECKS ////
 
         // Check that the tournament has been generated
-
         Boolean tournamentGenerated = isEqualAsync(getTournamentGeneratedPath(), true).join();
         assertThat(tournamentGenerated, is(true));
 
+        // Check that the tournament generation is locked
+        Boolean generationLocked = AppConcurrencyApi.isTournamentGenerationLocked().join();
+        assertThat(generationLocked, is(true));
 
+        // Check that the weeklyTournament string in Tournament file shared pref is not null
+        String weeklyTournament = tournamentSharedPref.getString("weeklyTournament", null);
+        assertThat(weeklyTournament, is(not(nullValue())));
 
     }
-
-
 
 
     private SharedPreferences getTournamentSharedPrefLocation(){
@@ -164,9 +163,4 @@ public class TournamentManagerApiTest {
     private DatabaseReference getTournamentGeneratedPath(){
         return getDeviceSynchronizationRef().child("generated");
     }
-
-
-
-
-
 }
