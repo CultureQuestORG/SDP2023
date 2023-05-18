@@ -47,8 +47,6 @@ import ch.epfl.culturequest.storage.FireStorage;
 public class ProfileCreatorActivityTest {
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
-//    @Rule
-//    public GrantPermissionRule grantPermissionRule2 = GrantPermissionRule.grant(Manifest.permission.READ_MEDIA_IMAGES);
 
     private static Profile profile;
     private static ProfileCreatorActivity activity;

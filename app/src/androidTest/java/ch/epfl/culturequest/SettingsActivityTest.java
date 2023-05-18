@@ -46,8 +46,6 @@ import ch.epfl.culturequest.storage.FireStorage;
 public class SettingsActivityTest {
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
-//    @Rule
-//    public GrantPermissionRule grantPermissionRule2 = GrantPermissionRule.grant(Manifest.permission.READ_MEDIA_IMAGES);
 
     private static SettingsActivity activity;
     private final String email = "test@gmail.com";
