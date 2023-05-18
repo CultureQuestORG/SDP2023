@@ -22,6 +22,10 @@ public class QuizActivity extends AppCompatActivity {
 
     private ActivityQuizBinding binding;
 
+    private String uid;
+    private String tournament;
+    private String artName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,9 +33,8 @@ public class QuizActivity extends AppCompatActivity {
         // To make the status bar transparent
         AndroidUtils.removeStatusBar(getWindow());
         // fetch the tournament and artname from the intent
-        String tournament = getIntent().getStringExtra("tournament");
-        String artName = getIntent().getStringExtra("artName");
-        String uid;
+        tournament = getIntent().getStringExtra("tournament");
+        artName = getIntent().getStringExtra("artName");
         if (Profile.getActiveProfile() != null) {
             uid = Profile.getActiveProfile().getUid();
         } else {
@@ -95,9 +98,9 @@ public class QuizActivity extends AppCompatActivity {
 
     private Bundle basicBundle(){
         Bundle bundle = new Bundle();
-        bundle.putString("uid", "1234");
-        bundle.putString("tournament", "tournament1");
-        bundle.putString("artName", "La Joconde");
+        bundle.putString("uid", uid);
+        bundle.putString("tournament", tournament);
+        bundle.putString("artName", artName);
         return bundle;
     }
 

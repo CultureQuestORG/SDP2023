@@ -102,6 +102,14 @@ public class QuizViewModel extends ViewModel {
         return Objects.requireNonNull(quiz.getValue()).getQuestions().get(questionNumber);
     }
 
+    public MutableLiveData<Integer> getScore() {
+        return score;
+    }
+
+    public MutableLiveData<Integer> getNextScore() {
+        return nextScore;
+    }
+
 
 
 

@@ -2,6 +2,7 @@ package ch.epfl.culturequest.tournament.quiz;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -58,6 +59,14 @@ public class QuestionTest{
         Question question = new Question("question", answers,0);
         assertEquals("question", question.getQuestion());
         assertEquals(answers, question.getPossibilities());
+        assertEquals(0, question.getAnswer());
+    }
+
+    @Test
+    public void emptyConstructor() {
+        Question question = new Question();
+        assertEquals("", question.getQuestion());
+        assertNull(question.getPossibilities());
         assertEquals(0, question.getAnswer());
     }
 
