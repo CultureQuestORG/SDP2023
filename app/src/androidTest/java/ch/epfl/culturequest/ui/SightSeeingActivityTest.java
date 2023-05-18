@@ -66,6 +66,7 @@ public class SightSeeingActivityTest {
         //Set up the authentication to run on the local emulator of Firebase
         Authenticator.setEmulatorOn();
 
+        Authenticator.manualSignUp("test@gmail.com", "abcdefg");
         Authenticator.manualSignIn("test@gmail.com", "abcdefg");
 
         Profile.setActiveProfile(new Profile(Authenticator.getCurrentUser().getUid(), "name", "Test", "test@gmail.com", "num", "profile", 0, new HashMap<>(), new ArrayList<>()));
