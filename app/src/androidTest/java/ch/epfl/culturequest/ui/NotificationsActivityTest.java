@@ -3,6 +3,7 @@ package ch.epfl.culturequest.ui;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -69,17 +70,17 @@ public class NotificationsActivityTest {
     @Test
     public void testNotificationsActivityShowsNotifications() throws InterruptedException {
         onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
-        onView(withText("notif1")).check(matches(isDisplayed()));
-        onView(withText("notif2")).check(matches(isDisplayed()));
-        onView(withText("notif3")).check(matches(isDisplayed()));
+        onView(withText("notif1")).check(matches(isEnabled()));
+        onView(withText("notif2")).check(matches(isEnabled()));
+        onView(withText("notif3")).check(matches(isEnabled()));
     }
 
     @Test
     public void testNotificationsActivityDeleteWorks() throws InterruptedException {
         onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
-        onView(withText("notif1")).check(matches(isDisplayed()));
-        onView(withText("notif2")).check(matches(isDisplayed()));
-        onView(withText("notif3")).check(matches(isDisplayed()));
+        onView(withText("notif1")).check(matches(isEnabled()));
+        onView(withText("notif2")).check(matches(isEnabled()));
+        onView(withText("notif3")).check(matches(isEnabled()));
         onView(withId(R.id.notifications_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.delete_button)));
 
         Thread.sleep(2000);
@@ -90,8 +91,8 @@ public class NotificationsActivityTest {
             fail("Test failed because of an exception: " + e.getMessage());
         }
 
-        onView(withText("notif2")).check(matches(isDisplayed()));
-        onView(withText("notif3")).check(matches(isDisplayed()));
+        onView(withText("notif2")).check(matches(isEnabled()));
+        onView(withText("notif3")).check(matches(isEnabled()));
     }
 
     public ViewAction clickChildViewWithId(final int id) {
