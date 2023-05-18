@@ -41,7 +41,7 @@ public class QuizActivityTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
 
@@ -84,6 +84,7 @@ public class QuizActivityTest {
             quizViewModel=QuizViewModel.getQuiz(Profile.getActiveProfile().getUid(), "tournamentId", "La Joconde");
         });
 
+        Thread.sleep(8000);
 
 
 
