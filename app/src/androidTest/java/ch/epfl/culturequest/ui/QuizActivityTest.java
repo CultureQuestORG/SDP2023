@@ -86,9 +86,10 @@ public class QuizActivityTest {
 
 
     }
+
+
     @Test
-    public void SuccessQuizActivity() throws InterruptedException {
-        // if a button with text "Start" is displayed, click on it
+    public void SuccessfulQuiz() throws InterruptedException {
     startQuiz();
     answerQuestion();
     turnWheel();
@@ -103,6 +104,29 @@ public class QuizActivityTest {
 
     }
 
+    @Test
+    public void QuitQuiz() throws InterruptedException {
+        startQuiz();
+        answerQuestion();
+        turnWheel();
+        answerQuestion();
+        quitQuiz();
+        checkFinalScreen();
+    }
+
+    @Test
+    public void FailedQuiz() throws InterruptedException {
+        startQuiz();
+        answerWrongly();
+        checkGameOverScreen();
+
+    }
+
+    private void checkGameOverScreen() {
+        onView(withText("GAME OVER")).check(matches(isDisplayed()));
+        onView(withText("BACK TO THE TOURNAMENT")).check(matches(isDisplayed()));
+    }
+
     private void checkFinalScreen() {
         onView(withText(String.format("You earned %d points", quizViewModel.getScore().getValue()))).check(matches(isDisplayed()));
         onView(withText("BACK TO THE TOURNAMENT")).perform(ViewActions.click());
@@ -115,6 +139,16 @@ public class QuizActivityTest {
         onView(withText("wrongAnswer2")).check(matches(isDisplayed()));
         onView(withText("wrongAnswer3")).check(matches(isDisplayed()));
         onView(withText("answer")).perform(ViewActions.click());
+        onView(withText("Next")).perform(ViewActions.click());
+
+    }
+
+    private void answerWrongly(){
+        onView(withText("answer")).check(matches(isDisplayed()));
+        onView(withText("wrongAnswer1")).check(matches(isDisplayed()));
+        onView(withText("wrongAnswer2")).check(matches(isDisplayed()));
+        onView(withText("wrongAnswer3")).check(matches(isDisplayed()));
+        onView(withText("wrongAnswer1")).perform(ViewActions.click());
         onView(withText("Next")).perform(ViewActions.click());
 
     }
