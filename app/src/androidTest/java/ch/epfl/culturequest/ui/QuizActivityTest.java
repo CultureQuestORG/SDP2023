@@ -131,7 +131,7 @@ public class QuizActivityTest {
     private void checkFinalScreen() throws InterruptedException  {
         Thread.sleep(2000);
         onView(withText(String.format("You earned %d points", quizViewModel.getScore().getValue()))).check(matches(isEnabled()));
-        onView(withText("BACK TO THE TOURNAMENT")).perform(ViewActions.click());
+        onView(withText("BACK TO THE TOURNAMENT")).check(matches(isEnabled()));
 
     }
 
@@ -141,6 +141,7 @@ public class QuizActivityTest {
         onView(withText("wrongAnswer1")).check(matches(isEnabled()));
         onView(withText("wrongAnswer2")).check(matches(isEnabled()));
         onView(withText("wrongAnswer3")).check(matches(isEnabled()));
+        Thread.sleep(2000);
         onView(withText("answer")).perform(ViewActions.click());
         Thread.sleep(2000);
         onView(withText("Next")).perform(ViewActions.click());
@@ -154,6 +155,7 @@ public class QuizActivityTest {
         onView(withText("wrongAnswer1")).check(matches(isEnabled()));
         onView(withText("wrongAnswer2")).check(matches(isEnabled()));
         onView(withText("wrongAnswer3")).check(matches(isEnabled()));
+        Thread.sleep(2000);
         onView(withText("wrongAnswer1")).perform(ViewActions.click());
         Thread.sleep(2000);
         onView(withText("Next")).perform(ViewActions.click());
@@ -165,6 +167,7 @@ public class QuizActivityTest {
         Thread.sleep(2000);
         onView(withText("Start")).check(matches(isEnabled()));
         onView(withText("La Joconde")).check(matches(isEnabled())); //check that the name of the art is displayed
+        Thread.sleep(2000);
         onView(withText("Start")).perform(ViewActions.click());
         Thread.sleep(2000);
     }
@@ -184,11 +187,13 @@ public class QuizActivityTest {
         onView(withText(String.format("%d", quizViewModel.getScore().getValue()))).check(matches(isEnabled()));
         onView(withText("SPIN")).check(matches(isEnabled()));
         onView(withText("QUIT")).check(matches(isEnabled()));
+        Thread.sleep(2000);
         onView(withText("SPIN")).perform(ViewActions.click());
         Thread.sleep(2000);
         onView(withText("OK")).perform(ViewActions.click());
         Thread.sleep(2000);
         onView(withText(String.format("%d", quizViewModel.getNextScore().getValue()))).check(matches(isEnabled()));
+        Thread.sleep(2000);
         onView(withText("NEXT")).perform(ViewActions.click());
         Thread.sleep(2000);
 
