@@ -135,10 +135,10 @@ public class QuizActivityTest {
 
     private void answerQuestion() throws InterruptedException {
         Thread.sleep(2000);
-        onView(withText("answer")).check(matches(isEnabled()));
-        onView(withText("wrongAnswer1")).check(matches(isEnabled()));
-        onView(withText("wrongAnswer2")).check(matches(isEnabled()));
-        onView(withText("wrongAnswer3")).check(matches(isEnabled()));
+        onView(withId(R.id.answer1RadioButton)).check(matches(isEnabled()));
+        onView(withId(R.id.answer2RadioButton)).check(matches(isEnabled()));
+        onView(withId(R.id.answer3RadioButton)).check(matches(isEnabled()));
+        onView(withId(R.id.answer4RadioButton)).check(matches(isEnabled()));
         Thread.sleep(2000);
         onView(withId(R.id.answer1RadioButton)).perform(ViewActions.click());
         Thread.sleep(2000);
@@ -149,10 +149,11 @@ public class QuizActivityTest {
 
     private void answerWrongly() throws InterruptedException {
         Thread.sleep(2000);
-        onView(withText("answer")).check(matches(isEnabled()));
-        onView(withText("wrongAnswer1")).check(matches(isEnabled()));
-        onView(withText("wrongAnswer2")).check(matches(isEnabled()));
-        onView(withText("wrongAnswer3")).check(matches(isEnabled()));
+        onView(withId(R.id.answer1RadioButton)).check(matches(isEnabled()));
+        onView(withId(R.id.answer2RadioButton)).check(matches(isEnabled()));
+        onView(withId(R.id.answer3RadioButton)).check(matches(isEnabled()));
+        onView(withId(R.id.answer4RadioButton)).check(matches(isEnabled()));
+
         Thread.sleep(2000);
         onView(withId(R.id.answer2RadioButton)).perform(ViewActions.click());
         Thread.sleep(2000);
@@ -163,7 +164,7 @@ public class QuizActivityTest {
 
     private void startQuiz() throws InterruptedException {
         Thread.sleep(2000);
-        onView(withText("Start")).check(matches(isEnabled()));
+        onView(withId(R.id.startButton)).check(matches(isEnabled()));
         onView(withText("La Joconde")).check(matches(isEnabled())); //check that the name of the art is displayed
         Thread.sleep(2000);
         onView(withId(R.id.startButton)).perform(ViewActions.click());
