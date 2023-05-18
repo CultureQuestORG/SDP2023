@@ -6,8 +6,9 @@ import androidx.lifecycle.ViewModel;
 import java.util.HashMap;
 import java.util.Objects;
 
-import ch.epfl.culturequest.social.quiz.Question;
-import ch.epfl.culturequest.social.quiz.Quiz;
+import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.tournament.quiz.Question;
+import ch.epfl.culturequest.tournament.quiz.Quiz;
 import kotlin.Triple;
 
 
@@ -21,6 +22,8 @@ public class QuizViewModel extends ViewModel {
 
     private final MutableLiveData<QuizActivity> quizActivity = new MutableLiveData<>();
 
+    private final MutableLiveData<String> uid = new MutableLiveData<>();
+
     private final MutableLiveData<Integer> score = new MutableLiveData<>();
     private final MutableLiveData<Integer> nextScore = new MutableLiveData<>();
 
@@ -28,11 +31,12 @@ public class QuizViewModel extends ViewModel {
 
 
 
-    public QuizViewModel(Quiz quiz, QuizActivity quizActivity) {
+    public QuizViewModel(Quiz quiz, QuizActivity quizActivity, String uid) {
         this.quiz.setValue(quiz);
         this.quizActivity.setValue(quizActivity);
         score.setValue(0);
         nextScore.setValue(100);
+        this.uid.setValue(uid);
 
 
     }
@@ -46,9 +50,10 @@ public class QuizViewModel extends ViewModel {
 
     public void startQuiz() {
         Objects.requireNonNull(quizActivity.getValue()).goToQuestion(0, Objects.requireNonNull(quiz.getValue()).getQuestions().get(0));
+        Database.startQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue());
     }
 
-    public void answerQuestion(int questionNumber, String answer) {
+    public void answerQuestion(int questionNumber, int answer) {
         boolean correct = Objects.requireNonNull(quiz.getValue()).getQuestions().get(questionNumber).isCorrect(answer);
         if (!correct) {
             Objects.requireNonNull(quizActivity.getValue()).FailQuiz();
@@ -75,13 +80,17 @@ public class QuizViewModel extends ViewModel {
 
     public void finishQuiz(int score) {
         Objects.requireNonNull(quizActivity.getValue()).endQuiz(score);
+        Database.setScoreQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue(), score);
     }
 
 
 
-    public static void addQuiz(Quiz quiz,QuizActivity activity,String uid) {
-        Triple<String, String, String> key = new Triple<>(uid, quiz.getTournament(), quiz.getArtName());
-        quizHashMap.put(key, new QuizViewModel(quiz, activity));
+    public static void addQuiz(String tournament,String artName,QuizActivity activity,String uid) {
+        Objects.requireNonNull(Database.getQuiz(tournament, artName)).thenAccept(quiz -> {
+            Triple<String, String, String> key = new Triple<>(uid, tournament, artName);
+            quizHashMap.put(key, new QuizViewModel(quiz, activity,uid));
+            activity.welcome();
+        });
     }
 
     public static QuizViewModel getQuiz(String uid, String tournament, String artName) {

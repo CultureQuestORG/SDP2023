@@ -16,7 +16,6 @@ import java.util.Objects;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.FragmentQuizQuestionBinding;
-import ch.epfl.culturequest.social.quiz.Question;
 
 public class QuizQuestionFragment extends Fragment {
     FragmentQuizQuestionBinding binding;
@@ -75,8 +74,8 @@ public class QuizQuestionFragment extends Fragment {
                 dialog.show();
                 return;
             }
-            quizViewModel.answerQuestion(questionNumber, possibleAnswers.stream().filter(RadioButton::isChecked).findFirst().get().getText().toString());
-
+            int selectedAnswer = possibleAnswers.indexOf(possibleAnswers.stream().filter(RadioButton::isChecked).findFirst().get());
+            quizViewModel.answerQuestion(questionNumber, selectedAnswer);
         });
 
 

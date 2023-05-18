@@ -1,7 +1,6 @@
-package ch.epfl.culturequest.social.quiz;
+package ch.epfl.culturequest.tournament.quiz;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Quiz {
 
@@ -21,6 +20,8 @@ public class Quiz {
         this.questions = null;
         this.tournament = "";
     }
+
+
 
 
     public String getArtName() {

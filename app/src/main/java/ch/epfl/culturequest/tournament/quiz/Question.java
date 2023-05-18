@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.social.quiz;
+package ch.epfl.culturequest.tournament.quiz;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,12 +7,13 @@ public class Question {
 
     String question;
     ArrayList<String> possibilities;
-    String answer;
+    int answer;
 
 
 
-    public Question(String question, ArrayList<String> possibilities, String answer) {
-        assert possibilities.contains(answer);
+    public Question(String question, ArrayList<String> possibilities, int answer) {
+        assert answer < possibilities.size();
+        assert answer >= 0;
         this.question = question;
         this.possibilities = possibilities;
         this.answer = answer;
@@ -21,7 +22,7 @@ public class Question {
     public Question() {
         this.question = "";
         this.possibilities = null;
-        this.answer = "";
+        this.answer = 0;
     }
 
     public String getQuestion() {
@@ -32,7 +33,7 @@ public class Question {
         return possibilities;
     }
 
-    public String getAnswer() {
+    public int getAnswer() {
         return answer;
     }
 
@@ -44,12 +45,14 @@ public class Question {
         this.possibilities = possibilities;
     }
 
-    public void setAnswer(String answer) {
+    public void setAnswer(int answer) {
+        assert answer < possibilities.size();
+        assert answer >= 0;
         this.answer = answer;
     }
 
 
-    public boolean isCorrect(String selectedAnswer) {
-        return selectedAnswer.equals(answer);
+    public boolean isCorrect(int selectedAnswer) {
+        return selectedAnswer == answer;
     }
 }
