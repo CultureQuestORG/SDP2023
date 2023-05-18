@@ -2,9 +2,15 @@ package ch.epfl.culturequest.backend.tournament.apis;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
+import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.getDeviceSynchronizationRef;
+import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.indicateTournamentGenerated;
+import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.indicateTournamentNotGenerated;
+import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.isTournamentGenerationLocked;
+import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.lockTournamentGeneration;
+import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.unlockTournamentGeneration;
+
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
 
 import androidx.annotation.NonNull;
@@ -22,7 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,9 +40,9 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -59,20 +64,16 @@ public class TournamentManagerApi {
     public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY);
 
     // Main function #1: To be called when most of activities are being resumed
-    public static void handleTournaments(){
+    public static void handleTournaments() {
 
-        if(tournamentRemainingTime() == 0){ // Tournament hasn't been scheduled yet (date not pseudo-randomly generated yet)
+        if (tournamentRemainingTime() == 0) { // Tournament hasn't been scheduled yet (date not pseudo-randomly generated yet)
             // schedule the tournament generation and store it in shared preferences
             generateAndStoreTournamentDate();
-        }
-
-        else if(tournamentRemainingTime() < 0){ // Tournament is over
+        } else if (tournamentRemainingTime() < 0) { // Tournament is over
 
             // Clear shared preferences, unlock all concurrency related variables, schedule the next tournament
             setWeeklyTournamentOver();
-        }
-
-        else if(isTimeToGenerateTournament() && !tournamentAlreadyStoredInSharedPref()){
+        } else if (isTimeToGenerateTournament() && !tournamentAlreadyStoredInSharedPref()) {
 
             // generate or fetch tournament once and store it in Shared Preferences to access it easily later
             generateOrFetchTournamentThenStore();
@@ -80,7 +81,7 @@ public class TournamentManagerApi {
     }
 
     // Main function #2: To be called to retrieve the tournament after it has been generated or fetched
-    public static Tournament getTournamentFromSharedPref(){
+    public static Tournament getTournamentFromSharedPref() {
 
         // Get shared preferences
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
@@ -88,7 +89,7 @@ public class TournamentManagerApi {
         // Get the JSON string of the stored tournament
         String jsonTournament = sharedPreferences.getString("weeklyTournament", null);
 
-        if(jsonTournament == null){
+        if (jsonTournament == null) {
             return null;
         }
 
@@ -102,21 +103,21 @@ public class TournamentManagerApi {
     }
 
 
-    private static void generateOrFetchTournamentThenStore(){
+    private static void generateOrFetchTournamentThenStore() {
 
         // Generate or fetch tournament once and store it in Shared Preferences to access it easily later
         generateOrFetchTournament().thenAccept(tournament -> {
-            if(tournament != null){
+            if (tournament != null) {
                 storeTournamentInSharedPref(tournament);
             }
         });
     }
 
-    private static void generateAndStoreTournamentDate(){
+    private static void generateAndStoreTournamentDate() {
 
 
         // To be called only if tournamentRemainingTime <= 0 (i.e. tournament is over or has not been generated yet)
-        if(tournamentRemainingTime() > 0){
+        if (tournamentRemainingTime() > 0) {
             return;
         }
 
@@ -130,11 +131,11 @@ public class TournamentManagerApi {
         editor.apply();
     }
 
-    private static Boolean isTimeToGenerateTournament(){
+    private static Boolean isTimeToGenerateTournament() {
 
         long tournamentDate = getTournamentSharedPrefLocation().getLong("tournamentDate", 0);
 
-        if(tournamentDate == 0){
+        if (tournamentDate == 0) {
             return false;
         }
 
@@ -144,14 +145,19 @@ public class TournamentManagerApi {
         return currentTime > tournamentDate;
     }
 
-    private static int tournamentRemainingTime(){
+
+
+    // Remaining time from now until the tournament ends (tournament date + 1 week)
+    // If tournament end date is in the past, return value is negative
+
+    private static int tournamentRemainingTime() {
 
         // a tournament should last 1 week
         int tournamentDuration = 7 * 24 * 60 * 60 * 1000;
 
         long tournamentDate = getTournamentSharedPrefLocation().getLong("tournamentDate", 0);
 
-        if(tournamentDate == 0){
+        if (tournamentDate == 0) {
             return 0;
         }
 
@@ -168,75 +174,76 @@ public class TournamentManagerApi {
     // If the tournament has not been generated yet, generate it and upload it to the database
     // If the tournament has already been generated, fetch it from the database and return it
 
-    private static CompletableFuture<Tournament> generateOrFetchTournament(){
-
-        if(isTournamentGenerationLocked()){
+    private static CompletableFuture<Tournament> generateOrFetchTournament() {
 
 
-            String weeklyTournamentId = RandomApi.getWeeklyTournamentPseudoRandomUUID();
-
-            // wait for the tournament to be generated by another user then fetch it from database
-            return fetchTournamentWhenGenerated(weeklyTournamentId);
-        }
-
-        else{
-
-            // If no one is currently generating the tournament, take the lead and generate it
-            // lock the tournament generation to prevent other users from generating it at the same time
-            lockTournamentGeneration();
-
-            //// Generate the tournament ////
-
-            // pseudo randomly choose the art names to be included in the tournament
-            ArrayList<String> artNames = randomlyChooseArtNames();
-
-            // given the art names, generate the art quizzes
-            Map<String, CompletableFuture<ArtQuiz>> artQuizFutures = new HashMap<>();
-
-            Supplier<ArtQuiz> fallBack = () -> null;
-
-            for (String artName : artNames) {
-
-                Supplier<CompletableFuture<ArtQuiz>> quizGenerator = () -> new QuizGeneratorApi(service).generateArtQuiz(artName);
-
-                CompletableFuture<ArtQuiz> artQuizFuture = RetryFuture.ExecWithRetryOrFallback(quizGenerator, fallBack, 2);
-                artQuizFutures.put(artName, artQuizFuture);
-            }
-
-            CompletableFuture<?>[] futuresArray = artQuizFutures.values().toArray(new CompletableFuture[0]);
+        return isTournamentGenerationLocked().thenCompose(generationLocked -> {
 
 
-            // wait for all the art quizzes to be generated then create the tournament and upload it to the database
+            if (generationLocked) {
 
-            return CompletableFuture.allOf(futuresArray)
-                    .thenApply(v -> {
+                String weeklyTournamentId = RandomApi.getWeeklyTournamentPseudoRandomUUID();
 
-                        Map<String, ArtQuiz> artQuizzes = new HashMap<>();
-                        for (Map.Entry<String, CompletableFuture<ArtQuiz>> entry : artQuizFutures.entrySet()) {
-                            try {
+                // wait for the tournament to be generated by another user then fetch it from database
+                return fetchTournamentWhenGenerated(weeklyTournamentId);
+            } else {
 
-                                ArtQuiz quiz = entry.getValue().get();
+                // If no one is currently generating the tournament, take the lead and generate it
+                // lock the tournament generation to prevent other users from generating it at the same time
+                lockTournamentGeneration();
 
-                                // A null quiz means that the quiz generation failed after 2 retries, the tournament would fail to be generated so we should abort and unlock
-                                if(quiz == null){
-                                    // unlock the tournament generation so that another user can try to generate it
-                                    unlockTournamentGeneration();
-                                    return null;
+                //// Generate the tournament ////
+
+                // pseudo randomly choose the art names to be included in the tournament
+                ArrayList<String> artNames = randomlyChooseArtNames();
+
+                // given the art names, generate the art quizzes
+                Map<String, CompletableFuture<ArtQuiz>> artQuizFutures = new HashMap<>();
+
+                Supplier<ArtQuiz> fallBack = () -> null;
+
+                for (String artName : artNames) {
+
+                    Supplier<CompletableFuture<ArtQuiz>> quizGenerator = () -> new QuizGeneratorApi(service).generateArtQuiz(artName);
+
+                    CompletableFuture<ArtQuiz> artQuizFuture = RetryFuture.ExecWithRetryOrFallback(quizGenerator, fallBack, 2);
+                    artQuizFutures.put(artName, artQuizFuture);
+                }
+
+                CompletableFuture<ArtQuiz>[] futuresArray = artQuizFutures.values().toArray(new CompletableFuture[0]);
+
+
+                // wait for all the art quizzes to be generated then create the tournament and upload it to the database
+
+                return CompletableFuture.allOf(futuresArray)
+                        .thenApply(v -> {
+
+                            Map<String, ArtQuiz> artQuizzes = new HashMap<>();
+                            for (Map.Entry<String, CompletableFuture<ArtQuiz>> entry : artQuizFutures.entrySet()) {
+                                try {
+
+                                    ArtQuiz quiz = entry.getValue().get();
+
+                                    // A null quiz means that the quiz generation failed after 2 retries, the tournament would fail to be generated so we should abort and unlock
+                                    if (quiz == null) {
+                                        // unlock the tournament generation so that another user can try to generate it
+                                        unlockTournamentGeneration();
+                                        return null;
+                                    }
+
+                                    artQuizzes.put(entry.getKey(), quiz);
+                                } catch (InterruptedException | ExecutionException e) {
+                                    e.printStackTrace();
                                 }
-
-                                artQuizzes.put(entry.getKey(), quiz);
-                            } catch (InterruptedException | ExecutionException e) {
-                                e.printStackTrace();
                             }
-                        }
 
-                        Tournament tournament = new Tournament(artQuizzes);
-                        uploadTournamentToDatabase(tournament);
+                            Tournament tournament = new Tournament(artQuizzes);
+                            uploadTournamentToDatabase(tournament);
 
-                        return new Tournament(artQuizzes);
-                    });
-
-        }
+                            return new Tournament(artQuizzes);
+                        });
+            }
+        });
     }
 
     // If the tournament generation is locked, another device is currently generating the tournament so we should wait for it to be generated and fetch it from the database
@@ -249,9 +256,8 @@ public class TournamentManagerApi {
 
         CompletableFuture<Tournament> future = new CompletableFuture<>();
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.schedule( () -> {
+        executor.schedule(() -> {
             if (fetchedTournament.get() == null) {
-
                 // If the tournament hasn't been generated 2 minutes after the generation lock, it's likely that the device that was generating it crashed so we should unlock the generation and try to generate it again
                 generateOrFetchTournamentThenStore();
             }
@@ -289,7 +295,7 @@ public class TournamentManagerApi {
         return future;
     }
 
-    private static void uploadTournamentToDatabase(Tournament tournament){
+    private static void uploadTournamentToDatabase(Tournament tournament) {
 
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
         DatabaseReference tournamentRef = dbRef.child("tournaments").child(tournament.getTournamentId());
@@ -298,13 +304,13 @@ public class TournamentManagerApi {
 
     }
 
-    private static void auxiliaryUploadTournamentToDatabase(Tournament tournament, DatabaseReference tournamentRef, int tentativeNumber){
+    private static void auxiliaryUploadTournamentToDatabase(Tournament tournament, DatabaseReference tournamentRef, int tentativeNumber) {
         tournamentRef.setValue(tournament, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                if(error != null){
+                if (error != null) {
 
-                    if(tentativeNumber == 2){
+                    if (tentativeNumber == 2) {
                         // If the upload failed 2 times, we unlock the tournament generation so that another device can try to generate it
                         unlockTournamentGeneration();
                         return;
@@ -313,8 +319,7 @@ public class TournamentManagerApi {
                     // If the upload failed and tentative didn't reach max, try again
                     auxiliaryUploadTournamentToDatabase(tournament, tournamentRef, tentativeNumber + 1);
 
-                }
-                else{
+                } else {
                     // If the upload is successful, we tell the other devices that the tournament can be fetched from the database
                     indicateTournamentGenerated();
                 }
@@ -323,8 +328,7 @@ public class TournamentManagerApi {
     }
 
 
-
-    private static Calendar generateWeeklyTournamentDate(){
+    private static Calendar generateWeeklyTournamentDate() {
 
         Random random = RandomApi.getRandom();
         int randomHour = random.nextInt(24);
@@ -342,16 +346,23 @@ public class TournamentManagerApi {
         return calendar;
     }
 
-    private static ArrayList<String> randomlyChooseArtNames(){
+    private static ArrayList<String> randomlyChooseArtNames() {
 
         Random random = RandomApi.getRandom();
         ArrayList<String> artNames = new ArrayList<>();
 
         try {
             Resources resources = getApplicationContext().getResources();
-            InputStream inputStream = resources.openRawResource(R.raw.lausanne_paintings);
-            String json = new Scanner(inputStream).useDelimiter("\\A").next();
-            JSONArray jsonArray = new JSONArray(json);
+            InputStream inputStream = resources.openRawResource(R.raw.famous_arts);
+
+            // InputStream to JSONArray
+            String json;
+            try (Scanner s = new Scanner(inputStream)) {
+                json = s.useDelimiter("\\A").hasNext() ? s.next() : "";
+            }
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("artworks");
+
 
             // Randomly choose three artworks from the JSON array
             int numArtworks = jsonArray.length();
@@ -375,7 +386,7 @@ public class TournamentManagerApi {
         return artNames;
     }
 
-    private static void storeTournamentInSharedPref(Tournament tournament){
+    private static void storeTournamentInSharedPref(Tournament tournament) {
 
         // Get shared preferences
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
@@ -392,7 +403,7 @@ public class TournamentManagerApi {
         editor.apply();
     }
 
-    private static void setWeeklyTournamentOver(){
+    private static void setWeeklyTournamentOver() {
 
         // clear the "tournament" shared preferences location
         clearTournamentSharedPref();
@@ -409,59 +420,20 @@ public class TournamentManagerApi {
 
     // - - - - - - -
 
-    private static SharedPreferences getTournamentSharedPrefLocation(){
+    private static SharedPreferences getTournamentSharedPrefLocation() {
         Context context = getApplicationContext();
         return context.getSharedPreferences("tournament", Context.MODE_PRIVATE);
     }
 
-    // Indicate other users that the tournament is currently being generated
-    private static void lockTournamentGeneration(){
-        getDeviceSynchronizationRef().child("generationLocked").setValue(true);
-    }
-
-
-    // To unlock when the tournament is over or if one of the device fails to generate the tournament
-    private static void unlockTournamentGeneration(){
-
-        getDeviceSynchronizationRef().child("generationLocked").setValue(false);
-    }
-
-
-    // Allow of form of synchronization to prevent other devices from generating the tournament if one of the device has already been charged to do so
-    private static Boolean isTournamentGenerationLocked(){
-        return getDeviceSynchronizationRef().child("generationLocked").equals(true);
-    }
-
-    // Indicate other devices that the tournament can now be fetched from Firebase
-    private static void indicateTournamentGenerated(){
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        getDeviceSynchronizationRef().child("generated").setValue(true);
-    }
-
-    // Reset the generation state of the tournament to allow upcoming generation in the next week
-
-    private static void indicateTournamentNotGenerated(){
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        getDeviceSynchronizationRef().child("generated").setValue(false);
-    }
-
-    // Slot where the variables used to handle the android apps synchronization are stored
-    private static DatabaseReference getDeviceSynchronizationRef() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        return database.getReference("tournaments").child("device-synchronization");
-    }
-
-    private static void clearTournamentSharedPref(){
+    private static void clearTournamentSharedPref() {
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
     }
 
-    private static boolean tournamentAlreadyStoredInSharedPref(){
+    private static boolean tournamentAlreadyStoredInSharedPref() {
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
-        return sharedPreferences.contains("weeklyTournament");
+        return sharedPreferences.getString("weeklyTournament", null) != null;
     }
 }
