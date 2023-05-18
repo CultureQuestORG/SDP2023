@@ -60,7 +60,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".ui.SearchUserActivity"
+            android:name=".ui.SearchActivity"
             android:exported="true" />
 
 
