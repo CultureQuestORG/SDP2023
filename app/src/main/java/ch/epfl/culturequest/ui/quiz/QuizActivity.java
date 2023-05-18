@@ -55,18 +55,19 @@ public class QuizActivity extends AppCompatActivity {
 
 
 
-    public void welcome(){
+    public QuizWelcomeFragment welcome(){
         Bundle bundle = basicBundle();
         QuizWelcomeFragment fragment = new QuizWelcomeFragment();
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_activity_quiz, fragment)
                 .commit();
+        return fragment;
     }
 
 
 
-    public void goToQuestion(int questionNumber,Question question) {
+    public QuizQuestionFragment goToQuestion(int questionNumber,Question question) {
         Bundle bundle = basicBundle();
         bundle.putInt("questionNumber", questionNumber);
         bundle.putStringArrayList("possibleAnswers", question.getPossibilities());
@@ -76,9 +77,10 @@ public class QuizActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_activity_quiz, fragment)
                 .commit();
+        return fragment;
     }
 
-    public void interQuestion(int score){
+    public QuizInterFragment interQuestion(int score){
         Bundle bundle = basicBundle();
         bundle.putInt("score", score);
         QuizInterFragment fragment = new QuizInterFragment();
@@ -86,13 +88,15 @@ public class QuizActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_activity_quiz, fragment)
                 .commit();
+        return fragment;
     }
 
-    public void FailQuiz(){
+    public QuizGameOverFragment FailQuiz(){
         QuizGameOverFragment fragment = new QuizGameOverFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_activity_quiz, fragment)
                 .commit();
+        return fragment;
     }
 
 
@@ -105,7 +109,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
 
-    public void endQuiz(int score) {
+    public QuizVictoryFragment endQuiz(int score) {
         Bundle bundle = new Bundle();
         bundle.putInt("score", score);
         QuizVictoryFragment fragment = new QuizVictoryFragment();
@@ -113,6 +117,7 @@ public class QuizActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_activity_quiz, fragment)
                 .commit();
+        return fragment;
 
     }
 }

@@ -14,6 +14,7 @@ import ch.epfl.culturequest.databinding.FragmentQuizWelcomeBinding;
 public class QuizWelcomeFragment extends Fragment {
 
     FragmentQuizWelcomeBinding binding;
+    QuizViewModel quizViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -30,7 +31,7 @@ public class QuizWelcomeFragment extends Fragment {
         String tournament = getArguments().getString("tournament");
         String artName = getArguments().getString("artName");
 
-        QuizViewModel quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
+        quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
 
         binding.titleTextView.setText(tournament);
         binding.blackTextView.setText(artName);
@@ -38,10 +39,12 @@ public class QuizWelcomeFragment extends Fragment {
 
 
 
-        binding.startButton.setOnClickListener(a-> {
-            quizViewModel.startQuiz();
-        });
+        binding.startButton.setOnClickListener(a-> startQuiz());
 
         return root;
+    }
+
+    public QuizQuestionFragment startQuiz() {
+        return quizViewModel.startQuiz();
     }
 }

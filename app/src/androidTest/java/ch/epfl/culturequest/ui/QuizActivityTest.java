@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.not;
 
 import android.content.Intent;
 
+import androidx.fragment.app.Fragment;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.action.ViewActions;
@@ -26,7 +27,12 @@ import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.tournament.quiz.Question;
 import ch.epfl.culturequest.tournament.quiz.Quiz;
 import ch.epfl.culturequest.ui.quiz.QuizActivity;
+import ch.epfl.culturequest.ui.quiz.QuizGameOverFragment;
+import ch.epfl.culturequest.ui.quiz.QuizInterFragment;
+import ch.epfl.culturequest.ui.quiz.QuizQuestionFragment;
+import ch.epfl.culturequest.ui.quiz.QuizVictoryFragment;
 import ch.epfl.culturequest.ui.quiz.QuizViewModel;
+import ch.epfl.culturequest.ui.quiz.QuizWelcomeFragment;
 
 public class QuizActivityTest {
 
@@ -88,34 +94,35 @@ public class QuizActivityTest {
 
     @Test
     public void SuccessfulQuiz() throws InterruptedException {
-    startQuiz();
-    answerQuestion();
-    turnWheel();
-    answerQuestion();
-    turnWheel();
-    answerQuestion();
-    turnWheel();
-    answerQuestion();
-    turnWheel();
-    answerQuestion();
-    checkFinalScreen();
+    QuizQuestionFragment q=startQuiz();
+    QuizInterFragment inter = (QuizInterFragment) answerQuestion(q);
+    q=turnWheel(inter);
+    inter =(QuizInterFragment) answerQuestion(q);
+    q=turnWheel(inter);
+    inter =(QuizInterFragment) answerQuestion(q);
+    q=turnWheel(inter);
+    inter =(QuizInterFragment) answerQuestion(q);
+    q=turnWheel(inter);
+    QuizVictoryFragment v =(QuizVictoryFragment) answerQuestion(q);
+    checkFinalScreen(v);
 
     }
 
     @Test
     public void QuitQuiz() throws InterruptedException {
-        startQuiz();
-        answerQuestion();
-        turnWheel();
-        answerQuestion();
-        quitQuiz();
-        checkFinalScreen();
+        QuizQuestionFragment q=startQuiz();
+        QuizInterFragment inter = (QuizInterFragment) answerQuestion(q);
+        q=turnWheel(inter);
+        inter =(QuizInterFragment) answerQuestion(q);
+        QuizVictoryFragment victory=quitQuiz(inter);
+        checkFinalScreen(victory);
     }
+
 
     @Test
     public void FailedQuiz() throws InterruptedException {
-        startQuiz();
-        answerWrongly();
+        QuizQuestionFragment q=startQuiz();
+        QuizGameOverFragment gameOver = (QuizGameOverFragment) answerWrongly(q);
         checkGameOverScreen();
 
     }
@@ -126,28 +133,28 @@ public class QuizActivityTest {
         onView(withText("BACK TO THE TOURNAMENT")).check(matches(isEnabled()));
     }
 
-    private void checkFinalScreen() throws InterruptedException  {
+    private void checkFinalScreen(QuizVictoryFragment victory) throws InterruptedException  {
         Thread.sleep(2000);
         onView(withText(String.format("You earned %d points", quizViewModel.getScore().getValue()))).check(matches(isEnabled()));
         onView(withText("BACK TO THE TOURNAMENT")).check(matches(isEnabled()));
 
     }
 
-    private void answerQuestion() throws InterruptedException {
+    private Fragment answerQuestion(QuizQuestionFragment q) throws InterruptedException {
         Thread.sleep(2000);
         onView(withId(R.id.answer1RadioButton)).check(matches(isEnabled()));
         onView(withId(R.id.answer2RadioButton)).check(matches(isEnabled()));
         onView(withId(R.id.answer3RadioButton)).check(matches(isEnabled()));
         onView(withId(R.id.answer4RadioButton)).check(matches(isEnabled()));
         Thread.sleep(2000);
-        onView(withId(R.id.answer1RadioButton)).perform(ViewActions.click());
+        q.pickAnswer(0);
         Thread.sleep(2000);
-        onView(withId(R.id.nextButton)).perform(ViewActions.click());
-        Thread.sleep(2000);
+        return q.valideAnswer();
+
 
     }
 
-    private void answerWrongly() throws InterruptedException {
+    private Fragment answerWrongly(QuizQuestionFragment q) throws InterruptedException {
         Thread.sleep(2000);
         onView(withId(R.id.answer1RadioButton)).check(matches(isEnabled()));
         onView(withId(R.id.answer2RadioButton)).check(matches(isEnabled()));
@@ -155,47 +162,46 @@ public class QuizActivityTest {
         onView(withId(R.id.answer4RadioButton)).check(matches(isEnabled()));
 
         Thread.sleep(2000);
-        onView(withId(R.id.answer2RadioButton)).perform(ViewActions.click());
+        q.pickAnswer(1);
         Thread.sleep(2000);
-        onView(withId(R.id.nextButton)).perform(ViewActions.click());
-        Thread.sleep(2000);
+        return q.valideAnswer();
 
     }
 
-    private void startQuiz() throws InterruptedException {
+    private QuizQuestionFragment startQuiz() throws InterruptedException {
         Thread.sleep(2000);
+        QuizWelcomeFragment fragment = activity.welcome();
         onView(withId(R.id.startButton)).check(matches(isEnabled()));
         onView(withText("La Joconde")).check(matches(isEnabled())); //check that the name of the art is displayed
         Thread.sleep(2000);
-        onView(withId(R.id.startButton)).perform(ViewActions.click());
-        Thread.sleep(2000);
+        return fragment.startQuiz();
+
     }
 
-    private void quitQuiz() throws InterruptedException {
+    private QuizVictoryFragment quitQuiz(QuizInterFragment inter) throws InterruptedException {
         Thread.sleep(2000);
         onView(withText(String.format("%d", quizViewModel.getScore().getValue()))).check(matches(isEnabled()));
         onView(withText("SPIN")).check(matches(isEnabled()));
         onView(withText("QUIT")).check(matches(isEnabled()));
         Thread.sleep(2000);
-        onView(withId(R.id.stopButton)).perform(ViewActions.click());
-        Thread.sleep(2000);
+        return inter.quit();
+
     }
 
-    private void turnWheel() throws InterruptedException {
+    private QuizQuestionFragment turnWheel(QuizInterFragment inter) throws InterruptedException {
         Thread.sleep(2000);
         onView(withText(String.format("%d", quizViewModel.getScore().getValue()))).check(matches(isEnabled()));
         onView(withText("SPIN")).check(matches(isEnabled()));
         onView(withText("QUIT")).check(matches(isEnabled()));
         Thread.sleep(2000);
-        onView(withId(R.id.spinButton)).perform(ViewActions.click());
-        Thread.sleep(2000);
+        inter.spinWheel();
+        Thread.sleep(6000);
         onView(withText("OK")).perform(ViewActions.click());
         Thread.sleep(2000);
         onView(withText(String.format("%d", quizViewModel.getNextScore().getValue()))).check(matches(isEnabled()));
         Thread.sleep(2000);
-        onView(withText("NEXT")).perform(ViewActions.click());
-        onView(withId(R.id.nextButton)).perform(ViewActions.click());
-        Thread.sleep(2000);
+        return inter.nextQuestion();
+
 
     }
 

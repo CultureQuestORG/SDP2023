@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.ui.quiz;
 
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -48,39 +49,38 @@ public class QuizViewModel extends ViewModel {
         return quiz;
     }
 
-    public void startQuiz() {
-        Objects.requireNonNull(quizActivity.getValue()).goToQuestion(0, Objects.requireNonNull(quiz.getValue()).getQuestions().get(0));
+    public QuizQuestionFragment startQuiz() {
         Database.startQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue());
+        return Objects.requireNonNull(quizActivity.getValue()).goToQuestion(0, Objects.requireNonNull(quiz.getValue()).getQuestions().get(0));
     }
 
-    public void answerQuestion(int questionNumber, int answer) {
+    public Fragment answerQuestion(int questionNumber, int answer) {
         boolean correct = Objects.requireNonNull(quiz.getValue()).getQuestions().get(questionNumber).isCorrect(answer);
         if (!correct) {
-            Objects.requireNonNull(quizActivity.getValue()).FailQuiz();
-            return;
+            return Objects.requireNonNull(quizActivity.getValue()).FailQuiz();
+
         }
 
         score.setValue(nextScore.getValue());
         this.questionNumber.setValue(questionNumber + 1);
         if (this.questionNumber.getValue() == Objects.requireNonNull(quiz.getValue()).getQuestions().size()) {
-            Objects.requireNonNull(quizActivity.getValue()).endQuiz(score.getValue());
-            return;
+            return Objects.requireNonNull(quizActivity.getValue()).endQuiz(score.getValue());
+
         }
 
-        Objects.requireNonNull(quizActivity.getValue()).interQuestion(nextScore.getValue());
+        return Objects.requireNonNull(quizActivity.getValue()).interQuestion(nextScore.getValue());
 
 
     }
 
-    public void nextQuestion(int nextScore) {
+    public QuizQuestionFragment nextQuestion(int nextScore) {
         this.nextScore.setValue(nextScore);
-        Objects.requireNonNull(quizActivity.getValue()).goToQuestion(questionNumber.getValue(), getQuestion(questionNumber.getValue()));
-
+        return Objects.requireNonNull(quizActivity.getValue()).goToQuestion(questionNumber.getValue(), getQuestion(questionNumber.getValue()));
     }
 
-    public void finishQuiz(int score) {
-        Objects.requireNonNull(quizActivity.getValue()).endQuiz(score);
+    public QuizVictoryFragment finishQuiz(int score) {
         Database.setScoreQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue(), score);
+        return Objects.requireNonNull(quizActivity.getValue()).endQuiz(score);
     }
 
 

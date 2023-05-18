@@ -22,6 +22,9 @@ import ch.epfl.culturequest.databinding.FragmentQuizInterBinding;
 public class QuizInterFragment extends Fragment {
 
     private FragmentQuizInterBinding binding;
+    private QuizViewModel quizViewModel;
+
+
 
     enum WheelLocation {
         X2,
@@ -61,79 +64,87 @@ public class QuizInterFragment extends Fragment {
         String artName = getArguments().getString("artName");
         int score = getArguments().getInt("score");
 
-        QuizViewModel quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
+        quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
 
         View root = binding.getRoot();
         binding.score.setText(String.format("%d", score));
 
-        setSpinWheel();
 
         binding.nextButton.setOnClickListener(a-> {
-            quizViewModel.nextQuestion(Integer.parseInt(binding.newscore.getText().toString()));
+            nextQuestion();
         });
 
         binding.stopButton.setOnClickListener(a-> {
             quizViewModel.finishQuiz(score);
         });
 
+        binding.spinButton.setOnClickListener(a-> {
+            spinWheel();
+        });
+
         return root;
 
     }
 
+    public void spinWheel()  {
+        binding.spinButton.setVisibility(View.INVISIBLE);
+        binding.stopButton.setVisibility(View.INVISIBLE);
 
-    private void setSpinWheel() {
-        binding.spinButton.setOnClickListener( a-> {
-            binding.spinButton.setVisibility(View.INVISIBLE);
-            binding.stopButton.setVisibility(View.INVISIBLE);
+        //select random location
+        int randomLocation = (int) Math.floor(Math.random() * wheelLocations.length);
 
-            //select random location
-            int randomLocation = (int) Math.floor(Math.random() * wheelLocations.length);
-
-            float angle = (float) (360*2+ randomLocation*360/wheelLocations.length + (Math.random() * 360/wheelLocations.length));
-            WheelLocation location = wheelLocations[randomLocation];
+        float angle = (float) (360*2+ randomLocation*360/wheelLocations.length + (Math.random() * 360/wheelLocations.length));
+        WheelLocation location = wheelLocations[randomLocation];
 
 
-            System.out.println("Spin button clicked");
-            RotateAnimation rotate = new RotateAnimation(0, angle,
-                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-            rotate.setDuration(5000);
-            rotate.setFillAfter(true);
+        System.out.println("Spin button clicked");
+        RotateAnimation rotate = new RotateAnimation(0, angle,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotate.setDuration(5000);
+        rotate.setFillAfter(true);
 
-            rotate.setInterpolator(new DecelerateInterpolator());
+        rotate.setInterpolator(new DecelerateInterpolator());
 
-            rotate.setAnimationListener(
-                    new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-                            System.out.println("Animation started");
-                        }
-
-                        @SuppressLint("DefaultLocale")
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-
-                            int newScore = computeScore(Integer.parseInt(binding.score.getText().toString()), location);
-                            binding.newscore.setText(String.format("%d", newScore));
-
-                            AlertDialog dial = new AlertDialog.Builder(getContext())
-                                    .setTitle("You can have " + binding.newscore.getText().toString() + " points if you answer the next question correctly!")
-                                    .setMessage("You can now go to the next question")
-                                    .setPositiveButton("OK", (dialog, which) -> binding.nextButton.setVisibility(View.VISIBLE))
-                                    .create();
-                            dial.show();
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-                            System.out.println("Animation repeated");
-                        }
+        rotate.setAnimationListener(
+                new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        System.out.println("Animation started");
                     }
-            );
 
-            binding.fortuneWheelImageView.startAnimation(rotate);
+                    @SuppressLint("DefaultLocale")
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+
+                        int newScore = computeScore(Integer.parseInt(binding.score.getText().toString()), location);
+                        binding.newscore.setText(String.format("%d", newScore));
+
+                        AlertDialog dial = new AlertDialog.Builder(getContext())
+                                .setTitle("You can have " + binding.newscore.getText().toString() + " points if you answer the next question correctly!")
+                                .setMessage("You can now go to the next question")
+                                .setPositiveButton("OK", (dialog, which) -> binding.nextButton.setVisibility(View.VISIBLE))
+                                .create();
+                        dial.show();
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                        System.out.println("Animation repeated");
+                    }
+                }
+        );
+
+        binding.fortuneWheelImageView.startAnimation(rotate);
 
 
-        });
+    }
+
+    public QuizVictoryFragment quit() {
+        return quizViewModel.finishQuiz(Integer.parseInt(binding.score.getText().toString()));
+    }
+
+    public QuizQuestionFragment nextQuestion() {
+        return quizViewModel.nextQuestion(Integer.parseInt(binding.newscore.getText().toString()));
     }
 
 

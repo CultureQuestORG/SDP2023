@@ -21,7 +21,7 @@ public class QuizQuestionFragment extends Fragment {
     FragmentQuizQuestionBinding binding;
     QuizViewModel quizViewModel;
 
-    List<RadioButton> possibleAnswers=new ArrayList<>();
+    ArrayList<RadioButton> possibleAnswers=new ArrayList<>();
 
     String question;
     int questionNumber;
@@ -58,30 +58,31 @@ public class QuizQuestionFragment extends Fragment {
 
          for (int i = 0; i < possibilities.size(); i++)
               possibleAnswers.get(i).setText(possibilities.get(i));
-        setupAnswer();
+        binding.nextButton.setOnClickListener(a->valideAnswer());
 
         return root;
 
     }
 
 
-    private void setupAnswer(){
-        binding.nextButton.setOnClickListener(a-> {
-            // check that at least one answer has been selected
-            if (!possibleAnswers.stream().reduce(false, (acc, possibleAnswer) -> acc || possibleAnswer.isChecked(), (acc1, acc2) -> acc1 || acc2)){
-                AlertDialog dialog = new AlertDialog.Builder(getContext())
-                        .setTitle("Error")
-                        .setMessage("Please select an answer")
-                        .setPositiveButton("OK", (dialog1, which) -> {
-                            dialog1.dismiss();
-                        })
-                        .create();
-                dialog.show();
-                return;
-            }
-            int selectedAnswer = possibleAnswers.indexOf(possibleAnswers.stream().filter(RadioButton::isChecked).findFirst().get());
-            quizViewModel.answerQuestion(questionNumber, selectedAnswer);
-        });
+    public void pickAnswer(int answer) {
+        possibleAnswers.get(answer).setChecked(true);
     }
 
+    public Fragment valideAnswer() {
+        if (!possibleAnswers.stream().reduce(false, (acc, possibleAnswer) -> acc || possibleAnswer.isChecked(), (acc1, acc2) -> acc1 || acc2)){
+            AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setTitle("Error")
+                    .setMessage("Please select an answer")
+                    .setPositiveButton("OK", (dialog1, which) -> {
+                        dialog1.dismiss();
+                    })
+                    .create();
+            dialog.show();
+            return null;
+        }
+        int selectedAnswer = possibleAnswers.indexOf(possibleAnswers.stream().filter(RadioButton::isChecked).findFirst().get());
+        return quizViewModel.answerQuestion(questionNumber, selectedAnswer);
+
+    }
 }
