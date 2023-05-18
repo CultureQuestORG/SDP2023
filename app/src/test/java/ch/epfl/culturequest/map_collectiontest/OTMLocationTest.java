@@ -21,7 +21,8 @@ public class OTMLocationTest {
     public void emptyConstructorHasDefaultValues(){
         OTMLocation l = new OTMLocation();
         assertEquals("", l.getName());
-        assertThat(l.getCoordinates(), is(new OTMLatLng()));
+        assertThat(l.getCoordinates().getLon(), is(0));
+        assertThat(l.getCoordinates().getLat(), is(0));
         assertThat(l.getKinds(), is("art"));
     }
 
