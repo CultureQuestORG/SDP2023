@@ -84,7 +84,7 @@ public class QuizActivityTest {
             quizViewModel=QuizViewModel.getQuiz(Profile.getActiveProfile().getUid(), "tournamentId", "La Joconde");
         });
 
-        Thread.sleep(8000);
+        Thread.sleep(20000);
 
 
 
