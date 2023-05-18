@@ -53,6 +53,7 @@ public class SightseeingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidUtils.removeStatusBar(getWindow());
         binding = SightseeingActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         listView = binding.placesToSee;
@@ -63,8 +64,7 @@ public class SightseeingActivity extends AppCompatActivity {
         backButton = binding.backButton;
         mapFragment = binding.mapFragment;
         backButton.setOnClickListener(l -> onBackPressed());
-        Map<String, OTMLocation> placeToLocation = getIntent().getStringArrayListExtra("locations").stream()
-                .map(OTMLocationSerializer::deserialize)
+        Map<String, OTMLocation> placeToLocation = getIntent().getStringArrayListExtra("locations").stream().map(OTMLocationSerializer::deserialize)
                 .collect(Collectors.toMap(OTMLocation::getName, location -> location, (existing, newValue) -> existing));
         adapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<>(placeToLocation.keySet()), List.of(preview, inviteFriends));
         listView.setAdapter(adapter);
@@ -74,9 +74,7 @@ public class SightseeingActivity extends AppCompatActivity {
             openMap(placeToLocation, selectedPlaces);
         });
         inviteFriends.setOnClickListener(l ->
-                handleFriendsLogic(placeToLocation.entrySet().stream()
-                        .filter(entry -> selectedPlaces.contains(entry.getKey()))
-                        .map(Map.Entry::getValue).collect(Collectors.toList())));
+                handleFriendsLogic(placeToLocation.entrySet().stream().filter(entry -> selectedPlaces.contains(entry.getKey())).map(Map.Entry::getValue).collect(Collectors.toList())));
     }
 
     /**

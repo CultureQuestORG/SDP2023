@@ -94,8 +94,8 @@ public class MapsViewModelTest {
         assertThat(mapsViewModel.getLocations().get(0).getName(), is("test"));
         assertThat(mapsViewModel.getLocations().get(0).getCoordinates().getLat(), is(0.0));
         assertThat(mapsViewModel.getLocations().get(0).getCoordinates().getLon(), is(0.0));
-        assertThat(mapsViewModel.getLocations().get(0).getKinds().size(), is(2));
-        assertThat(mapsViewModel.getLocations().get(0).getKinds(), containsInAnyOrder("kind1", "kind2"));
+        assertThat(mapsViewModel.getLocations().get(0).getKindsList().size(), is(2));
+        assertThat(mapsViewModel.getLocations().get(0).getKindsList(), containsInAnyOrder("kind1", "kind2"));
     }
 
     // Test if the default center is correct

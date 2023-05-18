@@ -8,7 +8,7 @@ public class OTMLocationSerializer {
     public static String serialize(OTMLocation location) {
         //we dont care about the kinds for sightseeing
         OTMLatLng coordinates = location.getCoordinates();
-        return location.getName()+"|"+coordinates.getLon()+"|"+coordinates.getLat()+"|"+location.getKinds();
+        return location.getName()+"|"+coordinates.getLon()+"|"+coordinates.getLat()+"|"+location.getKindsList();
     }
 
     public static OTMLocation deserialize(String serialized) {
