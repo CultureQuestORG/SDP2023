@@ -53,7 +53,7 @@ public class SearchActivity extends AppCompatActivity {
     private Button searchUsers, searchCities;
     private EditText search;
     private MutableLiveData<Boolean> searchingForUsers = new MutableLiveData<>(true);
-    public static final int NUMBER_USERS_TO_DISPLAY = 5, NUMBER_CITIES_TO_DISPLAY = 10;
+    public static final int NUMBER_USERS_TO_DISPLAY = 5, NUMBER_CITIES_TO_DISPLAY = 8;
 
     TextWatcher watcher = new TextWatcher() {
         @Override

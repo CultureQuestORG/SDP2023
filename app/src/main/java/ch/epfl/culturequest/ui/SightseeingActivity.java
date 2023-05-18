@@ -53,6 +53,7 @@ public class SightseeingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidUtils.removeStatusBar(getWindow());
         binding = SightseeingActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         listView = binding.placesToSee;

@@ -188,7 +188,7 @@ public class MapsFragment extends Fragment {
                     continue;
                 }
                 LatLng latLng = new LatLng(location.getCoordinates().getLat(), location.getCoordinates().getLon());
-                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(location.getName()).snippet(String.join(", ", location.getKinds())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(location.getName()).snippet(String.join(", ", location.getKindsList())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                 marker.setTag(location);
             }
         });

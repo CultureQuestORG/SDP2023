@@ -2,6 +2,7 @@ package ch.epfl.culturequest.map_collectiontest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
@@ -14,6 +15,14 @@ public class OTMLocationTest {
     @Test
     public void testConstructorThrowsExceptionIfCoordinatesAreNull() {
         assertThrows(IllegalArgumentException.class, () -> new OTMLocation("name", null, "tag1,tag2"));
+    }
+
+    @Test
+    public void emptyConstructorHasDefaultValues(){
+        OTMLocation l = new OTMLocation();
+        assertEquals("", l.getName());
+        assertThat(l.getCoordinates(), is(new OTMLatLng()));
+        assertThat(l.getKinds(), is("art"));
     }
 
     // Test that the constructor throws an IllegalArgumentException if the kinds are empty
@@ -41,8 +50,8 @@ public class OTMLocationTest {
     @Test
     public void testKindsAreCorrectlySet() {
         OTMLocation location = new OTMLocation("name", new OTMLatLng(0.,0.), "tag1,tag2");
-        assertThat(location.getKinds().get(0), is("tag1"));
-        assertThat(location.getKinds().get(1), is("tag2"));
+        assertThat(location.getKindsList().get(0), is("tag1"));
+        assertThat(location.getKindsList().get(1), is("tag2"));
     }
 
 
