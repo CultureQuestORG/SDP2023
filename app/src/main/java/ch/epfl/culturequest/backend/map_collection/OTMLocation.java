@@ -2,7 +2,7 @@ package ch.epfl.culturequest.backend.map_collection;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.Exclude;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +28,13 @@ public final class OTMLocation {
         this.kinds = kinds;
     }
 
+
+    public OTMLocation(){
+        this.name = "";
+        this.point = new OTMLatLng();
+        this.kinds = "art";
+    }
+
     /**
      * @return the name of the location
      */
@@ -45,11 +52,16 @@ public final class OTMLocation {
     /**
      * @return the tags of the location
      */
-    public List<String> getKinds() {
+    @Exclude
+    public List<String> getKindsList() {
         if (kindsList == null) {
             kindsList = Arrays.asList(kinds.split(","));
         }
         return kindsList;
+    }
+
+    public String getKinds(){
+        return kinds;
     }
 
     @NonNull

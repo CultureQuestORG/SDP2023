@@ -1,7 +1,5 @@
 package ch.epfl.culturequest.ui.map;
 
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
-
 import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,14 +26,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LastLocationRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -43,13 +39,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.Task;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.R;
@@ -59,10 +52,8 @@ import ch.epfl.culturequest.backend.map_collection.OTMProvider;
 import ch.epfl.culturequest.backend.map_collection.RetryingOTMProvider;
 import ch.epfl.culturequest.databinding.FragmentMapsBinding;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.ui.leaderboard.LeaderboardFragment;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.PermissionRequest;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsFragment extends Fragment {
 
@@ -196,8 +187,8 @@ public class MapsFragment extends Fragment {
                 if(location.getName().isEmpty()){
                     continue;
                 }
-                LatLng latLng = new LatLng(location.getCoordinates().latitude(), location.getCoordinates().longitude());
-                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(location.getName()).snippet(String.join(", ", location.getKinds())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                LatLng latLng = new LatLng(location.getCoordinates().getLat(), location.getCoordinates().getLon());
+                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(location.getName()).snippet(String.join(", ", location.getKindsList())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                 marker.setTag(location);
             }
         });
