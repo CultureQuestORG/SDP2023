@@ -33,4 +33,20 @@
     <string name="image_name">Image Name</string>
     <string name="Post">Post</string>
     <string name="cancel">Cancel</string>
+    <string name="spin">SPIN</string>
+    <string name="stop">STOP</string>
+    <string name="name_of_the_painting">Name of the painting</string>
+    <string name="quizz_1">Quizz 1</string>
+    <string name="start">Start</string>
+    <string name="your_score_is">Your score is :</string>
+    <string name="could_be">Could be :</string>
+    <string name="unknown">\?</string>
+    <string name="quit">QUIT</string>
+    <string name="next">NEXT</string>
+    <string name="disclaimer">Between each question, you can either cash out or all in for the next one</string>
+    <string name="game_over">GAME OVER</string>
+    <string name="you_lost_all_your_points">You lost all your points</string>
+    <string name="back_to_the_tournament">Back to the tournament</string>
+    <string name="congratulations">Congratulations!</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

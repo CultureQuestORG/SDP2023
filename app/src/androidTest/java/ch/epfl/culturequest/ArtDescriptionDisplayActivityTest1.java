@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.authentication.Authenticator;
@@ -60,7 +61,7 @@ public class ArtDescriptionDisplayActivityTest1 {
         // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
 
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0,new HashMap<>());
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0,new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(profile);
     }
 

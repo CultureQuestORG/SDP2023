@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +49,7 @@ public class FireStorageTest {
 
         imageBitmap = FireStorage.getBitmapFromURL(imageUrl);
 
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0,new HashMap<>());
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0,new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(profile);
     }
 
