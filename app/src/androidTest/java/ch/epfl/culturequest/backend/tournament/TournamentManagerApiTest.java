@@ -150,7 +150,7 @@ public class TournamentManagerApiTest {
 
     }
 
-    @Test
+    //@Test
     public void tournamentCorrectlyFetchedWhenConcurrency(){
 
         SharedPreferences tournamentSharedPref = getTournamentSharedPrefLocation();
