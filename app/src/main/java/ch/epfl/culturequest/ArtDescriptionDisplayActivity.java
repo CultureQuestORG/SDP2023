@@ -35,6 +35,7 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.ScanBadge;
+import ch.epfl.culturequest.storage.FireStorage;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
@@ -44,17 +45,19 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
     private Button postButton;
 
+    private String imageDownloadUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
-        findViewById(R.id.back_button).setOnClickListener(view -> finish());
+        findViewById(R.id.back_button).setOnClickListener(view -> onBackPressed());
         postButton = findViewById(R.id.post_button);
 
         // Get serialized artDescription and images from intent
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
         String imageUriExtra = getIntent().getStringExtra("imageUri");
-        String imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
+        imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
 
         // Check if the activity was started from the scanning activity
         boolean scan = getIntent().getBooleanExtra("scanning", true);
@@ -106,6 +109,16 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             // Remove post button as the image was not scanned
             postButton.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * If the user decides not to post the picture
+     * we delete the pic from firebase storage.
+     */
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        FireStorage.deleteImage(imageDownloadUrl);
     }
 
     private void displayArtInformation(BasicArtDescription artDescription) {

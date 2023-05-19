@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.social.Profile;
@@ -105,6 +106,19 @@ public class FireStorage {
 
         return future;
     }
+
+    public static CompletableFuture<AtomicBoolean> deleteImage(String imageUrl) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        StorageReference imageRef = storage.getReferenceFromUrl(imageUrl );
+        imageRef.delete().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+
+        return future;    }
 
     /**
      * Uploads to the storage an image and returns the url of the image.
