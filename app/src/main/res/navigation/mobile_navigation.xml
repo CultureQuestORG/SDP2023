@@ -35,4 +35,6 @@
         android:label="@string/title_scan"
         tools:layout="@layout/fragment_scan" />
 
+
+
 </navigation>

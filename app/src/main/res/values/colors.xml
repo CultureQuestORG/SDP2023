@@ -9,4 +9,5 @@
     <color name="transparent">#00000000</color>
     <color name="colorTertiary">#9F7F6C</color>
     <color name="background">#D9C2A6</color>
+    <color name="backgroundVictory">#CBFF8C</color>
 </resources>
