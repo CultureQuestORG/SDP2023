@@ -24,6 +24,8 @@ public class QuizVictoryFragment extends Fragment {
 
         assert getArguments() != null;
         int points = getArguments().getInt("score");
+
+
         binding.pointsEarned.setText(String.format(pointsFormat, points));
 
 

@@ -41,6 +41,10 @@ public class QuizActivity extends AppCompatActivity {
             uid = "1234";
         }
 
+        if (tournament == null || artName == null) {
+            throw new RuntimeException("Null argument");
+        }
+
         binding = ActivityQuizBinding.inflate(getLayoutInflater());
 
 

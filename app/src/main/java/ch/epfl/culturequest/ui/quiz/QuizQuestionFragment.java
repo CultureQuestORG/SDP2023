@@ -43,6 +43,10 @@ public class QuizQuestionFragment extends Fragment {
         question = getArguments().getString("question");
         possibilities = getArguments().getStringArrayList("possibleAnswers");
 
+        if ( uid == null || tournament == null || artName == null || question == null || possibilities == null) {
+            throw new RuntimeException("Null argument");
+        }
+
 
         quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
 

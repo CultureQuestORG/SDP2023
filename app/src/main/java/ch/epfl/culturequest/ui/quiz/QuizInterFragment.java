@@ -64,6 +64,10 @@ public class QuizInterFragment extends Fragment {
         String artName = getArguments().getString("artName");
         int score = getArguments().getInt("score");
 
+        if ( uid == null || tournament == null || artName == null) {
+            throw new RuntimeException("Null argument");
+        }
+
         quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
 
         View root = binding.getRoot();

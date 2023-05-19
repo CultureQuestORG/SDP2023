@@ -31,6 +31,10 @@ public class QuizWelcomeFragment extends Fragment {
         String tournament = getArguments().getString("tournament");
         String artName = getArguments().getString("artName");
 
+        if ( uid == null || tournament == null || artName == null) {
+            throw new RuntimeException("Null argument");
+        }
+
         quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
 
         binding.titleTextView.setText(tournament);
