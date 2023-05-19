@@ -816,7 +816,7 @@ public class Database {
     }
 
     /**
-     * Returns the event or events organized by the user with Uid
+     * Returns the event or events user with Uid is invited to/organizes
      *
      * @param Uid user id
      * @return the event or events organized by someone

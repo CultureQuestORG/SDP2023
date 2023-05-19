@@ -60,6 +60,9 @@
 
 
         <activity
+            android:name=".ui.events.EventsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.notifications.NotificationsActivity"
             android:exported="false" />
         <activity
