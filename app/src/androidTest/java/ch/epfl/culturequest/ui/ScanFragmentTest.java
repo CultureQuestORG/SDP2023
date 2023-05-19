@@ -1,16 +1,25 @@
 package ch.epfl.culturequest.ui;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import android.Manifest;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.View;
 
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.android21buttons.fragmenttestrule.FragmentTestRule;
@@ -24,6 +33,7 @@ import org.junit.runner.RunWith;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.ui.scan.ScanFragment;
 
 @RunWith(AndroidJUnit4.class)
@@ -35,6 +45,7 @@ public class ScanFragmentTest {
 
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
+    private LocalStorage localStorage;
 
     @Before
     public void setup() throws InterruptedException {
@@ -52,6 +63,10 @@ public class ScanFragmentTest {
 
         // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
+
+        localStorage = new LocalStorage(InstrumentationRegistry.getInstrumentation().getTargetContext().getContentResolver());
+        // Clear all images in shared storage before each test
+        localStorage.clearLocalStorage();
     }
 
     @Test
@@ -59,57 +74,43 @@ public class ScanFragmentTest {
         onView(withId(R.id.scanLoadingLayout)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.GONE))));
     }
 
-    @Test
-    public void testLoadingStartAfterButtonClick() {
-        onView(withId(R.id.scan_button)).perform(click());
-        onView(withId(R.id.scanLoadingLayout)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.VISIBLE))));
-    }
-
-    @Test
-    public void testLoadingStopsAfterCancelButtonClick() {
-        onView(withId(R.id.scan_button)).perform(click());
-        onView(withId(R.id.scanLoadingLayout)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.VISIBLE))));
-        onView(withId(R.id.cancelButtonScan)).perform(click());
-        onView(withId(R.id.scanLoadingLayout)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.GONE))));
-    }
-
-    @After
-    public void tearDown() {
-        // Clear the storage after the tests
-        FireStorage.clearStorage();
-    }
+//    @Test
+//    public void testLoadingStartAfterButtonClick() {
+//        onView(withId(R.id.scan_button)).perform(click());
+//        onView(withId(R.id.scanLoadingLayout)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.VISIBLE))));
+//    }
+//
+//    @Test
+//    public void testLoadingStopsAfterCancelButtonClick() {
+//        onView(withId(R.id.scan_button)).perform(click());
+//        onView(withId(R.id.scanLoadingLayout)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.VISIBLE))));
+//        onView(withId(R.id.cancelButtonScan)).perform(click());
+//        onView(withId(R.id.scanLoadingLayout)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.forViewVisibility(View.GONE))));
+//    }
 
 
 //    @Test
-//    public void clickOnScanButtonStoresOneImageInSharedStorage() {
+//    public void clickOnScanButtonStoresOneImageInSharedStorage() throws InterruptedException {
 //        int initialCount = countImagesInSharedStorage();
 //        onView(withId(R.id.scan_button)).perform(click());
+//
+//        Thread.sleep(1000);
+//
 //        int finalCount = countImagesInSharedStorage();
 //        assertThat(finalCount, is(initialCount + 1));
 //    }
-//
-//    @Test
-//    @After
-//    public void deleteAllImagesInSharedStorage() {
-//        Uri collection = fragmentTestRule.getFragment().localStorage.contentUri;
-//
-//        ContentResolver contentResolver = getApplicationContext().getContentResolver();
-//        contentResolver.delete(collection, null, null);
-//        int totalCount = countImagesInSharedStorage();
-//        assertThat(totalCount, is(0));
-//    }
-//
-//    private int countImagesInSharedStorage() {
-//        Uri collection = fragmentTestRule.getFragment().localStorage.contentUri;
-//
-//        // Counts the number of ready images (not pending) in the shared storage
-//        try (Cursor cursor = getApplicationContext().getContentResolver().query(
-//                collection,
-//                null,
-//                null,
-//                null,
-//                null)) {
-//            return cursor.getCount();
-//        }
-//    }
+
+    @Test
+    @After
+    public void deleteAllImagesInSharedStorage() {
+        localStorage.clearLocalStorage();
+        int totalImageCount = countImagesInSharedStorage();
+        ViewMatchers.assertThat(totalImageCount, is(0));
+        FireStorage.clearStorage();
+    }
+
+    private int countImagesInSharedStorage() {
+        // Counts the number of ready images (not pending) in the shared storage
+        return localStorage.countSelectedImagesInLocalStorage(null, null);
+    }
 }

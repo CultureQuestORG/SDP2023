@@ -18,10 +18,14 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.squareup.picasso.Picasso;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +35,8 @@ import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.CropUtils;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -46,8 +52,6 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
     private TextView textView;
     private final Profile profile = new Profile(null, "");
-    private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             this.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
                     isGranted -> {
@@ -146,7 +150,8 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     }
 
     private void openGallery() {
-        profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+        // start the gallery activity to select a picture with result code TAKE_PICTURE
+        startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI), CropUtils.TAKE_PICTURE);
     }
 
 
@@ -163,19 +168,23 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      *
      * @param result the result of the activity launched to select the profile picture
      */
-    public void displayProfilePic(ActivityResult result) {
-        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-            Uri profilePicture = result.getData().getData();
-            CircleImageView image = findViewById(R.id.profile_picture);
-            Picasso.get().load(profilePicture).into(image);
-            ((TextView) findViewById(R.id.profile_pic_text)).setText("");
-            profilePicUri = profilePicture.toString();
-            try {
-                profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), profilePicture);
-            } catch (IOException e) {
-                profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PIC_PATH);
-            }
+    private Void displayProfilePic(Uri result) {
+        CircleImageView image = findViewById(R.id.profile_picture);
+        Picasso.get().load(result).into(image);
+        ((TextView) findViewById(R.id.profile_pic_text)).setText("");
+        profilePicUri = result.toString();
+        try {
+            profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), result);
+        } catch (IOException e) {
+            profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PIC_PATH);
         }
+        return null;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        CropUtils.manageCropFlow(requestCode, resultCode, data, this, this::displayProfilePic, profileView);
     }
 
 

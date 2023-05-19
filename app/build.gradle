@@ -137,6 +137,8 @@ dependencies {
 
     testImplementation "org.mockito:mockito-core:5.1.1"
 
+    implementation 'com.github.yalantis:ucrop:2.2.8'
+    
     // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:32.0.0')
 
