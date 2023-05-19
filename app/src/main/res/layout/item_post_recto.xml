@@ -6,9 +6,6 @@
 
     android:layout_gravity="center"
 
-    android:layout_marginTop="10dp"
-    android:layout_marginEnd="0dp"
-    android:layout_marginBottom="10dp"
     android:background="@drawable/rounded_bg"
     android:orientation="vertical">
 
@@ -94,6 +91,20 @@
             android:layout_alignParentEnd="true"
             android:gravity="center_horizontal"
             android:src="@drawable/like_empty" />
+
+        <TextView
+            android:id="@+id/like_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="40dp"
+            android:fontFamily="@font/poppins_bold"
+            android:gravity="center"
+            android:text="@string/like_count"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14sp" />
 
         <ImageView
             android:id="@+id/delete_button"
