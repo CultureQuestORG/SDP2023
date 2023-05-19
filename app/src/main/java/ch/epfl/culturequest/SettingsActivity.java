@@ -3,7 +3,6 @@ package ch.epfl.culturequest;
 import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 import static ch.epfl.culturequest.utils.CropUtils.TAKE_PICTURE;
-import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 import static ch.epfl.culturequest.utils.ProfileUtils.setProblemHintTextIfAny;
 
 import android.app.Activity;
