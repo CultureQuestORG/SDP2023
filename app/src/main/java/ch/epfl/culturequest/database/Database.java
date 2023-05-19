@@ -30,6 +30,8 @@ import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
+import ch.epfl.culturequest.tournament.quiz.Question;
+import ch.epfl.culturequest.tournament.quiz.Quiz;
 
 
 /**
@@ -835,5 +837,47 @@ public class Database {
             }
         });
         return future;
+    }
+
+    public static CompletableFuture<Quiz> getQuiz(String tournament, String artName) {
+        CompletableFuture<Quiz> future = new CompletableFuture<>();
+
+        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName).child("questions");
+        quizRef.get().addOnCompleteListener(task -> {
+            //returns a list of questions
+            if (task.isSuccessful()) {
+                ArrayList<Question> questions = new ArrayList<>();
+                for (DataSnapshot child : task.getResult().getChildren()) {
+                    Question question = child.getValue(Question.class);
+                    questions.add(question);
+                }
+                future.complete(new Quiz(artName,questions,tournament));
+            } else {
+                future.completeExceptionally(new Exception("Quiz not found"));
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<AtomicBoolean> addQuiz(Quiz quiz) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(quiz.getTournament()).child(quiz.getArtName()).child("questions");
+        quizRef.setValue(quiz.getQuestions()).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
+    public static void startQuiz(String tournament, String artName, String uid) {
+        setScoreQuiz(tournament, artName, uid, 0);
+    }
+
+    public static void setScoreQuiz(String tournament, String artName, String uid, int score) {
+        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName).child("scores").child(uid);
+        quizRef.setValue(score);
     }
 }
