@@ -130,6 +130,13 @@ public class TournamentManagerApiTest {
         //// CHECKS ////
 
         // Check that the tournament has been generated
+
+        // wait to be sure that the tournament has been indicated as generated in Firebase
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Boolean tournamentGenerated = isEqualAsync(getTournamentGeneratedPath(), true).join();
         assertThat(tournamentGenerated, is(true));
 

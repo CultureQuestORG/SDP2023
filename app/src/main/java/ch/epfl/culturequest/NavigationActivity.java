@@ -43,7 +43,11 @@ public class NavigationActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        TournamentManagerApi.handleTournaments();
+        try{
+            TournamentManagerApi.handleTournaments();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

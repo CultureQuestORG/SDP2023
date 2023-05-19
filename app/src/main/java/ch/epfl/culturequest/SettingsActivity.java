@@ -25,7 +25,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.squareup.picasso.Picasso;
-import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
@@ -186,7 +185,12 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        TournamentManagerApi.handleTournaments();
+        try {
+            TournamentManagerApi.handleTournaments();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
