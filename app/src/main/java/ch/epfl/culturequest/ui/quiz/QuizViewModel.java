@@ -64,8 +64,8 @@ public class QuizViewModel extends ViewModel {
 
         score.postValue(nextScore.getValue());
         this.questionNumber.postValue(questionNumber + 1);
-        if (this.questionNumber.getValue() == Objects.requireNonNull(quiz.getValue()).getQuestions().size()) {
-            return Objects.requireNonNull(quizActivity.getValue()).endQuiz(score.getValue());
+        if (questionNumber + 1 == Objects.requireNonNull(quiz.getValue()).getQuestions().size()) {
+            return Objects.requireNonNull(quizActivity.getValue()).endQuiz(nextScore.getValue());
 
         }
 
