@@ -24,8 +24,7 @@ check_android_task:
     -gpu swiftshader_indirect
     -no-snapshot
     -no-window
-    -camera-front emulated
-    -camera-back emulated
+    -camera-back none
   extract_api_script: |
     echo MAPS_API_KEY=$MAPS_API_KEY >> local.properties
   assemble_instrumented_tests_script: |

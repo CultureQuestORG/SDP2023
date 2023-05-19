@@ -2,6 +2,7 @@ package ch.epfl.culturequest;
 
 import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
+import static ch.epfl.culturequest.utils.CropUtils.TAKE_PICTURE;
 import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
 
 import android.app.Activity;
@@ -36,6 +37,7 @@ import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.CropUtils;
 import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
@@ -45,17 +47,12 @@ import ch.epfl.culturequest.utils.ProfileUtils;
  * Activity that allows the user to change his profile picture and username
  */
 public class SettingsActivity extends AppCompatActivity {
-
-    private static final int TAKE_PICTURE = 10;
-
     private ImageView profilePictureView;
     private String profilePicUri;
     private Bitmap profilePicBitmap;
     private Profile activeProfile;
 
     private TextView username;
-
-    private UCrop.Options options;
 
     private View rootView;
 
@@ -103,18 +100,6 @@ public class SettingsActivity extends AppCompatActivity {
         updateProfileButton.setOnClickListener(this::UpdateProfile);
 
         rootView = binding.getRoot();
-
-        // Create crop options
-        options = new UCrop.Options();
-        options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
-        options.setCompressionQuality(100);
-        options.setCircleDimmedLayer(true);
-        options.setShowCropGrid(false);
-        options.setActiveControlsWidgetColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        options.setToolbarColor(ContextCompat.getColor(this, R.color.background));
-        options.setStatusBarColor(ContextCompat.getColor(this, R.color.background));
-        options.setToolbarWidgetColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        options.setToolbarTitle("Adjust your profile picture");
     }
 
 
@@ -165,7 +150,7 @@ public class SettingsActivity extends AppCompatActivity {
      *
      * @param result the result of the activity launched to select the profile picture
      */
-    private void displayProfilePic(Uri result) {
+    private Void displayProfilePic(Uri result) {
         Picasso.get().load(result).into(profilePictureView);
         profilePicUri = result.toString();
         try {
@@ -173,6 +158,7 @@ public class SettingsActivity extends AppCompatActivity {
         } catch (IOException e) {
             profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PIC_PATH);
         }
+        return null;
     }
 
 
@@ -197,28 +183,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // handle the result of the crop activity
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            final Uri resultUri = UCrop.getOutput(data);
-            if (resultUri != null) {
-                displayProfilePic(resultUri);
-            }
-            // handle the result of the gallery activity
-        } else if (requestCode == TAKE_PICTURE && resultCode == RESULT_OK) {
-            Uri result = data.getData();
-            if (result != null) {
-                String destinationFileName = UUID.randomUUID().toString() + ".jpg";
-
-                // start the crop activity
-                UCrop.of(result, Uri.fromFile(new File(getCacheDir() + "/" + destinationFileName)))
-                        .withAspectRatio(1, 1)
-                        .withOptions(options)
-                        .withMaxResultSize(500, 500)
-                        .start(this);
-            }
-        } else {
-            CustomSnackbar.showCustomSnackbar("Error while choosing a picture,please retry", R.drawable.unknown_error, rootView);
-        }
+        CropUtils.manageCropFlow(requestCode, resultCode, data, this, this::displayProfilePic, rootView);
     }
 
 
