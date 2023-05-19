@@ -9,7 +9,7 @@ public class ArtQuiz {
     ArrayList<QuizQuestion> questions;
 
 
-    private ArtQuiz(){
+    public ArtQuiz(){
         // For Serialization
     }
 

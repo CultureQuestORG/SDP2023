@@ -11,7 +11,7 @@ public class Tournament {
 
     private Map<String, ArtQuiz> artQuizzes = new HashMap<String, ArtQuiz>();
 
-    private Tournament(){
+    public Tournament(){
         // For Serialization
     }
     public Tournament(Map<String, ArtQuiz> artQuizzes){

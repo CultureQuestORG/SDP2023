@@ -15,6 +15,11 @@ public class QuizQuestion {
     public QuizQuestion(String questionContent, ArrayList<String> possibleAnswers, int correctAnswerIndex){
         this.possibleAnswers = possibleAnswers;
         this.correctAnswerIndex = correctAnswerIndex;
+        this.questionContent = questionContent;
+    }
+
+    public QuizQuestion(){
+        // For Serialization
     }
 
     public ArrayList<String> getPossibleAnswers(){

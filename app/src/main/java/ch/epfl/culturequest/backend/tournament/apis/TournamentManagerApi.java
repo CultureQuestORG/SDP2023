@@ -64,7 +64,7 @@ import ch.epfl.culturequest.backend.tournament.utils.RandomApi;
 public class TournamentManagerApi {
 
     @SuppressLint("NewApi")
-    public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY, Duration.ofSeconds(60));
+    public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY, Duration.ofMinutes(2));
 
     // Main function #1: To be called when most of activities are being resumed
     public static CompletableFuture<Void> handleTournaments() {
@@ -280,6 +280,7 @@ public class TournamentManagerApi {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean isGenerated = dataSnapshot.getValue(Boolean.class);
                 if (isGenerated) {
+
                     tournamentRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -307,16 +308,20 @@ public class TournamentManagerApi {
         return future;
     }
 
-    private static void uploadTournamentToDatabase(Tournament tournament) {
+    public static CompletableFuture<Void> uploadTournamentToDatabase(Tournament tournament) {
+
+        CompletableFuture<Void> voidFuture = new CompletableFuture<>();
 
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
         DatabaseReference tournamentRef = dbRef.child("tournaments").child(tournament.getTournamentId());
 
-        auxiliaryUploadTournamentToDatabase(tournament, tournamentRef, 0);
+        auxiliaryUploadTournamentToDatabase(tournament, tournamentRef, 0, voidFuture);
 
+        return voidFuture;
     }
 
-    private static void auxiliaryUploadTournamentToDatabase(Tournament tournament, DatabaseReference tournamentRef, int tentativeNumber) {
+    private static void auxiliaryUploadTournamentToDatabase(Tournament tournament, DatabaseReference tournamentRef, int tentativeNumber, CompletableFuture<Void> voidFuture) {
+
         tournamentRef.setValue(tournament, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
@@ -325,20 +330,21 @@ public class TournamentManagerApi {
                     if (tentativeNumber == 2) {
                         // If the upload failed 2 times, we unlock the tournament generation so that another device can try to generate it
                         unlockTournamentGeneration();
+                        voidFuture.completeExceptionally(new RuntimeException("Failed to upload tournament to database: " + error.getMessage()));
                         return;
                     }
 
                     // If the upload failed and tentative didn't reach max, try again
-                    auxiliaryUploadTournamentToDatabase(tournament, tournamentRef, tentativeNumber + 1);
+                    auxiliaryUploadTournamentToDatabase(tournament, tournamentRef, tentativeNumber + 1, voidFuture);
 
                 } else {
                     // If the upload is successful, we tell the other devices that the tournament can be fetched from the database
                     indicateTournamentGenerated();
+                    voidFuture.complete(null);
                 }
             }
         });
     }
-
 
     private static Calendar generateWeeklyTournamentDate() {
 
@@ -398,7 +404,7 @@ public class TournamentManagerApi {
         return artNames;
     }
 
-    private static void storeTournamentInSharedPref(Tournament tournament) {
+    public static void storeTournamentInSharedPref(Tournament tournament) {
 
         // Get shared preferences
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
