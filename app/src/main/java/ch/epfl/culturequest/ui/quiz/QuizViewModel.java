@@ -38,6 +38,7 @@ public class QuizViewModel extends ViewModel {
         score.postValue(0);
         nextScore.postValue(100);
         this.uid.postValue(uid);
+        questionNumber.postValue(0);
 
 
     }
