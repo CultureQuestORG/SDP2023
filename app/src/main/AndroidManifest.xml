@@ -85,8 +85,11 @@
 
         <activity
             android:name=".ui.quiz.QuizActivity"
-            android:exported="true">
-
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".ui.events.tournaments.TournamentActivity"
+            android:exported="false">
         </activity>
 
 

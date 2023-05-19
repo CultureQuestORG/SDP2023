@@ -1,4 +1,4 @@
-package ch.epfl.culturequest.ui.events;
+package ch.epfl.culturequest.ui.events.sightseeing;
 
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -17,6 +17,7 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
+import ch.epfl.culturequest.ui.events.EventsViewModel;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<SightseeingRecycleViewAdapter.SightseeingViewHolder> {

@@ -12,7 +12,7 @@ import ch.epfl.culturequest.social.SightseeingEvent;
 public class EventsViewModel extends ViewModel {
 
     private final MutableLiveData<List<SightseeingEvent>> sightseeingEvents;
-    private final MutableLiveData<List<Void>> tournamentsEvents;
+    private final MutableLiveData<List<String>> tournamentsEvents;
 
     public EventsViewModel() {
         sightseeingEvents = new MutableLiveData<>();
@@ -36,7 +36,7 @@ public class EventsViewModel extends ViewModel {
         });
     }
 
-    public MutableLiveData<List<Void>> getTournamentsEvents() {
+    public MutableLiveData<List<String>> getTournamentsEvents() {
         return tournamentsEvents;
     }
 
@@ -48,7 +48,7 @@ public class EventsViewModel extends ViewModel {
 //            }
 //            tournamentsEvents.setValue(events);
 //        });
-        tournamentsEvents.setValue(List.of());
+        tournamentsEvents.setValue(List.of("Tournament 1", "Tournament 2", "Tournament 3"));
     }
 
 }

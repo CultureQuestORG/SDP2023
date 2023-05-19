@@ -1,15 +1,16 @@
 package ch.epfl.culturequest.tournament.quiz;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Quiz {
 
     String artName;
 
     String tournament;
-    ArrayList<Question> questions;
+    List<Question> questions;
 
-    public Quiz(String artName, ArrayList<Question> questions, String tournament) {
+    public Quiz(String artName, List<Question> questions, String tournament) {
         this.artName = artName;
         this.questions = questions;
         this.tournament = tournament;
@@ -32,7 +33,7 @@ public class Quiz {
         this.artName = artName;
     }
 
-    public ArrayList<Question> getQuestions() {
+    public List<Question> getQuestions() {
         return questions;
     }
 

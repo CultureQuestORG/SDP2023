@@ -74,7 +74,7 @@ public class QuizActivity extends AppCompatActivity {
     public QuizQuestionFragment goToQuestion(int questionNumber,Question question) {
         Bundle bundle = basicBundle();
         bundle.putInt("questionNumber", questionNumber);
-        bundle.putStringArrayList("possibleAnswers", question.getPossibilities());
+        bundle.putStringArrayList("possibleAnswers", new ArrayList<>(question.getPossibilities()));
         bundle.putString("question", question.getQuestion());
         QuizQuestionFragment fragment = new QuizQuestionFragment();
         fragment.setArguments(bundle);

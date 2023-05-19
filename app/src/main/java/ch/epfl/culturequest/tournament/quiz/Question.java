@@ -6,12 +6,12 @@ import java.util.List;
 public class Question {
 
     String question;
-    ArrayList<String> possibilities;
+    List<String> possibilities;
     int answer;
 
 
 
-    public Question(String question, ArrayList<String> possibilities, int answer) {
+    public Question(String question, List<String> possibilities, int answer) {
         assert answer < possibilities.size();
         assert answer >= 0;
         this.question = question;
@@ -29,7 +29,7 @@ public class Question {
         return question;
     }
 
-    public ArrayList<String> getPossibilities() {
+    public List<String> getPossibilities() {
         return possibilities;
     }
 

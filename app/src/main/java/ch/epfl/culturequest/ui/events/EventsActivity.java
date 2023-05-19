@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.ActivityEventsBinding;
+import ch.epfl.culturequest.ui.events.sightseeing.SightseeingRecycleViewAdapter;
+import ch.epfl.culturequest.ui.events.tournaments.TournamentsRecycleViewAdapter;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 /**
@@ -28,6 +30,7 @@ public class EventsActivity extends AppCompatActivity {
     private EventsViewModel eventsViewModel;
     private RecyclerView eventsRecyclerView;
     private SightseeingRecycleViewAdapter sightseeingRecycleViewAdapter;
+    private TournamentsRecycleViewAdapter tournamentsRecycleViewAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,9 +44,12 @@ public class EventsActivity extends AppCompatActivity {
         tournamentsButton = binding.tournamentsButton;
         tournamentsButton.setOnClickListener(this::displayTournaments);
 
-        eventsViewModel = new ViewModelProvider(this).get(EventsViewModel.class);
         eventsRecyclerView = binding.eventsRecyclerView;
+
+        eventsViewModel = new ViewModelProvider(this).get(EventsViewModel.class);
         sightseeingRecycleViewAdapter = new SightseeingRecycleViewAdapter(eventsViewModel);
+        tournamentsRecycleViewAdapter = new TournamentsRecycleViewAdapter(eventsViewModel);
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         eventsRecyclerView.setLayoutManager(layoutManager);
         eventsRecyclerView.setAdapter(sightseeingRecycleViewAdapter);
@@ -62,7 +68,7 @@ public class EventsActivity extends AppCompatActivity {
             tournamentsButton.setTextColor(getResources().getColor(R.color.white, null));
             sightseeingButton.setBackgroundResource(R.drawable.rounded_button_transparent);
             sightseeingButton.setTextColor(getResources().getColor(R.color.colorPrimary, null));
-            eventsRecyclerView.setAdapter(null);
+            eventsRecyclerView.setAdapter(tournamentsRecycleViewAdapter);
         }
     }
 
