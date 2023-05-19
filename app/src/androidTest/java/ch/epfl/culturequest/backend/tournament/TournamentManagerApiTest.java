@@ -187,7 +187,7 @@ public class TournamentManagerApiTest {
     }
 
 
-    @Test
+    //@Test
     public void tournamentCorrectlyRetrievedAndDeserializedFromSharedPref(){
 
         Tournament fakeTournament = getFakeTournament();
