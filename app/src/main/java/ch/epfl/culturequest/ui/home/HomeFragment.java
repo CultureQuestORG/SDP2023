@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -16,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import ch.epfl.culturequest.databinding.FragmentHomeBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.ui.SearchActivity;
+import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.notifications.NotificationsActivity;
 
 public class HomeFragment extends Fragment {
 
@@ -33,6 +37,9 @@ public class HomeFragment extends Fragment {
         final ImageView searchIcon = binding.searchIcon;
         final RecyclerView feed = binding.feedContainer;
         searchIcon.setOnClickListener(view -> startActivity(new Intent(getActivity(), SearchActivity.class)));
+
+        final ImageView notificationIcon = binding.notificationIcon;
+        notificationIcon.setOnClickListener(view -> startActivity(new Intent(getActivity(), NotificationsActivity.class)));
 
         homeViewModel.getPosts().observe(getViewLifecycleOwner(), images -> {
             // Create a new PictureAdapter and set it as the adapter for the RecyclerView

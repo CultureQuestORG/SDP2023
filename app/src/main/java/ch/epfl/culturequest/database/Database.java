@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.database;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -23,8 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
-import ch.epfl.culturequest.notifications.FireMessaging;
-import ch.epfl.culturequest.notifications.LikeNotification;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
@@ -50,6 +50,8 @@ public class Database {
             databaseInstance.getReference("follows").keepSynced(true);
             databaseInstance.getReference("artworks").keepSynced(true);
             databaseInstance.getReference("notifications").keepSynced(true);
+            databaseInstance.getReference("sightseeing_event").keepSynced(true);
+            databaseInstance.getReference("tournaments").keepSynced(true);
         }
     }
 
@@ -791,12 +793,47 @@ public class Database {
 
     public static CompletableFuture<AtomicBoolean> setSightseeingEvent(SightseeingEvent event) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        DatabaseReference usersRef = databaseInstance.getReference("sightseeing_event").child(event.getOwner().getUid()).child(String.valueOf(event.getEventId()));
-        usersRef.setValue(event).addOnCompleteListener(task -> {
+        DatabaseReference usersRef = databaseInstance.getReference("sightseeing_event");
+        //// we need two separate set operations. if we merge both the owner also receives a notification...
+        usersRef.child(event.getOwner().getUid()).child(String.valueOf(event.getEventId())).setValue(event).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 future.complete(new AtomicBoolean(true));
             } else {
                 future.complete(new AtomicBoolean(false));
+            }
+        });
+
+        event.getInvited().forEach(profile -> {
+            usersRef.child(profile.getUid()).child(String.valueOf(event.getEventId())).setValue(event).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    future.complete(new AtomicBoolean(true));
+                } else {
+                    future.complete(new AtomicBoolean(false));
+                }
+            });
+        });
+        return future;
+    }
+
+    /**
+     * Returns the event or events organized by the user with Uid
+     *
+     * @param Uid user id
+     * @return the event or events organized by someone
+     */
+    public static CompletableFuture<List<SightseeingEvent>> getSightseeingEvents(String Uid) {
+        CompletableFuture<List<SightseeingEvent>> future = new CompletableFuture<>();
+        DatabaseReference usersRef = databaseInstance.getReference("sightseeing_event").child(Uid);
+        usersRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<SightseeingEvent> events = new ArrayList<>();
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    SightseeingEvent event = snapshot.getValue(SightseeingEvent.class);
+                    events.add(event);
+                }
+                future.complete(events);
+            } else {
+                future.completeExceptionally(task.getException());
             }
         });
         return future;

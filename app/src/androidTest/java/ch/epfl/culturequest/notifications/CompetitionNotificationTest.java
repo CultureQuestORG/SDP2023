@@ -34,7 +34,7 @@ public class CompetitionNotificationTest {
         Notification competitionNotification = new CompetitionNotification().buildNotification(context);
         assertThat(competitionNotification.extras.get(Notification.EXTRA_TITLE).toString(), is("A new competition has started!"));
         assertThat(competitionNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("Click here to see your new competition!"));
-        assertThat(competitionNotification.priority, is(Notification.PRIORITY_DEFAULT));
+        assertThat(competitionNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(competitionNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(competitionNotification.getChannelId(), is(CompetitionNotification.CHANNEL_ID));
     }

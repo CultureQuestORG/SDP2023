@@ -3,6 +3,7 @@ package ch.epfl.culturequest.social;
 import java.util.List;
 import java.util.UUID;
 
+import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 
 public class SightseeingEvent {
@@ -21,8 +22,7 @@ public class SightseeingEvent {
      * @param locations the places ppl are invited to visit with the owner of the event
      */
     private SightseeingEvent(String eventId, Profile owner, List<Profile> invited, List<OTMLocation> locations) {
-        if (owner == null || invited.isEmpty() || locations.isEmpty())
-            throw new IllegalArgumentException();
+        if (owner == null) throw new IllegalArgumentException();
         this.owner = owner;
         this.invited = invited;
         this.locations = locations;
@@ -37,6 +37,10 @@ public class SightseeingEvent {
      */
     public SightseeingEvent(Profile owner, List<Profile> invited, List<OTMLocation> locations) {
         this(UUID.randomUUID().toString(), owner, invited, locations);
+    }
+
+    public SightseeingEvent(){
+        this(UUID.randomUUID().toString(), new Profile(), List.of(), List.of());
     }
 
     /**

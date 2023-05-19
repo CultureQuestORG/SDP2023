@@ -2,7 +2,9 @@ package ch.epfl.culturequest.map_collectiontest;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -37,6 +39,12 @@ public class OTMLatLngTest {
         assertThat(latLng.getLon(), is(25.));
     }
 
+    @Test
+    public void emptyConstructorHas0Coordinates(){
+        OTMLatLng latLng = new OTMLatLng();
+        assertEquals(0, latLng.getLat(), 0.0);
+        assertEquals(0, latLng.getLon(), 0.0);
+    }
     @Test
     public void duplicateGetAndSetAreCorrect(){
         OTMLatLng latLng = new OTMLatLng(25.,0.);

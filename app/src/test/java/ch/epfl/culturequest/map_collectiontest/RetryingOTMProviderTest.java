@@ -90,7 +90,7 @@ public class RetryingOTMProviderTest {
         assertThat(locations.get(0).getName(), is("Château de La Côte-Saint-André"));
         assertThat(locations.get(0).getCoordinates().getLon(), is(20.23));
         assertThat(locations.get(0).getCoordinates().getLat(), is(47.39));
-        assertThat(locations.get(0).getKinds(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
+        assertThat(locations.get(0).getKindsList(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
     }
 
     @After

@@ -39,7 +39,7 @@ public class ScanNotificationTest {
         Notification scanNotification = new ScanNotification().buildNotification(context);
         assertThat(scanNotification.extras.get(Notification.EXTRA_TITLE).toString(), is("You have a new scan!"));
         assertThat(scanNotification.extras.get(Notification.EXTRA_TEXT).toString(), is("We found a new offline scan result!"));
-        assertThat(scanNotification.priority, is(Notification.PRIORITY_DEFAULT));
+        assertThat(scanNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(scanNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(scanNotification.getChannelId(), is(ScanNotification.CHANNEL_ID));
         Intent intent = new Intent(context, NavigationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

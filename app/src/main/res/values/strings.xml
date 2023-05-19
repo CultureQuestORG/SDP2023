@@ -48,4 +48,5 @@
     <string name="you_lost_all_your_points">You lost all your points</string>
     <string name="back_to_the_tournament">Back to the tournament</string>
     <string name="congratulations">Congratulations!</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

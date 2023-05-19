@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +34,12 @@ public class SightseeingEventTest {
     }
 
     @Test
+    public void emptyConstructorIsGood(){
+        SightseeingEvent event1 = new SightseeingEvent();
+        assertTrue(event1.getInvited().isEmpty());
+        assertTrue(event1.getLocations().isEmpty());
+    }
+    @Test
     public void ownerIsCorrect(){
         assertThat(event.getOwner(), is(owner));
     }
@@ -50,8 +57,6 @@ public class SightseeingEventTest {
     @Test
     public void throwsExceptionsWithWrongArgs(){
         assertThrows(IllegalArgumentException.class, () -> new SightseeingEvent(null, invited, locations));
-        assertThrows(IllegalArgumentException.class, () -> new SightseeingEvent(owner, List.of(), locations));
-        assertThrows(IllegalArgumentException.class, () -> new SightseeingEvent(owner, invited, List.of()));
     }
 
     @Test

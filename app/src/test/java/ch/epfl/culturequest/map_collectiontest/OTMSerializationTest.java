@@ -33,6 +33,6 @@ public class OTMSerializationTest {
         assertEquals(-1, location.getCoordinates().getLon(), 0);
         assertEquals(1, location.getCoordinates().getLat(), 0);
         assertEquals("test", location.getName());
-        assertEquals(List.of("art", "architecture"), location.getKinds());
+        assertEquals(List.of("art", "architecture"), location.getKindsList());
     }
 }

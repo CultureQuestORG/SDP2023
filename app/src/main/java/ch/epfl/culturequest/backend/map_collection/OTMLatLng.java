@@ -22,6 +22,10 @@ public final class OTMLatLng {
         this.lat = lat;
     }
 
+    public OTMLatLng(){
+        this(0,0);
+    }
+
     /**
      * @return the latitude of the point
      */
