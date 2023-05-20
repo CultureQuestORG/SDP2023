@@ -12,6 +12,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class AppConcurrencyApi {
 
@@ -81,7 +83,7 @@ public class AppConcurrencyApi {
             }
         });
 
-        future.orTimeout(120, java.util.concurrent.TimeUnit.SECONDS);
+        handleFutureTimeout(future, 120);
 
         return future;
     }
@@ -113,9 +115,23 @@ public class AppConcurrencyApi {
             }
         });
 
-        future.orTimeout(120, java.util.concurrent.TimeUnit.SECONDS);
+        handleFutureTimeout(future, 120);
 
         return future;
-
     }
+
+    public static <T> void handleFutureTimeout(CompletableFuture<T> future, int timeoutSeconds) {
+
+        // create scheduled executor service
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.schedule(() -> {
+            if (!future.isDone()) {
+                future.completeExceptionally(new Exception("Timeout exception"));
+            }
+        }, timeoutSeconds, java.util.concurrent.TimeUnit.SECONDS);
+
+        future.complete(null);
+    }
+
+
 }

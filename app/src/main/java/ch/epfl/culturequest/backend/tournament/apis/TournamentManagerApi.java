@@ -3,6 +3,7 @@ package ch.epfl.culturequest.backend.tournament.apis;
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
 import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.getDeviceSynchronizationRef;
+import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.handleFutureTimeout;
 import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.indicateTournamentGenerated;
 import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.indicateTournamentNotGenerated;
 import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.isTournamentGenerationLocked;
@@ -85,7 +86,10 @@ public class TournamentManagerApi {
         } else if (isTimeToGenerateTournament() && !tournamentAlreadyStoredInSharedPref()) {
 
             // generate or fetch tournament once and store it in Shared Preferences to access it easily later
-            return generateOrFetchTournamentThenStore().orTimeout(180, TimeUnit.SECONDS); // timeout if not completed after 3 minutes
+            CompletableFuture<Void> future = generateOrFetchTournamentThenStore(); // asynchronous call
+            handleFutureTimeout(future, 180); // timeout after 3 minutes
+
+            return future;
         }
         return CompletableFuture.completedFuture(null);
     }
