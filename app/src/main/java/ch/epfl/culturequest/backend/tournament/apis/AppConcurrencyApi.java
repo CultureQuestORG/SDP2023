@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.backend.tournament.apis;
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -62,6 +64,7 @@ public class AppConcurrencyApi {
 
     // Put boolean in database reference and returns a future boolean indicating whether the operation was successful or not
     // true -> setValue succeeded; null -> setValue failed
+    @SuppressLint("NewApi")
     public static CompletableFuture<Boolean> setBoolAsync(DatabaseReference databaseReference, Boolean bool) {
 
 
@@ -78,6 +81,8 @@ public class AppConcurrencyApi {
             }
         });
 
+        future.orTimeout(120, java.util.concurrent.TimeUnit.SECONDS);
+
         return future;
     }
 
@@ -85,6 +90,8 @@ public class AppConcurrencyApi {
     // Returns true if the value in the database reference is equal to the expected boolean
     // Returns false if the value in the database reference is not equal to the expected boolean
     // Returns null if the value in the database reference is null or if the operation failed
+
+    @SuppressLint("NewApi")
     public static CompletableFuture<Boolean> isEqualAsync(DatabaseReference databaseReference, Boolean expectedBool) {
 
         CompletableFuture<Boolean> future = new CompletableFuture<>();
@@ -105,6 +112,8 @@ public class AppConcurrencyApi {
                 future.complete(null);
             }
         });
+
+        future.orTimeout(120, java.util.concurrent.TimeUnit.SECONDS);
 
         return future;
 

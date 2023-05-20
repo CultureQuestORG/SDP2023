@@ -64,9 +64,10 @@ import ch.epfl.culturequest.backend.tournament.utils.RandomApi;
     * getTournamentFromSharedPref() should be called each time the user wants to access the tournament after successfully stored or fetch, it will return the tournament stored in shared preferences
  */
 
+@SuppressLint("NewApi")
+
 public class TournamentManagerApi {
 
-    @SuppressLint("NewApi")
     public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY, Duration.ofMinutes(2));
 
     // Main function #1: To be called when most of activities are being resumed
@@ -74,19 +75,18 @@ public class TournamentManagerApi {
 
         if (tournamentRemainingTime() == 0) { // Tournament hasn't been scheduled yet (date not pseudo-randomly generated yet)
             // schedule the tournament generation and store it in shared preferences
-            generateAndStoreTournamentDate();
+            generateAndStoreTournamentDate(); //synchronous call
 
         } else if (tournamentRemainingTime() < 0) { // Tournament is over
 
             // Clear shared preferences, unlock all concurrency related variables, schedule the next tournament
-            setWeeklyTournamentOver();
+            return setWeeklyTournamentOver(); // asynchronous call
 
         } else if (isTimeToGenerateTournament() && !tournamentAlreadyStoredInSharedPref()) {
 
             // generate or fetch tournament once and store it in Shared Preferences to access it easily later
-            return generateOrFetchTournamentThenStore();
+            return generateOrFetchTournamentThenStore().orTimeout(180, TimeUnit.SECONDS); // timeout if not completed after 3 minutes
         }
-
         return CompletableFuture.completedFuture(null);
     }
 
@@ -446,7 +446,7 @@ public class TournamentManagerApi {
         editor.apply();
     }
 
-    private static void setWeeklyTournamentOver() {
+    private static CompletableFuture<Void> setWeeklyTournamentOver() {
 
         // clear the "tournament" shared preferences location
         clearTournamentSharedPref();
@@ -454,11 +454,12 @@ public class TournamentManagerApi {
         // schedule the tournament for next week (7 days (should) have passed so week number incremented)
         generateAndStoreTournamentDate();
 
-        // unlock tournament generation
-        unlockTournamentGeneration();
 
-        // reset the tournament generation state
-        indicateTournamentNotGenerated();
+        // return a future that completes whenever both of unlock tournament generation and indicate tournament not generated are completed
+        CompletableFuture<Boolean> unlockTournamentGenerationFuture = unlockTournamentGeneration();
+        CompletableFuture<Boolean> indicateTournamentNotGeneratedFuture = indicateTournamentNotGenerated();
+
+        return CompletableFuture.allOf(unlockTournamentGenerationFuture, indicateTournamentNotGeneratedFuture);
     }
 
     // - - - - - - -

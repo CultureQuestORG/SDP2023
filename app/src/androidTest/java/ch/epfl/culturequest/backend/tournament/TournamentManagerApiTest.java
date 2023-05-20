@@ -41,7 +41,7 @@ import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 
 public class TournamentManagerApiTest {
 
-    //@After
+    @After
     public void resetData() {
         clearSharedPreferences();
         unlockTournamentGeneration().join();
@@ -66,7 +66,7 @@ public class TournamentManagerApiTest {
     }
 
     // Correct handling when tournament is over
-    //@Test
+    @Test
     public void everythingCorrectlyHandledWhenTournamentIsOver(){
 
         SharedPreferences tournamentSharedPref = getTournamentSharedPrefLocation();
@@ -85,7 +85,7 @@ public class TournamentManagerApiTest {
         lockTournamentGeneration().join();
 
         // main function call (in the real app, this is called by onResume() handler of main activities)
-        TournamentManagerApi.handleTournaments();
+        TournamentManagerApi.handleTournaments().join();
 
 
         // check that the tournament date/schedule has been updated
@@ -108,7 +108,7 @@ public class TournamentManagerApiTest {
 
     }
 
-    //@Test
+    @Test
     public void tournamentCorrectlyGeneratedWhenNoConcurrency(){
 
 
@@ -150,7 +150,7 @@ public class TournamentManagerApiTest {
 
     }
 
-    //@Test
+    @Test
     public void tournamentCorrectlyFetchedWhenConcurrency(){
 
         SharedPreferences tournamentSharedPref = getTournamentSharedPrefLocation();
@@ -187,7 +187,7 @@ public class TournamentManagerApiTest {
     }
 
 
-    //@Test
+    @Test
     public void tournamentCorrectlyRetrievedAndDeserializedFromSharedPref(){
 
         Tournament fakeTournament = getFakeTournament();
