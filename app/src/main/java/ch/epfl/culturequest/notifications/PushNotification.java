@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
-import androidx.navigation.NavDeepLinkBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +101,7 @@ public class PushNotification {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
                 .build();
     }
 
@@ -115,18 +115,24 @@ public class PushNotification {
     public PendingIntent selectPendingIntent(Context context, String channelId) {
         Intent intent;
         switch (channelId) {
+            // opens the profile of the user who sent the notification
             case FollowNotification.CHANNEL_ID:
                 intent = new Intent(context, DisplayUserProfileActivity.class);
                 intent.putExtra("uid", senderId);
+                intent.putExtra("redirect", "home");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE);
+            // opens the profile of the current user
             case LikeNotification.CHANNEL_ID:
-                return new NavDeepLinkBuilder(context).setGraph(R.navigation.mobile_navigation)
-                        .setDestination(R.id.navigation_profile).createPendingIntent();
+                intent = new Intent(context, NavigationActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("redirect", "profile");
+                return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE);
             // case CompetitionNotification.CHANNEL_ID:
                 // TODO: open the competition activity
             // case SightseeingNotification.CHANNEL_ID:
                 //TODO: open the sightseeing activity
+            // opens the scan fragment
             default:
                 intent = new Intent(context, NavigationActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

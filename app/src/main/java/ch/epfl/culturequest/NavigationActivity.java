@@ -9,6 +9,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Objects;
+
 import ch.epfl.culturequest.databinding.ActivityNavigationBinding;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.utils.AndroidUtils;
@@ -34,8 +36,38 @@ public class NavigationActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_navigation);
         BottomNavigationView navView = binding.navView;
         NavigationUI.setupWithNavController(navView, navController);
+        // Listener used to ensure that the correct fragment is displayed even after an intent with redirection
+        navView.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.navigation_scan:
+                    navController.navigate(R.id.navigation_scan);
+                    break;
+                case R.id.navigation_home:
+                    navController.navigate(R.id.navigation_home);
+                    break;
+                case R.id.navigation_profile:
+                    navController.navigate(R.id.navigation_profile);
+                    break;
+                case R.id.navigation_leaderboard:
+                    navController.navigate(R.id.navigation_leaderboard);
+                    break;
+                case R.id.navigation_map:
+                    navController.navigate(R.id.navigation_map);
+                    break;
+            }
+            return true;
+        });
 
         // Disables default grey tint on icons
         navView.setItemIconTintList(null);
+
+        // allows to redirect to the correct fragment after an intent with redirection
+        String redirect = getIntent().getStringExtra("redirect");
+        if (Objects.equals(redirect, "profile")) {
+            navController.navigate(R.id.navigation_profile);
+        }
+        if (Objects.equals(redirect, "home")) {
+            navController.navigate(R.id.navigation_home);
+        }
     }
 }

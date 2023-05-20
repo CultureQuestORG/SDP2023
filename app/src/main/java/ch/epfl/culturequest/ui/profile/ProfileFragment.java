@@ -33,8 +33,6 @@ import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.notifications.CompetitionNotification;
-import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -83,9 +81,28 @@ public class ProfileFragment extends Fragment {
         progressBar.setOnClickListener(v -> {
             // open the badges activity
             Intent intent = new Intent(getActivity(), DisplayUserBadgeCollectionActivity.class);
-            intent.putExtra("uid", Profile.getActiveProfile().getUid());
+            intent.putExtra("uid", Authenticator.getCurrentUser().getUid());
             startActivity(intent);
         });
+
+//        if (Profile.getActiveProfile() != null) {
+//
+//
+//            FollowNotification followNotification = new FollowNotification("mimi");
+//            FireMessaging.sendNotification(Authenticator.getCurrentUser().getUid(), followNotification);
+//
+////        CompetitionNotification competitionNotification = new CompetitionNotification();
+////        FireMessaging.sendNotification(Profile.getActiveProfile().getUid(),competitionNotification);
+//
+//            LikeNotification likeNotification = new LikeNotification("mimi");
+//            FireMessaging.sendNotification(Authenticator.getCurrentUser().getUid(), likeNotification);
+//
+//            SightseeingNotification sightseeingNotification = new SightseeingNotification("mimi");
+//            FireMessaging.sendNotification(Authenticator.getCurrentUser().getUid(), sightseeingNotification);
+////
+////        ScanNotification scanNotification = new ScanNotification();
+////        FireMessaging.sendNotification(Profile.getActiveProfile().getUid(),scanNotification);
+//        }
 
         requestPermissions();
         return root;

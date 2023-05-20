@@ -22,7 +22,6 @@ import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
-import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -40,23 +39,22 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
     private ImageView backIcon, homeIcon;
     private FollowButton followButton;
 
-
-
     /**
      * Baiscally we use the viewModel for the profile fragment to display the profile in this activity.
      * Use ProfileUtils to upddate the the profile that this class will use
      *
      * @param savedInstanceState If the activity is being re-initialized after
-     *     previously being shut down then this Bundle contains the data it most
-     *     recently supplied in {@link #onSaveInstanceState}.
-     *
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in {@link #onSaveInstanceState}.
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidUtils.removeStatusBar(getWindow());
+
         //we use the extra bc we wont always open from the search activity
         String uid = getIntent().getStringExtra("uid");
+        String redirect = getIntent().getStringExtra("redirect");
         ProfileViewModel profileViewModel = new ViewModelProvider(this, new ProfileViewModelFactory(uid)).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(getLayoutInflater());
         View root = binding.getRoot();
@@ -65,9 +63,8 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         final RecyclerView pictureGrid = binding.pictureGrid;
 
         final TextView level = binding.level;
-        final TextView levelText= binding.levelText;
+        final TextView levelText = binding.levelText;
         final ProgressBar progressBar = binding.progressBar;
-
 
 
         profileViewModel.getUsername().observe(this, textView::setText);
@@ -78,7 +75,7 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
             GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
             pictureGrid.setLayoutManager(gridLayoutManager);
         });
-        profileViewModel.getScore().observe(this, s-> ProfileUtils.handleScore(level,levelText,progressBar,s));
+        profileViewModel.getScore().observe(this, s -> ProfileUtils.handleScore(level, levelText, progressBar, s));
 
 
         setContentView(root);
@@ -100,19 +97,25 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-
-
-
         binding.settingsButton.setVisibility(View.INVISIBLE);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.pictureGrid.getLayoutParams();
         params.setMargins(0, 80, 0, 0);
         binding.pictureGrid.setLayoutParams(params);
 
         List.of(backIcon, homeIcon).forEach(elem -> elem.setVisibility(View.VISIBLE));
-        backIcon.setOnClickListener(l -> super.onBackPressed());
+        backIcon.setOnClickListener(l -> {
+            if (redirect != null) {
+                Intent intent = new Intent(this, NavigationActivity.class);
+                intent.putExtra("redirect", redirect);
+                startActivity(intent);
+            } else {
+                super.onBackPressed();
+            }
+        });
         homeIcon.setOnClickListener(l -> {
-            setResult(RESULT_OK);
-            finish();
+            Intent intent = new Intent(this, NavigationActivity.class);
+            intent.putExtra("redirect", "home");
+            startActivity(intent);
         });
     }
 }

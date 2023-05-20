@@ -118,8 +118,8 @@ public class SightseeingActivity extends AppCompatActivity {
                         CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v);
                         // send out notifications to the selected friends
                         for (Profile profile : selectedFriends) {
-                            SightseeingNotification notif = new SightseeingNotification(profile.getUsername());
-                            FireMessaging.sendNotification(profile.getUid(), notif);
+                            SightseeingNotification notification = new SightseeingNotification(profile.getUsername());
+                            FireMessaging.sendNotification(profile.getUid(), notification);
                         }
                         CompletableFuture.runAsync(() -> {
                             //we do this to wait for the snackbar to be visible for 1 second before going back to the nav activity.

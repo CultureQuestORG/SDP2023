@@ -27,6 +27,9 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
      */
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        if (Authenticator.getCurrentUser() == null) {
+            return;
+        }
         super.onMessageReceived(remoteMessage);
         sendNotification(remoteMessage);
     }
