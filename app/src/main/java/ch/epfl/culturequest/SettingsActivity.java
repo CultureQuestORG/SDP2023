@@ -25,8 +25,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.squareup.picasso.Picasso;
-import com.yalantis.ucrop.UCrop;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
