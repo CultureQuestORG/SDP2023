@@ -20,7 +20,7 @@ public class SightseeingNotification extends PushNotification {
     public SightseeingNotification(String friend) {
         super(friend + ", you have a new sightseeing event!",
                 Profile.getActiveProfile().getUsername() + " invited you to a new sightseeing event!",
-                CHANNEL_ID);
+                CHANNEL_ID, Profile.getActiveProfile().getUid());
     }
 
     /**
@@ -38,17 +38,5 @@ public class SightseeingNotification extends PushNotification {
             return channel;
         }
         return null;
-    }
-
-    /**
-     * Returns the pending intent for the notification
-     *
-     * @param context the context of the notification
-     * @return the pending intent for the notification
-     */
-    public static PendingIntent getPendingIntent(Context context) {
-        Intent intent = new Intent(context, NavigationActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        return  PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
     }
 }

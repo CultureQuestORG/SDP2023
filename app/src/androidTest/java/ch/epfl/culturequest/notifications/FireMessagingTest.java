@@ -54,7 +54,7 @@ public class FireMessagingTest {
             Database.setProfile(profile).get(5, TimeUnit.SECONDS);
             Thread.sleep(2000);
             String uid = "test";
-            PushNotification notification = new PushNotification("title", "text", "channelId");
+            PushNotification notification = new PushNotification("title", "text", "channelId", "senderId");
             boolean result = FireMessaging.sendNotification(uid, notification).get(5, TimeUnit.SECONDS).get();
             assertThat(result, is(true));
             assertThat(Database.getNotifications(uid).get(5, TimeUnit.SECONDS).get(0), is(notification));
@@ -68,7 +68,7 @@ public class FireMessagingTest {
     public void sendNotificationToUnknownUserReturnsFalse() {
         try {
             String uid = "unknown";
-            PushNotification notification = new PushNotification("title", "text", "channelId");
+            PushNotification notification = new PushNotification("title", "text", "channelId", "senderId");
             boolean result = FireMessaging.sendNotification(uid, notification).get(5, TimeUnit.SECONDS).get();
             assertThat(result, is(false));
         }

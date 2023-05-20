@@ -18,7 +18,7 @@ public class CompetitionNotification extends PushNotification {
     public CompetitionNotification() {
         super("A new competition has started!",
                 "Click here to see your new competition!",
-                CHANNEL_ID);
+                CHANNEL_ID, Profile.getActiveProfile().getUid());
     }
 
     /**
@@ -37,17 +37,4 @@ public class CompetitionNotification extends PushNotification {
         }
         return null;
     }
-
-    /**
-     * Returns the pending intent for the notification
-     *
-     * @param context the context of the notification
-     * @return the pending intent for the notification
-     */
-    public static PendingIntent getPendingIntent(Context context) {
-        Intent intent = new Intent(context, NavigationActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        return  PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-    }
-
 }

@@ -57,13 +57,13 @@ public class NotificationsActivityTest {
         Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
 
-        PushNotification notif1 = new PushNotification("notif1", "notif1", "LIKE");
+        PushNotification notif1 = new PushNotification("notif1", "notif1", "LIKE", "senderId1");
         Database.addNotification(activeProfile.getUid(), notif1);
 
-        PushNotification notif2 = new PushNotification("notif2", "notif2", "FOLLOW");
+        PushNotification notif2 = new PushNotification("notif2", "notif2", "FOLLOW", "senderId2");
         Database.addNotification(activeProfile.getUid(), notif2);
 
-        PushNotification notif3 = new PushNotification("notif3", "notif3", "SCAN");
+        PushNotification notif3 = new PushNotification("notif3", "notif3", "SCAN", "senderId3");
         Database.addNotification(activeProfile.getUid(), notif3);
 
         ActivityScenario<NotificationsActivity> testRule = ActivityScenario.launch(NotificationsActivity.class);

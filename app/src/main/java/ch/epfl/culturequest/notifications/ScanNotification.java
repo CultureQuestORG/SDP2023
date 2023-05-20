@@ -2,11 +2,8 @@ package ch.epfl.culturequest.notifications;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 
-import ch.epfl.culturequest.NavigationActivity;
+import ch.epfl.culturequest.social.Profile;
 
 /**
  * Class that represents notifications for a new offline scan
@@ -20,7 +17,7 @@ public class ScanNotification extends PushNotification {
     public ScanNotification() {
         super("You have a new scan!",
                 "We found a new offline scan result!",
-                CHANNEL_ID);
+                CHANNEL_ID, Profile.getActiveProfile().getUid());
     }
 
     /**
@@ -38,17 +35,5 @@ public class ScanNotification extends PushNotification {
             return channel;
         }
         return null;
-    }
-
-    /**
-     * Returns the pending intent for the notification
-     *
-     * @param context the context of the notification
-     * @return the pending intent for the notification
-     */
-    public static PendingIntent getPendingIntent(Context context) {
-        Intent intent = new Intent(context, NavigationActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        return  PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
     }
 }

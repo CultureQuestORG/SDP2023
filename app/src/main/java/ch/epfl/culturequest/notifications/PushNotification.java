@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
+import androidx.navigation.NavDeepLinkBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 /**
  * Super class that represents notifications stored in the database and sent by cloud messaging.
@@ -29,6 +31,7 @@ public class PushNotification {
     private String title;
     private String text;
     private long time;
+    private String senderId;
 
     /**
      * Empty constructor used by Firebase
@@ -39,6 +42,7 @@ public class PushNotification {
         this.channelId = "";
         this.notificationId = "";
         this.time = 0;
+        this.senderId = "";
     }
 
     /**
@@ -48,12 +52,13 @@ public class PushNotification {
      * @param text      the text of the notification
      * @param channelId the channel id of the notification
      */
-    public PushNotification(String title, String text, String channelId) {
+    public PushNotification(String title, String text, String channelId, String senderId) {
         this.title = title;
         this.text = text;
         this.channelId = channelId;
         this.notificationId = UUID.randomUUID().toString();
         this.time = System.currentTimeMillis();
+        this.senderId = senderId;
     }
 
     /**
@@ -108,23 +113,25 @@ public class PushNotification {
      * @return the pending intent
      */
     public PendingIntent selectPendingIntent(Context context, String channelId) {
-        Intent default_intent = new Intent(context, NavigationActivity.class);
-        default_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent default_pending_intent = PendingIntent.getActivity(context, 0, default_intent, PendingIntent.FLAG_IMMUTABLE);
-        
+        Intent intent;
         switch (channelId) {
             case FollowNotification.CHANNEL_ID:
-                return FollowNotification.getPendingIntent(context);
-            case ScanNotification.CHANNEL_ID:
-                return ScanNotification.getPendingIntent(context);
+                intent = new Intent(context, DisplayUserProfileActivity.class);
+                intent.putExtra("uid", senderId);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
             case LikeNotification.CHANNEL_ID:
-                return LikeNotification.getPendingIntent(context);
-            case CompetitionNotification.CHANNEL_ID:
-                return CompetitionNotification.getPendingIntent(context);
-            case SightseeingNotification.CHANNEL_ID:
-                return SightseeingNotification.getPendingIntent(context);
+                return new NavDeepLinkBuilder(context).setGraph(R.navigation.mobile_navigation)
+                        .setDestination(R.id.navigation_profile).createPendingIntent();
+            // case CompetitionNotification.CHANNEL_ID:
+                // TODO: open the competition activity
+            // case SightseeingNotification.CHANNEL_ID:
+                //TODO: open the sightseeing activity
             default:
-                return default_pending_intent;
+                intent = new Intent(context, NavigationActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
         }
     }
 
@@ -148,6 +155,10 @@ public class PushNotification {
         return time;
     }
 
+    public String getSenderId() {
+        return senderId;
+    }
+
     public void setNotificationId(String notificationId) {
         this.notificationId = notificationId;
     }
@@ -166,6 +177,10 @@ public class PushNotification {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
     @Override

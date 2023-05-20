@@ -102,6 +102,7 @@ public class FireMessaging {
         data.addProperty("title", notification.getTitle());
         data.addProperty("text", notification.getText());
         data.addProperty("channelId", notification.getChannelId());
+        data.addProperty("senderId", notification.getSenderId());
         payload.add("data", data);
         return payload;
     }

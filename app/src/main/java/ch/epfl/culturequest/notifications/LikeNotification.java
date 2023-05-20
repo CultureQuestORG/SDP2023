@@ -28,7 +28,7 @@ public class LikeNotification extends PushNotification {
     public LikeNotification(String likee) {
         super(likee + ", you have a new like!",
                 Profile.getActiveProfile().getUsername() + " liked your post!",
-                CHANNEL_ID);
+                CHANNEL_ID, Profile.getActiveProfile().getUid());
     }
 
     /**
@@ -46,16 +46,5 @@ public class LikeNotification extends PushNotification {
             return channel;
         }
         return null;
-    }
-
-    /**
-     * Returns the pending intent for the notification
-     *
-     * @param context the context of the notification
-     * @return the pending intent for the notification
-     */
-    public static PendingIntent getPendingIntent(Context context) {
-        PendingIntent pendingIntent = new NavDeepLinkBuilder(context).setGraph(R.navigation.mobile_navigation).setDestination(R.id.navigation_profile).createPendingIntent();
-        return pendingIntent;
     }
 }
