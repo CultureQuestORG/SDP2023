@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -51,9 +53,8 @@ public class FireMessaging {
      * @return a CompletableFuture that will be completed with a boolean indicating if the
      * notification was sent successfully
      */
-    public static CompletableFuture<AtomicBoolean> sendNotification(String uid, PushNotification notification) {
-        // TODO: create instead an array of futures and return a future of array of booleans
-        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+    public static List<CompletableFuture<AtomicBoolean>> sendNotification(String uid, PushNotification notification) {
+        List<CompletableFuture<AtomicBoolean>> futures = new ArrayList<>();
 
         // add notification to database first
         Database.addNotification(uid, notification);
@@ -61,30 +62,36 @@ public class FireMessaging {
         // send the notification to all devices of the user
         Database.getDeviceTokens(uid).whenComplete((deviceTokens, throwable) -> {
             if (throwable != null || deviceTokens.isEmpty()) {
-                future.complete(new AtomicBoolean(false));
+                futures.add(CompletableFuture.completedFuture(new AtomicBoolean(false)));
                 return;
             }
 
-            for (String token : deviceTokens) {
-                JsonObject payload = buildNotificationPayload(token, notification);
+            // initialize the futures list with the correct number of futures
+            for (int i = 0; i < deviceTokens.size(); i++) {
+                futures.add(new CompletableFuture<>());
+            }
+
+            for (int i = 0; i < deviceTokens.size(); i++) {
+                JsonObject payload = buildNotificationPayload(deviceTokens.get(i), notification);
+                int finalI = i;
                 ApiClient.getApiService().sendNotification(payload).enqueue(new Callback<>() {
                     @Override
                     public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
                         if (response.isSuccessful()) {
-                            future.complete(new AtomicBoolean(true));
+                            futures.get(finalI).complete(new AtomicBoolean(true));
                         } else {
-                            future.complete(new AtomicBoolean(false));
+                            futures.get(finalI).complete(new AtomicBoolean(false));
                         }
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
-                        future.complete(new AtomicBoolean(false));
+                        futures.get(finalI).complete(new AtomicBoolean(false));
                     }
                 });
             }
         });
-        return future;
+        return futures;
     }
 
     /**

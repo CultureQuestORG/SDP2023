@@ -14,9 +14,11 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.notifications.FireMessaging;
@@ -55,8 +57,10 @@ public class FireMessagingTest {
             Thread.sleep(2000);
             String uid = "test";
             PushNotification notification = new PushNotification("title", "text", "channelId", "senderId");
-            boolean result = FireMessaging.sendNotification(uid, notification).get(5, TimeUnit.SECONDS).get();
-            assertThat(result, is(true));
+            List<CompletableFuture<AtomicBoolean>> futures = FireMessaging.sendNotification(uid, notification);
+            for (CompletableFuture<AtomicBoolean> future : futures) {
+                assertThat(future.get(5, TimeUnit.SECONDS).get(), is(true));
+            }
             assertThat(Database.getNotifications(uid).get(5, TimeUnit.SECONDS).get(0), is(notification));
         }
         catch (ExecutionException | InterruptedException | TimeoutException e) {
@@ -69,8 +73,10 @@ public class FireMessagingTest {
         try {
             String uid = "unknown";
             PushNotification notification = new PushNotification("title", "text", "channelId", "senderId");
-            boolean result = FireMessaging.sendNotification(uid, notification).get(5, TimeUnit.SECONDS).get();
-            assertThat(result, is(false));
+            List<CompletableFuture<AtomicBoolean>> futures = FireMessaging.sendNotification(uid, notification);
+            for (CompletableFuture<AtomicBoolean> future : futures) {
+                assertThat(future.get(5, TimeUnit.SECONDS).get(), is(false));
+            }
         }
         catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());

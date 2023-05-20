@@ -25,10 +25,13 @@ import ch.epfl.culturequest.social.Profile;
 @RunWith(AndroidJUnit4.class)
 public class CompetitionNotificationTest {
     private final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    private final Profile profile = new Profile("test", "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
+
 
     @Before
     public void setup() {
         PushNotification.createNotificationChannels(context);
+        Profile.setActiveProfile(profile);
     }
 
     @Test
