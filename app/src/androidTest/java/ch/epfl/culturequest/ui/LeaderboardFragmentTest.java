@@ -64,6 +64,7 @@ public class LeaderboardFragmentTest {
 
         // Initialize the database with some test profiles
         Profile activeProfile = new Profile(Authenticator.getCurrentUser().getUid(), "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>(), new ArrayList<>());
+        Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
 
         Database.setProfile(new Profile("testUid2", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", 300,new HashMap<>(), new ArrayList<>()));
