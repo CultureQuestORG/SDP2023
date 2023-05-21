@@ -34,13 +34,13 @@ import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
 public class AuthenticatorTest {
+    private ComponentActivity activity;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
     static {
         BuildConfig.IS_TESTING.set(true);
     }
-    private ComponentActivity activity;
-    private final String email = "test@gmail.com";
-    private final String password = "abcdefg";
 
     @Before
     public void setup() {

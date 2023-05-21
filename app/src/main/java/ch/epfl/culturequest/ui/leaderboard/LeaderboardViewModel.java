@@ -6,16 +6,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.utils.EspressoIdlingResource;
 
 public class LeaderboardViewModel extends ViewModel {
     private final MutableLiveData<String> currentUsername;
@@ -34,6 +29,7 @@ public class LeaderboardViewModel extends ViewModel {
     private final MutableLiveData<List<String>> topNUserProfilePicturesUriFriends;
     private final MutableLiveData<List<String>> topNUserRanks;
     private final int N = 10;
+    Profile activeProfile = Profile.getActiveProfile();
 
     public LeaderboardViewModel() {
         currentUsername = new MutableLiveData<>();
@@ -52,34 +48,33 @@ public class LeaderboardViewModel extends ViewModel {
         topNUserProfilePicturesUriFriends = new MutableLiveData<>();
         currentUserRankFriends = new MutableLiveData<>();
 
-        // EspressoIdlingResource is used to wait for the database to finish loading before
-        // the tests are run
-        EspressoIdlingResource.increment();
-        EspressoIdlingResource.increment();
-        EspressoIdlingResource.increment();
-        EspressoIdlingResource.increment();
-        EspressoIdlingResource.increment();
+        if (activeProfile != null) {
+            updateLeaderboard();
+        }
+        else{
+            Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, e) -> {
+                activeProfile = profile;
+                Profile.setActiveProfile(profile);
+                updateLeaderboard();
+            });
+        }
 
-        String currentUserUid = Authenticator.getCurrentUser().getUid();
+    }
+
+    private void updateLeaderboard() {
+        String currentUserUid = activeProfile.getUid();
 
         // retrieve the current user's information to be displayed in the leaderboard
-        Database.getProfile(currentUserUid).whenComplete((p, e) -> {
-            currentUsername.setValue(p.getUsername());
-            currentUserProfilePictureUri.setValue(p.getProfilePicture());
-            currentUserScore.setValue(p.getScore().toString());
-            EspressoIdlingResource.decrement();
-        });
-
+        currentUsername.setValue(activeProfile.getUsername());
+        currentUserProfilePictureUri.setValue(activeProfile.getProfilePicture());
+        currentUserScore.setValue(activeProfile.getScore().toString());
 
         Database.getRank(currentUserUid).whenComplete((rank, e) -> {
             currentUserRank.setValue(rank.toString());
-            EspressoIdlingResource.decrement();
         });
-
 
         Database.getRankFriends(currentUserUid).whenComplete((rank, e) -> {
             currentUserRankFriends.setValue(rank.toString());
-            EspressoIdlingResource.decrement();
         });
 
         // retrieve the top N users' information to be displayed in the leaderboard
@@ -95,7 +90,6 @@ public class LeaderboardViewModel extends ViewModel {
                 ranks[i] = Integer.toString(i + 1);
             }
             topNUserRanks.setValue(List.of(ranks));
-            EspressoIdlingResource.decrement();
         });
 
         Database.getTopNFriendsProfiles(N).whenComplete((topN, e) -> {
@@ -109,7 +103,6 @@ public class LeaderboardViewModel extends ViewModel {
                 ranks[i] = Integer.toString(i + 1);
             }
             topNUserRanksFriends.setValue(List.of(ranks));
-            EspressoIdlingResource.decrement();
         });
     }
 

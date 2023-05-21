@@ -28,7 +28,9 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.leaderboard.LeaderboardFragment;
@@ -36,6 +38,12 @@ import ch.epfl.culturequest.ui.leaderboard.LeaderboardFragment;
 @RunWith(AndroidJUnit4.class)
 public class LeaderboardFragmentTest {
     private LeaderboardFragment fragment;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
+
+    static {
+        BuildConfig.IS_TESTING.set(true);
+    }
 
     @Before
     public void setUp() throws InterruptedException {
@@ -45,17 +53,25 @@ public class LeaderboardFragmentTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
+
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        // Manually signs in the user before the tests in order to test the automatic redirection
+        Authenticator.manualSignIn(email, password).join();
+
         // Initialize the database with some test profiles
-        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>(), new ArrayList<>());
-        Profile.setActiveProfile(activeProfile);
+        Profile activeProfile = new Profile(Authenticator.getCurrentUser().getUid(), "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>(), new ArrayList<>());
         Database.setProfile(activeProfile);
 
         Database.setProfile(new Profile("testUid2", "testName2", "testUsername2", "testEmail2", "testPhone2", "testProfilePicture2", 300,new HashMap<>(), new ArrayList<>()));
         Database.setProfile(new Profile("testUid3", "testName3", "testUsername3", "testEmail3", "testPhone3", "testProfilePicture3", 200,new HashMap<>(), new ArrayList<>()));
         Database.setProfile(new Profile("testUid4", "testName4", "testUsername4", "testEmail4", "testPhone4", "testProfilePicture4", 100,new HashMap<>(), new ArrayList<>()));
 
-        Database.addFollow("currentUserUid", "testUid2");
-        Database.addFollow("currentUserUid", "testUid3");
+        Database.addFollow(Authenticator.getCurrentUser().getUid(), "testUid2");
+        Database.addFollow(Authenticator.getCurrentUser().getUid(), "testUid3");
 
         // Launch the fragment with the current user's uid for testing
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);

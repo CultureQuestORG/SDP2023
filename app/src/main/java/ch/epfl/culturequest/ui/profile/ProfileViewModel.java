@@ -28,7 +28,7 @@ public class ProfileViewModel extends ViewModel {
 
     private final MutableLiveData<HashMap<String, Integer>> badges;
 
-    private Profile profile = Profile.getActiveProfile();
+    private Profile activeProfile = Profile.getActiveProfile();
 
     MutableLiveData<Profile> selectedProfile = new MutableLiveData<>();
 
@@ -44,15 +44,15 @@ public class ProfileViewModel extends ViewModel {
         followed = new MutableLiveData<>(false);
         badges = new MutableLiveData<>(new HashMap<>());
 
-        if (profile == null) {
+        if (activeProfile == null) {
             // Sets the active profile, useful when app is opened from a notification
-            Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((result_profile, throwable) -> {
-                if (throwable != null || result_profile == null) {
+            Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, throwable) -> {
+                if (throwable != null || profile == null) {
                     // if no profile is active, we load a default profile
                     return;
                 }
-                Profile.setActiveProfile(result_profile);
-                profile = result_profile;
+                Profile.setActiveProfile(profile);
+                activeProfile = profile;
                 display_profile(uid);
             });
         } else {
@@ -62,7 +62,7 @@ public class ProfileViewModel extends ViewModel {
     }
 
     private void display_profile(String uid) {
-        if (!profile.getUid().equals(uid)) {
+        if (!activeProfile.getUid().equals(uid)) {
             Database.getProfile(uid).whenComplete((selectedProfile, e) -> {
                 this.selectedProfile.setValue(selectedProfile);
                 username.setValue(selectedProfile.getUsername());
@@ -81,26 +81,26 @@ public class ProfileViewModel extends ViewModel {
                 });
             });
 
-            Database.getFollowed(profile.getUid()).whenComplete((followedProfiles, t) -> {
+            Database.getFollowed(activeProfile.getUid()).whenComplete((followedProfiles, t) -> {
                 if (t == null) {
                     followed.setValue(followedProfiles.isFollowing(selectedProfile.getValue().getUid()));
                 }
             });
 
         } else {
-            CompletableFuture<List<Post>> profilePosts = profile.retrievePosts();
+            CompletableFuture<List<Post>> profilePosts = activeProfile.retrievePosts();
             profilePosts.whenComplete((posts, t) -> {
                 if (posts != null && t == null) {
                     //set the values of the live data
-                    username.setValue(profile.getUsername());
-                    profilePictureUri.setValue(profile.getProfilePicture());
-                    score.setValue(profile.getScore());
-                    badges.setValue(profile.getBadges());
+                    username.setValue(activeProfile.getUsername());
+                    profilePictureUri.setValue(activeProfile.getProfilePicture());
+                    score.setValue(activeProfile.getScore());
+                    badges.setValue(activeProfile.getBadges());
                     pictures.setValue(posts);
                 }
             });
             // add an observer to the profile so that the view is updated when the profile is updated
-            profile.addObserver((profileObject, arg) -> {
+            activeProfile.addObserver((profileObject, arg) -> {
                 Profile p = (Profile) profileObject;
                 username.postValue(p.getUsername());
                 profilePictureUri.postValue(p.getProfilePicture());
@@ -157,12 +157,12 @@ public class ProfileViewModel extends ViewModel {
 
         this.followed.setValue(Boolean.FALSE.equals(followed.getValue()));
         if (Boolean.TRUE.equals(this.followed.getValue())) {
-            Database.addFollow(profile.getUid(), selectedProfile.getValue().getUid());
+            Database.addFollow(activeProfile.getUid(), selectedProfile.getValue().getUid());
             // Send notification to the followed user
             FollowNotification notification = new FollowNotification(selectedProfile.getValue().getUsername());
             FireMessaging.sendNotification(selectedProfile.getValue().getUid(), notification);
         } else {
-            Database.removeFollow(profile.getUid(), selectedProfile.getValue().getUid());
+            Database.removeFollow(activeProfile.getUid(), selectedProfile.getValue().getUid());
         }
     }
 }
