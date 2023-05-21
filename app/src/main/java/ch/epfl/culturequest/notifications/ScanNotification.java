@@ -3,10 +3,11 @@ package ch.epfl.culturequest.notifications;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 
-import ch.epfl.culturequest.social.Profile;
-
 /**
- * Class that represents notifications for a new offline scan
+ * Class that represents notifications for a new offline scan. It will be created on each
+ * where there is a new scan available by using a service, so as it is the phone of the
+ * user that will create and send it to the user itself, without using CLoud Messaging,
+ * the senderId is not needed.
  */
 public class ScanNotification extends PushNotification {
     public static final String CHANNEL_ID = "SCAN";
@@ -17,7 +18,7 @@ public class ScanNotification extends PushNotification {
     public ScanNotification() {
         super("You have a new scan!",
                 "We found a new offline scan result!",
-                CHANNEL_ID, Profile.getActiveProfile().getUid());
+                CHANNEL_ID, "");
     }
 
     /**

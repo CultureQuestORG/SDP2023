@@ -2,13 +2,13 @@ package ch.epfl.culturequest.notifications;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 
-import ch.epfl.culturequest.NavigationActivity;
-import ch.epfl.culturequest.social.Profile;
-
+/**
+ * Class that represents a notification for a new competition. It will be created on each
+ * phone of the users that are in the competition by using a service, so as it is the phone of the
+ * user that will create and send it to the user itself, without using CLoud Messaging,
+ * the senderId is not needed.
+ */
 public class CompetitionNotification extends PushNotification {
     public static final String CHANNEL_ID = "COMPETITION";
 
@@ -18,7 +18,7 @@ public class CompetitionNotification extends PushNotification {
     public CompetitionNotification() {
         super("A new competition has started!",
                 "Click here to see your new competition!",
-                CHANNEL_ID, Profile.getActiveProfile().getUid());
+                CHANNEL_ID, "");
     }
 
     /**

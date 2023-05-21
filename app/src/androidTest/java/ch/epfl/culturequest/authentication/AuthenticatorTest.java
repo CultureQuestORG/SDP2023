@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.SignUpActivity;
 import ch.epfl.culturequest.database.Database;
@@ -33,6 +34,10 @@ import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
 public class AuthenticatorTest {
+
+    static {
+        BuildConfig.IS_TESTING.set(true);
+    }
     private ComponentActivity activity;
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
@@ -71,7 +76,7 @@ public class AuthenticatorTest {
 
     @Test
     public void SignInWithExistingProfileRedirectsToNavigationActivity() {
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
 
         try {
             Database.setProfile(profile);
@@ -122,6 +127,21 @@ public class AuthenticatorTest {
             assertTrue(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
             assertFalse(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
 
+            // Signs in the user again for the other tests
+            assertTrue(Authenticator.manualSignIn(email, password).get(5, TimeUnit.SECONDS).get());
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void checkIfUserIsLoggedInRedirectsToSignUpActivityIfUserIsLoggedOut() {
+        try {
+            assertTrue(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
+            assertNull(Authenticator.getCurrentUser());
+            Authenticator.checkIfUserIsLoggedIn(activity);
+            Thread.sleep(3000);
+            onView(withId(R.id.sign_in_button)).check(matches(isDisplayed()));
             // Signs in the user again for the other tests
             assertTrue(Authenticator.manualSignIn(email, password).get(5, TimeUnit.SECONDS).get());
         } catch (ExecutionException | InterruptedException | TimeoutException e) {

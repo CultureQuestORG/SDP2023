@@ -11,6 +11,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Objects;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.databinding.ActivityNavigationBinding;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.utils.AndroidUtils;
@@ -22,6 +23,8 @@ public class NavigationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Authenticator.checkIfUserIsLoggedIn(this);
 
         // Create the notification channels on NavigationActivity creation
         PushNotification.createNotificationChannels(this);

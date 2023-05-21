@@ -29,6 +29,7 @@ import java.util.List;
 
 import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
@@ -85,25 +86,6 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
 
-//        if (Profile.getActiveProfile() != null) {
-//
-//
-//            FollowNotification followNotification = new FollowNotification("mimi");
-//            FireMessaging.sendNotification(Authenticator.getCurrentUser().getUid(), followNotification);
-//
-////        CompetitionNotification competitionNotification = new CompetitionNotification();
-////        FireMessaging.sendNotification(Profile.getActiveProfile().getUid(),competitionNotification);
-//
-//            LikeNotification likeNotification = new LikeNotification("mimi");
-//            FireMessaging.sendNotification(Authenticator.getCurrentUser().getUid(), likeNotification);
-//
-//            SightseeingNotification sightseeingNotification = new SightseeingNotification("mimi");
-//            FireMessaging.sendNotification(Authenticator.getCurrentUser().getUid(), sightseeingNotification);
-////
-////        ScanNotification scanNotification = new ScanNotification();
-////        FireMessaging.sendNotification(Profile.getActiveProfile().getUid(),scanNotification);
-//        }
-
         requestPermissions();
         return root;
     }
@@ -117,18 +99,29 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        int limit = POSTS_ADDED;
-        List<Post> images = this.images.getValue();
-        if (limit > 0) {
-            Profile.getActiveProfile().retrievePosts(limit, 0)
-                    .whenComplete((posts, e) -> {
-                        assert images != null;
-                        images.addAll(0, posts);
-                        images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
-                        pictureAdapter.notifyItemRangeInserted(0, limit);
-                    });
-            POSTS_ADDED = 0;
+        if (POSTS_ADDED > 0) {
+            if (Profile.getActiveProfile() != null) {
+                update_posts();
+            } else {
+                Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, e) -> {
+                    if(e != null || profile == null) return;
+                    Profile.setActiveProfile(profile);
+                    update_posts();
+                });
+            }
         }
+    }
+
+    private void update_posts() {
+        List<Post> images = this.images.getValue();
+        Profile.getActiveProfile().retrievePosts(POSTS_ADDED, 0)
+                .whenComplete((posts, e) -> {
+                    assert images != null;
+                    images.addAll(0, posts);
+                    images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
+                    pictureAdapter.notifyItemRangeInserted(0, POSTS_ADDED);
+                });
+        POSTS_ADDED = 0;
     }
 
     @Override

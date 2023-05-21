@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
@@ -53,6 +54,7 @@ public class SightseeingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Authenticator.checkIfUserIsLoggedIn(this);
         AndroidUtils.removeStatusBar(getWindow());
         binding = SightseeingActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

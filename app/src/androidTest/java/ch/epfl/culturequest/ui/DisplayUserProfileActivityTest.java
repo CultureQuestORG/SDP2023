@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
@@ -40,7 +41,8 @@ import ch.epfl.culturequest.utils.ProfileUtils;
 
 @RunWith(AndroidJUnit4.class)
 public class DisplayUserProfileActivityTest {
-
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
     public static ActivityScenario<DisplayUserProfileActivity> scenario;
     @Before
@@ -51,6 +53,16 @@ public class DisplayUserProfileActivityTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
         // Initialize the database with some test profiles
+
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
+
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
+
         Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(activeProfile);
 

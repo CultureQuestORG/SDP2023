@@ -20,6 +20,7 @@ import java.util.List;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.utils.AndroidUtils;
@@ -51,6 +52,7 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidUtils.removeStatusBar(getWindow());
+        Authenticator.checkIfUserIsLoggedIn(this);
 
         //we use the extra bc we wont always open from the search activity
         String uid = getIntent().getStringExtra("uid");
@@ -85,10 +87,14 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         final TextView profilePlace = binding.profilePlace;
         profilePlace.setText("Lausanne");
 
-
-        followButton = new FollowButton(binding.profileFollowButton);
-        profileViewModel.getFollowed().observe(this, followButton::setFollowed);
-        followButton.setOnClickListener(v -> profileViewModel.changeFollow());
+        if (uid.equals(Authenticator.getCurrentUser().getUid())) {
+            binding.profileFollowButton.setVisibility(View.INVISIBLE);
+        }
+        else{
+            followButton = new FollowButton(binding.profileFollowButton);
+            profileViewModel.getFollowed().observe(this, followButton::setFollowed);
+            followButton.setOnClickListener(v -> profileViewModel.changeFollow());
+        }
 
         progressBar.setOnClickListener(v -> {
             // open the badges activity
