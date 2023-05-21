@@ -10,6 +10,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibilit
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
 import android.content.Intent;
@@ -80,6 +81,7 @@ public class ArtDescriptionDisplayActivityTest1 {
             localStorage.storeImageLocally(bitmap, true);
             Uri imageUri = localStorage.lastlyStoredImageUri;
             intent.putExtra("imageUri", imageUri.toString());
+            intent.putExtra("downloadUrl", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2FcT93LtGk2dT9Jvg46pOpbBP69Kx1?alt=media&token=35ba6af5-104d-4218-bc26-3fb39f75ac15");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,6 +124,15 @@ public class ArtDescriptionDisplayActivityTest1 {
     @Test
     public void activityDisplayingPostButton() {
         onView(withId(R.id.post_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+    }
+
+    @Test
+    public void pressingBackEmptiesStorage(){
+        LocalStorage localStorage = new LocalStorage(InstrumentationRegistry.getInstrumentation().getTargetContext().getContentResolver());
+        onView(withId(R.id.back_button)).perform(click());
+        // Counts the number of ready images (not pending) in the shared storage
+        int sharedStorageSize = localStorage.countSelectedImagesInLocalStorage(null, null);
+        assertEquals(0, sharedStorageSize);
     }
 
     @After
