@@ -101,16 +101,14 @@ public class ProfileFragment extends Fragment {
     public void onResume() {
         super.onResume();
         int limit = POSTS_ADDED;
-        List<Post> images = this.images.getValue();
         if (limit > 0) {
-            Profile.getActiveProfile().retrievePosts(limit, 0)
+            Profile.getActiveProfile().retrievePosts()
                     .whenComplete((posts, e) -> {
-                        assert images != null;
-                        images.addAll(0, posts);
-                        images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
-                        pictureAdapter.notifyItemRangeInserted(0, limit);
+                        posts.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
+                        this.images.setValue(posts);
+                        binding.pictureGrid.setAdapter(new PictureAdapter(posts));
+                        POSTS_ADDED = 0;
                     });
-            POSTS_ADDED = 0;
         }
     }
 
