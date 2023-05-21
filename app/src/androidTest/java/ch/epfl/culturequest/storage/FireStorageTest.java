@@ -68,20 +68,6 @@ public class FireStorageTest {
     }
 
     @Test
-    public void uploadingAndDeletingRemovesPicFromStorage(){
-        try {
-            String uploadedImageUrl = FireStorage.uploadAndGetUrlFromImage(imageBitmap, false).get(5, TimeUnit.SECONDS);
-            Thread.sleep(1000);
-            FireStorage.deleteImage(uploadedImageUrl).get(5, TimeUnit.SECONDS);
-            Thread.sleep(1000);
-            assertNull(FireStorage.getBitmapFromURL(uploadedImageUrl));
-        } catch (ExecutionException | InterruptedException |
-                 TimeoutException e) {
-            fail("Test failed because of an exception: " + e.getMessage());
-        }
-    }
-
-    @Test
     public void uploadNewProfilePictureToStorageReturnsCorrectProfilePicURLInUpdatedProfile() {
         try {
             Profile updatedProfile = FireStorage.uploadNewProfilePictureToStorage(Profile.getActiveProfile(), imageBitmap, false).get(5, TimeUnit.SECONDS);

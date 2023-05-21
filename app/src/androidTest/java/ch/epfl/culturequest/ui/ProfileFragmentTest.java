@@ -64,7 +64,9 @@ public class ProfileFragmentTest {
         // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
 
-        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PIC_PATH
+        // picpath is the url to the profile pic of the test user
+        String picpath = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2FcT93LtGk2dT9Jvg46pOpbBP69Kx1?alt=media&token=35ba6af5-104d-4218-bc26-3fb39f75ac15";
+        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), picpath
                 , "Piece of Art", 0, 0, new ArrayList<>());
         Database.uploadPost(post);
 
