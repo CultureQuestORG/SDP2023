@@ -235,28 +235,62 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
      * Uploads an image to the database when the user presses on the post button. it will post
      * the image in the storage at the address: images/uid/postId
      *
-     * @param url  the image url to upload
+     * @param url     the image url to upload
      * @param artwork the artwork to add to the database
      */
     private void postImage(String url, BasicArtDescription artwork, List<String> badges) {
         String postId = UUID.randomUUID().toString();
         Profile activeProfile = Profile.getActiveProfile();
         String uid = activeProfile.getUid();
-        Database.uploadPost(new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>())).whenComplete((lambda, e) -> {
-            if (e == null) {
-                POSTS_ADDED++;
-                activeProfile.incrementScore(artwork.getScore());
-                activeProfile.addBadges(badges);
-                finish();
+        Post newPost = new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>());
+        Profile.getActiveProfile().retrievePosts().thenCompose(posts -> {
+            boolean alreadyPosted = posts.stream().anyMatch(post -> post.getArtworkName().equals(newPost.getArtworkName()));
+            if (alreadyPosted) {
+                showAlreadyPostedDialog(newPost);
             } else {
-                e.printStackTrace();
+                Database.uploadPost(newPost).whenComplete((lambda, e) -> {
+                    if (e == null) {
+                        POSTS_ADDED++;
+                        activeProfile.incrementScore(artwork.getScore());
+                        activeProfile.addBadges(badges);
+                        finish();
+                    } else {
+                        e.printStackTrace();
+                    }
+                }).exceptionally(l -> {
+                    showErrorDialog("Couldn't post picture");
+                    return null;
+                });
             }
-        }).exceptionally(l -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Error").setMessage("Couldn't post picture").setCancelable(false).setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss());
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
             return null;
         });
     }
+
+    private void showAlreadyPostedDialog(Post post) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(post.getArtworkName() + " is already in your collection!");
+        builder.setIcon(R.drawable.image_recognition_error);
+        builder.setMessage("This post is already in your collection. You can still post it, but you will not get more points or badges!");
+        builder.setCancelable(true);
+        builder.setPositiveButton("Post", (dialog, which) -> {
+            Database.uploadPost(post).handle((lambda, e) -> {
+                if (e != null) {
+                    e.printStackTrace();
+                }
+                POSTS_ADDED++;
+                return null;
+            });
+            dialog.cancel();
+            finish();
+        });
+        builder.setNegativeButton("Cancel", (dialog, id) -> {
+            dialog.dismiss();
+        });
+        builder.create().show();
+    }
+
+    private void showErrorDialog(String message) {
+        new AlertDialog.Builder(this).setTitle("Error").setMessage(message).setCancelable(false).setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss()).create().show();
+    }
+
 }

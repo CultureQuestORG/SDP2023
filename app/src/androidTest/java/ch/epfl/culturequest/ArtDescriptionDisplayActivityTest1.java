@@ -10,6 +10,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibilit
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +20,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.idling.CountingIdlingResource;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -28,9 +33,13 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.storage.LocalStorage;
@@ -39,6 +48,7 @@ public class ArtDescriptionDisplayActivityTest1 {
     private final String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100|false";
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
+    private CountingIdlingResource postActionIdlingResource;
 
     @Rule
     public ActivityScenarioRule<ArtDescriptionDisplayActivity> activityRule =
@@ -61,7 +71,7 @@ public class ArtDescriptionDisplayActivityTest1 {
         // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
 
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0, new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(profile);
     }
 
@@ -105,6 +115,28 @@ public class ArtDescriptionDisplayActivityTest1 {
 
 
     @Test
+    public void postingSameArtTwiceLaunchesPopUp() throws ExecutionException, InterruptedException, TimeoutException {
+        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PIC_PATH
+                , "Mona Lisa", 0, 0, new ArrayList<>());
+        Database.uploadPost(post);
+        Thread.sleep(5000);
+        onView(withId(R.id.artName)).perform(swipeUp());
+        // I couldnt find a nice and easy way to get the test to swipe all the way down on a Scroll view
+        //it'd be easier if it was a recycler view
+        onView(withId(R.id.artSummary)).perform(swipeUp(), swipeUp(), swipeUp(), swipeUp());// Scroll to the bottom of the RecyclerView
+        onView(withId(R.id.post_button)).perform(click());
+        onView(withText("This post is already in your collection. You can still post it, but you will not get more points or badges!")).check(matches(isDisplayed()));
+        onView(withText("Cancel")).perform(click());
+        Thread.sleep(2000);
+        onView(withId(R.id.post_button)).perform(click());
+        onView(withText("This post is already in your collection. You can still post it, but you will not get more points or badges!")).check(matches(isDisplayed()));
+        onView(withText("Post")).perform(click());
+        Thread.sleep(2000);
+        assertEquals(2, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+    }
+
+
+    @Test
     public void activityDisplaysCorrectInformation() {
 
         onView(withId(R.id.artName)).check(matches(withText("Mona Lisa")));
@@ -127,6 +159,7 @@ public class ArtDescriptionDisplayActivityTest1 {
     @After
     public void tearDown() {
         // clear the database after the tests
+        IdlingRegistry.getInstance().unregister(postActionIdlingResource);
         Database.clearDatabase();
     }
 }
