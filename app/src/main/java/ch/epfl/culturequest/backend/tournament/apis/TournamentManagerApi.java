@@ -1,6 +1,7 @@
 package ch.epfl.culturequest.backend.tournament.apis;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+import static ch.epfl.culturequest.database.Database.fetchTournamentWhenGenerated;
 import static ch.epfl.culturequest.database.Database.getDeviceSynchronizationRef;
 import static ch.epfl.culturequest.database.Database.handleFutureTimeout;
 import static ch.epfl.culturequest.database.Database.indicateTournamentGenerated;
@@ -285,58 +286,6 @@ public class TournamentManagerApi {
             }
         });
     }
-
-    // If the tournament generation is locked, another device is currently generating the tournament so we should wait for it to be generated and fetch it from the database
-    private static CompletableFuture<Tournament> fetchTournamentWhenGenerated(String tournamentId) {
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference tournamentRef = dbRef.child("tournaments").child(tournamentId);
-        DatabaseReference generatedRef = getDeviceSynchronizationRef().child("generated");
-
-        AtomicReference<Tournament> fetchedTournament = new AtomicReference<>();
-
-        CompletableFuture<Tournament> future = new CompletableFuture<>();
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.schedule(() -> {
-            if (fetchedTournament.get() == null) {
-                    // If the tournament hasn't been generated 2 minutes after the generation lock, it's likely that the device that was generating it crashed so we should unlock the generation and try to generate it again
-                // we make the future complete exceptionally so that the caller (generateOrFetchTournament) can handle it and try to generate the tournament again if needed
-                future.completeExceptionally(new TimeoutException("Failed to fetch the tournament from the database after 2 minutes"));
-            }
-        }, 2, TimeUnit.MINUTES);
-
-        generatedRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean isGenerated = dataSnapshot.getValue(Boolean.class);
-                if (isGenerated) {
-
-                    tournamentRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            fetchedTournament.set(dataSnapshot.getValue(Tournament.class));
-                            future.complete(fetchedTournament.get());
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            // todo: handle it better
-                            future.completeExceptionally(new RuntimeException("Failed to read data from Firebase: " + databaseError.getMessage()));
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // todo: handle it better
-                future.completeExceptionally(new RuntimeException("Failed to read data from Firebase: " + databaseError.getMessage()));
-            }
-        });
-
-        executor.shutdown();
-        return future;
-    }
-
     private static Calendar generateWeeklyTournamentDate() {
 
         Random random = RandomApi.getRandom();

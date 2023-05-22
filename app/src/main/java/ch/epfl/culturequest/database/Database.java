@@ -24,7 +24,10 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
@@ -855,7 +858,7 @@ public class Database {
                     Question question = child.getValue(Question.class);
                     questions.add(question);
                 }
-                future.complete(new Quiz(artName,questions,tournament));
+                future.complete(new Quiz(artName, questions, tournament));
             } else {
                 future.completeExceptionally(new Exception("Quiz not found"));
             }
@@ -932,7 +935,6 @@ public class Database {
     }
 
 
-
     // Put boolean in database reference and returns a future boolean indicating whether the operation was successful or not
     // true -> setValue succeeded; null -> setValue failed
     @SuppressLint("NewApi")
@@ -993,8 +995,6 @@ public class Database {
                 future.completeExceptionally(new Exception("Timeout exception"));
             }
         }, timeoutSeconds, java.util.concurrent.TimeUnit.SECONDS);
-
-        future.complete(null);
     }
 
     public static CompletableFuture<Void> uploadTournamentToDatabase(Tournament tournament) {
@@ -1035,5 +1035,55 @@ public class Database {
     }
 
 
+    // If the tournament generation is locked, another device is currently generating the tournament so we should wait for it to be generated and fetch it from the database
+    public static CompletableFuture<Tournament> fetchTournamentWhenGenerated(String tournamentId) {
+        DatabaseReference dbRef = databaseInstance.getReference();
+        DatabaseReference tournamentRef = dbRef.child("tournaments").child(tournamentId);
+        DatabaseReference generatedRef = getDeviceSynchronizationRef().child("generated");
 
+        AtomicReference<Tournament> fetchedTournament = new AtomicReference<>();
+
+        CompletableFuture<Tournament> future = new CompletableFuture<>();
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.schedule(() -> {
+            if (fetchedTournament.get() == null) {
+                // If the tournament hasn't been generated 2 minutes after the generation lock, it's likely that the device that was generating it crashed so we should unlock the generation and try to generate it again
+                // we make the future complete exceptionally so that the caller (generateOrFetchTournament) can handle it and try to generate the tournament again if needed
+                future.completeExceptionally(new TimeoutException("Failed to fetch the tournament from the database after 2 minutes"));
+            }
+        }, 2, TimeUnit.MINUTES);
+
+        generatedRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean isGenerated = dataSnapshot.exists() ? dataSnapshot.getValue(Boolean.class) : false;
+
+                if (isGenerated) {
+
+                    tournamentRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            fetchedTournament.set(dataSnapshot.getValue(Tournament.class));
+                            future.complete(fetchedTournament.get());
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // todo: handle it better
+                            future.completeExceptionally(new RuntimeException("Failed to read data from Firebase: " + databaseError.getMessage()));
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // todo: handle it better
+                future.completeExceptionally(new RuntimeException("Failed to read data from Firebase: " + databaseError.getMessage()));
+            }
+        });
+
+        executor.shutdown();
+        return future;
+    }
 }

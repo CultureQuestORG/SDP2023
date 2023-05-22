@@ -52,12 +52,22 @@ public class TournamentManagerApiTest {
         Database.setEmulatorOn();
 
         // clear the database before starting the following tests
-        Database.clearDatabase();
+        Database.clearDatabase().join();
 
 
         unlockTournamentGeneration().join();
         indicateTournamentNotGenerated().join();
     }
+
+    @After
+    public void tearDown() {
+        // clear the shared pref after the tests
+        clearSharedPreferences();
+
+        // clear the database after the tests
+        Database.clearDatabase().join();
+    }
+
 
 
     // Tournament date is correctly created and stored in shared pref in the first time
@@ -145,7 +155,7 @@ public class TournamentManagerApiTest {
 
         // wait to be sure that the tournament has been indicated as generated in Firebase
         try {
-            Thread.sleep(10000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
