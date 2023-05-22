@@ -3,8 +3,12 @@ package ch.epfl.culturequest.map_collectiontest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -84,9 +88,9 @@ public class RetryingOTMProviderTest {
 
         assertThat(locations.size(), is(1));
         assertThat(locations.get(0).getName(), is("Château de La Côte-Saint-André"));
-        assertThat(locations.get(0).getCoordinates().longitude(), is(20.23));
-        assertThat(locations.get(0).getCoordinates().latitude(), is(47.39));
-        assertThat(locations.get(0).getKinds(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
+        assertThat(locations.get(0).getCoordinates().getLon(), is(20.23));
+        assertThat(locations.get(0).getCoordinates().getLat(), is(47.39));
+        assertThat(locations.get(0).getKindsList(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
     }
 
     @After

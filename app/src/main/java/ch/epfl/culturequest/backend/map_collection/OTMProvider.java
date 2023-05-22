@@ -19,4 +19,7 @@ public interface OTMProvider {
      * @return an array of locations in the bounding box
      */
     CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight);
+
+    CompletableFuture<List<OTMLocation>> getLocations(String city);
+
 }

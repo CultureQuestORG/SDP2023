@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.FollowNotification;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
@@ -144,6 +146,9 @@ public class ProfileViewModel extends ViewModel {
         this.followed.setValue(Boolean.FALSE.equals(followed.getValue()));
         if (Boolean.TRUE.equals(this.followed.getValue())) {
             Database.addFollow(profile.getUid(), selectedProfile.getValue().getUid());
+            // Send notification to the followed user
+            FollowNotification notif = new FollowNotification(selectedProfile.getValue().getUsername());
+            FireMessaging.sendNotification(selectedProfile.getValue().getUid(), notif);
         } else {
             Database.removeFollow(profile.getUid(), selectedProfile.getValue().getUid());
         }

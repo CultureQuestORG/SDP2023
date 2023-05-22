@@ -31,6 +31,8 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.LikeNotification;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.CustomSnackbar;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -97,6 +99,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             holder.year.setText(artwork.getYear());
             holder.description.setText(shortenDescription(artwork.getSummary()));
             holder.score.setText("+" + artwork.getScore() + " pts");
+            holder.location.setText(artwork.getCity()!=null ? artwork.getCity() : artwork.getCountry()!=null ? artwork.getCountry() : "World");
+
 
             // Put a see more button if the description is too long
             displaySeeMore(artwork, holder.seeMore, pictureUrl);
@@ -121,7 +125,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             return null;
         });
 
-        holder.location.setText("Lausanne");
+
 
         // Set handlers for the like and delete buttons
         handleLike(holder, post);
@@ -166,6 +170,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 Database.addLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
                     if (throwable != null) {
                         post.setLikers(aVoid.getLikers());
+                    }
+                });
+                // send the like notification
+                Database.getProfile(post.getUid()).thenAccept(profile -> {
+                    if (profile != null) {
+                        LikeNotification notif = new LikeNotification(profile.getUsername());
+                        FireMessaging.sendNotification(profile.getUid(), notif);
                     }
                 });
                 Picasso.get().load(R.drawable.like_full).into(holder.like);

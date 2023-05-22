@@ -8,7 +8,7 @@
     tools:context=".ui.leaderboard.LeaderboardFragment">
 
     <TextView
-        android:id="@+id/tittle_leaderboard"
+        android:id="@+id/title_leaderboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tittle_leaderboard">
+        app:layout_constraintTop_toBottomOf="@+id/title_leaderboard">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/current_user_profile_picture"
