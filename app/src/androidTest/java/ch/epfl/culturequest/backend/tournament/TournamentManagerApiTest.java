@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.backend.tournament;
 
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,9 +34,13 @@ import ch.epfl.culturequest.database.Database;
 
 public class TournamentManagerApiTest {
 
+    Context targetContext;
 
     @Before
     public void setUp() {
+
+        targetContext = getApplicationContext();
+
         // clear the shared pref before starting the following tests
         clearSharedPreferences();
 
@@ -64,7 +69,7 @@ public class TournamentManagerApiTest {
     @Test
     public void tournamentCorrectlyScheduledWhenFirstTime() {
 
-        TournamentManagerApi.handleTournaments();
+        TournamentManagerApi.handleTournaments(targetContext);
 
         SharedPreferences tournamentSharedPref = getTournamentSharedPrefLocation();
 
@@ -96,7 +101,7 @@ public class TournamentManagerApiTest {
         lockTournamentGeneration().join();
 
         // main function call (in the real app, this is called by onResume() handler of main activities)
-        TournamentManagerApi.handleTournaments().join();
+        TournamentManagerApi.handleTournaments(targetContext).join();
 
 
         // check that the tournament date/schedule has been updated
@@ -137,7 +142,7 @@ public class TournamentManagerApiTest {
 
 
         // Launch the main method
-        TournamentManagerApi.handleTournaments().join();
+        TournamentManagerApi.handleTournaments(targetContext).join();
 
         //// CHECKS ////
 
@@ -185,7 +190,7 @@ public class TournamentManagerApiTest {
 
         // Launch the main method
         // In the given context, the tournament should be fetched from Firebase whenever it appears to be generated
-        TournamentManagerApi.handleTournaments().join();
+        TournamentManagerApi.handleTournaments(targetContext).join();
 
         //// CHECKS ////
 
