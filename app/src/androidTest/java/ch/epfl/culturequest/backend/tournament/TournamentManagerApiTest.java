@@ -14,14 +14,12 @@ import static ch.epfl.culturequest.database.Database.isTournamentGenerationLocke
 import static ch.epfl.culturequest.database.Database.lockTournamentGeneration;
 import static ch.epfl.culturequest.database.Database.unlockTournamentGeneration;
 import static ch.epfl.culturequest.database.Database.uploadTournamentToDatabase;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.google.firebase.database.DatabaseReference;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

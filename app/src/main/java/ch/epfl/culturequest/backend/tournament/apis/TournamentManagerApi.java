@@ -37,7 +37,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
@@ -133,7 +132,6 @@ public class TournamentManagerApi {
         return waitForTournamentGenerationAndFetchIt(fetchedTournament, future, tournamentId);
     }
 
-
     private static void generateAndStoreTournamentDate() {
 
 
@@ -166,11 +164,8 @@ public class TournamentManagerApi {
         return currentTime > tournamentDate;
     }
 
-
-
     // Remaining time from now until the tournament ends (tournament date + 1 week)
     // If tournament end date is in the past, return value is negative
-
     private static int tournamentRemainingTime() {
 
         // a tournament should last 1 week
@@ -336,7 +331,6 @@ public class TournamentManagerApi {
             e.printStackTrace();}
         return artNames;
     }
-
     public static void storeTournamentInSharedPref(Tournament tournament) {
 
         // Get shared preferences
@@ -370,8 +364,6 @@ public class TournamentManagerApi {
         return CompletableFuture.allOf(unlockTournamentGenerationFuture, indicateTournamentNotGeneratedFuture);
     }
 
-    // - - - - - - -
-
     private static SharedPreferences getTournamentSharedPrefLocation() {
         Context context = getApplicationContext();
         return context.getSharedPreferences("tournament", Context.MODE_PRIVATE);
@@ -383,7 +375,6 @@ public class TournamentManagerApi {
         editor.clear();
         editor.apply();
     }
-
     private static boolean tournamentAlreadyStoredInSharedPref() {
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
         return sharedPreferences.getString("weeklyTournament", null) != null;
