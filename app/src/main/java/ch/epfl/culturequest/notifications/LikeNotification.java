@@ -2,16 +2,8 @@ package ch.epfl.culturequest.notifications;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 
-import androidx.navigation.NavDeepLinkBuilder;
-
-import ch.epfl.culturequest.NavigationActivity;
-import ch.epfl.culturequest.R;
-import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Profile;
 
 /**

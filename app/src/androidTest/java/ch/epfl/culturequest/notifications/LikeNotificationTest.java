@@ -36,7 +36,8 @@ public class LikeNotificationTest {
 
     @Test
     public void likeNotificationIsCorrectlyCreated() {
-        Notification likeNotification = new LikeNotification("Likee").buildNotification(context);
+        PushNotification notification = new LikeNotification("Likee");
+        Notification likeNotification = notification.buildNotification(context);
         assertThat(likeNotification.extras.get(Notification.EXTRA_TITLE).toString(), is("Likee, you have a new like!"));
         assertThat(likeNotification.extras.get(Notification.EXTRA_TEXT).toString(), is(profile.getUsername() + " liked your post!"));
         assertThat(likeNotification.priority, is(Notification.PRIORITY_HIGH));
@@ -44,7 +45,7 @@ public class LikeNotificationTest {
         assertThat(likeNotification.getChannelId(), is(LikeNotification.CHANNEL_ID));
         Intent intent = new Intent(context, NavigationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 .putExtra("redirect", "profile");
-        assertThat(likeNotification.contentIntent, is(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)));
+        assertThat(likeNotification.contentIntent, is(PendingIntent.getActivity(context, notification.getNotificationId().hashCode(), intent, PendingIntent.FLAG_MUTABLE)));
     }
 
 }

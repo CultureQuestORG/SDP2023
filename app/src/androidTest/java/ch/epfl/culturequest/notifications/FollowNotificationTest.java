@@ -36,7 +36,8 @@ public class FollowNotificationTest {
 
     @Test
     public void FollowNotificationIsCorrectlyCreated() {
-        Notification followNotification = new FollowNotification("Followee").buildNotification(context);
+        PushNotification notification = new FollowNotification("Followee");
+        Notification followNotification = notification.buildNotification(context);
         assertThat(followNotification.extras.get(Notification.EXTRA_TITLE).toString(), is("Followee, you have a new follower!"));
         assertThat(followNotification.extras.get(Notification.EXTRA_TEXT).toString(), is(profile.getUsername() + " is now following you!"));
         assertThat(followNotification.priority, is(Notification.PRIORITY_HIGH));
@@ -44,7 +45,7 @@ public class FollowNotificationTest {
         assertThat(followNotification.getChannelId(), is(FollowNotification.CHANNEL_ID));
         Intent intent = new Intent(context, DisplayUserProfileActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 .putExtra("uid", profile.getUid()).putExtra("redirect", "home");
-        assertThat(followNotification.contentIntent, is(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)));
+        assertThat(followNotification.contentIntent, is(PendingIntent.getActivity(context, notification.getNotificationId().hashCode(), intent, PendingIntent.FLAG_MUTABLE)));
     }
 
 }

@@ -172,6 +172,20 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-1656254317">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="OnePlus&#10; HD1903" value="120" />
+                  <entry key="Tests" value="360" />
+                  <entry key="adb-97a1577b-cOvNOb._adb-tls-connect._tcp" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-1577782932">
           <value>
             <AndroidTestResultsTableState>
@@ -349,8 +363,10 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="OnePlus&#10; HD1903" value="120" />
                   <entry key="Pixel_2_API_33" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="adb-97a1577b-cOvNOb._adb-tls-connect._tcp" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -1066,8 +1082,10 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="OnePlus&#10; HD1903" value="120" />
                   <entry key="Pixel_2_API_33" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="adb-97a1577b-cOvNOb._adb-tls-connect._tcp" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -1197,8 +1215,10 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="OnePlus&#10; HD1903" value="120" />
                   <entry key="Pixel_2_API_33" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="adb-97a1577b-cOvNOb._adb-tls-connect._tcp" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>

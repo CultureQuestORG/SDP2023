@@ -76,7 +76,7 @@ public class PushNotification {
             channels.add(FollowNotification.getNotificationChannel());
             channels.add(ScanNotification.getNotificationChannel());
             channels.add(LikeNotification.getNotificationChannel());
-            channels.add(CompetitionNotification.getNotificationChannel());
+            channels.add(TournamentNotification.getNotificationChannel());
             channels.add(SightseeingNotification.getNotificationChannel());
 
             // Register the channel with the system; you can't change the importance
@@ -120,25 +120,24 @@ public class PushNotification {
                 intent = new Intent(context, DisplayUserProfileActivity.class);
                 intent.putExtra("uid", senderId);
                 intent.putExtra("redirect", "home");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE);
+                break;
             // opens the profile of the current user
             case LikeNotification.CHANNEL_ID:
                 intent = new Intent(context, NavigationActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.putExtra("redirect", "profile");
-                return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE);
-            // case CompetitionNotification.CHANNEL_ID:
-                // TODO: open the competition activity
+                break;
+            // case TournamentNotification.CHANNEL_ID:
+                // TODO: open the tournament activity
             // case SightseeingNotification.CHANNEL_ID:
                 //TODO: open the sightseeing activity
             // opens the scan fragment
             default:
                 intent = new Intent(context, NavigationActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
+                break;
         }
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        return PendingIntent.getActivity(context, notificationId.hashCode(), intent, PendingIntent.FLAG_MUTABLE);
     }
 
     public String getNotificationId() {
