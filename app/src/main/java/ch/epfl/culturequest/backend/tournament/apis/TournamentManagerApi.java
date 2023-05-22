@@ -1,14 +1,14 @@
 package ch.epfl.culturequest.backend.tournament.apis;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
-
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.getDeviceSynchronizationRef;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.handleFutureTimeout;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.indicateTournamentGenerated;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.indicateTournamentNotGenerated;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.isTournamentGenerationLocked;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.lockTournamentGeneration;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.unlockTournamentGeneration;
+import static ch.epfl.culturequest.database.Database.getDeviceSynchronizationRef;
+import static ch.epfl.culturequest.database.Database.handleFutureTimeout;
+import static ch.epfl.culturequest.database.Database.indicateTournamentGenerated;
+import static ch.epfl.culturequest.database.Database.indicateTournamentNotGenerated;
+import static ch.epfl.culturequest.database.Database.isTournamentGenerationLocked;
+import static ch.epfl.culturequest.database.Database.lockTournamentGeneration;
+import static ch.epfl.culturequest.database.Database.unlockTournamentGeneration;
+import static ch.epfl.culturequest.database.Database.uploadTournamentToDatabase;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -335,44 +335,6 @@ public class TournamentManagerApi {
 
         executor.shutdown();
         return future;
-    }
-
-    public static CompletableFuture<Void> uploadTournamentToDatabase(Tournament tournament) {
-
-        CompletableFuture<Void> voidFuture = new CompletableFuture<>();
-
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference tournamentRef = dbRef.child("tournaments").child(tournament.getTournamentId());
-
-        auxiliaryUploadTournamentToDatabase(tournament, tournamentRef, 0, voidFuture);
-
-        return voidFuture;
-    }
-
-    private static void auxiliaryUploadTournamentToDatabase(Tournament tournament, DatabaseReference tournamentRef, int tentativeNumber, CompletableFuture<Void> voidFuture) {
-
-        tournamentRef.setValue(tournament, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                if (error != null) {
-
-                    if (tentativeNumber == 2) {
-                        // If the upload failed 2 times, we unlock the tournament generation so that another device can try to generate it
-                        unlockTournamentGeneration();
-                        voidFuture.completeExceptionally(new RuntimeException("Failed to upload tournament to database: " + error.getMessage()));
-                        return;
-                    }
-
-                    // If the upload failed and tentative didn't reach max, try again
-                    auxiliaryUploadTournamentToDatabase(tournament, tournamentRef, tentativeNumber + 1, voidFuture);
-
-                } else {
-                    // If the upload is successful, we tell the other devices that the tournament can be fetched from the database
-                    indicateTournamentGenerated();
-                    voidFuture.complete(null);
-                }
-            }
-        });
     }
 
     private static Calendar generateWeeklyTournamentDate() {

@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.database;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -21,10 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
@@ -880,4 +884,156 @@ public class Database {
         DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName).child("scores").child(uid);
         quizRef.setValue(score);
     }
+
+    ///// TOURNAMENTS //////
+
+
+    // Indicate other users that the tournament is currently being generated
+    public static CompletableFuture<Boolean> lockTournamentGeneration() {
+
+        DatabaseReference pathToGenerationLock = getDeviceSynchronizationRef().child("generationLocked");
+        return setBoolAsync(pathToGenerationLock, true);
+    }
+
+
+    // To unlock when the tournament is over or if one of the device fails to generate the tournament
+    public static CompletableFuture<Boolean> unlockTournamentGeneration() {
+
+        DatabaseReference pathToGenerationLock = getDeviceSynchronizationRef().child("generationLocked");
+        return setBoolAsync(pathToGenerationLock, false);
+    }
+
+
+    // Allow of form of synchronization to prevent other devices from generating the tournament if one of the device has already been charged to do so
+    public static CompletableFuture<Boolean> isTournamentGenerationLocked() {
+
+        DatabaseReference pathToGenerationLock = getDeviceSynchronizationRef().child("generationLocked");
+        return isEqualAsync(pathToGenerationLock, true);
+    }
+
+    // Indicate other devices that the tournament can now be fetched from Firebase
+    public static CompletableFuture<Boolean> indicateTournamentGenerated() {
+
+        DatabaseReference pathToGenerated = getDeviceSynchronizationRef().child("generated");
+        return setBoolAsync(pathToGenerated, true);
+    }
+
+    // Reset the generation state of the tournament to allow upcoming generation in the next week
+
+    public static CompletableFuture<Boolean> indicateTournamentNotGenerated() {
+
+        DatabaseReference pathToGenerated = getDeviceSynchronizationRef().child("generated");
+        return setBoolAsync(pathToGenerated, false);
+    }
+
+    // Slot where the variables used to handle the android apps synchronization are stored
+    public static DatabaseReference getDeviceSynchronizationRef() {
+        return databaseInstance.getReference("tournaments").child("device-synchronization");
+    }
+
+
+
+    // Put boolean in database reference and returns a future boolean indicating whether the operation was successful or not
+    // true -> setValue succeeded; null -> setValue failed
+    @SuppressLint("NewApi")
+    public static CompletableFuture<Boolean> setBoolAsync(DatabaseReference databaseReference, Boolean bool) {
+
+
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        databaseReference.setValue(bool, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+
+                if (error != null) {
+                    future.complete(null);
+                } else {
+                    future.complete(true);
+                }
+            }
+        });
+
+        handleFutureTimeout(future, 120);
+
+        return future;
+    }
+
+    @SuppressLint("NewApi")
+    public static CompletableFuture<Boolean> isEqualAsync(DatabaseReference databaseReference, Boolean expectedBool) {
+
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Boolean value = snapshot.getValue(Boolean.class);
+
+                if (value == null) {
+                    future.complete(null);
+                } else {
+                    future.complete(value.equals(expectedBool));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                future.complete(null);
+            }
+        });
+
+        handleFutureTimeout(future, 120);
+
+        return future;
+    }
+
+    public static <T> void handleFutureTimeout(CompletableFuture<T> future, int timeoutSeconds) {
+
+        // create scheduled executor service
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.schedule(() -> {
+            if (!future.isDone()) {
+                future.completeExceptionally(new Exception("Timeout exception"));
+            }
+        }, timeoutSeconds, java.util.concurrent.TimeUnit.SECONDS);
+
+        future.complete(null);
+    }
+
+    public static CompletableFuture<Void> uploadTournamentToDatabase(Tournament tournament) {
+
+        CompletableFuture<Void> voidFuture = new CompletableFuture<>();
+
+        DatabaseReference tournamentRef = databaseInstance.getReference().child("tournaments").child(tournament.getTournamentId());
+
+        auxiliaryUploadTournamentToDatabase(tournament, tournamentRef, 0, voidFuture);
+
+        return voidFuture;
+    }
+
+    private static void auxiliaryUploadTournamentToDatabase(Tournament tournament, DatabaseReference tournamentRef, int tentativeNumber, CompletableFuture<Void> voidFuture) {
+
+        tournamentRef.setValue(tournament, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error != null) {
+
+                    if (tentativeNumber == 2) {
+                        // If the upload failed 2 times, we unlock the tournament generation so that another device can try to generate it
+                        unlockTournamentGeneration();
+                        voidFuture.completeExceptionally(new RuntimeException("Failed to upload tournament to database: " + error.getMessage()));
+                        return;
+                    }
+
+                    // If the upload failed and tentative didn't reach max, try again
+                    auxiliaryUploadTournamentToDatabase(tournament, tournamentRef, tentativeNumber + 1, voidFuture);
+
+                } else {
+                    // If the upload is successful, we tell the other devices that the tournament can be fetched from the database
+                    indicateTournamentGenerated();
+                    voidFuture.complete(null);
+                }
+            }
+        });
+    }
+
+
+
 }

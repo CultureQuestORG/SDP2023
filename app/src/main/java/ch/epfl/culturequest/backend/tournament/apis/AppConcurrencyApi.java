@@ -18,6 +18,8 @@ import java.util.concurrent.ScheduledExecutorService;
 public class AppConcurrencyApi {
 
 
+    /*
+
     // Indicate other users that the tournament is currently being generated
     public static CompletableFuture<Boolean> lockTournamentGeneration() {
 
@@ -133,5 +135,5 @@ public class AppConcurrencyApi {
         future.complete(null);
     }
 
-
+    */
 }

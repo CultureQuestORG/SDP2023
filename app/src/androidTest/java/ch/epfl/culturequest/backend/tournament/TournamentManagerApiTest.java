@@ -6,15 +6,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.getDeviceSynchronizationRef;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.indicateTournamentGenerated;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.indicateTournamentNotGenerated;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.isEqualAsync;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.isTournamentGenerationLocked;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.lockTournamentGeneration;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.setBoolAsync;
-import static ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi.unlockTournamentGeneration;
+import static ch.epfl.culturequest.database.Database.getDeviceSynchronizationRef;
+import static ch.epfl.culturequest.database.Database.indicateTournamentGenerated;
+import static ch.epfl.culturequest.database.Database.indicateTournamentNotGenerated;
+import static ch.epfl.culturequest.database.Database.isEqualAsync;
+import static ch.epfl.culturequest.database.Database.isTournamentGenerationLocked;
+import static ch.epfl.culturequest.database.Database.lockTournamentGeneration;
+import static ch.epfl.culturequest.database.Database.unlockTournamentGeneration;
+import static ch.epfl.culturequest.database.Database.uploadTournamentToDatabase;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -25,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.internal.bind.ArrayTypeAdapter;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -38,12 +38,23 @@ import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
+import ch.epfl.culturequest.database.Database;
 
 public class TournamentManagerApiTest {
 
-    @After
-    public void resetData() {
+
+    @Before
+    public void setUp() {
+        // clear the shared pref before starting the following tests
         clearSharedPreferences();
+
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+
+
         unlockTournamentGeneration().join();
         indicateTournamentNotGenerated().join();
     }
@@ -120,6 +131,7 @@ public class TournamentManagerApiTest {
 
         unlockTournamentGeneration().join();
         indicateTournamentNotGenerated().join();
+
         // clear weeklyTournament string in Tournament file shared pref
         tournamentSharedPref.edit().putString("weeklyTournament", null).commit();
 
@@ -141,7 +153,7 @@ public class TournamentManagerApiTest {
         assertThat(tournamentGenerated, is(true));
 
         // Check that the tournament generation is locked
-        Boolean generationLocked = AppConcurrencyApi.isTournamentGenerationLocked().join();
+        Boolean generationLocked = isTournamentGenerationLocked().join();
         assertThat(generationLocked, is(true));
 
         // Check that the weeklyTournament string in Tournament file shared pref is not null
@@ -249,7 +261,7 @@ public class TournamentManagerApiTest {
 
             Tournament fakeTournament = getFakeTournament();
 
-            TournamentManagerApi.uploadTournamentToDatabase(fakeTournament).join();
+            uploadTournamentToDatabase(fakeTournament).join();
 
             indicateTournamentGenerated().join();
             fakeConcurrentGeneration.complete(null);
