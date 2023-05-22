@@ -136,6 +136,8 @@ public class ArtDescriptionDisplayActivityTest1 {
 
     @Test
     public void checkSharingSendsProperIntent() {
+        onView(withId(R.id.artName)).perform(swipeUp());
+        onView(withId(R.id.artSummary)).perform(swipeUp(), swipeUp(), swipeUp(), swipeUp());// Scroll to the bottom of the RecyclerView
         onView(withId(R.id.share_button)).perform(click());
         intended(hasAction(Intent.ACTION_SEND));
         intended(hasExtra(Intent.EXTRA_TEXT, "I just scanned Mona Lisa with \uD835\uDC02\uD835\uDC2E\uD835\uDC25\uD835\uDC2D\uD835\uDC2E\uD835\uDC2B\uD835\uDC1E\uD835\uDC10\uD835\uDC2E\uD835\uDC1E\uD835\uDC2C\uD835\uDC2D!\n\nIt's a epic artwork from Da Vinci, displayed at Louvre, Paris.\n\nPure Masterclass\n\nDownload the app here: https://play.google.com/store/apps/details?id=com.culturequest.culturequest"));
