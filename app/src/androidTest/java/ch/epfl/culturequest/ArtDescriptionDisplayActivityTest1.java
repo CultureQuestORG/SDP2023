@@ -138,7 +138,6 @@ public class ArtDescriptionDisplayActivityTest1 {
 
     @Test
     public void activityDisplaysCorrectInformation() {
-
         onView(withId(R.id.artName)).check(matches(withText("Mona Lisa")));
         onView(withId(R.id.artistName)).check(matches(withText("Da Vinci")));
         onView(withId(R.id.artYear)).check(matches(withText("1519")));
