@@ -33,7 +33,7 @@ public class QuizGeneratorApi {
     private final String testPrompt5 = "Given the art: \"Mona Lisa\", write a quiz (in JSON) of 5 questions with 4 options in each, with the correct answer indicated by its index. Directly return the array including all the questions without beginning with any title key.";
     */
 
-    private final static String quizGenerationPrompt ="Given the art \"David (Michelangelo)\", generate a quiz of 5 difficult questions in JSON, with 4 options in each, 3 wrong and 1 correct answer. As the \"options\" list four questions, the answer should always be among them!!";
+    private final static String quizGenerationPrompt ="Given the art \"%s\", generate a quiz of 5 difficult questions in JSON, with 4 options in each, 3 wrong and 1 correct answer. As the \"options\" list four questions, the answer should always be among them!!";
 
 
     public QuizGeneratorApi(OpenAiService service){
