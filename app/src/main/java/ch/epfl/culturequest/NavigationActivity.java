@@ -44,7 +44,7 @@ public class NavigationActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         try{
-            TournamentManagerApi.handleTournaments();
+            TournamentManagerApi.handleTournaments(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

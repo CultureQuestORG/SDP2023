@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.backend.tournament.apis;
 
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static ch.epfl.culturequest.backend.tournament.utils.RandomApi.generateWeeklyTournamentDate;
 import static ch.epfl.culturequest.database.Database.handleFutureTimeout;
@@ -55,9 +56,12 @@ import ch.epfl.culturequest.backend.tournament.utils.RandomApi;
 public class TournamentManagerApi {
 
     public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY, Duration.ofMinutes(2));
+    private static Context currentContext;
 
     // Main function #1: To be called when most of activities are being resumed
-    public static CompletableFuture<Void> handleTournaments() {
+    public static CompletableFuture<Void> handleTournaments(Context context) {
+
+        currentContext = context;
 
         if (tournamentRemainingTime() == 0) { // Tournament hasn't been scheduled yet (date not pseudo-randomly generated yet)
             // schedule the tournament generation and store it in shared preferences
@@ -143,7 +147,6 @@ public class TournamentManagerApi {
         Calendar tournamentDate = generateWeeklyTournamentDate();
 
         // Store calendar.getTime() in shared preferences
-        Context context = getApplicationContext();
         SharedPreferences sharedPref = getTournamentSharedPrefLocation();
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putLong("tournamentDate", tournamentDate.getTime().getTime());
@@ -286,7 +289,7 @@ public class TournamentManagerApi {
 
         ArrayList<String> artNames = new ArrayList<>();
         try {
-            Resources resources = getApplicationContext().getResources();
+            Resources resources = currentContext.getResources();
             InputStream inputStream = resources.openRawResource(R.raw.famous_arts);
             // InputStream to JSONArray
             String json;
@@ -337,8 +340,8 @@ public class TournamentManagerApi {
         return CompletableFuture.allOf(unlockTournamentGenerationFuture, indicateTournamentNotGeneratedFuture);
     }
     private static SharedPreferences getTournamentSharedPrefLocation() {
-        Context context = getApplicationContext();
-        return context.getSharedPreferences("tournament", Context.MODE_PRIVATE);
+
+        return currentContext.getSharedPreferences("tournament", Context.MODE_PRIVATE);
     }
 
     private static void clearTournamentSharedPref() {
