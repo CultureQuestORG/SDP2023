@@ -67,7 +67,6 @@ public class TournamentManagerApiTest {
     }
 
 
-
     // Tournament date is correctly created and stored in shared pref in the first time
     @Test
     public void tournamentCorrectlyScheduledWhenFirstTime() {

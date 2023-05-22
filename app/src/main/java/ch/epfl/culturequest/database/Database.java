@@ -1033,24 +1033,11 @@ public class Database {
         });
     }
 
+    public static CompletableFuture<Tournament> waitForTournamentGenerationAndFetchIt(AtomicReference<Tournament> fetchedTournament, CompletableFuture<Tournament> future, String tournamentId){
 
-    // If the tournament generation is locked, another device is currently generating the tournament so we should wait for it to be generated and fetch it from the database
-    public static CompletableFuture<Tournament> fetchTournamentWhenGenerated(String tournamentId) {
         DatabaseReference dbRef = databaseInstance.getReference();
         DatabaseReference tournamentRef = dbRef.child("tournaments").child(tournamentId);
         DatabaseReference generatedRef = getDeviceSynchronizationRef().child("generated");
-        AtomicReference<Tournament> fetchedTournament = new AtomicReference<>();
-
-        CompletableFuture<Tournament> future = new CompletableFuture<>();
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.schedule(() -> {
-            if (fetchedTournament.get() == null) {
-                // If the tournament hasn't been generated 2 minutes after the generation lock, it's likely that the device that was generating it crashed so we should unlock the generation and try to generate it again
-                // we make the future complete exceptionally so that the caller (generateOrFetchTournament) can handle it and try to generate the tournament again if needed
-                future.completeExceptionally(new TimeoutException("Failed to fetch the tournament from the database after 2 minutes"));
-            }
-        }, 2, TimeUnit.MINUTES);
-
         generatedRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -1076,7 +1063,8 @@ public class Database {
             }
         });
 
-        executor.shutdown();
         return future;
     }
+
+
 }
