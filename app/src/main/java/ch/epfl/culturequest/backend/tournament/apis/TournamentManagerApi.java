@@ -333,29 +333,20 @@ public class TournamentManagerApi {
     }
     public static void storeTournamentInSharedPref(Tournament tournament) {
 
-        // Get shared preferences
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
-
-        // Create Gson instance
         Gson gson = new Gson();
-
-        // Convert the tournament object to a JSON string
         String jsonTournament = gson.toJson(tournament);
-
-        // Store the JSON string in shared preferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("weeklyTournament", jsonTournament);
         editor.apply();
     }
 
     private static CompletableFuture<Void> setWeeklyTournamentOver() {
-
         // clear the "tournament" shared preferences location
         clearTournamentSharedPref();
 
         // schedule the tournament for next week (7 days (should) have passed so week number incremented)
         generateAndStoreTournamentDate();
-
 
         // return a future that completes whenever both of unlock tournament generation and indicate tournament not generated are completed
         CompletableFuture<Boolean> unlockTournamentGenerationFuture = unlockTournamentGeneration();
@@ -363,7 +354,6 @@ public class TournamentManagerApi {
 
         return CompletableFuture.allOf(unlockTournamentGenerationFuture, indicateTournamentNotGeneratedFuture);
     }
-
     private static SharedPreferences getTournamentSharedPrefLocation() {
         Context context = getApplicationContext();
         return context.getSharedPreferences("tournament", Context.MODE_PRIVATE);
