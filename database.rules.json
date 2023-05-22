@@ -1,9 +1,0 @@
-{
-  "rules": {
-    "users" : {
-          ".indexOn": ["score", "username"]
-    },
-    ".read": "true",
-    ".write": "true"
-  }
-}
