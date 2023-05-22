@@ -4,11 +4,16 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasType;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 
 import android.content.Context;
@@ -122,6 +127,19 @@ public class ArtDescriptionDisplayActivityTest1 {
     @Test
     public void activityDisplayingPostButton() {
         onView(withId(R.id.post_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+    }
+
+    @Test
+    public void activityDisplayingShareButton() {
+        onView(withId(R.id.share_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+    }
+
+    @Test
+    public void checkSharingSendsProperIntent() {
+        onView(withId(R.id.share_button)).perform(click());
+        intended(hasAction(Intent.ACTION_SEND));
+        intended(hasExtra(Intent.EXTRA_TEXT, "I just scanned Mona Lisa with \uD835\uDC02\uD835\uDC2E\uD835\uDC25\uD835\uDC2D\uD835\uDC2E\uD835\uDC2B\uD835\uDC1E\uD835\uDC10\uD835\uDC2E\uD835\uDC1E\uD835\uDC2C\uD835\uDC2D!\n\nIt's a epic artwork from Da Vinci, displayed at Louvre, Paris.\n\nPure Masterclass\n\nDownload the app here: https://play.google.com/store/apps/details?id=com.culturequest.culturequest"));
+        intended(hasType("image/jpeg"));
     }
 
     @After
