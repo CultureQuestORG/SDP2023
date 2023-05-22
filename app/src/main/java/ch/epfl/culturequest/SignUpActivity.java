@@ -1,5 +1,6 @@
 package ch.epfl.culturequest;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -44,6 +45,10 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        TournamentManagerApi.handleTournaments();
+        try{
+            TournamentManagerApi.handleTournaments(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
