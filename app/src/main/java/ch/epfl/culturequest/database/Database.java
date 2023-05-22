@@ -1,7 +1,6 @@
 package ch.epfl.culturequest.database;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -1040,7 +1039,6 @@ public class Database {
         DatabaseReference dbRef = databaseInstance.getReference();
         DatabaseReference tournamentRef = dbRef.child("tournaments").child(tournamentId);
         DatabaseReference generatedRef = getDeviceSynchronizationRef().child("generated");
-
         AtomicReference<Tournament> fetchedTournament = new AtomicReference<>();
 
         CompletableFuture<Tournament> future = new CompletableFuture<>();
@@ -1057,25 +1055,20 @@ public class Database {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean isGenerated = dataSnapshot.exists() ? dataSnapshot.getValue(Boolean.class) : false;
-
                 if (isGenerated) {
-
                     tournamentRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             fetchedTournament.set(dataSnapshot.getValue(Tournament.class));
                             future.complete(fetchedTournament.get());
                         }
-
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                             // todo: handle it better
                             future.completeExceptionally(new RuntimeException("Failed to read data from Firebase: " + databaseError.getMessage()));
-                        }
-                    });
+                        }});
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // todo: handle it better

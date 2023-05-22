@@ -32,8 +32,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
-import ch.epfl.culturequest.backend.tournament.apis.AppConcurrencyApi;
 import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;

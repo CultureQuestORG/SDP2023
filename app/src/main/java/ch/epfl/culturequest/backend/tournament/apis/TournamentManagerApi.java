@@ -2,9 +2,7 @@ package ch.epfl.culturequest.backend.tournament.apis;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static ch.epfl.culturequest.database.Database.fetchTournamentWhenGenerated;
-import static ch.epfl.culturequest.database.Database.getDeviceSynchronizationRef;
 import static ch.epfl.culturequest.database.Database.handleFutureTimeout;
-import static ch.epfl.culturequest.database.Database.indicateTournamentGenerated;
 import static ch.epfl.culturequest.database.Database.indicateTournamentNotGenerated;
 import static ch.epfl.culturequest.database.Database.isTournamentGenerationLocked;
 import static ch.epfl.culturequest.database.Database.lockTournamentGeneration;
@@ -15,15 +13,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.theokanning.openai.service.OpenAiService;
 
@@ -44,12 +33,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -94,7 +78,6 @@ public class TournamentManagerApi {
         }
         return CompletableFuture.completedFuture(null);
     }
-
     // Main function #2: To be called to retrieve the tournament after it has been generated or fetched
     public static Tournament getTournamentFromSharedPref() {
 
@@ -196,9 +179,7 @@ public class TournamentManagerApi {
 
     private static CompletableFuture<Tournament> generateOrFetchTournament() {
 
-
         return isTournamentGenerationLocked().thenCompose(generationLocked -> {
-
 
             if (generationLocked) {
 
@@ -239,53 +220,60 @@ public class TournamentManagerApi {
                 ArrayList<String> artNames = randomlyChooseArtNames();
 
                 // given the art names, generate the art quizzes
-                Map<String, CompletableFuture<ArtQuiz>> artQuizFutures = new HashMap<>();
-
-                Supplier<ArtQuiz> fallBack = () -> null;
-
-                for (String artName : artNames) {
-
-                    Supplier<CompletableFuture<ArtQuiz>> quizGenerator = () -> new QuizGeneratorApi(service).generateArtQuiz(artName);
-
-                    CompletableFuture<ArtQuiz> artQuizFuture = RetryFuture.ExecWithRetryOrFallback(quizGenerator, fallBack, 2);
-                    artQuizFutures.put(artName, artQuizFuture);
-                }
+                Map<String, CompletableFuture<ArtQuiz>> artQuizFutures = generateTournamentQuizzesGivenArtNames(artNames);
 
                 CompletableFuture<ArtQuiz>[] futuresArray = artQuizFutures.values().toArray(new CompletableFuture[0]);
 
-
                 // wait for all the art quizzes to be generated then create the tournament and upload it to the database
-
                 return CompletableFuture.allOf(futuresArray)
-                        .thenApply(v -> {
-
-                            Map<String, ArtQuiz> artQuizzes = new HashMap<>();
-                            for (Map.Entry<String, CompletableFuture<ArtQuiz>> entry : artQuizFutures.entrySet()) {
-                                try {
-
-                                    ArtQuiz quiz = entry.getValue().get();
-
-                                    // A null quiz means that the quiz generation failed after 2 retries, the tournament would fail to be generated so we should abort and unlock
-                                    if (quiz == null) {
-                                        // unlock the tournament generation so that another user can try to generate it
-                                        unlockTournamentGeneration();
-                                        return null;
-                                    }
-
-                                    artQuizzes.put(entry.getKey(), quiz);
-                                } catch (InterruptedException | ExecutionException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            Tournament tournament = new Tournament(artQuizzes);
-                            uploadTournamentToDatabase(tournament);
-
-                            return tournament;
-                        });
+                        .thenApply(x -> createAndUploadTournamentFromQuizzes(artQuizFutures));
             }
         });
     }
+
+    private static Map<String, CompletableFuture<ArtQuiz>> generateTournamentQuizzesGivenArtNames(ArrayList<String> artNames) {
+
+        Map<String, CompletableFuture<ArtQuiz>> artQuizFutures = new HashMap<>();
+
+        Supplier<ArtQuiz> fallBack = () -> null;
+
+        for (String artName : artNames) {
+            Supplier<CompletableFuture<ArtQuiz>> quizGenerator = () -> new QuizGeneratorApi(service).generateArtQuiz(artName);
+            CompletableFuture<ArtQuiz> artQuizFuture = RetryFuture.ExecWithRetryOrFallback(quizGenerator, fallBack, 2);
+            artQuizFutures.put(artName, artQuizFuture);
+        }
+
+        return artQuizFutures;
+    }
+
+    private static Tournament createAndUploadTournamentFromQuizzes(Map<String, CompletableFuture<ArtQuiz>> completedQuizzesMappedByArtName){
+
+        Map<String, ArtQuiz> artQuizzes = new HashMap<>();
+        for (Map.Entry<String, CompletableFuture<ArtQuiz>> entry : completedQuizzesMappedByArtName.entrySet()) {
+            try {
+
+                ArtQuiz quiz = entry.getValue().get();
+
+                // A null quiz means that the quiz generation failed after 2 retries, the tournament would fail to be generated so we should abort and unlock
+                if (quiz == null) {
+                    // unlock the tournament generation so that another user can try to generate it
+                    unlockTournamentGeneration();
+                    return null;
+                }
+
+                artQuizzes.put(entry.getKey(), quiz);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Tournament tournament = new Tournament(artQuizzes);
+        uploadTournamentToDatabase(tournament);
+
+        return tournament;
+    }
+
+
     private static Calendar generateWeeklyTournamentDate() {
 
         Random random = RandomApi.getRandom();
@@ -321,7 +309,6 @@ public class TournamentManagerApi {
             JSONObject jsonObj = new JSONObject(json);
             JSONArray jsonArray = jsonObj.getJSONArray("artworks");
 
-
             // Randomly choose three artworks from the JSON array
             int numArtworks = jsonArray.length();
             int numArtNamesToChoose = 3;
@@ -336,11 +323,8 @@ public class TournamentManagerApi {
                     chosenIndices.add(randomIndex);
                 }
             }
-
         } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+            e.printStackTrace();}
         return artNames;
     }
 
