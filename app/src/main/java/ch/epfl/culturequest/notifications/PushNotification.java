@@ -96,7 +96,6 @@ public class PushNotification {
                 .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(Notification.DEFAULT_ALL)
-                .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .build();
     }
