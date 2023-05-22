@@ -1053,16 +1053,13 @@ public class Database {
                         public void onCancelled(DatabaseError databaseError) {
                             // todo: handle it better
                             future.completeExceptionally(new RuntimeException("Failed to read data from Firebase: " + databaseError.getMessage()));
-                        }});
-                }
-            }
+                        }});}}
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // todo: handle it better
                 future.completeExceptionally(new RuntimeException("Failed to read data from Firebase: " + databaseError.getMessage()));
             }
         });
-
         return future;
     }
 

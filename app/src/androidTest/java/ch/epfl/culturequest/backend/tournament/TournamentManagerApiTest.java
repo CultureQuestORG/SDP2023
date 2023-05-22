@@ -17,12 +17,7 @@ import static ch.epfl.culturequest.database.Database.uploadTournamentToDatabase;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import com.google.android.apps.common.testing.accessibility.framework.Question;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.gson.internal.bind.ArrayTypeAdapter;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

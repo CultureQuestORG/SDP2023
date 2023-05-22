@@ -8,18 +8,15 @@ import static ch.epfl.culturequest.database.Database.lockTournamentGeneration;
 import static ch.epfl.culturequest.database.Database.unlockTournamentGeneration;
 import static ch.epfl.culturequest.database.Database.uploadTournamentToDatabase;
 import static ch.epfl.culturequest.database.Database.waitForTournamentGenerationAndFetchIt;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import com.google.gson.Gson;
 import com.theokanning.openai.service.OpenAiService;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -55,7 +52,6 @@ import ch.epfl.culturequest.backend.tournament.utils.RandomApi;
  */
 
 @SuppressLint("NewApi")
-
 public class TournamentManagerApi {
 
     public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY, Duration.ofMinutes(2));
@@ -103,7 +99,6 @@ public class TournamentManagerApi {
 
         return tournament;
     }
-
 
     private static CompletableFuture<Void> generateOrFetchTournamentThenStore() {
 
@@ -202,28 +197,7 @@ public class TournamentManagerApi {
 
         return isTournamentGenerationLocked().thenCompose(generationLocked -> {
             if (generationLocked) {
-                String weeklyTournamentId = RandomApi.getWeeklyTournamentPseudoRandomUUID();
-
-                return fetchTournamentWhenGenerated(weeklyTournamentId)
-                        .handle((result, ex) -> {
-                            if (ex != null && ex.getCause() instanceof TimeoutException) {
-                                if (ex.getCause() instanceof TimeoutException) {
-
-                                    // If the device that firstly took the generation lead at least 2 minutes after the lock didn't generate the tournament yet, we consider that this device is finito, so we unlock the generation, take the lead and generate the tournament
-                                    return unlockTournamentGeneration().thenCompose(unlocked -> {
-                                        if (unlocked) {
-                                            return generateOrFetchTournament();
-                                        } else {
-                                            throw new RuntimeException("Failed to unlock tournament generation", ex);
-                                        }
-                                    });
-                                } else {
-                                    throw new CompletionException(ex);
-                                }
-                            } else {
-                                return CompletableFuture.completedFuture(result);
-                            }
-                        }).thenCompose(Function.identity());
+                return fetchTournamentWhenGeneratedAndHandleGenerationTimeout();
             }
             else {
                 // lock the tournament generation to prevent other users from generating it at the same time
@@ -241,6 +215,33 @@ public class TournamentManagerApi {
                         .thenApply(x -> createAndUploadTournamentFromQuizzes(artQuizFutures));
             }
         });
+    }
+
+    // This method is responsible for fetching the tournament from database (call to fetchTournamentWhenGenerated) and handling the case where the tournament takes too long to be generated, in which case we unlock the generation and try to generate it again
+    private static CompletableFuture<Tournament> fetchTournamentWhenGeneratedAndHandleGenerationTimeout(){
+
+        String weeklyTournamentId = RandomApi.getWeeklyTournamentPseudoRandomUUID();
+
+        return fetchTournamentWhenGenerated(weeklyTournamentId)
+                .handle((result, ex) -> {
+                    if (ex != null && ex.getCause() instanceof TimeoutException) {
+                        if (ex.getCause() instanceof TimeoutException) {
+
+                            // If the device that firstly took the generation lead at least 2 minutes after the lock didn't generate the tournament yet, we consider that this device is finito, so we unlock the generation, take the lead and generate the tournament
+                            return unlockTournamentGeneration().thenCompose(unlocked -> {
+                                if (unlocked) {
+                                    return generateOrFetchTournament();
+                                } else {
+                                    throw new RuntimeException("Failed to unlock tournament generation", ex);
+                                }
+                            });
+                        } else {
+                            throw new CompletionException(ex);
+                        }
+                    } else {
+                        return CompletableFuture.completedFuture(result);
+                    }
+                }).thenCompose(Function.identity());
     }
 
     private static Map<String, CompletableFuture<ArtQuiz>> generateTournamentQuizzesGivenArtNames(ArrayList<String> artNames) {
@@ -284,7 +285,6 @@ public class TournamentManagerApi {
 
         return tournament;
     }
-
 
     private static Calendar generateWeeklyTournamentDate() {
 
