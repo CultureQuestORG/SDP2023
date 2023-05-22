@@ -16,6 +16,8 @@ import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
@@ -74,12 +76,11 @@ public class ProfileFragmentTest {
 
         // picpath is the url to the profile pic of the test user
 
-        String downloadUrl = FireStorage.uploadAndGetUrlFromImage(FireStorage.getBitmapFromURL(DEFAULT_PROFILE_PIC_PATH), true)
-                .join();
 
         ProfileUtils.POSTS_ADDED = 0;
 
-        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), downloadUrl
+        String picpath = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2FcT93LtGk2dT9Jvg46pOpbBP69Kx1?alt=media&token=35ba6af5-104d-4218-bc26-3fb39f75ac15";
+        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), picpath
                 , "Piece of Art", 0, 0, new ArrayList<>());
         Database.uploadPost(post);
 
