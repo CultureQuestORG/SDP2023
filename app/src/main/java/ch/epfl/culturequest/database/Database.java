@@ -880,4 +880,22 @@ public class Database {
         DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName).child("scores").child(uid);
         quizRef.setValue(score);
     }
+
+    public static CompletableFuture<String> getImageForArt(String artwork){
+        CompletableFuture<String> future = new CompletableFuture<>();
+        // get the first post with "artworkName" = artwork
+        DatabaseReference postsRef = databaseInstance.getReference("posts");
+        postsRef.orderByChild("artworkName").equalTo(artwork).limitToFirst(1).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    Post post = snapshot.getValue(Post.class);
+                    assert post != null;
+                    future.complete(post.getImageUrl());
+                }
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
 }
