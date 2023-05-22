@@ -78,12 +78,9 @@ public class ArtDescriptionDisplayActivityTest1 {
     public static Intent createTestIntentWithExtras(String serializedDescription) {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         Intent intent = new Intent(targetContext, ArtDescriptionDisplayActivity.class);
-
         //String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100";
         intent.putExtra("artDescription", serializedDescription);
-
         Bitmap bitmap = FireStorage.getBitmapFromURL("https://uploads0.wikiart.org/00339/images/leonardo-da-vinci/mona-lisa-c-1503-1519.jpg");
-
         // get content resolver from the target context
         LocalStorage localStorage = new LocalStorage(targetContext.getContentResolver());
         try {
