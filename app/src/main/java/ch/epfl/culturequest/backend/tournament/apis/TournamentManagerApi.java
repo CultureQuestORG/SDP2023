@@ -1,6 +1,7 @@
 package ch.epfl.culturequest.backend.tournament.apis;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+import static ch.epfl.culturequest.backend.tournament.utils.RandomApi.generateWeeklyTournamentDate;
 import static ch.epfl.culturequest.database.Database.handleFutureTimeout;
 import static ch.epfl.culturequest.database.Database.indicateTournamentNotGenerated;
 import static ch.epfl.culturequest.database.Database.isTournamentGenerationLocked;
@@ -133,7 +134,6 @@ public class TournamentManagerApi {
     }
 
     private static void generateAndStoreTournamentDate() {
-
 
         // To be called only if tournamentRemainingTime <= 0 (i.e. tournament is over or has not been generated yet)
         if (tournamentRemainingTime() > 0) {
@@ -279,24 +279,6 @@ public class TournamentManagerApi {
         uploadTournamentToDatabase(tournament);
 
         return tournament;
-    }
-
-    private static Calendar generateWeeklyTournamentDate() {
-
-        Random random = RandomApi.getRandom();
-        int randomHour = random.nextInt(24);
-        int randomMinute = random.nextInt(60);
-        int randomSecond = random.nextInt(60);
-        int randomDay = random.nextInt(7);
-
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, randomHour);
-        calendar.set(Calendar.MINUTE, randomMinute);
-        calendar.set(Calendar.SECOND, randomSecond);
-        calendar.set(Calendar.DAY_OF_WEEK, randomDay);
-
-        return calendar;
     }
 
     private static ArrayList<String> randomlyChooseArtNames() {
