@@ -115,7 +115,7 @@ public class ArtDescriptionDisplayActivityTest1 {
 
 
     @Test
-    public void postingSameArtTwiceLaunchesPopUp() throws ExecutionException, InterruptedException, TimeoutException {
+    public void postingSameArtTwiceLaunchesPopUp() throws InterruptedException {
         Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PIC_PATH
                 , "Mona Lisa", 0, 0, new ArrayList<>());
         Database.uploadPost(post);
