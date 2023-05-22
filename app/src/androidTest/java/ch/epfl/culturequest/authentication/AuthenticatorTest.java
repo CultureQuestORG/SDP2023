@@ -83,12 +83,11 @@ public class AuthenticatorTest {
             Thread.sleep(2000);
             String signInState = Authenticator.signIn(activity).get(5, TimeUnit.SECONDS);
             assertEquals(signInState, "User signed in with an existing profile");
+            Thread.sleep(2000);
             onView(withId(R.id.navigation_scan)).check(matches(isDisplayed()));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
-
-        Database.clearDatabase();
     }
 
     @Test
