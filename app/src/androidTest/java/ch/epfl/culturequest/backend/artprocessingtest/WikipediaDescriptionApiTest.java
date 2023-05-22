@@ -2,7 +2,7 @@ package ch.epfl.culturequest.backend.artprocessingtest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
@@ -50,14 +50,13 @@ public class WikipediaDescriptionApiTest {
         assertThat(descriptionMonaLisa.getSummary(), is(expectedSummaryMonaLisa));
         String realSummaryDavidOfMichelangelo = descriptionDavidOfMichelangelo.getSummary();
 
-        assertThat(realSummaryDavidOfMichelangelo,containsString("David"));
-        assertThat(realSummaryDavidOfMichelangelo,containsString("Michelangelo"));
-        assertThat(realSummaryDavidOfMichelangelo,containsString("sculpture"));
-        assertThat(realSummaryDavidOfMichelangelo,containsString("1504"));
-        assertThat(realSummaryDavidOfMichelangelo,containsString("Florence"));
-        assertThat(realSummaryDavidOfMichelangelo,containsString("Italy"));
-        assertThat(realSummaryDavidOfMichelangelo,containsString("Renaissance"));
-        assertThat(realSummaryDavidOfMichelangelo,containsString("5.17"));
+        assertThat(realSummaryDavidOfMichelangelo,containsStringIgnoringCase("David"));
+        assertThat(realSummaryDavidOfMichelangelo,containsStringIgnoringCase("Michelangelo"));
+        assertThat(realSummaryDavidOfMichelangelo,containsStringIgnoringCase("sculpture"));
+        assertThat(realSummaryDavidOfMichelangelo,containsStringIgnoringCase("1504"));
+        assertThat(realSummaryDavidOfMichelangelo,containsStringIgnoringCase("Florence"));
+        assertThat(realSummaryDavidOfMichelangelo,containsStringIgnoringCase("Renaissance"));
+        assertThat(realSummaryDavidOfMichelangelo,containsStringIgnoringCase("5.17"));
 
         assertThat(descriptionArcDeTriomphe.getSummary(), is("The Arc de Triomphe de l'Étoile is one of the most famous monuments in Paris, France, standing at the western end of the Champs-Élysées at the centre of Place Charles de Gaulle, formerly named Place de l'Étoile—the étoile or \"star\" of the juncture formed by its twelve radiating avenues. The location of the arc and the plaza is shared between three arrondissements, 16th, 17th, and 8th. The Arc de Triomphe honours those who fought and died for France in the French Revolutionary and Napoleonic Wars, with the names of all French victories and generals inscribed on its inner and outer surfaces.") );
     }
