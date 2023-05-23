@@ -140,8 +140,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
      *
      * @param likes the number of likes
      */
-    private String getNumberOfLikes(int likes) {
-        if (likes == 0) {
+    public static String getNumberOfLikes(int likes) {
+        if (likes <= 0) {
             return null;
         } else if (likes == 1) {
             return "1 like";
