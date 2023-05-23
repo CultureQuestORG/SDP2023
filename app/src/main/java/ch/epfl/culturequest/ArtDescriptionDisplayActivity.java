@@ -271,7 +271,6 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.putExtra(Intent.EXTRA_TEXT, "I just scanned " + description.getName() + " with \uD835\uDC02\uD835\uDC2E\uD835\uDC25\uD835\uDC2D\uD835\uDC2E\uD835\uDC2B\uD835\uDC1E\uD835\uDC10\uD835\uDC2E\uD835\uDC1E\uD835\uDC2C\uD835\uDC2D!\n\n" +
                 "It's a " + getRarityLevel(description.getScore()).name().toLowerCase() + " artwork from " + description.getArtist() + ", displayed at "+ description.getMuseum() + ", " + description.getCity() + ".\n\n" +
-                description.getSummary() + "\n\n" +
                 "Download the app here: https://play.google.com/store/apps/details?id=com.culturequest.culturequest");
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(Intent.createChooser(shareIntent, "Share your scan using"));
