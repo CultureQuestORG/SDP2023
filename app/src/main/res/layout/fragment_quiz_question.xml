@@ -111,7 +111,8 @@
                 android:layout_height="wrap_content"
                 android:button="@drawable/radio_button_custom"
                 android:checked="false"
-                android:text="Answer 1234"
+                android:text="Answer 1"
+                android:textColor="#000000"
                 android:textAlignment="viewStart"
 
                 android:textSize="15sp" />
