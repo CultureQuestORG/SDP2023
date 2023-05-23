@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
@@ -13,7 +12,6 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
-        android:background="#FCFAF6"
         android:scaleType="centerCrop"
         app:srcCompat="@drawable/login_background" />
 
@@ -28,6 +26,28 @@
         android:layout_marginEnd="83dp"
         android:layout_marginBottom="670dp" />
 
+    <EditText
+        android:id="@+id/editTextTextEmailAddress"
+        android:layout_width="287dp"
+        android:layout_height="56dp"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="80dp"
+        android:background="@drawable/edittext_border"
+        android:hint="@string/fui_email_hint"
+        android:inputType="textEmailAddress"
+        android:padding="10dp" />
+
+    <EditText
+        android:id="@+id/editTextTextPassword"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_below="@id/editTextTextEmailAddress"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="80dp"
+        android:background="@drawable/edittext_border"
+        android:hint="@string/fui_password_hint"
+        android:inputType="textPassword"
+        android:padding="10dp" />
+
 </RelativeLayout>
-
-
