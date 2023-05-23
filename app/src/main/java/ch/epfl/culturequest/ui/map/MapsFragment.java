@@ -306,7 +306,7 @@ public class MapsFragment extends Fragment {
         try {
             if (viewModel.isLocationPermissionGranted()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    locationRequest = new LocationRequest.Builder(200000).build();
+                    locationRequest = new LocationRequest.Builder(10000).build();
                 }
                 LocationCallback locationCallback = new LocationCallback() {
                     @Override
@@ -329,8 +329,8 @@ public class MapsFragment extends Fragment {
                                     getProfilePicture();
                                 }
                             }
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
+                            //mMap.moveCamera(CameraUpdateFactory
+                                    //.newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
 
                             getMarkers(viewModel.getCurrentLocation().getValue());
                         }
