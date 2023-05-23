@@ -12,11 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.ui.events.EventsViewModel;
 
 public class TournamentsRecycleViewAdapter extends RecyclerView.Adapter<TournamentsRecycleViewAdapter.TournamentViewHolder> {
 
-    private List<String> tournamentsEvents = List.of();
+    private List<Tournament> tournamentsEvents = List.of();
 
     public TournamentsRecycleViewAdapter(EventsViewModel eventsViewModel) {
         eventsViewModel.getTournamentsEvents().observeForever(sightseeingEvents -> {
@@ -34,12 +36,12 @@ public class TournamentsRecycleViewAdapter extends RecyclerView.Adapter<Tourname
 
     @Override
     public void onBindViewHolder(@NonNull TournamentViewHolder holder, int position) {
-        holder.getTournamentName().setText(tournamentsEvents.get(position));
-        holder.getTournamentStatus().setText("Status: " + "In progress");
+        holder.getTournamentName().setText("Quizz of the week");
+        holder.getTournamentStatus().setText("Status: In progress");
 
         holder.itemView.setOnClickListener(view -> {
             Intent intent = new Intent(holder.itemView.getContext(), TournamentActivity.class);
-            intent.putExtra("tournament_id", tournamentsEvents.get(position));
+            intent.putExtra("tournament_id", tournamentsEvents.get(position).getTournamentId());
             holder.itemView.getContext().startActivity(intent);
         });
     }

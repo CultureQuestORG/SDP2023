@@ -4,7 +4,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.List;
+import java.util.Map;
 
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
@@ -14,14 +17,13 @@ import ch.epfl.culturequest.tournament.quiz.Quiz;
 public class TournamentViewModel extends ViewModel {
 
 //    private final MutableLiveData<Tournament> tournament;
-    private final MutableLiveData<List<Quiz>> quizzes = new MutableLiveData<>();
+    private final MutableLiveData<Map<String, ArtQuiz>> quizzes = new MutableLiveData<>();
 
-    public TournamentViewModel(String tournamentId) {
-        Quiz quiz = new Quiz("Joconde", List.of(new Question("Quel est le nom de cette oeuvre ?", List.of("La Joconde", "La Joconde", "La Joconde", "La Joconde"), 0)), tournamentId);
-        quizzes.setValue(List.of(quiz));
+    public TournamentViewModel(Tournament tournament) {
+        quizzes.setValue(tournament.getArtQuizzes());
     }
 
-    public MutableLiveData<List<Quiz>> getQuizzes() {
+    public MutableLiveData<Map<String, ArtQuiz>> getQuizzes() {
         return quizzes;
     }
 

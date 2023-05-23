@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.ui.quiz;
 
+import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -7,6 +8,7 @@ import androidx.fragment.app.Fragment;
 
 import ch.epfl.culturequest.databinding.FragmentQuizGameOverBinding;
 import ch.epfl.culturequest.databinding.FragmentQuizInterBinding;
+import ch.epfl.culturequest.ui.events.tournaments.TournamentActivity;
 
 public class QuizGameOverFragment extends Fragment {
 
@@ -20,7 +22,9 @@ public class QuizGameOverFragment extends Fragment {
         View root = binding.getRoot();
 
         binding.btnBackToTournament.setOnClickListener(a-> {
-            //handle back to tournament
+            Intent intent = new Intent(getActivity(), TournamentActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            getActivity().startActivity(intent);
         });
 
         return root;

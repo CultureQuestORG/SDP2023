@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
@@ -12,7 +14,7 @@ import ch.epfl.culturequest.social.SightseeingEvent;
 public class EventsViewModel extends ViewModel {
 
     private final MutableLiveData<List<SightseeingEvent>> sightseeingEvents;
-    private final MutableLiveData<List<String>> tournamentsEvents;
+    private final MutableLiveData<List<Tournament>> tournamentsEvents;
 
     public EventsViewModel() {
         sightseeingEvents = new MutableLiveData<>();
@@ -36,19 +38,12 @@ public class EventsViewModel extends ViewModel {
         });
     }
 
-    public MutableLiveData<List<String>> getTournamentsEvents() {
+    public MutableLiveData<List<Tournament>> getTournamentsEvents() {
         return tournamentsEvents;
     }
 
     public void refreshTournamentsEvents() {
-//        Database.getTournamentsEvents(Profile.getActiveProfile().getUid()).whenComplete((events, throwable) -> {
-//            if (throwable != null) {
-//                throwable.printStackTrace();
-//                return;
-//            }
-//            tournamentsEvents.setValue(events);
-//        });
-        tournamentsEvents.setValue(List.of("Tournament 1", "Tournament 2", "Tournament 3"));
+        tournamentsEvents.setValue(List.of(TournamentManagerApi.getTournamentFromSharedPref()));
     }
 
 }

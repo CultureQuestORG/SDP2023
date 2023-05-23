@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.databinding.ActivityEventsBinding;
 import ch.epfl.culturequest.databinding.ActivityQuizBinding;
 import ch.epfl.culturequest.databinding.ActivityTournamentBinding;
@@ -29,7 +31,7 @@ public class TournamentActivity extends AppCompatActivity {
     private ActivityTournamentBinding binding;
 
     private String uid;
-    private String tournament;
+    private Tournament tournament;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,8 @@ public class TournamentActivity extends AppCompatActivity {
         // To make the status bar transparent
         AndroidUtils.removeStatusBar(getWindow());
         // fetch the tournament from the intent
-        tournament = getIntent().getStringExtra("tournament_id");
+        // tournament = getIntent().getStringExtra("tournament_id");
+        tournament = TournamentManagerApi.getTournamentFromSharedPref();
 
         if (Profile.getActiveProfile() != null) {
             uid = Profile.getActiveProfile().getUid();
@@ -54,7 +57,7 @@ public class TournamentActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         TextView tournamentName = binding.titleTournament;
-        tournamentName.setText(tournament);
+        tournamentName.setText("Tournament of the week");
         TextView tournamentDescription = binding.tournamentInfos;
         tournamentDescription.setText("Ongoing tournament of the week");
 

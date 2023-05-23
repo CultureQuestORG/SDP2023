@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Objects;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.databinding.FragmentQuizQuestionBinding;
 
 public class QuizQuestionFragment extends Fragment {
@@ -37,7 +39,8 @@ public class QuizQuestionFragment extends Fragment {
             throw new RuntimeException("QuizQuestionFragment needs arguments");
         }
         String uid = getArguments().getString("uid");
-        String tournament = getArguments().getString("tournament");
+        Tournament tournament = TournamentManagerApi.getTournamentFromSharedPref();
+        // String tournament = getArguments().getString("tournament");
         String artName = getArguments().getString("artName");
         questionNumber = getArguments().getInt("questionNumber");
         question = getArguments().getString("question");
@@ -48,7 +51,7 @@ public class QuizQuestionFragment extends Fragment {
         }
 
 
-        quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
+        quizViewModel = QuizViewModel.getQuiz(uid, tournament.getTournamentId(), artName);
 
         binding.questionTextView.setText(question);
 

@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivityQuizBinding;
 import ch.epfl.culturequest.social.Profile;
@@ -23,7 +26,7 @@ public class QuizActivity extends AppCompatActivity {
     private ActivityQuizBinding binding;
 
     private String uid;
-    private String tournament;
+    private Tournament tournament;
     private String artName;
 
     @Override
@@ -33,7 +36,8 @@ public class QuizActivity extends AppCompatActivity {
         // To make the status bar transparent
         AndroidUtils.removeStatusBar(getWindow());
         // fetch the tournament and artname from the intent
-        tournament = getIntent().getStringExtra("tournament");
+        tournament = TournamentManagerApi.getTournamentFromSharedPref();
+        //tournament = getIntent().getStringExtra("tournament");
         artName = getIntent().getStringExtra("artName");
         if (Profile.getActiveProfile() != null) {
             uid = Profile.getActiveProfile().getUid();
@@ -41,7 +45,7 @@ public class QuizActivity extends AppCompatActivity {
             uid = "1234";
         }
 
-        if (tournament == null || artName == null) {
+        if (artName == null) {
             throw new RuntimeException("Null argument");
         }
 
@@ -49,7 +53,7 @@ public class QuizActivity extends AppCompatActivity {
 
 
 
-        QuizViewModel.addQuiz(tournament, artName,this, uid);
+        QuizViewModel.addQuiz(tournament.getTournamentId(), artName,this, uid);
 
 
         setContentView(binding.getRoot());
@@ -71,11 +75,11 @@ public class QuizActivity extends AppCompatActivity {
 
 
 
-    public QuizQuestionFragment goToQuestion(int questionNumber,Question question) {
+    public QuizQuestionFragment goToQuestion(int questionNumber, QuizQuestion question) {
         Bundle bundle = basicBundle();
         bundle.putInt("questionNumber", questionNumber);
-        bundle.putStringArrayList("possibleAnswers", new ArrayList<>(question.getPossibilities()));
-        bundle.putString("question", question.getQuestion());
+        bundle.putStringArrayList("possibleAnswers", new ArrayList<>(question.getPossibleAnswers()));
+        bundle.putString("question", question.getQuestionContent());
         QuizQuestionFragment fragment = new QuizQuestionFragment();
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
@@ -107,7 +111,7 @@ public class QuizActivity extends AppCompatActivity {
     private Bundle basicBundle(){
         Bundle bundle = new Bundle();
         bundle.putString("uid", uid);
-        bundle.putString("tournament", tournament);
+        // bundle.putString("tournament", tournament);
         bundle.putString("artName", artName);
         return bundle;
     }

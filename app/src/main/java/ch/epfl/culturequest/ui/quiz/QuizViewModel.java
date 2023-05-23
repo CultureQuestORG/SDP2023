@@ -7,6 +7,10 @@ import androidx.lifecycle.ViewModel;
 import java.util.HashMap;
 import java.util.Objects;
 
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.tournament.quiz.Question;
 import ch.epfl.culturequest.tournament.quiz.Quiz;
@@ -19,7 +23,7 @@ public class QuizViewModel extends ViewModel {
     public static HashMap<Triple<String, String, String>, QuizViewModel> quizHashMap = new HashMap<>();
 
 
-    private final MutableLiveData<Quiz> quiz = new MutableLiveData<>();
+    private final MutableLiveData<ArtQuiz> quiz = new MutableLiveData<>();
 
     private final MutableLiveData<QuizActivity> quizActivity = new MutableLiveData<>();
 
@@ -32,7 +36,7 @@ public class QuizViewModel extends ViewModel {
 
 
 
-    public QuizViewModel(Quiz quiz, QuizActivity quizActivity, String uid) {
+    public QuizViewModel(ArtQuiz quiz, QuizActivity quizActivity, String uid) {
         this.quiz.postValue(quiz);
         this.quizActivity.postValue(quizActivity);
         score.postValue(0);
@@ -42,24 +46,23 @@ public class QuizViewModel extends ViewModel {
 
 
     }
-    public void setQuiz(Quiz quiz) {
+    public void setQuiz(ArtQuiz quiz) {
         this.quiz.postValue(quiz);
     }
 
-    public MutableLiveData<Quiz> getQuiz() {
+    public MutableLiveData<ArtQuiz> getQuiz() {
         return quiz;
     }
 
     public QuizQuestionFragment startQuiz() {
-        Database.startQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue());
+        //Database.startQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue());
         return Objects.requireNonNull(quizActivity.getValue()).goToQuestion(0, Objects.requireNonNull(quiz.getValue()).getQuestions().get(0));
     }
 
     public Fragment answerQuestion(int questionNumber, int answer) {
-        boolean correct = Objects.requireNonNull(quiz.getValue()).getQuestions().get(questionNumber).isCorrect(answer);
+        boolean correct = quiz.getValue().getQuestions().get(questionNumber).getCorrectAnswerIndex() == answer;
         if (!correct) {
             return Objects.requireNonNull(quizActivity.getValue()).FailQuiz();
-
         }
 
         score.postValue(nextScore.getValue());
@@ -80,18 +83,17 @@ public class QuizViewModel extends ViewModel {
     }
 
     public QuizVictoryFragment finishQuiz(int score) {
-        Database.setScoreQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue(), score);
+        //Database.setScoreQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue(), score);
         return Objects.requireNonNull(quizActivity.getValue()).endQuiz(score);
     }
 
 
 
     public static void addQuiz(String tournament,String artName,QuizActivity activity,String uid) {
-        Objects.requireNonNull(Database.getQuiz(tournament, artName)).thenAccept(quiz -> {
-            Triple<String, String, String> key = new Triple<>(uid, tournament, artName);
-            quizHashMap.put(key, new QuizViewModel(quiz, activity,uid));
-            activity.welcome();
-        });
+        Tournament tournament1 = TournamentManagerApi.getTournamentFromSharedPref();
+        Triple<String, String, String> key = new Triple<>(uid, tournament1.getTournamentId(), artName);
+        quizHashMap.put(key, new QuizViewModel(tournament1.getArtQuizzes().get(artName), activity,uid));
+        activity.welcome();
     }
 
     public static QuizViewModel getQuiz(String uid, String tournament, String artName) {
@@ -99,7 +101,7 @@ public class QuizViewModel extends ViewModel {
         return quizHashMap.get(key);
     }
 
-    public Question getQuestion(int questionNumber) {
+    public QuizQuestion getQuestion(int questionNumber) {
         return Objects.requireNonNull(quiz.getValue()).getQuestions().get(questionNumber);
     }
 

@@ -1,6 +1,8 @@
 package ch.epfl.culturequest.ui.events.tournaments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +16,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
 import ch.epfl.culturequest.tournament.quiz.Quiz;
 import ch.epfl.culturequest.ui.events.EventsViewModel;
+import ch.epfl.culturequest.ui.quiz.QuizActivity;
 
 public class QuizzesRecycleViewAdapter extends RecyclerView.Adapter<QuizzesRecycleViewAdapter.QuizzViewHolder> {
 
-    private List<Quiz> quizzes;
+    private Map<String, ArtQuiz> quizzes;
     private final FragmentManager fragmentManager;
 
     public QuizzesRecycleViewAdapter(TournamentViewModel eventsViewModel, FragmentManager fragmentManager) {
@@ -41,9 +46,9 @@ public class QuizzesRecycleViewAdapter extends RecyclerView.Adapter<QuizzesRecyc
 
     @Override
     public void onBindViewHolder(@NonNull QuizzViewHolder holder, int position) {
-        holder.getQuizzTitle().setText(quizzes.get(position).getArtName());
+        holder.getQuizzTitle().setText(quizzes.keySet().toArray()[position].toString());
         holder.getQuizzStatus().setText("Not started yet");
-        setAvailable(false, holder);
+        setAvailable(true, holder, quizzes.keySet().toArray()[position].toString());
     }
 
     @Override
@@ -51,7 +56,7 @@ public class QuizzesRecycleViewAdapter extends RecyclerView.Adapter<QuizzesRecyc
         return quizzes.size();
     }
 
-    private void setAvailable(boolean available, QuizzViewHolder holder) {
+    private void setAvailable(boolean available, QuizzViewHolder holder, String artName) {
         if (!available) {
             holder.quizzTitleMark.setAlpha(0.7f);
             holder.quizzTitle.setAlpha(0.7f);
@@ -60,6 +65,12 @@ public class QuizzesRecycleViewAdapter extends RecyclerView.Adapter<QuizzesRecyc
             holder.itemView.setOnClickListener(v -> {
                 QuizzUnavailableDialog quizzUnavailableDialog = new QuizzUnavailableDialog();
                 quizzUnavailableDialog.show(fragmentManager, "QuizzUnavailableDialog");
+            });
+        } else {
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(holder.itemView.getContext(), QuizActivity.class);
+                intent.putExtra("artName", artName);
+                holder.itemView.getContext().startActivity(intent);
             });
         }
     }
