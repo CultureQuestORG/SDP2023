@@ -12,6 +12,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.Objects;
 
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.databinding.ActivityNavigationBinding;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.utils.AndroidUtils;
@@ -73,4 +74,15 @@ public class NavigationActivity extends AppCompatActivity {
             navController.navigate(R.id.navigation_home);
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            TournamentManagerApi.handleTournaments(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
