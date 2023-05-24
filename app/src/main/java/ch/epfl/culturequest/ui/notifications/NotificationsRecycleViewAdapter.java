@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import ch.epfl.culturequest.NavigationActivity;
@@ -45,13 +47,15 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
     @Override
     public void onBindViewHolder(@NonNull NotificationsRecycleViewAdapter.NotificationViewHolder holder, int position) {
         holder.getNotificationText().setText(notificationTexts.get(position).getText());
-        setIconNotification(holder.getNotificationIcon(), notificationTexts.get(position).getChannelId());
+        setIconNotification(holder.getNotificationIcon(), notificationTexts.get(position).getChannelId(), notificationTexts.get(position).getSenderId());
+
         holder.getDeleteButton().setOnClickListener(view -> {
             Database.deleteNotification(Profile.getActiveProfile().getUid(), notificationTexts.get(position));
             notificationTexts.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(0, getItemCount());
         });
+
         holder.itemView.setOnClickListener(view -> {
             System.out.println(notificationTexts.get(position).getChannelId());
             switch (notificationTexts.get(position).getChannelId()) {
@@ -67,11 +71,13 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
                     holder.itemView.getContext().startActivity(intent);
                     return;
 //                case TournamentNotification.CHANNEL_ID:
-//                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
+//                    intent = new Intent(holder.itemView.getContext(), EventActivity.class);
+//                    intent.putExtra("redirect", "tournament");
 //                    holder.itemView.getContext().startActivity(intent);
 //                    return;
 //                case SightseeingNotification.CHANNEL_ID:
-//                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
+//                    intent = new Intent(holder.itemView.getContext(), EventActivity.class);
+//                    intent.putExtra("redirect", "sightseeing");
 //                    holder.itemView.getContext().startActivity(intent);
 //                    return;
                 default:
@@ -85,7 +91,7 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
         return notificationTexts.size();
     }
 
-    private void setIconNotification(ImageView icon, String channel) {
+    private void setIconNotification(ImageView icon, String channel, String uid) {
         switch (channel) {
             case ScanNotification.CHANNEL_ID:
                 icon.setImageResource(R.drawable.scan_icon_unsel);
@@ -94,7 +100,12 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
                 icon.setImageResource(R.drawable.like_full);
                 break;
             case FollowNotification.CHANNEL_ID:
-                icon.setImageResource(R.drawable.profile_icon_unsel);
+                Database.getProfile(uid).thenAccept(profile -> {
+                    Picasso.get()
+                            .load(profile.getProfilePicture())
+                            .placeholder(R.drawable.profile_icon_unsel)
+                            .into(icon);
+                });
                 break;
             case TournamentNotification.CHANNEL_ID:
                 icon.setImageResource(R.drawable.planner);

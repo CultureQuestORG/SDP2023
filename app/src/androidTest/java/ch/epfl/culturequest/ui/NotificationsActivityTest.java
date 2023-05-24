@@ -1,7 +1,11 @@
 package ch.epfl.culturequest.ui;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -35,6 +39,7 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.notifications.NotificationsActivity;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 @RunWith(AndroidJUnit4.class)
 public class NotificationsActivityTest {
@@ -59,8 +64,6 @@ public class NotificationsActivityTest {
         Authenticator.manualSignIn(email, password).join();
 
         // Initialize the database with some test profiles
-        ArrayList<String> myFriendsIds = new ArrayList<>();
-        myFriendsIds.add("friendID");
 
         Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400, new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(activeProfile);
@@ -71,6 +74,8 @@ public class NotificationsActivityTest {
 
         PushNotification notif2 = new PushNotification("notif2", "notif2", "FOLLOW", "senderId2");
         Database.addNotification(activeProfile.getUid(), notif2);
+
+        Thread.sleep(5000);
 
         PushNotification notif3 = new PushNotification("notif3", "notif3", "SCAN", "senderId3");
         Database.addNotification(activeProfile.getUid(), notif3);
@@ -102,6 +107,26 @@ public class NotificationsActivityTest {
 
         onView(withText("notif2")).check(matches(isEnabled()));
         onView(withText("notif1")).check(matches(isEnabled()));
+    }
+
+    @Test
+    public void clickOnNotifFollowSendsToProfile() {
+        onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
+        onView(withId(R.id.notifications_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.notification_text)));
+
+        onView(withText("notif2")).perform(click());
+        intended(hasComponent(DisplayUserProfileActivity.class.getName()));
+        intended(hasExtra("uid", "senderId2"));
+    }
+
+    @Test
+    public void clickOnNotifLikeSendsToProfile() {
+        onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
+        onView(withId(R.id.notifications_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.notification_text)));
+
+        onView(withText("notif1")).perform(click());
+        intended(hasComponent(DisplayUserProfileActivity.class.getName()));
+        intended(hasExtra("uid", "senderId2"));
     }
 
     public ViewAction clickChildViewWithId(final int id) {
