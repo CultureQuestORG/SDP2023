@@ -50,7 +50,7 @@ public class TournamentManagerApiTest {
         Database.setEmulatorOn();
 
         // clear the database before starting the following tests
-        Database.clearDatabase();
+        Database.clearDatabase().join();
 
 
         unlockTournamentGeneration().join();
@@ -63,7 +63,7 @@ public class TournamentManagerApiTest {
         clearSharedPreferences();
 
         // clear the database after the tests
-        Database.clearDatabase();
+        Database.clearDatabase().join();
     }
 
 
