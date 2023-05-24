@@ -50,6 +50,7 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
             Database.deleteNotification(Profile.getActiveProfile().getUid(), notificationTexts.get(position));
             notificationTexts.remove(position);
             notifyItemRemoved(position);
+            notifyItemRangeChanged(0, getItemCount());
         });
         holder.itemView.setOnClickListener(view -> {
             System.out.println(notificationTexts.get(position).getChannelId());
