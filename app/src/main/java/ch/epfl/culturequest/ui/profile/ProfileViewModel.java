@@ -151,7 +151,7 @@ public class ProfileViewModel extends ViewModel {
     }
 
     public void changeFollow() {
-        if (selectedProfile == null) {
+        if (selectedProfile == null || activeProfile == null) {
             return;
         }
 

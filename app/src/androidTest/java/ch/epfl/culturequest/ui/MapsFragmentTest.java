@@ -68,7 +68,7 @@ public class MapsFragmentTest {
     @Test
     public void mapsFragmentIsVisible() {
         // Check that the maps fragment is visible
-        onView(withId(R.id.map)).check(matches(isDisplayed()));
+        onView(withId(R.id.mapsFragment)).check(matches(isDisplayed()));
     }
 
     @After

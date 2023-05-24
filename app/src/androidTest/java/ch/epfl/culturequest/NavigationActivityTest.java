@@ -60,7 +60,7 @@ public class NavigationActivityTest {
                 .perform(click());
 
         // check home fragment is displayed
-        onView(withId(R.id.navigation_home)).check(matches(isEnabled()));
+        onView(withId(R.id.homeFragment)).check(matches(isEnabled()));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class NavigationActivityTest {
                 .perform(click());
 
         // check leaderboard fragment is displayed
-        onView(withId(R.id.navigation_leaderboard)).check(matches(isEnabled()));
+        onView(withId(R.id.leaderboardFragment)).check(matches(isEnabled()));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class NavigationActivityTest {
                 .perform(click());
 
         // check map fragment is displayed
-        onView(withId(R.id.navigation_map)).check(matches(isEnabled()));
+        onView(withId(R.id.mapsFragment)).check(matches(isEnabled()));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class NavigationActivityTest {
                 .perform(click());
 
         // check profile fragment is displayed
-        onView(withId(R.id.navigation_profile)).check(matches(isEnabled()));
+        onView(withId(R.id.profileFragment)).check(matches(isEnabled()));
     }
 
     @Test
@@ -96,25 +96,25 @@ public class NavigationActivityTest {
                 .perform(click());
 
         // check scan fragment is displayed
-        onView(withId(R.id.navigation_scan)).check(matches(isEnabled()));
+        onView(withId(R.id.scanFragment)).check(matches(isEnabled()));
     }
 
     @Test
-    public void navigationActivityWithProfileExtraRedirectToProfileFragment() {
+    public void navigationActivityWithProfileExtraRedirectsToProfileFragment() {
         Intent intent = new Intent(getApplicationContext(), NavigationActivity.class);
         intent.putExtra("redirect", "profile");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(getApplicationContext(), intent, null);
-        onView(withId(R.id.navigation_profile)).check(matches(isEnabled()));
+        onView(withId(R.id.profileFragment)).check(matches(isEnabled()));
     }
 
     @Test
-    public void navigationActivityWithHomeExtraRedirectToHomeFragment() {
+    public void navigationActivityWithHomeExtraRedirectsToHomeFragment() {
         Intent intent = new Intent(getApplicationContext(), NavigationActivity.class);
         intent.putExtra("redirect", "home");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(getApplicationContext(), intent, null);
-        onView(withId(R.id.navigation_home)).check(matches(isEnabled()));
+        onView(withId(R.id.homeFragment)).check(matches(isEnabled()));
     }
 
     @Test
@@ -127,7 +127,7 @@ public class NavigationActivityTest {
         onView(withId(R.id.navigation_home)).perform(click());
 
         // check scan fragment is displayed
-        onView(withId(R.id.navigation_home)).check(matches(isEnabled()));
+        onView(withId(R.id.homeFragment)).check(matches(isEnabled()));
     }
 
     @After
