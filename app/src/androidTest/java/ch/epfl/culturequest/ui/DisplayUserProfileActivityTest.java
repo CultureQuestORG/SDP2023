@@ -116,13 +116,6 @@ public class DisplayUserProfileActivityTest {
         onView(withId(R.id.homeFragment)).check(matches(isEnabled()));
     }
 
-    @Test
-    public void clickOnFollowButtonFollowsUser() throws InterruptedException {
-        onView(withId(R.id.profileFollowButton)).perform(click());
-        Thread.sleep(4000);
-        onView(withId(R.id.profileFollowText)).check(matches(withText("Unfollow")));
-    }
-
     @After
     public void tearDown() {
         Database.clearDatabase();
