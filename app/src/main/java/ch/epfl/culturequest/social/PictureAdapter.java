@@ -196,8 +196,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 // send the like notification
                 Database.getProfile(post.getUid()).thenAccept(profile -> {
                     if (profile != null) {
-                        LikeNotification notif = new LikeNotification(profile.getUsername());
-                        FireMessaging.sendNotification(profile.getUid(), notif);
+                        LikeNotification notification = new LikeNotification(profile.getUsername());
+                        FireMessaging.sendNotification(profile.getUid(), notification);
                     }
                 });
                 Picasso.get().load(R.drawable.like_full).into(holder.like);

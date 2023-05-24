@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 /**
  * Super class that represents notifications stored in the database and sent by cloud messaging.
@@ -29,6 +30,7 @@ public class PushNotification {
     private String title;
     private String text;
     private long time;
+    private String senderId;
 
     /**
      * Empty constructor used by Firebase
@@ -39,6 +41,7 @@ public class PushNotification {
         this.channelId = "";
         this.notificationId = "";
         this.time = 0;
+        this.senderId = "";
     }
 
     /**
@@ -48,12 +51,13 @@ public class PushNotification {
      * @param text      the text of the notification
      * @param channelId the channel id of the notification
      */
-    public PushNotification(String title, String text, String channelId) {
+    public PushNotification(String title, String text, String channelId, String senderId) {
         this.title = title;
         this.text = text;
         this.channelId = channelId;
         this.notificationId = UUID.randomUUID().toString();
         this.time = System.currentTimeMillis();
+        this.senderId = senderId;
     }
 
     /**
@@ -72,7 +76,7 @@ public class PushNotification {
             channels.add(FollowNotification.getNotificationChannel());
             channels.add(ScanNotification.getNotificationChannel());
             channels.add(LikeNotification.getNotificationChannel());
-            channels.add(CompetitionNotification.getNotificationChannel());
+            channels.add(TournamentNotification.getNotificationChannel());
             channels.add(SightseeingNotification.getNotificationChannel());
 
             // Register the channel with the system; you can't change the importance
@@ -97,6 +101,7 @@ public class PushNotification {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
                 .build();
     }
 
@@ -108,24 +113,31 @@ public class PushNotification {
      * @return the pending intent
      */
     public PendingIntent selectPendingIntent(Context context, String channelId) {
-        Intent default_intent = new Intent(context, NavigationActivity.class);
-        default_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent default_pending_intent = PendingIntent.getActivity(context, 0, default_intent, PendingIntent.FLAG_IMMUTABLE);
-        
+        Intent intent;
         switch (channelId) {
+            // opens the profile of the user who sent the notification
             case FollowNotification.CHANNEL_ID:
-                return FollowNotification.getPendingIntent(context);
-            case ScanNotification.CHANNEL_ID:
-                return ScanNotification.getPendingIntent(context);
+                intent = new Intent(context, DisplayUserProfileActivity.class);
+                intent.putExtra("uid", senderId);
+                intent.putExtra("redirect", "home");
+                break;
+            // opens the profile of the current user
             case LikeNotification.CHANNEL_ID:
-                return LikeNotification.getPendingIntent(context);
-            case CompetitionNotification.CHANNEL_ID:
-                return CompetitionNotification.getPendingIntent(context);
-            case SightseeingNotification.CHANNEL_ID:
-                return SightseeingNotification.getPendingIntent(context);
+                intent = new Intent(context, NavigationActivity.class);
+                intent.putExtra("redirect", "profile");
+                break;
+            // case TournamentNotification.CHANNEL_ID:
+                // TODO: open the tournament activity
+            // case SightseeingNotification.CHANNEL_ID:
+                //TODO: open the sightseeing activity
+            // opens the scan fragment
             default:
-                return default_pending_intent;
+                intent = new Intent(context, NavigationActivity.class);
+                break;
         }
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        return PendingIntent.getActivity(context, notificationId.hashCode(), intent, PendingIntent.FLAG_MUTABLE);
     }
 
     public String getNotificationId() {
@@ -148,6 +160,10 @@ public class PushNotification {
         return time;
     }
 
+    public String getSenderId() {
+        return senderId;
+    }
+
     public void setNotificationId(String notificationId) {
         this.notificationId = notificationId;
     }
@@ -166,6 +182,10 @@ public class PushNotification {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
     @Override
