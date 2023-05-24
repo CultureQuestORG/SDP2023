@@ -53,6 +53,10 @@ public class LeaderboardViewModel extends ViewModel {
         }
         else{
             Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, e) -> {
+                if (e != null || profile == null) {
+                    return;
+                }
+
                 activeProfile = profile;
                 Profile.setActiveProfile(profile);
                 updateLeaderboard();
