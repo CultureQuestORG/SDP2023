@@ -9,10 +9,14 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
+import android.Manifest;
 import android.content.Intent;
 
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.After;
 import org.junit.Before;
@@ -23,6 +27,7 @@ import org.junit.runner.RunWith;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 @RunWith(AndroidJUnit4.class)
 public class NavigationActivityTest {
@@ -30,8 +35,12 @@ public class NavigationActivityTest {
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
 
+    public static ActivityScenario<DisplayUserProfileActivity> scenario;
+
     @Rule
-    public ActivityScenarioRule<NavigationActivity> testRule = new ActivityScenarioRule<>(NavigationActivity.class);
+    public GrantPermissionRule permissionCamera = GrantPermissionRule.grant(Manifest.permission.CAMERA);
+    @Rule
+    public GrantPermissionRule permissionMaps = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION);
 
     @Before
     public void setUp() {
@@ -52,49 +61,52 @@ public class NavigationActivityTest {
 
         // Set activeProfile to null in order to test the robustness of the app
         Profile.setActiveProfile(null);
+
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), NavigationActivity.class);
+        scenario = ActivityScenario.launch(intent);
     }
 
     @Test
-    public void clickOnHomeMenuItemDisplaysHomeFragment() {
+    public void clickOnHomeMenuItemDisplaysHomeFragment() throws InterruptedException {
         onView(withId(R.id.navigation_home))
                 .perform(click());
-
+        Thread.sleep(2000);
         // check home fragment is displayed
         onView(withId(R.id.homeFragment)).check(matches(isEnabled()));
     }
 
     @Test
-    public void clickOnLeaderboardMenuItemDisplaysLeaderboardFragment() {
+    public void clickOnLeaderboardMenuItemDisplaysLeaderboardFragment() throws InterruptedException {
         onView(withId(R.id.navigation_leaderboard))
                 .perform(click());
-
+        Thread.sleep(2000);
         // check leaderboard fragment is displayed
         onView(withId(R.id.leaderboardFragment)).check(matches(isEnabled()));
     }
 
     @Test
-    public void clickOnMapMenuItemDisplaysMapFragment() {
+    public void clickOnMapMenuItemDisplaysMapFragment() throws InterruptedException {
         onView(withId(R.id.navigation_map))
                 .perform(click());
-
+        Thread.sleep(2000);
         // check map fragment is displayed
         onView(withId(R.id.mapsFragment)).check(matches(isEnabled()));
     }
 
     @Test
-    public void clickOnProfileMenuItemDisplaysProfileFragment() {
+    public void clickOnProfileMenuItemDisplaysProfileFragment() throws InterruptedException {
         onView(withId(R.id.navigation_profile))
                 .perform(click());
-
+        Thread.sleep(2000);
         // check profile fragment is displayed
         onView(withId(R.id.profileFragment)).check(matches(isEnabled()));
     }
 
     @Test
-    public void clickOnScanMenuItemDisplaysScanFragment() {
+    public void clickOnScanMenuItemDisplaysScanFragment() throws InterruptedException {
         onView(withId(R.id.navigation_scan))
                 .perform(click());
-
+        Thread.sleep(2000);
         // check scan fragment is displayed
         onView(withId(R.id.scanFragment)).check(matches(isEnabled()));
     }
@@ -104,7 +116,7 @@ public class NavigationActivityTest {
         Intent intent = new Intent(getApplicationContext(), NavigationActivity.class);
         intent.putExtra("redirect", "profile");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(getApplicationContext(), intent, null);
+        scenario = ActivityScenario.launch(intent);
         onView(withId(R.id.profileFragment)).check(matches(isEnabled()));
     }
 
@@ -113,19 +125,19 @@ public class NavigationActivityTest {
         Intent intent = new Intent(getApplicationContext(), NavigationActivity.class);
         intent.putExtra("redirect", "home");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(getApplicationContext(), intent, null);
+        scenario = ActivityScenario.launch(intent);
         onView(withId(R.id.homeFragment)).check(matches(isEnabled()));
     }
 
     @Test
-    public void clickOnSeveralMenuItemTriggersTheListener() {
+    public void clickOnSeveralMenuItemTriggersTheListener() throws InterruptedException {
         onView(withId(R.id.navigation_home)).perform(click());
         onView(withId(R.id.navigation_leaderboard)).perform(click());
         onView(withId(R.id.navigation_map)).perform(click());
         onView(withId(R.id.navigation_profile)).perform(click());
         onView(withId(R.id.navigation_scan)).perform(click());
         onView(withId(R.id.navigation_home)).perform(click());
-
+        Thread.sleep(2000);
         // check scan fragment is displayed
         onView(withId(R.id.homeFragment)).check(matches(isEnabled()));
     }
