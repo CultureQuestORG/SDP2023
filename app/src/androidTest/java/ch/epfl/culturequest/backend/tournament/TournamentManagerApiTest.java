@@ -151,19 +151,19 @@ public class TournamentManagerApiTest {
         // Check that the tournament has been generated
 
         // wait to be sure that the tournament has been indicated as generated in Firebase
-//        try {
-//            Thread.sleep(20000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 //        Boolean tournamentGenerated = isEqualAsync(getTournamentGeneratedPath(), true).join();
 //        assertThat(tournamentGenerated, is(true));
-//
-//        // Check that the tournament generation is locked
-//        Boolean generationLocked = isTournamentGenerationLocked().join();
-//        assertThat(generationLocked, is(true));
-//
-//        // Check that the weeklyTournament string in Tournament file shared pref is not null
+
+        // Check that the tournament generation is locked
+        Boolean generationLocked = isTournamentGenerationLocked().join();
+        assertThat(generationLocked, is(true));
+
+        // Check that the weeklyTournament string in Tournament file shared pref is not null
 //        String weeklyTournament = tournamentSharedPref.getString("weeklyTournament", null);
 //        assertThat(weeklyTournament, is(not(nullValue())));
 
