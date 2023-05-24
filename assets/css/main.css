@@ -9,6 +9,7 @@ html {
 
 body {
   width: 70%;
+  min-width: 1200px;
   margin: auto;
   padding: 0;
   display: flex;
