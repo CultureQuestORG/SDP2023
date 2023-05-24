@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Profile;
 
 @RunWith(AndroidJUnit4.class)
 public class NavigationActivityTest {
@@ -48,6 +49,9 @@ public class NavigationActivityTest {
 
         // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
+
+        // Set activeProfile to null in order to test the robustness of the app
+        Profile.setActiveProfile(null);
     }
 
     @Test
