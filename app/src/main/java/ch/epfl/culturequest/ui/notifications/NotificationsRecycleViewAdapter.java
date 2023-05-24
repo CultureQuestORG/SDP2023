@@ -15,7 +15,7 @@ import java.util.List;
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.notifications.CompetitionNotification;
+import ch.epfl.culturequest.notifications.TournamentNotification;
 import ch.epfl.culturequest.notifications.FollowNotification;
 import ch.epfl.culturequest.notifications.LikeNotification;
 import ch.epfl.culturequest.notifications.PushNotification;
@@ -96,7 +96,7 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
             case FollowNotification.CHANNEL_ID:
                 icon.setImageResource(R.drawable.profile_icon_unsel);
                 break;
-            case CompetitionNotification.CHANNEL_ID:
+            case TournamentNotification.CHANNEL_ID:
                 icon.setImageResource(R.drawable.planner);
                 break;
             case SightseeingNotification.CHANNEL_ID:
