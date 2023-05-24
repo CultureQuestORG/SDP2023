@@ -22,6 +22,7 @@ import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.notifications.ScanNotification;
 import ch.epfl.culturequest.notifications.SightseeingNotification;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<NotificationsRecycleViewAdapter.NotificationViewHolder> {
 
@@ -51,29 +52,27 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
             notifyItemRemoved(position);
         });
         holder.itemView.setOnClickListener(view -> {
+            System.out.println(notificationTexts.get(position).getChannelId());
             switch (notificationTexts.get(position).getChannelId()) {
                 case ScanNotification.CHANNEL_ID:
                     Intent intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
                     intent.putExtra("redirect", "profile");
+                    holder.itemView.getContext().startActivity(intent);
                     break;
                 case LikeNotification.CHANNEL_ID:
-                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
-                    //intent.putExtra("uid", senderId);
-                    intent.putExtra("redirect", "home");
-                    return;
                 case FollowNotification.CHANNEL_ID:
-                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
-                    //intent.putExtra("uid", senderId);
-                    intent.putExtra("redirect", "home");
-                    return;
-                case CompetitionNotification.CHANNEL_ID:
-                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
+                    intent = new Intent(holder.itemView.getContext(), DisplayUserProfileActivity.class);
+                    intent.putExtra("uid", notificationTexts.get(position).getSenderId());
                     holder.itemView.getContext().startActivity(intent);
                     return;
-                case SightseeingNotification.CHANNEL_ID:
-                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
-                    holder.itemView.getContext().startActivity(intent);
-                    return;
+//                case TournamentNotification.CHANNEL_ID:
+//                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
+//                    holder.itemView.getContext().startActivity(intent);
+//                    return;
+//                case SightseeingNotification.CHANNEL_ID:
+//                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
+//                    holder.itemView.getContext().startActivity(intent);
+//                    return;
                 default:
                     break;
             }
