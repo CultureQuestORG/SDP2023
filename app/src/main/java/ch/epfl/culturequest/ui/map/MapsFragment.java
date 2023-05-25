@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -26,8 +27,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -46,10 +47,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.map_collection.BasicOTMProvider;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMProvider;
 import ch.epfl.culturequest.backend.map_collection.RetryingOTMProvider;
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.FragmentMapsBinding;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.utils.AndroidUtils;
@@ -63,9 +66,12 @@ public class MapsFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
 
+    private boolean firstLocationUpdate = true;
+
     private final static MapUnavailableFragment unavailableFragment = new MapUnavailableFragment();
 
     private FragmentMapsBinding binding;
+    private ImageView centerButton;
     private MapsViewModel viewModel;
 
     private OTMProvider otmProvider;
@@ -97,7 +103,7 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            if(!isWifiAvailable) return;
+            if (!isWifiAvailable) return;
             mMap = googleMap;
             getProfilePicture();
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.maps_style_json));
@@ -107,21 +113,22 @@ public class MapsFragment extends Fragment {
         }
     };
 
-    private void checkInternet(){
-        if(!AndroidUtils.hasConnection(this.getContext())) {
+    private void checkInternet() {
+        if (!AndroidUtils.hasConnection(this.getContext())) {
             isWifiAvailable = false;
+            centerButton.setVisibility(View.GONE);
             this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
             AndroidUtils.showNoConnectionAlert(getContext(), "It seems that you are not connected to the internet. You can't use the map without internet connection.");
-        }
-        else {
+        } else {
             isWifiAvailable = true;
+            centerButton.setVisibility(View.VISIBLE);
             this.getParentFragmentManager().beginTransaction().hide(unavailableFragment).show(this).setReorderingAllowed(true).commit();
         }
     }
 
-    private void drawPositionMarker(LatLng latestLocation){
+    private void drawPositionMarker(LatLng latestLocation) {
         frame = mMap.addMarker(new MarkerOptions().zIndex(10000f).position(latestLocation).icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.map_icon_frame), 75, 75, false))));
-        if(profilePicture != null) {
+        if (profilePicture != null) {
             profileMarker = mMap.addMarker(new MarkerOptions().zIndex(10001f).icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(profilePicture, 70, 70, false))).position(latestLocation));
         }
     }
@@ -159,7 +166,7 @@ public class MapsFragment extends Fragment {
         return output;
     }
 
-    private void getMarkers(LatLng latestLocation){
+    private void getMarkers(LatLng latestLocation) {
         CompletableFuture<List<OTMLocation>> places;
         float distance[] = new float[1];
         if (viewModel.getCenterOfLocations() == null) {
@@ -167,15 +174,14 @@ public class MapsFragment extends Fragment {
         }
         Location.distanceBetween(latestLocation.latitude, latestLocation.longitude, viewModel.getCenterOfLocations().latitude, viewModel.getCenterOfLocations().longitude, distance);
 
-        if(viewModel.getLocations() != null && distance[0] < 1000){
+        if (viewModel.getLocations() != null && distance[0] < 1000) {
             places = CompletableFuture.completedFuture(viewModel.getLocations());
-        }
-        else {
+        } else {
             mMap.clear();
             drawPositionMarker(latestLocation);
 
-            LatLng upperLeft = new LatLng(latestLocation.latitude + LATITUDE_DIFF/2, latestLocation.longitude - LONGITUDE_DIFF/2);
-            LatLng lowerRight = new LatLng(latestLocation.latitude - LATITUDE_DIFF/2, latestLocation.longitude + LONGITUDE_DIFF/2);
+            LatLng upperLeft = new LatLng(latestLocation.latitude + LATITUDE_DIFF / 2, latestLocation.longitude - LONGITUDE_DIFF / 2);
+            LatLng lowerRight = new LatLng(latestLocation.latitude - LATITUDE_DIFF / 2, latestLocation.longitude + LONGITUDE_DIFF / 2);
             places = otmProvider.getLocations(upperLeft, lowerRight).thenApply(x -> {
                 viewModel.setCenterOfLocations(latestLocation);
                 viewModel.setLocations(x);
@@ -184,7 +190,7 @@ public class MapsFragment extends Fragment {
         }
         places.thenAccept(x -> {
             for (OTMLocation location : x) {
-                if(location.getName().isEmpty()){
+                if (location.getName().isEmpty()) {
                     continue;
                 }
                 LatLng latLng = new LatLng(location.getCoordinates().getLat(), location.getCoordinates().getLon());
@@ -196,7 +202,7 @@ public class MapsFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        if (mMap != null){
+        if (mMap != null) {
             outState.putParcelable("location", lastKnownLocation);
         }
         super.onSaveInstanceState(outState);
@@ -205,11 +211,27 @@ public class MapsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(!isWifiAvailable) return;
+        if (!isWifiAvailable) return;
         checkInternet();
     }
 
-    private void getProfilePicture(){
+    private void getProfilePicture() {
+        if (Profile.getActiveProfile() != null) {
+            loadProfilePicture();
+        } else {
+            Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, e) -> {
+                if (e != null || profile == null) {
+                    return;
+                }
+
+                Profile.setActiveProfile(profile);
+                loadProfilePicture();
+            });
+        }
+
+    }
+
+    private void loadProfilePicture() {
         Picasso.get().load(Profile.getActiveProfile().getProfilePicture()).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -238,19 +260,18 @@ public class MapsFragment extends Fragment {
         }
 
         binding = FragmentMapsBinding.inflate(inflater, container, false);
+        centerButton = binding.localisationButton;
         View mapView = binding.getRoot();
 
         checkInternet();
-        if(!isWifiAvailable) return null;
+        if (!isWifiAvailable) return null;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
+        centerButton.setOnClickListener(v -> {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
+        });
 
         otmProvider = new RetryingOTMProvider(new BasicOTMProvider());
-        viewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location -> {
-            if (mMap != null) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
-            }
-        });
         return mapView;
     }
 
@@ -278,8 +299,7 @@ public class MapsFragment extends Fragment {
             // If request is cancelled, the result arrays are empty.
             viewModel.setIsLocationPermissionGranted(true);
             getDeviceLocation();
-        }
-        else {
+        } else {
             this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
             Toast.makeText(getContext(), "Please give access to your location to use this feature.", Toast.LENGTH_SHORT).show();
         }
@@ -306,32 +326,33 @@ public class MapsFragment extends Fragment {
         try {
             if (viewModel.isLocationPermissionGranted()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    locationRequest = new LocationRequest.Builder(200000).build();
+                    locationRequest = new LocationRequest.Builder(10000).build();
                 }
                 LocationCallback locationCallback = new LocationCallback() {
                     @Override
                     public void onLocationResult(@NonNull LocationResult result) {
                         super.onLocationResult(result);
                         if (result != null) {
-                            for(Location location : result.getLocations()){
-                                    lastKnownLocation = location;
+                            for (Location location : result.getLocations()) {
+                                lastKnownLocation = location;
                             }
                             if (lastKnownLocation != null) {
                                 viewModel.setCurrentLocation(new LatLng(lastKnownLocation.getLatitude(),
                                         lastKnownLocation.getLongitude()));
-                                if(frame != null) {
+                                if (frame != null) {
                                     frame.setPosition(viewModel.getCurrentLocation().getValue());
                                 }
                                 if (profileMarker != null) {
                                     profileMarker.setPosition(viewModel.getCurrentLocation().getValue());
-                                }
-                                else {
+                                } else {
                                     getProfilePicture();
                                 }
                             }
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
 
+                            if(firstLocationUpdate) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
+                                firstLocationUpdate = false;
+                            }
                             getMarkers(viewModel.getCurrentLocation().getValue());
                         }
 
@@ -340,8 +361,12 @@ public class MapsFragment extends Fragment {
 
                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage(), e);
         }
+    }
+
+    private void recenter(View view) {
+        Toast.makeText(getContext(), "Recentering...", Toast.LENGTH_SHORT).show();
     }
 }

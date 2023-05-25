@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.social.Profile;
@@ -77,7 +78,7 @@ public class FireStorage {
         //upload image to firebase storage
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        if(compress)
+        if (compress)
             bitmapImage.compress(Bitmap.CompressFormat.WEBP, 50 /*ignored for PNG*/, bos);
         else
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100 /*ignored for PNG*/, bos);
@@ -106,6 +107,23 @@ public class FireStorage {
         return future;
     }
 
+    public static CompletableFuture<AtomicBoolean> deleteImage(String imageUrl) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        if (imageUrl != null) {
+            StorageReference imageRef = storage.getReferenceFromUrl(imageUrl);
+            imageRef.delete().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    future.complete(new AtomicBoolean(true));
+                } else {
+                    future.complete(new AtomicBoolean(false));
+                }
+            });
+        } else {
+            future.complete(new AtomicBoolean(false));
+        }
+        return future;
+    }
+
     /**
      * Uploads to the storage an image and returns the url of the image.
      *
@@ -121,7 +139,7 @@ public class FireStorage {
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        if(compress)
+        if (compress)
             bitmapImage.compress(Bitmap.CompressFormat.WEBP, 70 /*ignored for PNG*/, bos);
         else
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100 /*ignored for PNG*/, bos);

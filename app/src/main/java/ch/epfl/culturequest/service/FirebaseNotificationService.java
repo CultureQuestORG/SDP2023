@@ -27,6 +27,9 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
      */
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        if (Authenticator.getCurrentUser() == null) {
+            return;
+        }
         super.onMessageReceived(remoteMessage);
         sendNotification(remoteMessage);
     }
@@ -63,7 +66,8 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
      */
     private void sendNotification(RemoteMessage remoteMessage) {
         PushNotification pushNotification = new PushNotification(remoteMessage.getData().get("title"),
-                remoteMessage.getData().get("text"), remoteMessage.getData().get("channelId"));
+                remoteMessage.getData().get("text"), remoteMessage.getData().get("channelId"),
+                remoteMessage.getData().get("senderId"));
 
         Notification notification = pushNotification.buildNotification(this);
 

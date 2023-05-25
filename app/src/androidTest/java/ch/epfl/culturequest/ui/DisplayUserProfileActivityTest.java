@@ -1,31 +1,25 @@
 package ch.epfl.culturequest.ui;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import android.app.Application;
-import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.matcher.ViewMatchers;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,16 +27,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
-import ch.epfl.culturequest.utils.ProfileUtils;
 
 @RunWith(AndroidJUnit4.class)
 public class DisplayUserProfileActivityTest {
-
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
     public static ActivityScenario<DisplayUserProfileActivity> scenario;
+
     @Before
     public void setUp() throws InterruptedException {
 
@@ -51,10 +47,20 @@ public class DisplayUserProfileActivityTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
         // Initialize the database with some test profiles
-        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,new HashMap<>(), new ArrayList<>());
+
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
+
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
+
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400, new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(activeProfile);
 
-        Profile profile1 = new Profile("fakeuid", "name", "username", "email", "phone", "photo", 3,new HashMap<>(), new ArrayList<>());
+        Profile profile1 = new Profile("fakeuid", "name", "username", "email", "phone", "photo", 3, new HashMap<>(), new ArrayList<>());
 
         Database.setProfile(profile1);
         Database.setProfile(activeProfile);
@@ -82,10 +88,32 @@ public class DisplayUserProfileActivityTest {
     }
 
     @Test
-    public void textViewDisplaysUnfollowButton() throws InterruptedException {
+    public void textViewDisplaysUnfollowButton() {
         onView(withId(R.id.profileFollowText)).check(matches(withText("Follow")));
         onView(withId(R.id.profileFollowButton)).perform(click());
         onView(withId(R.id.profileFollowText)).check(matches(withText("Unfollow")));
+    }
+
+    @Test
+    public void clickOnHomeButtonRedirectsToHome() {
+        onView(withId(R.id.home_icon)).perform(click());
+        onView(withId(R.id.homeFragment)).check(matches(isEnabled()));
+    }
+
+    @Test
+    public void clickOnBackButtonWithoutIntentExtraRedirectsToLastActivity() {
+        onView(withId(R.id.back_button)).perform(click());
+    }
+
+    @Test
+    public void clickOnBackButtonWithIntentExtraRedirectsToHome() {
+        Intent intent = new Intent(getApplicationContext(), DisplayUserProfileActivity.class);
+        intent.putExtra("uid", "fakeuid");
+        intent.putExtra("redirect", "home");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        scenario = ActivityScenario.launch(intent);
+        onView(withId(R.id.back_button)).perform(click());
+        onView(withId(R.id.homeFragment)).check(matches(isEnabled()));
     }
 
     @After

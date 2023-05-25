@@ -891,6 +891,31 @@ public class Database {
         quizRef.setValue(score);
     }
 
+    public static CompletableFuture<String> getImageForArt(String artwork){
+        CompletableFuture<String> future = new CompletableFuture<>();
+        // get the first post with "artworkName" = artwork
+        DatabaseReference postsRef = databaseInstance.getReference("posts");
+        postsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                //iterate over the users
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    //iterate over the posts
+                    for (DataSnapshot post : snapshot.getChildren()) {
+                        if (post.child("artworkName").getValue().equals(artwork)) {
+                            future.complete(post.child("imageUrl").getValue().toString());
+                            return;
+                        }
+
+                    }
+                }
+                future.completeExceptionally(new Exception("No post found for artwork " + artwork));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
     ///// TOURNAMENTS //////
 
 
@@ -1067,5 +1092,50 @@ public class Database {
         return future;
     }
 
+    public static CompletableFuture<Long> fetchSeedIfAlreadyGenerated() {
+
+        CompletableFuture<Long> seedFuture = new CompletableFuture<>();
+
+        DatabaseReference seedReference = databaseInstance.getReference().child("tournaments").child("device-synchronization").child("seed");
+
+        seedReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Long seed = dataSnapshot.getValue(Long.class);
+                if (seed == null) {
+                    seedFuture.complete(null);
+                } else {
+                    seedFuture.complete(seed);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                seedFuture.completeExceptionally(new RuntimeException("Failed to read data from Firebase: " + databaseError.getMessage()));
+            }
+        });
+
+        return seedFuture;
+    }
+
+    public static CompletableFuture<Void> uploadSeedToDatabase(Long seed){
+
+        CompletableFuture<Void> voidFuture = new CompletableFuture<>();
+
+        DatabaseReference seedReference = databaseInstance.getReference().child("tournaments").child("device-synchronization").child("seed");
+        seedReference.setValue(seed, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                if (error != null) {
+                    voidFuture.completeExceptionally(new RuntimeException("Failed to upload seed to database: " + error.getMessage()));
+                } else {
+                    voidFuture.complete(null);
+                }
+            }
+        });
+
+        return voidFuture;
+    }
 
 }

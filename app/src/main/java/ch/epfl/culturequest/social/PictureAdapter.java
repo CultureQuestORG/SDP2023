@@ -33,6 +33,7 @@ import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.notifications.LikeNotification;
+import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.CustomSnackbar;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -127,9 +128,30 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
 
 
+        // Set the like count
+        holder.likeCount.setText(getNumberOfLikes(post.getLikes()));
+
         // Set handlers for the like and delete buttons
         handleLike(holder, post);
         handleDelete(holder, post);
+    }
+
+    /**
+     * Adapts the like count string to the number of likes.
+     *
+     * @param likes the number of likes
+     */
+    public static String getNumberOfLikes(int likes) {
+        if (likes <= 0) {
+            return null;
+        } else if (likes == 1) {
+            return "1 like";
+        } else if (likes / 1000d >= 1){
+            return String.format("%.2fK likes", (likes/1000d));
+        }
+        else {
+            return likes + " likes";
+        }
     }
 
     /**
@@ -175,8 +197,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 // send the like notification
                 Database.getProfile(post.getUid()).thenAccept(profile -> {
                     if (profile != null) {
-                        LikeNotification notif = new LikeNotification(profile.getUsername());
-                        FireMessaging.sendNotification(profile.getUid(), notif);
+                        LikeNotification notification = new LikeNotification(profile.getUsername());
+                        FireMessaging.sendNotification(profile.getUid(), notification);
                     }
                 });
                 Picasso.get().load(R.drawable.like_full).into(holder.like);
@@ -210,17 +232,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
      * @param post the post
      */
     private void handleDeletePopUp(View v, Post post) {
-
         AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
                 .setPositiveButton("Yes", (dialog, which) -> {
                     pictures.remove(post);
                     notifyItemRemoved(pictures.indexOf(post));
                     notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
                     Database.removePost(post);
-                    //TODO: delete image from storage when the mock is removed
-                    //FirebaseStorage storage = FirebaseStorage.getInstance();
-                    //storage.getReferenceFromUrl(post.getImageUrl()).delete();
-
+                    FireStorage.deleteImage(post.getImageUrl());
                     View rootView = v.getRootView();
                     CustomSnackbar.showCustomSnackbar("Post deleted successfully", R.drawable.image_recognition_error, rootView);
                 })
@@ -348,6 +366,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView username;
         public TextView location;
         public ImageView like;
+        public TextView likeCount;
         public ImageView delete;
         public TextView artName;
         public TextView artist;
@@ -377,6 +396,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             location = itemView.findViewById(R.id.location);
             profilePicture = itemView.findViewById(R.id.profile_picture);
             like = itemView.findViewById(R.id.like_button);
+            likeCount = itemView.findViewById(R.id.like_count);
             delete = itemView.findViewById(R.id.delete_button);
             View descriptionContainer = itemView.findViewById(R.id.descriptionContainerPost);
 

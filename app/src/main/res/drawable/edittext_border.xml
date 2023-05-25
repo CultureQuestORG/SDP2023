@@ -1,0 +1,7 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@android:color/transparent" /> <!-- Set background color to transparent -->
+    <stroke
+        android:color="#000000"
+        android:width="2dp" />
+    <corners android:radius="8dp" />
+</shape>

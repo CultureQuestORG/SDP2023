@@ -29,6 +29,7 @@ import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.quiz.QuizActivity;
 import ch.epfl.culturequest.ui.quiz.QuizGameOverFragment;
@@ -68,6 +69,13 @@ public class QuizActivityTest {
         Authenticator.manualSignIn(email, password).join();
 
         Profile.setActiveProfile(new Profile("testUser",""));
+
+        Post post = new Post("postID",
+                "uid",
+                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/images%2FAcZdcTtQxkUtA4gLRj9rgaFoWVv1%2Fa6a2f12c-401b-4f02-a394-928e1e6bea74?alt=media&token=24102b4b-7a82-4692-bce2-36f770b065c3",
+        "La Joconde",1234,0,new ArrayList<>());
+        Database.uploadPost(post).join();
+
 
         ArrayList<String> possibilities = new ArrayList<>();
         possibilities.add("answer");

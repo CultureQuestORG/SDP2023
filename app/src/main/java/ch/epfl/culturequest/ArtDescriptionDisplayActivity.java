@@ -3,6 +3,7 @@ package ch.epfl.culturequest;
 import static ch.epfl.culturequest.social.RarityLevel.getRarityLevel;
 import static ch.epfl.culturequest.utils.ProfileUtils.POSTS_ADDED;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +36,7 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.ScanBadge;
+import ch.epfl.culturequest.storage.FireStorage;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
@@ -43,18 +45,22 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     private static final int POPUP_DELAY = 5000;
 
     private Button postButton;
+    private Button shareButton;
+
+    private String imageDownloadUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
-        findViewById(R.id.back_button).setOnClickListener(view -> finish());
+        findViewById(R.id.back_button).setOnClickListener(view -> onBackPressed());
         postButton = findViewById(R.id.post_button);
+        shareButton = findViewById(R.id.share_button);
 
         // Get serialized artDescription and images from intent
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
         String imageUriExtra = getIntent().getStringExtra("imageUri");
-        String imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
+        imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
 
         // Check if the activity was started from the scanning activity
         boolean scan = getIntent().getBooleanExtra("scanning", true);
@@ -77,6 +83,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
                 ((ImageView) findViewById(R.id.artImage)).setImageBitmap(bitmap);
                 displayArtInformation(artDescription);
                 postButton.setOnClickListener(v -> postImage(imageDownloadUrl, artDescription, List.of(artDescription.getCountry(), artDescription.getCity(), artDescription.getMuseum())));
+                shareButton.setOnClickListener(v -> shareImage(imageUri, artDescription));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 finish();
@@ -105,7 +112,18 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
             // Remove post button as the image was not scanned
             postButton.setVisibility(View.GONE);
+            shareButton.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * If the user decides not to post the picture
+     * we delete the pic from firebase storage.
+     */
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        FireStorage.deleteImage(imageDownloadUrl);
     }
 
     private void displayArtInformation(BasicArtDescription artDescription) {
@@ -235,28 +253,75 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
      * Uploads an image to the database when the user presses on the post button. it will post
      * the image in the storage at the address: images/uid/postId
      *
-     * @param url  the image url to upload
+     * @param url     the image url to upload
      * @param artwork the artwork to add to the database
      */
     private void postImage(String url, BasicArtDescription artwork, List<String> badges) {
         String postId = UUID.randomUUID().toString();
         Profile activeProfile = Profile.getActiveProfile();
         String uid = activeProfile.getUid();
-        Database.uploadPost(new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>())).whenComplete((lambda, e) -> {
-            if (e == null) {
-                POSTS_ADDED++;
-                activeProfile.incrementScore(artwork.getScore());
-                activeProfile.addBadges(badges);
-                finish();
+        Post newPost = new Post(postId, uid, url, artwork.getName(), new Date().getTime(), 0, new ArrayList<>());
+        Profile.getActiveProfile().retrievePosts().thenCompose(posts -> {
+            boolean alreadyPosted = posts.stream().anyMatch(post -> post.getArtworkName().equals(newPost.getArtworkName()));
+            if (alreadyPosted) {
+                showAlreadyPostedDialog(newPost);
             } else {
-                e.printStackTrace();
+                Database.uploadPost(newPost).whenComplete((lambda, e) -> {
+                    if (e == null) {
+                        POSTS_ADDED++;
+                        activeProfile.incrementScore(artwork.getScore());
+                        activeProfile.addBadges(badges);
+                        finish();
+                    } else {
+                        e.printStackTrace();
+                    }
+                }).exceptionally(l -> {
+                    showErrorDialog("Couldn't post picture");
+                    return null;
+                });
             }
-        }).exceptionally(l -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Error").setMessage("Couldn't post picture").setCancelable(false).setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss());
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
             return null;
         });
     }
+
+    private void showAlreadyPostedDialog(Post post) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(post.getArtworkName() + " is already in your collection!");
+        builder.setIcon(R.drawable.image_recognition_error);
+        builder.setMessage("This post is already in your collection. You can still post it, but you will not get more points or badges!");
+        builder.setCancelable(true);
+        builder.setPositiveButton("Post", (dialog, which) -> {
+            Database.uploadPost(post).handle((lambda, e) -> {
+                if (e != null) {
+                    e.printStackTrace();
+                }
+                POSTS_ADDED++;
+                return null;
+            });
+            dialog.cancel();
+            finish();
+        });
+        builder.setNegativeButton("Cancel", (dialog, id) -> {
+            dialog.dismiss();
+        });
+        builder.create().show();
+    }
+
+    private void showErrorDialog(String message) {
+        new AlertDialog.Builder(this).setTitle("Error").setMessage(message).setCancelable(false).setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss()).create().show();
+    }
+
+    private void shareImage(Uri uri, BasicArtDescription description) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("image/jpeg");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "I just scanned " + description.getName() + " with \uD835\uDC02\uD835\uDC2E\uD835\uDC25\uD835\uDC2D\uD835\uDC2E\uD835\uDC2B\uD835\uDC1E\uD835\uDC10\uD835\uDC2E\uD835\uDC1E\uD835\uDC2C\uD835\uDC2D!\n\n" +
+                "It's a " + getRarityLevel(description.getScore()).name().toLowerCase() + " artwork from " + description.getArtist() + ", displayed at "+ description.getMuseum() + ", " + description.getCity() + ".\n\n" +
+                "Download the app here: https://play.google.com/store/apps/details?id=com.culturequest.culturequest");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(shareIntent, "Share your scan using"));
+    }
+
+
+
 }

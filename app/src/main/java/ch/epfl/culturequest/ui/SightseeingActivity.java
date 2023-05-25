@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
@@ -53,12 +56,14 @@ public class SightseeingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Authenticator.checkIfUserIsLoggedIn(this);
         AndroidUtils.removeStatusBar(getWindow());
         binding = SightseeingActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         listView = binding.placesToSee;
         String city = getIntent().getStringExtra("city");
-        binding.cityText.setText("What to do in " + city.split(",")[0] + "?");
+        String cityName = city.split(",")[0];
+        binding.cityText.setText("What to do in " + cityName + "?");
         inviteFriends = binding.inviteFriends;
         preview = binding.preview;
         backButton = binding.backButton;
@@ -66,15 +71,20 @@ public class SightseeingActivity extends AppCompatActivity {
         backButton.setOnClickListener(l -> onBackPressed());
         Map<String, OTMLocation> placeToLocation = getIntent().getStringArrayListExtra("locations").stream().map(OTMLocationSerializer::deserialize)
                 .collect(Collectors.toMap(OTMLocation::getName, location -> location, (existing, newValue) -> existing));
-        adapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<>(placeToLocation.keySet()), List.of(preview, inviteFriends));
-        listView.setAdapter(adapter);
-        List<String> selectedPlaces = adapter.getSelected();
-        preview.setOnClickListener(l -> {
-            inviteFriends.setVisibility(View.INVISIBLE);
-            openMap(placeToLocation, selectedPlaces);
-        });
-        inviteFriends.setOnClickListener(l ->
-                handleFriendsLogic(placeToLocation.entrySet().stream().filter(entry -> selectedPlaces.contains(entry.getKey())).map(Map.Entry::getValue).collect(Collectors.toList())));
+        if (placeToLocation.isEmpty()) {
+            binding.cityText.setText("Couldn't find anything in " + cityName);
+            binding.cityText.setTextColor(R.color.black);
+        } else {
+            adapter = new SightSeeingArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<>(placeToLocation.keySet()), List.of(preview, inviteFriends));
+            listView.setAdapter(adapter);
+            List<String> selectedPlaces = adapter.getSelected();
+            preview.setOnClickListener(l -> {
+                inviteFriends.setVisibility(View.INVISIBLE);
+                openMap(placeToLocation, selectedPlaces);
+            });
+            inviteFriends.setOnClickListener(l ->
+                    handleFriendsLogic(placeToLocation.entrySet().stream().filter(entry -> selectedPlaces.contains(entry.getKey())).map(Map.Entry::getValue).collect(Collectors.toList())));
+        }
     }
 
     /**
@@ -112,14 +122,13 @@ public class SightseeingActivity extends AppCompatActivity {
                     inviteFriends.setOnClickListener(v -> {
                         List<String> usernamesSelected = adapter.getSelected();
                         List<Profile> selectedFriends = profiles.stream().filter(profile -> usernamesSelected.contains(profile.getUsername())).collect(Collectors.toList());
-                        // TODO: DEAL WITH THE NOTIFICATIONS
                         SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces);
                         Database.setSightseeingEvent(newEvent);
                         CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v);
                         // send out notifications to the selected friends
                         for (Profile profile : selectedFriends) {
-                            SightseeingNotification notif = new SightseeingNotification(profile.getUsername());
-                            FireMessaging.sendNotification(profile.getUid(), notif);
+                            SightseeingNotification notification = new SightseeingNotification(profile.getUsername());
+                            FireMessaging.sendNotification(profile.getUid(), notification);
                         }
                         CompletableFuture.runAsync(() -> {
                             //we do this to wait for the snackbar to be visible for 1 second before going back to the nav activity.
@@ -150,7 +159,7 @@ public class SightseeingActivity extends AppCompatActivity {
             for (OTMLocation location : selectedPlaces.values()) {
                 OTMLatLng coord = location.getCoordinates();
                 LatLng mapCoord = new LatLng(coord.getLat(), coord.getLon());
-                MarkerOptions markerOptions = new MarkerOptions().position(mapCoord).title(location.getName());
+                MarkerOptions markerOptions = new MarkerOptions().position(mapCoord).title(location.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
                 googleMap.addMarker(markerOptions);
             }
             LatLngBounds.Builder builder = new LatLngBounds.Builder();

@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.backend.tournament.utils;
 
+import static ch.epfl.culturequest.backend.tournament.apis.SeedApi.getCurrentSeed;
+
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -9,7 +11,6 @@ import java.util.Random;
 import java.util.UUID;
 
 public class RandomApi {
-    private static final long SEED_COMPLEMENT = 517802433597L;
 
     private RandomApi() {
         // Private constructor to prevent instantiation
@@ -17,14 +18,7 @@ public class RandomApi {
 
     public static Random getRandom() { return new Random(getCurrentSeed());}
 
-    // Get fresh seed associated to the current week number and year + a complement number to add entropy
-    private static Long getCurrentSeed() {
 
-        Calendar calendar = Calendar.getInstance();
-        int weekNumber = calendar.get(Calendar.WEEK_OF_YEAR);
-        int year = calendar.get(Calendar.YEAR);
-        return (long) weekNumber + year + SEED_COMPLEMENT;
-    }
     public static String getWeeklyTournamentPseudoRandomUUID() {
 
         long seed = getCurrentSeed();
@@ -69,6 +63,5 @@ public class RandomApi {
 
         return calendar;
     }
-
 
 }

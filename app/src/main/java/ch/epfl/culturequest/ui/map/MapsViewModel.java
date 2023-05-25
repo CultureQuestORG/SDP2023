@@ -12,7 +12,7 @@ import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 
 public class MapsViewModel extends ViewModel{
 
-    private final static LatLng DEFAULT = new LatLng(46.520536, 6.568318);
+    public final static LatLng DEFAULT = new LatLng(46.520536, 6.568318);
 
     private final MutableLiveData<Boolean> isLocationPermissionGranted;
 
