@@ -47,7 +47,7 @@ public class SignUpActivityTest {
         BuildConfig.IS_TESTING.set(true);
     }
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
         Database.setEmulatorOn();
 
         // clear the database before starting the following tests
@@ -64,7 +64,7 @@ public class SignUpActivityTest {
 
         // Signs up a test user used in all the tests
         Authenticator.manualSignUp(email, password).join();
-
+        Thread.sleep(3000);
         ActivityScenario<SignUpActivity> activityScenario = ActivityScenario.launch(SignUpActivity.class);
         activityScenario.onActivity(activity -> {
             this.activity = activity;
@@ -133,16 +133,18 @@ public class SignUpActivityTest {
     }
 
     @Test
-    public void signingInWithCorrectEmailWorks() {
+    public void signingInWithCorrectEmailWorks() throws InterruptedException {
         Authenticator.manualSignUp("testx@gmail.com", "password1!");
+        Thread.sleep(3000);
         onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText("testx@gmail.com"));
         onView(withId(R.id.editTextTextPassword)).perform(replaceText("password1!"));
         onView(withId(R.id.sign_in_manually)).perform(click());
     }
 
     @Test
-    public void signingInWithIncorrectCredentialsSetsIssue(){
+    public void signingInWithIncorrectCredentialsSetsIssue() throws InterruptedException {
         Authenticator.manualSignUp("testx@gmail.com", "password1!");
+        Thread.sleep(3000);
         onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText("testx@gmail.com"));
         onView(withId(R.id.editTextTextPassword)).perform(replaceText("wrongpassword1!"));
         onView(withId(R.id.sign_in_manually)).perform(click());
