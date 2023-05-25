@@ -891,13 +891,20 @@ public class Database {
         CompletableFuture<String> future = new CompletableFuture<>();
         // get the first post with "artworkName" = artwork
         DatabaseReference postsRef = databaseInstance.getReference("posts");
-        postsRef.orderByChild("artworkName").equalTo(artwork).limitToFirst(1).get().addOnCompleteListener(task -> {
+        postsRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                //iterate over the users
                 for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                    Post post = snapshot.getValue(Post.class);
-                    assert post != null;
-                    future.complete(post.getImageUrl());
+                    //iterate over the posts
+                    for (DataSnapshot post : snapshot.getChildren()) {
+                        if (post.child("artworkName").getValue().equals(artwork)) {
+                            future.complete(post.child("imageUrl").getValue().toString());
+                            return;
+                        }
+
+                    }
                 }
+                future.completeExceptionally(new Exception("No post found for artwork " + artwork));
             } else {
                 future.completeExceptionally(task.getException());
             }
