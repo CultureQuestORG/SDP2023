@@ -43,7 +43,13 @@ public class EventsViewModel extends ViewModel {
     }
 
     public void refreshTournamentsEvents() {
-        tournamentsEvents.setValue(List.of(TournamentManagerApi.getTournamentFromSharedPref()));
+        Tournament tournament = TournamentManagerApi.getTournamentFromSharedPref();
+
+        if(tournament == null) {
+            return;
+        }
+
+        tournamentsEvents.setValue(List.of(tournament));
     }
 
 }
