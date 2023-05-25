@@ -13,6 +13,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -35,6 +36,7 @@ import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.home.HomeFragment;
 import ch.epfl.culturequest.ui.profile.ProfileFragment;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
@@ -99,6 +101,66 @@ public class ProfileFragmentTest {
 
         onView(withId(R.id.settingsButton)).perform(click());
         onView(withId(R.id.log_out)).check(matches(isEnabled()));
+    }
+
+    @Test
+    public void checkingThatPostsUpdateCorrectly() throws InterruptedException {
+        Post p = new Post("def", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PIC_PATH
+                , "Piece of Art number 2", 1, 0, new ArrayList<>());
+        onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(1)));
+
+        Database.uploadPost(p);
+
+        ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
+        activityScenario.onActivity(activity -> {
+            Fragment fragment = new HomeFragment();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(android.R.id.content, fragment);
+            fragmentTransaction.commitNow();
+        });
+
+        activityScenario = ActivityScenario.launch(FragmentActivity.class);
+        activityScenario.onActivity(activity -> {
+            fragment = new ProfileFragment();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(android.R.id.content, fragment);
+            fragmentTransaction.commitNow();
+        });
+        Thread.sleep(2000);
+        onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(2)));
+    }
+
+    @Test
+    public void checkingThatPostsUpdateCorrectlyIfSigningOutInBetween() throws InterruptedException {
+        Post p = new Post("def", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PIC_PATH
+                , "Piece of Art number 2", 1, 0, new ArrayList<>());
+        onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(1)));
+
+        Database.uploadPost(p);
+
+        ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
+        activityScenario.onActivity(activity -> {
+            Fragment fragment = new HomeFragment();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(android.R.id.content, fragment);
+            fragmentTransaction.commitNow();
+        });
+
+        Profile.setActiveProfile(null);
+
+        activityScenario = ActivityScenario.launch(FragmentActivity.class);
+        activityScenario.onActivity(activity -> {
+            fragment = new ProfileFragment();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(android.R.id.content, fragment);
+            fragmentTransaction.commitNow();
+        });
+        Thread.sleep(2000);
+        onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(2)));
     }
 
     @Test
