@@ -78,8 +78,10 @@ public class ProfileFragment extends Fragment {
         });
         //handle the score
         profileViewModel.getScore().observe(getViewLifecycleOwner(), s -> ProfileUtils.handleScore(level, levelText, progressBar, s));
+
         // set the onClickListener for the settings button
         settingsButton.setOnClickListener(this::goToSettings);
+        profilePicture.setOnClickListener(this::goToSettings);
 
         // set the onClickListener for badges
         View.OnClickListener badgesListener = v -> {
