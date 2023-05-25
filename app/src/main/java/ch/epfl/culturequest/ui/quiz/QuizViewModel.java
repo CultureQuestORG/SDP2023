@@ -12,8 +12,6 @@ import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.tournament.quiz.Question;
-import ch.epfl.culturequest.tournament.quiz.Quiz;
 import kotlin.Triple;
 
 
@@ -34,15 +32,18 @@ public class QuizViewModel extends ViewModel {
 
     private final MutableLiveData<Integer> questionNumber = new MutableLiveData<>();
 
+    private final MutableLiveData<String> tournament = new MutableLiveData<>();
 
 
-    public QuizViewModel(ArtQuiz quiz, QuizActivity quizActivity, String uid) {
+
+    public QuizViewModel(ArtQuiz quiz, QuizActivity quizActivity, String uid, String tournament) {
         this.quiz.postValue(quiz);
         this.quizActivity.postValue(quizActivity);
         score.postValue(0);
         nextScore.postValue(100);
         this.uid.postValue(uid);
         questionNumber.postValue(0);
+        this.tournament.postValue(tournament);
 
 
     }
@@ -55,7 +56,7 @@ public class QuizViewModel extends ViewModel {
     }
 
     public QuizQuestionFragment startQuiz() {
-        //Database.startQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue());
+        Database.startQuiz(tournament.getValue(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue());
         return Objects.requireNonNull(quizActivity.getValue()).goToQuestion(0, Objects.requireNonNull(quiz.getValue()).getQuestions().get(0));
     }
 
@@ -83,16 +84,16 @@ public class QuizViewModel extends ViewModel {
     }
 
     public QuizVictoryFragment finishQuiz(int score) {
-        //Database.setScoreQuiz(Objects.requireNonNull(quiz.getValue()).getTournament(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue(), score);
+        Database.setScoreQuiz(tournament.getValue(), Objects.requireNonNull(quiz.getValue()).getArtName(), uid.getValue(), score);
         return Objects.requireNonNull(quizActivity.getValue()).endQuiz(score);
     }
 
 
 
-    public static void addQuiz(String tournament,String artName,QuizActivity activity,String uid) {
+    public static void addQuiz(String artName,QuizActivity activity,String uid) {
         Tournament tournament1 = TournamentManagerApi.getTournamentFromSharedPref();
         Triple<String, String, String> key = new Triple<>(uid, tournament1.getTournamentId(), artName);
-        quizHashMap.put(key, new QuizViewModel(tournament1.getArtQuizzes().get(artName), activity,uid));
+        quizHashMap.put(key, new QuizViewModel(tournament1.getArtQuizzes().get(artName), activity,uid,tournament1.getTournamentId()));
         activity.welcome();
     }
 

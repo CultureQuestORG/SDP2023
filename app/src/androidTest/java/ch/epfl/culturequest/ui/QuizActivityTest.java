@@ -1,8 +1,5 @@
 package ch.epfl.culturequest.ui;
 
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
@@ -10,29 +7,20 @@ import static org.hamcrest.Matchers.not;
 
 import android.content.Intent;
 
-import androidx.fragment.app.Fragment;
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.action.ViewActions;
 
 import org.junit.Before;
-import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.tournament.quiz.Question;
-import ch.epfl.culturequest.tournament.quiz.Quiz;
 import ch.epfl.culturequest.ui.quiz.QuizActivity;
-import ch.epfl.culturequest.ui.quiz.QuizGameOverFragment;
-import ch.epfl.culturequest.ui.quiz.QuizInterFragment;
-import ch.epfl.culturequest.ui.quiz.QuizQuestionFragment;
-import ch.epfl.culturequest.ui.quiz.QuizVictoryFragment;
 import ch.epfl.culturequest.ui.quiz.QuizViewModel;
-import ch.epfl.culturequest.ui.quiz.QuizWelcomeFragment;
 
 public class QuizActivityTest {
 
@@ -68,14 +56,15 @@ public class QuizActivityTest {
         possibilities.add("wrongAnswer1");
         possibilities.add("wrongAnswer2");
         possibilities.add("wrongAnswer3");
-        Question question = new Question("question", possibilities,0);
-        ArrayList<Question> questions = new ArrayList<>();
+        QuizQuestion question = new QuizQuestion("question", possibilities,0);
+        ArrayList<QuizQuestion> questions = new ArrayList<>();
         questions.add(question);
         questions.add(question);
         questions.add(question);
         questions.add(question);
         questions.add(question);
-        Quiz quiz = new Quiz("La Joconde", questions,"tournamentId");
+        ArtQuiz quiz = new ArtQuiz("La Joconde", questions,new HashMap<>());
+
         //Database.addQuiz(quiz).join();
 
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(), QuizActivity.class);

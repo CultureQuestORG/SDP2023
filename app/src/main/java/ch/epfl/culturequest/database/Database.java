@@ -23,21 +23,19 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
-import ch.epfl.culturequest.tournament.quiz.Question;
-import ch.epfl.culturequest.tournament.quiz.Quiz;
 
 
 /**
@@ -845,19 +843,25 @@ public class Database {
         return future;
     }
 
-    public static CompletableFuture<Quiz> getQuiz(String tournament, String artName) {
-        CompletableFuture<Quiz> future = new CompletableFuture<>();
+    public static CompletableFuture<ArtQuiz> getQuiz(String tournament, String artName) {
+        CompletableFuture<ArtQuiz> future = new CompletableFuture<>();
 
-        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName).child("questions");
+        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName);
         quizRef.get().addOnCompleteListener(task -> {
             //returns a list of questions
             if (task.isSuccessful()) {
-                ArrayList<Question> questions = new ArrayList<>();
-                for (DataSnapshot child : task.getResult().getChildren()) {
-                    Question question = child.getValue(Question.class);
+                // there is a child questions and a child scores
+
+                ArrayList<QuizQuestion> questions = new ArrayList<>();
+                for (DataSnapshot child : task.getResult().child("questions").getChildren()) {
+                    QuizQuestion question = child.getValue(QuizQuestion.class);
                     questions.add(question);
                 }
-                future.complete(new Quiz(artName, questions, tournament));
+                HashMap<String, Integer> scores = new HashMap<>();
+                for (DataSnapshot child : task.getResult().child("scores").getChildren()) {
+                    scores.put(child.getKey(), child.getValue(Integer.class));
+                }
+                future.complete(new ArtQuiz(artName, questions,scores));
             } else {
                 future.completeExceptionally(new Exception("Quiz not found"));
             }
@@ -865,9 +869,9 @@ public class Database {
         return future;
     }
 
-    public static CompletableFuture<AtomicBoolean> addQuiz(Quiz quiz) {
+    public static CompletableFuture<AtomicBoolean> addQuiz(ArtQuiz quiz,String tournament) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(quiz.getTournament()).child(quiz.getArtName()).child("questions");
+        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(quiz.getArtName()).child("questions");
         quizRef.setValue(quiz.getQuestions()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 future.complete(new AtomicBoolean(true));

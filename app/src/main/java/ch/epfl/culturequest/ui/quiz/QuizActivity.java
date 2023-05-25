@@ -14,11 +14,8 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
-import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivityQuizBinding;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.tournament.quiz.Question;
-import ch.epfl.culturequest.tournament.quiz.Quiz;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class QuizActivity extends AppCompatActivity {
@@ -53,7 +50,7 @@ public class QuizActivity extends AppCompatActivity {
 
 
 
-        QuizViewModel.addQuiz(tournament.getTournamentId(), artName,this, uid);
+        QuizViewModel.addQuiz(artName,this, uid);
 
 
         setContentView(binding.getRoot());

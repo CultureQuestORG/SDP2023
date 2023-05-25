@@ -6,24 +6,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
-import ch.epfl.culturequest.databinding.ActivityEventsBinding;
-import ch.epfl.culturequest.databinding.ActivityQuizBinding;
 import ch.epfl.culturequest.databinding.ActivityTournamentBinding;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.tournament.quiz.Question;
-import ch.epfl.culturequest.ui.quiz.QuizGameOverFragment;
-import ch.epfl.culturequest.ui.quiz.QuizInterFragment;
-import ch.epfl.culturequest.ui.quiz.QuizQuestionFragment;
-import ch.epfl.culturequest.ui.quiz.QuizVictoryFragment;
-import ch.epfl.culturequest.ui.quiz.QuizViewModel;
-import ch.epfl.culturequest.ui.quiz.QuizWelcomeFragment;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class TournamentActivity extends AppCompatActivity {

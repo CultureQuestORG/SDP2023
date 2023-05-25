@@ -1,7 +1,5 @@
 package ch.epfl.culturequest.ui.events.tournaments;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,18 +8,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
-import ch.epfl.culturequest.tournament.quiz.Quiz;
-import ch.epfl.culturequest.ui.events.EventsViewModel;
 import ch.epfl.culturequest.ui.quiz.QuizActivity;
 
 public class QuizzesRecycleViewAdapter extends RecyclerView.Adapter<QuizzesRecycleViewAdapter.QuizzViewHolder> {
