@@ -92,7 +92,7 @@ public class SignUpActivityTest {
 
     ///////////////////////Manual sign in tests///////////////////////
     @Test
-    public void signUpSetsIssuesWhenIncorrectPW() throws InterruptedException {
+    public void signUpSetsIssuesWhenIncorrectPW() {
         Authenticator.signOut(activity).join();
 
         onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText("test@gmail.com")).perform(closeSoftKeyboard());
@@ -119,7 +119,8 @@ public class SignUpActivityTest {
     }
 
     @Test
-    public void tryingToSignUpWithSameEmailSetsIssue(){
+    public void tryingToSignUpWithSameEmailSetsIssue() throws InterruptedException {
+        Authenticator.signOut(activity).join();
         onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText("test@gmail.com"));
         onView(withId(R.id.editTextTextPassword)).perform(replaceText("abcdefg1!"));
         onView(withId(R.id.sign_up_manually)).perform(click());
@@ -128,6 +129,7 @@ public class SignUpActivityTest {
 
     @Test
     public void signingInWithCorrectEmailWorks() {
+        Authenticator.signOut(activity).join();
         Authenticator.manualSignUp("testx@gmail.com", "password1!").join();
         onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText("testx@gmail.com"));
         onView(withId(R.id.editTextTextPassword)).perform(replaceText("password1!"));
@@ -158,5 +160,8 @@ public class SignUpActivityTest {
     public void tearDown() {
         // clear the database after running the tests
         Database.clearDatabase();
+        if(Authenticator.getCurrentUser()!=null){
+            Authenticator.deleteCurrentUser();
+        }
     }
 }
