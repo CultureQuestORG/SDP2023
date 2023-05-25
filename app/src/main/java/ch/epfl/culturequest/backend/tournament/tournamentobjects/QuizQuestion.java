@@ -18,8 +18,23 @@ public class QuizQuestion {
         this.questionContent = questionContent;
     }
 
+    public void setPossibleAnswers(ArrayList<String> possibleAnswers) {
+        this.possibleAnswers = possibleAnswers;
+    }
+
+    public void setQuestionContent(String questionContent) {
+        this.questionContent = questionContent;
+    }
+
+    public void setCorrectAnswerIndex(int correctAnswerIndex) {
+        this.correctAnswerIndex = correctAnswerIndex;
+    }
+
     public QuizQuestion(){
         // For Serialization
+        this.possibleAnswers = null;
+        this.correctAnswerIndex = 0;
+        this.questionContent = "";
     }
 
     public ArrayList<String> getPossibleAnswers(){
@@ -37,5 +52,9 @@ public class QuizQuestion {
     public String getQuestionContent(){
         return questionContent;
     }
+
+
+
+
 
 }
