@@ -128,6 +128,7 @@ public class ArtDescriptionDisplayActivityTest1 {
         //it'd be easier if it was a recycler view
         onView(withId(R.id.artSummary)).perform(swipeUp(), swipeUp(), swipeUp(), swipeUp());// Scroll to the bottom of the RecyclerView
         onView(withId(R.id.post_button)).perform(click());
+        Thread.sleep(2000);
         onView(withText("This post is already in your collection. You can still post it, but you will not get more points or badges!")).check(matches(isDisplayed()));
         onView(withText("Cancel")).perform(click());
         Thread.sleep(2000);
