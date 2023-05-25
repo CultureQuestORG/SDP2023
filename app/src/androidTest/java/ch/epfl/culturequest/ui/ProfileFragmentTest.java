@@ -110,7 +110,7 @@ public class ProfileFragmentTest {
         onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(1)));
 
         Database.uploadPost(p);
-
+        Thread.sleep(3000);
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
         activityScenario.onActivity(activity -> {
             Fragment fragment = new HomeFragment();
@@ -139,7 +139,7 @@ public class ProfileFragmentTest {
         onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(1)));
 
         Database.uploadPost(p);
-
+        Thread.sleep(3000);
         ActivityScenario<FragmentActivity> activityScenario = ActivityScenario.launch(FragmentActivity.class);
         activityScenario.onActivity(activity -> {
             Fragment fragment = new HomeFragment();
