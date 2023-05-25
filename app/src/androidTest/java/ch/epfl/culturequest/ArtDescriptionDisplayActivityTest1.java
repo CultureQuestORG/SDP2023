@@ -15,6 +15,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
@@ -93,6 +94,7 @@ public class ArtDescriptionDisplayActivityTest1 {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        intent.putExtra("downloadUrl", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2FcT93LtGk2dT9Jvg46pOpbBP69Kx1?alt=media&token=35ba6af5-104d-4218-bc26-3fb39f75ac15");
 
         return intent;
     }
@@ -116,7 +118,6 @@ public class ArtDescriptionDisplayActivityTest1 {
 
     @Test
     public void activityDisplaysCorrectInformation() {
-
         onView(withId(R.id.artName)).check(matches(withText("Mona Lisa")));
         onView(withId(R.id.artistName)).check(matches(withText("Da Vinci")));
         onView(withId(R.id.artYear)).check(matches(withText("1519")));
