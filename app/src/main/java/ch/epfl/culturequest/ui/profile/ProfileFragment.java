@@ -29,12 +29,11 @@ import java.util.List;
 
 import ch.epfl.culturequest.SettingsActivity;
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.notifications.CompetitionNotification;
-import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -100,16 +99,27 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        int limit = POSTS_ADDED;
-        if (limit > 0) {
-            Profile.getActiveProfile().retrievePosts()
-                    .whenComplete((posts, e) -> {
-                        posts.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
-                        this.images.setValue(posts);
-                        binding.pictureGrid.setAdapter(new PictureAdapter(posts));
-                        POSTS_ADDED = 0;
-                    });
+        if (POSTS_ADDED > 0) {
+            if (Profile.getActiveProfile() != null) {
+                updatePosts();
+            } else {
+                Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, e) -> {
+                    if (e != null || profile == null) return;
+                    Profile.setActiveProfile(profile);
+                    updatePosts();
+                });
+            }
         }
+    }
+
+    private void updatePosts() {
+        Profile.getActiveProfile().retrievePosts()
+                .whenComplete((posts, e) -> {
+                    posts.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
+                    this.images.setValue(posts);
+                    binding.pictureGrid.setAdapter(new PictureAdapter(posts));
+                    POSTS_ADDED = 0;
+                });
     }
 
     @Override

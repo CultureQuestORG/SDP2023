@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.backend.map_collection.OTMLocationSerializer;
@@ -53,6 +54,7 @@ public class SightseeingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Authenticator.checkIfUserIsLoggedIn(this);
         AndroidUtils.removeStatusBar(getWindow());
         binding = SightseeingActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -118,8 +120,8 @@ public class SightseeingActivity extends AppCompatActivity {
                         CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v);
                         // send out notifications to the selected friends
                         for (Profile profile : selectedFriends) {
-                            SightseeingNotification notif = new SightseeingNotification(profile.getUsername());
-                            FireMessaging.sendNotification(profile.getUid(), notif);
+                            SightseeingNotification notification = new SightseeingNotification(profile.getUsername());
+                            FireMessaging.sendNotification(profile.getUid(), notification);
                         }
                         CompletableFuture.runAsync(() -> {
                             //we do this to wait for the snackbar to be visible for 1 second before going back to the nav activity.
