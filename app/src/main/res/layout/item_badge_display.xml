@@ -30,6 +30,7 @@
 
         android:textSize="35sp"
         android:fontFamily="@font/poppins_bold"
+        android:textColor="@color/white"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

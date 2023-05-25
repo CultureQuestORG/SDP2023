@@ -1,6 +1,8 @@
 package ch.epfl.culturequest.authentication;
 
 import static android.app.Activity.RESULT_OK;
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
+import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 
 import android.content.Intent;
 
@@ -21,6 +23,7 @@ import ch.epfl.culturequest.ProfileCreatorActivity;
 import ch.epfl.culturequest.SignUpActivity;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 /**
@@ -75,36 +78,54 @@ public class Authenticator {
 
     /**
      * Automatically Sign Up and In the user to the app by using a tier party service with the Firebase UI
+     *
+     * @param activity the activity from which the sign in is launched
      */
     public static CompletableFuture<String> signIn(ComponentActivity activity) {
         CompletableFuture<String> future = new CompletableFuture<>();
         if (getCurrentUser() == null) {
-            signInLauncher.launch(signInIntent());
-            future.complete("User signed in after being signed out with the Firebase UI");
+            if (hasConnection(activity)) {
+                signInLauncher.launch(signInIntent());
+                future.complete("User signed in after being signed out with the Firebase UI");
+            } else showNoConnectionAlert(activity, "Please try to login again later");
         } else {
-            Database.getProfile(getCurrentUser().getUid()).handle((profile, throwable) -> {
-                if (profile != null) {
-                    Profile.setActiveProfile(profile);
-                    AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
-                    future.complete("User signed in with an existing profile");
-                } else {
-                    AndroidUtils.redirectToActivity(activity, ProfileCreatorActivity.class);
-                    future.complete("User signed in with no existing profile");
-                }
-                return null;
-            }).exceptionally(throwable -> {
-                // If an error occurs, sign out the user
-                signOut(activity);
-                future.completeExceptionally(throwable);
-                return null;
-            });
+                Database.getProfile(getCurrentUser().getUid()).handle((profile, throwable) -> {
+                    if (profile != null && throwable == null) {
+                        // the following part is used to check at every login if the user has a
+                        // new device token
+                        List<String> deviceTokens = profile.getDeviceTokens();
+                        FireMessaging.getDeviceToken().whenComplete((token, throwable1) -> {
+                            // if the current device token is not already in the list, add it
+                            // and update the database
+                            if (throwable1 == null && token != null && !deviceTokens.contains(token)) {
+                                deviceTokens.add(token);
+                                profile.setDeviceTokens(deviceTokens);
+                                Database.setDeviceTokens(profile.getUid(), deviceTokens);
+                            }
+                            Profile.setActiveProfile(profile);
+                            AndroidUtils.redirectToActivity(activity, NavigationActivity.class);
+                            future.complete("User signed in with an existing profile");
+                        });
+                    } else {
+                        AndroidUtils.redirectToActivity(activity, ProfileCreatorActivity.class);
+                        future.complete("User signed in with no existing profile");
+                    }
+                    return null;
+                }).exceptionally(throwable -> {
+                    // If an error occurs, sign out the user
+                    signOut(activity);
+                    future.completeExceptionally(throwable);
+                    return null;
+                });
         }
-
         return future;
     }
 
     /**
      * Signs up (creates) new user to the app manually by using the email and password
+     *
+     * @param email
+     * @param password
      */
     public static CompletableFuture<AtomicBoolean> manualSignUp(String email, String password) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
@@ -121,6 +142,9 @@ public class Authenticator {
 
     /**
      * Signs in the user to the app manually by using the email and password
+     *
+     * @param email
+     * @param password
      */
     public static CompletableFuture<AtomicBoolean> manualSignIn(String email, String password) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();

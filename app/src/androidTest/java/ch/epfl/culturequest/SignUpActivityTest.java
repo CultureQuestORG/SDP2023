@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.authentication.Authenticator;
@@ -29,6 +30,9 @@ public class SignUpActivityTest {
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
 
+    static {
+        BuildConfig.IS_TESTING.set(true);
+    }
     @Before
     public void setup() {
         // Set up the database to run on the local emulator of Firebase
@@ -60,7 +64,7 @@ public class SignUpActivityTest {
     public void signInTransitionsToNavActivityForSignInUserWithExistingProfile() throws InterruptedException {
         Authenticator.manualSignIn(email, password).join();
         assertNotNull(Authenticator.getCurrentUser());
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0,new HashMap<>());
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
         Database.setProfile(profile);
         Thread.sleep(2000);
         AndroidUtils.redirectToActivity(activity, SignUpActivity.class);

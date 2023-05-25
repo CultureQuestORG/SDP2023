@@ -18,6 +18,7 @@ import androidx.test.core.app.ApplicationProvider;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class BadgeCollectionActivityTest {
         badges.put("london", 2);
         badges.put("lausanne", 3);
 
-        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,badges);
+        Profile activeProfile = new Profile("currentUserUid", "currentUserName", "currentUserUsername", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 400,badges, new ArrayList<>());
         Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
 

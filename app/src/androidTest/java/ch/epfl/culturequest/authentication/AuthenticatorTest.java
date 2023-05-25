@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +71,7 @@ public class AuthenticatorTest {
 
     @Test
     public void SignInWithExistingProfileRedirectsToNavigationActivity() {
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0,new HashMap<>());
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
 
         try {
             Database.setProfile(profile);
@@ -90,6 +91,7 @@ public class AuthenticatorTest {
         try {
             assertTrue(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
             assertNull(Authenticator.getCurrentUser());
+            Thread.sleep(3000);
             onView(withId(R.id.sign_in_button)).check(matches(isDisplayed()));
             String signInState = Authenticator.signIn(activity).get(5, TimeUnit.SECONDS);
             assertEquals(signInState, "User signed in after being signed out with the Firebase UI");
@@ -105,6 +107,7 @@ public class AuthenticatorTest {
         try {
             assertTrue(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
             assertNull(Authenticator.getCurrentUser());
+            Thread.sleep(3000);
             onView(withId(R.id.sign_in_button)).check(matches(isDisplayed()));
             // Signs in the user again for the other tests
             assertTrue(Authenticator.manualSignIn(email, password).get(5, TimeUnit.SECONDS).get());

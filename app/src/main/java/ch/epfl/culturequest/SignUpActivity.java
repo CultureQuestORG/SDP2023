@@ -1,18 +1,32 @@
 package ch.epfl.culturequest;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class SignUpActivity extends AppCompatActivity {
 
+    // we call this method here so that is called only once!!
+    // before, if a user logged in and then logged out, the app would crash
+    static {
+        Database.setPersistenceEnabled();
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Create the notification channels on login
+        PushNotification.createNotificationChannels(this);
+
         // If the user is not logged in, display the sign in activity
         AndroidUtils.removeStatusBar(getWindow());
         if (Authenticator.getCurrentUser() == null) {
@@ -25,6 +39,16 @@ public class SignUpActivity extends AppCompatActivity {
         // Otherwise directly signIn
         else {
             Authenticator.signIn(this);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try{
+            TournamentManagerApi.handleTournaments(this);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

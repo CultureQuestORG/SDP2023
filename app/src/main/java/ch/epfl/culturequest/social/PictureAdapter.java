@@ -7,19 +7,18 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.app.AlertDialog;
+import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -32,7 +31,10 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.notifications.LikeNotification;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -97,6 +99,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             holder.year.setText(artwork.getYear());
             holder.description.setText(shortenDescription(artwork.getSummary()));
             holder.score.setText("+" + artwork.getScore() + " pts");
+            holder.location.setText(artwork.getCity()!=null ? artwork.getCity() : artwork.getCountry()!=null ? artwork.getCountry() : "World");
+
 
             // Put a see more button if the description is too long
             displaySeeMore(artwork, holder.seeMore, pictureUrl);
@@ -121,11 +125,32 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             return null;
         });
 
-        holder.location.setText("Lausanne");
+
+
+        // Set the like count
+        holder.likeCount.setText(getNumberOfLikes(post.getLikes()));
 
         // Set handlers for the like and delete buttons
         handleLike(holder, post);
         handleDelete(holder, post);
+    }
+
+    /**
+     * Adapts the like count string to the number of likes.
+     *
+     * @param likes the number of likes
+     */
+    public static String getNumberOfLikes(int likes) {
+        if (likes <= 0) {
+            return null;
+        } else if (likes == 1) {
+            return "1 like";
+        } else if (likes / 1000d >= 1){
+            return String.format("%.2fK likes", (likes/1000d));
+        }
+        else {
+            return likes + " likes";
+        }
     }
 
     /**
@@ -134,6 +159,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
      * @param post the post
      */
     private void handleLike(@NonNull PictureViewHolder holder, Post post) {
+        if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
+            holder.like.setVisibility(View.GONE);
+            return;
+        }
+
+        holder.like.setVisibility(View.VISIBLE);
+
         if (post.isLikedBy(Profile.getActiveProfile().getUid())) {
             holder.isLiked = true;
             Picasso.get().load(R.drawable.like_full).into(holder.like);
@@ -159,6 +191,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 Database.addLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
                     if (throwable != null) {
                         post.setLikers(aVoid.getLikers());
+                    }
+                });
+                // send the like notification
+                Database.getProfile(post.getUid()).thenAccept(profile -> {
+                    if (profile != null) {
+                        LikeNotification notif = new LikeNotification(profile.getUsername());
+                        FireMessaging.sendNotification(profile.getUid(), notif);
                     }
                 });
                 Picasso.get().load(R.drawable.like_full).into(holder.like);
@@ -200,8 +239,11 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
                     Database.removePost(post);
                     //TODO: delete image from storage when the mock is removed
+                    //FirebaseStorage storage = FirebaseStorage.getInstance();
+                    //storage.getReferenceFromUrl(post.getImageUrl()).delete();
 
-                    Snackbar.make(v, "Post deleted", Snackbar.LENGTH_LONG).show();
+                    View rootView = v.getRootView();
+                    CustomSnackbar.showCustomSnackbar("Post deleted successfully", R.drawable.image_recognition_error, rootView);
                 })
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
         dial.show();
@@ -327,6 +369,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView username;
         public TextView location;
         public ImageView like;
+        public TextView likeCount;
         public ImageView delete;
         public TextView artName;
         public TextView artist;
@@ -356,6 +399,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             location = itemView.findViewById(R.id.location);
             profilePicture = itemView.findViewById(R.id.profile_picture);
             like = itemView.findViewById(R.id.like_button);
+            likeCount = itemView.findViewById(R.id.like_count);
             delete = itemView.findViewById(R.id.delete_button);
             View descriptionContainer = itemView.findViewById(R.id.descriptionContainerPost);
 
@@ -381,21 +425,22 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
             // Enables flipping the post from recto to verso
             pictureImageView.setOnClickListener(v -> {
-                if(isFlipping) return;
+                if (isFlipping) return;
                 flip(v.getContext(), postVerso, postRecto);
             });
 
             // Enables flipping the post from verso to recto
             descriptionContainer.setOnClickListener(v -> {
-                if(isFlipping) return;
+                if (isFlipping) return;
                 flip(v.getContext(), postRecto, postVerso);
             });
         }
 
         /**
          * Flips the post from recto to verso or verso to recto.
-         * @param context the context
-         * @param visibleView the visible view to show
+         *
+         * @param context       the context
+         * @param visibleView   the visible view to show
          * @param inVisibleView the invisible view to hide
          */
         private void flip(Context context, View visibleView, View inVisibleView) {
@@ -428,7 +473,6 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 }
             });
         }
-
     }
 }
 

@@ -11,7 +11,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
-import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -64,13 +64,13 @@ public class ProfileFragmentTest {
         // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
 
-        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PATH
+        Post post = new Post("abc", Authenticator.getCurrentUser().getUid(), DEFAULT_PROFILE_PIC_PATH
                 , "Piece of Art", 0, 0, new ArrayList<>());
         Database.uploadPost(post);
 
-        ProfileUtils.postsAdded = 0;
+        ProfileUtils.POSTS_ADDED = 0;
 
-        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PATH, 35,new HashMap<>());
+        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PIC_PATH, 35,new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 
@@ -102,7 +102,7 @@ public class ProfileFragmentTest {
     }
 
     @Test
-    public void deleteButtonWorks() {
+    public void deleteButtonWorks() throws InterruptedException {
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
         //long click on the first picture should open an alert dialog
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
@@ -111,10 +111,12 @@ public class ProfileFragmentTest {
         onView(withText("No")).perform(click());
         onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
         assertEquals(1, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
+        Thread.sleep(2000);
         onView(withId(R.id.pictureGrid)).perform(RecyclerViewActions.actionOnItemAtPosition(0, ViewActions.longClick()));
         onView(withText("Are you sure you want to delete this post?")).check(matches(isDisplayed()));
         onView(withText("Yes")).perform(click());
         onView(withText("Are you sure you want to delete this post?")).check(doesNotExist());
+        Thread.sleep(2000);
         assertEquals(0, Objects.requireNonNull(Database.getPosts(Profile.getActiveProfile().getUid()).join()).size());
         onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(0)));
     }

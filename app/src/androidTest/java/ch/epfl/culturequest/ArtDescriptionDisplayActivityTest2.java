@@ -49,4 +49,9 @@ public class ArtDescriptionDisplayActivityTest2 {
         onView(withId(R.id.post_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
     }
 
+    @Test
+    public void activityDisplayingShareButton() {
+        onView(withId(R.id.share_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+    }
+
 }

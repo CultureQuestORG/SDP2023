@@ -8,8 +8,8 @@ import androidx.annotation.NonNull;
  * This is needed for Gson to parse the JSON response from OTM correctly
  */
 public final class OTMLatLng {
-    private final double lat;
-    private final double lon;
+    private double lat;
+    private double lon;
 
     public OTMLatLng(double lon, double lat) {
         if(lat < -90 || lat > 90){
@@ -22,19 +22,33 @@ public final class OTMLatLng {
         this.lat = lat;
     }
 
+    public OTMLatLng(){
+        this(0,0);
+    }
+
     /**
      * @return the latitude of the point
      */
-    public double latitude() {
+    public double getLat() {
         return lat;
     }
 
     /**
      * @return the longitude of the point
      */
-    public double longitude() {
+    public double getLon() {
         return lon;
     }
+
+
+    public void setLat(double lat){
+        this.lat =  lat;
+    }
+
+    public void setLon(double lon){
+        this.lon = lon;
+    }
+
 
     @NonNull
     public String toString(){

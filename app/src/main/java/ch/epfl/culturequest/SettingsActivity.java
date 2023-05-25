@@ -1,7 +1,12 @@
 package ch.epfl.culturequest;
 
-import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
+import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
+import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
+import static ch.epfl.culturequest.utils.CropUtils.TAKE_PICTURE;
+import static ch.epfl.culturequest.utils.ProfileUtils.setProblemHintTextIfAny;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -21,14 +26,19 @@ import androidx.core.content.ContextCompat;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.CropUtils;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.EspressoIdlingResource;
 import ch.epfl.culturequest.utils.ProfileUtils;
 
@@ -37,7 +47,6 @@ import ch.epfl.culturequest.utils.ProfileUtils;
  * Activity that allows the user to change his profile picture and username
  */
 public class SettingsActivity extends AppCompatActivity {
-
     private ImageView profilePictureView;
     private String profilePicUri;
     private Bitmap profilePicBitmap;
@@ -45,15 +54,14 @@ public class SettingsActivity extends AppCompatActivity {
 
     private TextView username;
 
+    private View rootView;
 
-    private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
     private final ActivityResultLauncher<String> requestPermissionLauncher = this.registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
         if (isGranted) openGallery();
     });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         AndroidUtils.removeStatusBar(getWindow());
@@ -62,7 +70,14 @@ public class SettingsActivity extends AppCompatActivity {
 
         //handle logout
         Button logoutButton = binding.logOut;
-        logoutButton.setOnClickListener(v -> Authenticator.signOut(this));
+        logoutButton.setOnClickListener(v -> {
+            Context context = v.getContext();
+            if (hasConnection(context)) Authenticator.signOut(this);
+            else {
+                View rootView = v.getRootView();
+                CustomSnackbar.showCustomSnackbar("Cannot log out. You are not connected to the internet", R.drawable.unknown_error, rootView);
+            }
+        });
 
         activeProfile = Profile.getActiveProfile();
 
@@ -83,6 +98,8 @@ public class SettingsActivity extends AppCompatActivity {
         // handle the update profile button
         Button updateProfileButton = binding.updateProfile;
         updateProfileButton.setOnClickListener(this::UpdateProfile);
+
+        rootView = binding.getRoot();
     }
 
 
@@ -90,14 +107,11 @@ public class SettingsActivity extends AppCompatActivity {
         EspressoIdlingResource.increment();
 
         // Check if the username is valid
-        if (!ProfileUtils.isValid(activeProfile, username.getText().toString())) {
-            username.setText("");
-            username.setHint(INCORRECT_USERNAME_FORMAT);
+        if (setProblemHintTextIfAny(username)) {
             EspressoIdlingResource.decrement();
             return;
         }
-
-
+        activeProfile.setUsername(username.getText().toString());
         // if the profile picture has not been changed, we don't need to upload it again
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
@@ -107,43 +121,40 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
-        // Upload the new profile picture and update the profile
-        FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap).whenComplete(
-                (profile, throwable) -> {
-                    if (throwable != null) {
-                        throwable.printStackTrace();
-                    } else {
-                        Database.setProfile(profile);
-                        Profile.setActiveProfile(profile);
-                    }
+        if (!hasConnection(this)) {
+            showNoConnectionAlert(this, "You have no internet connection. Your profile will be updated once you connect.");
+        }
+            FireStorage.uploadNewProfilePictureToStorage(activeProfile, profilePicBitmap,true).whenComplete(
+                    (profile, throwable) -> {
+                        if (throwable != null) {
+                            throwable.printStackTrace();
+                        } else {
+                            Database.setProfile(profile);
+                            Profile.setActiveProfile(profile);
+                        }
 
-                    finish();
-                    EspressoIdlingResource.decrement();
-                }
-        );
-    }
+                        finish();
+                        EspressoIdlingResource.decrement();
+                    }
+            );
+        }
+
+
 
     /**
      * Displays the profile picture selected by the user
      *
      * @param result the result of the activity launched to select the profile picture
      */
-    private void displayProfilePic(ActivityResult result) {
-        if (result.getResultCode() != RESULT_OK) return;
-
-        Intent data = result.getData();
-        if (data == null) return;
-
-        Uri selectedImage = data.getData();
-        if (selectedImage == null) return;
-
-        Picasso.get().load(selectedImage).into(profilePictureView);
-        profilePicUri = selectedImage.toString();
+    private Void displayProfilePic(Uri result) {
+        Picasso.get().load(result).into(profilePictureView);
+        profilePicUri = result.toString();
         try {
-            profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+            profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), result);
         } catch (IOException e) {
-            profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PATH);
+            profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PIC_PATH);
         }
+        return null;
     }
 
 
@@ -161,7 +172,25 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void openGallery() {
-        profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+        // start the gallery activity to select a picture with result code TAKE_PICTURE
+        startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI), TAKE_PICTURE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        CropUtils.manageCropFlow(requestCode, resultCode, data, this, this::displayProfilePic, rootView);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            TournamentManagerApi.handleTournaments(this);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

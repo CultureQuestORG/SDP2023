@@ -1,9 +1,6 @@
 package ch.epfl.culturequest;
 
-import android.os.Build;
 import android.os.Bundle;
-import android.view.Window;
-import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -12,7 +9,9 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.databinding.ActivityNavigationBinding;
+import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class NavigationActivity extends AppCompatActivity {
@@ -22,6 +21,9 @@ public class NavigationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Create the notification channels on NavigationActivity creation
+        PushNotification.createNotificationChannels(this);
 
         // To make the status bar transparent
         AndroidUtils.removeStatusBar(getWindow());
@@ -36,6 +38,16 @@ public class NavigationActivity extends AppCompatActivity {
 
         // Disables default grey tint on icons
         navView.setItemIconTintList(null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try{
+            TournamentManagerApi.handleTournaments(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -1,28 +1,35 @@
 package ch.epfl.culturequest;
 
+import static android.app.Activity.RESULT_OK;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PATH;
-import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
+import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 
 import android.Manifest;
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.net.Uri;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
+
+import com.yalantis.ucrop.UCropActivity;
 
 import org.junit.After;
 import org.junit.Before;
@@ -39,6 +46,8 @@ import ch.epfl.culturequest.storage.FireStorage;
 public class ProfileCreatorActivityTest {
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
+//    @Rule
+//    public GrantPermissionRule grantPermissionRule2 = GrantPermissionRule.grant(Manifest.permission.READ_MEDIA_IMAGES);
 
     private static Profile profile;
     private static ProfileCreatorActivity activity;
@@ -109,10 +118,10 @@ public class ProfileCreatorActivityTest {
 
     @Test
     public void wrongUserNameSetsHintText() throws InterruptedException {
-        onView(withId(R.id.username)).perform(typeText("  !+ "));
+        onView(withId(R.id.username)).perform(typeText("!!!!!!!"));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("Only letters and digits allowed")));
     }
 
     @Test
@@ -126,9 +135,8 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.username)).perform(typeText("JohnDoe"));
         onView(withId(R.id.create_profile)).perform(pressBack()).perform(click());
         Thread.sleep(8000);
-        assertEquals(profile.getUsername(), "JohnDoe");
-        // assert  that the URL contains https://firebasestorage.googleapis.com and contains
-        assertEquals(DEFAULT_PROFILE_PATH, activity.getProfilePicUri());
+        assertEquals("JohnDoe", profile.getUsername());
+        assertEquals(DEFAULT_PROFILE_PIC_PATH, activity.getProfilePicUri());
     }
 
 
@@ -137,23 +145,41 @@ public class ProfileCreatorActivityTest {
         onView(withId(R.id.username)).perform(typeText(""));
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("Username is empty")));
 
-        onView(withId(R.id.username)).perform(typeText("lol"), pressBack());
+        onView(withId(R.id.username)).perform(typeText("lo"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("3 to 20 characters allowed")));
 
         onView(withId(R.id.username)).perform(typeText("abcdefghijklmnopqrstuvxyz"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("3 to 20 characters allowed")));
 
         onView(withId(R.id.username)).perform(typeText("john Doe"), pressBack());
         onView(withId(R.id.create_profile)).perform(click());
         Thread.sleep(2000);
-        onView(withId(R.id.username)).check(matches(withHint(INCORRECT_USERNAME_FORMAT)));
+        onView(withId(R.id.username)).check(matches(withHint("Username cannot have spaces")));
     }
+
+//    @Test
+//    public void profilePictureButtonSendsPickerIntent() throws InterruptedException {
+//        onView(withId(R.id.profile_picture)).perform(click());
+//        intended(hasAction(Intent.ACTION_PICK));
+//    }
+
+//    @Test
+//    public void afterPictureChosenGoToCrop() {
+//        Intent intent = new Intent();
+//        intent.setData(Uri.parse("content://media/external/images/media/1"));
+//        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(RESULT_OK, intent);
+//        intending(hasAction(Intent.ACTION_PICK)).respondWith(result);
+//
+//        onView(withId(R.id.profile_picture)).perform(click());
+//
+//        intended(hasComponent(UCropActivity.class.getName()));
+//    }
 
     @After
     public void tearDown() {

@@ -1,6 +1,6 @@
 package ch.epfl.culturequest;
 
-import static ch.epfl.culturequest.utils.ProfileUtils.INCORRECT_USERNAME_FORMAT;
+import static ch.epfl.culturequest.utils.ProfileUtils.setProblemHintTextIfAny;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,18 +18,24 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.utils.AndroidUtils;
+import ch.epfl.culturequest.utils.CropUtils;
+import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -42,9 +48,9 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     private String profilePicUri;
 
     private Bitmap profilePicBitmap;
+
+    private TextView textView;
     private final Profile profile = new Profile(null, "");
-    private final ActivityResultLauncher<Intent> profilePictureSelector = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), this::displayProfilePic);
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             this.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
                     isGranted -> {
@@ -62,6 +68,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile_creation);
         //the following attributes are used to check whether the user actually selected a profile pic
         profileView = findViewById(R.id.profile_picture);
+        textView = findViewById(R.id.username);
         initialDrawable = profileView.getDrawable();
     }
 
@@ -93,59 +100,63 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      * @param view
      */
     public void createProfile(View view) {
-        EditText textView = findViewById(R.id.username);
-        String username = textView.getText().toString();
-
         //check if username is valid
-        if (!ProfileUtils.isValid(profile, username)) {
-            textView.setText("");
-            textView.setHint(INCORRECT_USERNAME_FORMAT);
-            return;
-        }
-
+        if (setProblemHintTextIfAny(textView)) return;
+        String username = textView.getText().toString();
         setDefaultPicIfNoneSelected();
 
         profile.setUsername(username);
         profile.setUid(Authenticator.getCurrentUser().getUid());
 
-        //if user is anonymous, we don't want to store the profile in the database
-        if (!Authenticator.getCurrentUser().isAnonymous()) {
+        // Get first the device token, then store the profile in the database if it is not anonymous
+        FireMessaging.getDeviceToken().whenComplete((token, ex) -> {
+            if (ex == null && token != null) {
+                List<String> deviceTokens = new ArrayList<>();
+                deviceTokens.add(token);
+                profile.setDeviceTokens(deviceTokens);
+            }
 
-            //if the profile picture is not the default one, we store it in the storage
-            if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PATH))
-                FireStorage.uploadNewProfilePictureToStorage(profile, profilePicBitmap).whenComplete(
-                        (profile, throwable) -> {
-                            if (throwable != null) {
-                                throwable.printStackTrace();
-                            } else {
-                                Database.setProfile(profile);
-                                Profile.setActiveProfile(profile);
+            //if user is anonymous, we don't want to store the profile in the database
+            if (!Authenticator.getCurrentUser().isAnonymous()) {
+
+                //if the profile picture is not the default one, we store it in the storage
+                if (!profilePicUri.equals(ProfileUtils.DEFAULT_PROFILE_PIC_PATH))
+                    FireStorage.uploadNewProfilePictureToStorage(profile, profilePicBitmap, true).whenComplete(
+                            (profile, throwable) -> {
+                                if (throwable != null) {
+                                    throwable.printStackTrace();
+                                } else {
+                                    Database.setProfile(profile);
+                                    Profile.setActiveProfile(profile);
+                                }
                             }
-                        }
-                );
-                // if the profile picture is the default one, we don't need to store it in the storage
-            else {
-                Database.setProfile(profile);
+                    );
+                    // if the profile picture is the default one, we don't need to store it in the storage
+                else {
+                    Database.setProfile(profile);
+                    Profile.setActiveProfile(profile);
+                }
+
+            } else {
+                //if user is anonymous, we don't want to store the profile in the database
                 Profile.setActiveProfile(profile);
             }
 
-        } else {
-            //if user is anonymous, we don't want to store the profile in the database
-            Profile.setActiveProfile(profile);
-        }
+            Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
+            startActivity(successfulProfileCreation);
 
-        Intent successfulProfileCreation = new Intent(this, NavigationActivity.class);
-        startActivity(successfulProfileCreation);
+        });
     }
 
     private void openGallery() {
-        profilePictureSelector.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+        // start the gallery activity to select a picture with result code TAKE_PICTURE
+        startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI), CropUtils.TAKE_PICTURE);
     }
 
 
     private void setDefaultPicIfNoneSelected() {
         if (profileView.getDrawable().equals(initialDrawable)) {
-            profilePicUri = ProfileUtils.DEFAULT_PROFILE_PATH;
+            profilePicUri = ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
             profile.setProfilePicture(profilePicUri);
         }
     }
@@ -156,19 +167,23 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      *
      * @param result the result of the activity launched to select the profile picture
      */
-    public void displayProfilePic(ActivityResult result) {
-        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-            Uri profilePicture = result.getData().getData();
-            CircleImageView image = findViewById(R.id.profile_picture);
-            Picasso.get().load(profilePicture).into(image);
-            ((TextView) findViewById(R.id.profile_pic_text)).setText("");
-            profilePicUri = profilePicture.toString();
-            try {
-                profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), profilePicture);
-            } catch (IOException e) {
-                profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PATH);
-            }
+    private Void displayProfilePic(Uri result) {
+        CircleImageView image = findViewById(R.id.profile_picture);
+        Picasso.get().load(result).into(image);
+        ((TextView) findViewById(R.id.profile_pic_text)).setText("");
+        profilePicUri = result.toString();
+        try {
+            profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), result);
+        } catch (IOException e) {
+            profilePicBitmap = FireStorage.getBitmapFromURL(ProfileUtils.DEFAULT_PROFILE_PIC_PATH);
         }
+        return null;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        CropUtils.manageCropFlow(requestCode, resultCode, data, this, this::displayProfilePic, profileView);
     }
 
 

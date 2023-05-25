@@ -1,30 +1,18 @@
 package ch.epfl.culturequest.utils;
 
 import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
-import android.provider.MediaStore;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.core.content.ContextCompat;
-
-import ch.epfl.culturequest.social.Profile;
 
 
 /**
  * Class that contains methods that are used in activities where a profile is created or modified
- *
  */
 public class ProfileUtils {
 
-    public static String DEFAULT_PROFILE_PATH = "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2Fbasic_profile_picture.png?alt=media&token=8e407bd6-ad5f-401a-9b2d-7852ccfb9d62";
-    public static int postsAdded = 0;
-    public static String INCORRECT_USERNAME_FORMAT = "Incorrect Username Format";
+    public static String DEFAULT_PROFILE_PIC_PATH = "https://drive.google.com/uc?id=1gA_7AkkcoW4PJggzBvJYY2JT0dXbsr6Y";
+    public static int POSTS_ADDED = 0;
     public static String USERNAME_REGEX = "^[a-zA-Z0-9_-]+$";
 
     public static int DEFAULT_POST_LIMIT = 4, DEFAULT_POST_OFFSET = 0;
@@ -43,34 +31,27 @@ public class ProfileUtils {
      * @param username the username to check
      * @return true if the username is valid, false otherwise
      */
-    public static boolean usernameIsValid(String username) {
+    private static USERNAME_PB usernameIsValid(String username) {
         int length = username.length();
-        return !username.isEmpty()
-                && length > 3
-                && length < 20
-                && username.matches(USERNAME_REGEX)
-                && !username.contains(" ");
+        USERNAME_PB result;
+        if (username.isEmpty())
+            result = USERNAME_PB.USERNAME_IS_EMPTY;
+        else if (length < 3 || length > 20)
+            result = USERNAME_PB.USERNAME_LENGTH_PB;
+        else if (username.contains(" "))
+            result = USERNAME_PB.USERNAME_HAS_WHITESPACE;
+        else if (!username.matches(USERNAME_REGEX))
+            result = USERNAME_PB.USERNAME_HAS_WRONG_REGEX;
+        else
+            result = USERNAME_PB.USERNAME_VALID;
+        return result;
     }
 
 
-    /**
-     * Checks if the username is valid and sets it to the profile if it is
-     *
-     * @param profile the profile to set the username to
-     * @param username the username to check
-     * @return true if the username is valid, false otherwise
-     */
-    public static boolean isValid(Profile profile, String username) {
-        if (usernameIsValid(username)) {
-            profile.setUsername(username);
-            return true;
-        }
-        return false;
-    }
-    public static void handleScore(TextView level,TextView levelText, ProgressBar progressBar, int score){
+    public static void handleScore(TextView level, TextView levelText, ProgressBar progressBar, int score) {
 
 
-        int levelNumber = (int) Math.floor(Math.pow(score, 1.0/3.0));
+        int levelNumber = (int) Math.floor(Math.pow(score, 1.0 / 3.0));
 
 
         int pointsfromlastlevel = (int) (Math.pow(levelNumber, 3));
@@ -87,5 +68,32 @@ public class ProfileUtils {
         progressBar.setProgress(progress);
     }
 
+    public static boolean setProblemHintTextIfAny(TextView username) {
+        switch (usernameIsValid(username.getText().toString())) {
+            case USERNAME_VALID:
+                return false;
+            case USERNAME_IS_EMPTY:
+                username.setText("");
+                username.setHint("Username is empty");
+                break;
+            case USERNAME_HAS_WHITESPACE:
+                username.setText("");
+                username.setHint("Username cannot have spaces");
+                break;
+            case USERNAME_HAS_WRONG_REGEX:
+                username.setText("");
+                username.setHint("Only letters and digits allowed");
+                break;
+            case USERNAME_LENGTH_PB:
+                username.setText("");
+                username.setHint("3 to 20 characters allowed");
+                break;
+        }
+        return true;
+    }
+
+    enum USERNAME_PB {
+        USERNAME_IS_EMPTY, USERNAME_LENGTH_PB, USERNAME_HAS_WHITESPACE, USERNAME_HAS_WRONG_REGEX, USERNAME_VALID;
+    }
 
 }

@@ -4,11 +4,17 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasType;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 
 import android.content.Context;
@@ -17,15 +23,19 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.epfl.culturequest.authentication.Authenticator;
@@ -60,7 +70,7 @@ public class ArtDescriptionDisplayActivityTest1 {
         // Manually signs in the user before the tests
         Authenticator.manualSignIn(email, password).join();
 
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0,new HashMap<>());
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "testName", "testUsername", "testEmail", "testPhone", "testProfilePicture", 0,new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(profile);
     }
 
@@ -121,6 +131,35 @@ public class ArtDescriptionDisplayActivityTest1 {
     @Test
     public void activityDisplayingPostButton() {
         onView(withId(R.id.post_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+    }
+
+    @Test
+    public void activityDisplayingShareButton() {
+        onView(withId(R.id.share_button)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+    }
+
+    @Test
+    public void checkSharingSendsProperIntent() {
+        Intents.init();
+        onView(withId(R.id.artName)).perform(swipeUp());
+        onView(withId(R.id.artSummary)).perform(swipeUp(), swipeUp(), swipeUp(), swipeUp());// Scroll to the bottom of the RecyclerView
+        onView(withId(R.id.share_button)).perform(click());
+        intended(hasAction(Intent.ACTION_CHOOSER));
+
+        Matcher<Intent> expectedIntent = Matchers.allOf(
+                hasAction(Intent.ACTION_SEND),
+                hasExtra(Intent.EXTRA_TEXT, "I just scanned Mona Lisa with \uD835\uDC02\uD835\uDC2E\uD835\uDC25\uD835\uDC2D\uD835\uDC2E\uD835\uDC2B\uD835\uDC1E\uD835\uDC10\uD835\uDC2E\uD835\uDC1E\uD835\uDC2C\uD835\uDC2D!\n\nIt's a epic artwork from Da Vinci, displayed at Louvre, Paris.\n\nDownload the app here: https://play.google.com/store/apps/details?id=com.culturequest.culturequest"),
+                hasType("image/jpeg")
+        );
+
+        intended(chooser(expectedIntent));
+        Intents.release();
+    }
+
+    private Matcher<Intent> chooser(Matcher<Intent> matcher) {
+        return allOf(
+                hasAction(Intent.ACTION_CHOOSER),
+                hasExtra(Intent.EXTRA_INTENT, matcher));
     }
 
     @After

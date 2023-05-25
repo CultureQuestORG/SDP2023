@@ -89,14 +89,14 @@ public class BasicOTMProviderTest {
         assertThat(locations.size(), is(2));
         //Check location 1
         assertThat(locations.get(0).getName(), is("Tombe du silence et du repos sans fin (Facteur Cheval)"));
-        assertThat(locations.get(0).getCoordinates().longitude(), is(5.));
-        assertThat(locations.get(0).getCoordinates().latitude(), is(45.250064849853516));
-        assertThat(locations.get(0).getKinds(), containsInAnyOrder("historic", "monuments_and_memorials"));
+        assertThat(locations.get(0).getCoordinates().getLon(), is(5.));
+        assertThat(locations.get(0).getCoordinates().getLat(), is(45.250064849853516));
+        assertThat(locations.get(0).getKindsList(), containsInAnyOrder("historic", "monuments_and_memorials"));
         //Check location 2
         assertThat(locations.get(1).getName(), is("Château de La Côte-Saint-André"));
-        assertThat(locations.get(1).getCoordinates().longitude(), is(20.23));
-        assertThat(locations.get(1).getCoordinates().latitude(), is(47.39));
-        assertThat(locations.get(1).getKinds(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
+        assertThat(locations.get(1).getCoordinates().getLon(), is(20.23));
+        assertThat(locations.get(1).getCoordinates().getLat(), is(47.39));
+        assertThat(locations.get(1).getKindsList(), containsInAnyOrder("fortifications", "interesting_places", "castles"));
     }
 
     @After

@@ -4,35 +4,69 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D9C2A6"
+    android:background="@color/background"
     android:id="@+id/homeFragment"
     tools:context=".ui.home.HomeFragment"
     tools:visibility="visible">
 
 
-    <ImageView
-        android:id="@+id/search_icon"
-        android:layout_width="38dp"
-        android:layout_height="36dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        android:src="?android:attr/actionModeWebSearchDrawable"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/feed_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="80dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="70dp"
         android:padding="5dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_icon"
-        app:layout_constraintVertical_bias="0.0"
-        app:spanCount="3" />
+        app:layout_constraintTop_toBottomOf="@+id/logoApp"
+        app:spanCount="3">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <ImageView
+        android:id="@+id/search_icon"
+        android:layout_width="38dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="20dp"
+        android:src="?android:attr/actionModeWebSearchDrawable"
+        app:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/logoApp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/logoApp" />
+
+    <ImageView
+        android:id="@+id/notification_icon"
+        android:layout_width="38dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="13dp"
+        android:src="@drawable/notification"
+        app:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/logoApp"
+        app:layout_constraintEnd_toStartOf="@id/search_icon"
+        app:layout_constraintTop_toTopOf="@+id/logoApp" />
+
+    <ImageView
+        android:id="@+id/events_icon"
+        android:layout_width="38dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="13dp"
+        android:src="@drawable/planner"
+        app:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/logoApp"
+        app:layout_constraintEnd_toStartOf="@id/notification_icon"
+        app:layout_constraintTop_toTopOf="@+id/logoApp" />
+
+    <ImageView
+        android:id="@+id/logoApp"
+        android:layout_width="104dp"
+        android:layout_height="78dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/logo_compact" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
