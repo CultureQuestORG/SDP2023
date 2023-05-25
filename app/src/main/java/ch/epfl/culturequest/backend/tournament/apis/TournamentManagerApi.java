@@ -2,12 +2,18 @@ package ch.epfl.culturequest.backend.tournament.apis;
 
 import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+import static ch.epfl.culturequest.backend.tournament.apis.SeedApi.generateOrFetchSeedThenStore;
+import static ch.epfl.culturequest.backend.tournament.apis.SeedApi.getCurrentSeed;
+import static ch.epfl.culturequest.backend.tournament.apis.SeedApi.handleNewSeed;
+import static ch.epfl.culturequest.backend.tournament.apis.SeedApi.seedAlreadyStoredInSharedPref;
 import static ch.epfl.culturequest.backend.tournament.utils.RandomApi.generateWeeklyTournamentDate;
+import static ch.epfl.culturequest.database.Database.fetchSeedIfAlreadyGenerated;
 import static ch.epfl.culturequest.database.Database.handleFutureTimeout;
 import static ch.epfl.culturequest.database.Database.indicateTournamentNotGenerated;
 import static ch.epfl.culturequest.database.Database.isTournamentGenerationLocked;
 import static ch.epfl.culturequest.database.Database.lockTournamentGeneration;
 import static ch.epfl.culturequest.database.Database.unlockTournamentGeneration;
+import static ch.epfl.culturequest.database.Database.uploadSeedToDatabase;
 import static ch.epfl.culturequest.database.Database.uploadTournamentToDatabase;
 import static ch.epfl.culturequest.database.Database.waitForTournamentGenerationAndFetchIt;
 import android.annotation.SuppressLint;
@@ -63,9 +69,12 @@ public class TournamentManagerApi {
 
         currentContext = context;
 
-        if (tournamentRemainingTime() == 0) { // Tournament hasn't been scheduled yet (date not pseudo-randomly generated yet)
-            // schedule the tournament generation and store it in shared preferences
-            generateAndStoreTournamentDate(); //synchronous call
+        if (tournamentRemainingTime() == 0) { // A tournament has never been scheduled yet - first time the app is launched
+
+            if(!seedAlreadyStoredInSharedPref()){
+                return generateOrFetchSeedThenStore().thenAccept(x -> generateAndStoreTournamentDate());
+            }
+            generateAndStoreTournamentDate();
 
         } else if (tournamentRemainingTime() < 0) { // Tournament is over
 
@@ -327,19 +336,23 @@ public class TournamentManagerApi {
     }
 
     private static CompletableFuture<Void> setWeeklyTournamentOver() {
-        // clear the "tournament" shared preferences location
+
+        // We remember the current seed before cleaning the shared pref
+        Long currentSeed = getCurrentSeed();
+
         clearTournamentSharedPref();
 
-        // schedule the tournament for next week (7 days (should) have passed so week number incremented)
-        generateAndStoreTournamentDate();
+        CompletableFuture<Void> newSeedHandled = handleNewSeed(currentSeed).thenAccept(x -> {
+            generateAndStoreTournamentDate();
+        });
 
-        // return a future that completes whenever both of unlock tournament generation and indicate tournament not generated are completed
         CompletableFuture<Boolean> unlockTournamentGenerationFuture = unlockTournamentGeneration();
         CompletableFuture<Boolean> indicateTournamentNotGeneratedFuture = indicateTournamentNotGenerated();
 
-        return CompletableFuture.allOf(unlockTournamentGenerationFuture, indicateTournamentNotGeneratedFuture);
+        return CompletableFuture.allOf(unlockTournamentGenerationFuture, indicateTournamentNotGeneratedFuture, newSeedHandled);
     }
-    private static SharedPreferences getTournamentSharedPrefLocation() {
+
+    public static SharedPreferences getTournamentSharedPrefLocation() {
 
         return currentContext.getSharedPreferences("tournament", Context.MODE_PRIVATE);
     }
@@ -354,4 +367,5 @@ public class TournamentManagerApi {
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
         return sharedPreferences.getString("weeklyTournament", null) != null;
     }
+
 }
