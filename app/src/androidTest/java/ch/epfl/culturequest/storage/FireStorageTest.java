@@ -2,6 +2,7 @@ package ch.epfl.culturequest.storage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import android.graphics.Bitmap;
@@ -13,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
@@ -76,6 +78,7 @@ public class FireStorageTest {
             fail("Test failed because of an exception: " + e.getMessage());
         }
     }
+
 
     @After
     public void tearDown() {
