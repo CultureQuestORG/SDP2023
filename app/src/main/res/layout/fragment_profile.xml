@@ -27,8 +27,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profilePicture"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginStart="44dp"
         android:layout_marginTop="100dp"
         android:src="@drawable/basic_profile_picture"
@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="45dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/button_rounded_corner"
         android:elevation="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -49,8 +49,8 @@
 
         <ImageView
             android:id="@+id/settingsButtonText"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:padding="4dp"
             app:srcCompat="@drawable/settings_button" />
     </RelativeLayout>
@@ -59,7 +59,7 @@
         android:id="@+id/profileUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="-20dp"
+        android:layout_marginStart="10dp"
         android:fontFamily="@font/poppins_bold"
         android:shadowColor="#80000000"
         android:shadowDx="0"
@@ -76,7 +76,7 @@
         android:id="@+id/profilePlace"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="-15dp"
         android:fontFamily="@font/poppins"
         android:shadowColor="#80000000"
@@ -92,7 +92,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pictureGrid"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="80dp"
@@ -152,7 +152,7 @@
             android:text="Follow"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="15sp"
             app:drawableTint="@color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -164,15 +164,13 @@
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="250dp"
+        android:layout_width="220dp"
         android:layout_height="13dp"
-
-        android:layout_marginStart="72dp"
 
         android:layout_marginTop="5dp"
         android:indeterminateDrawable="@drawable/progress_bar_shape"
         android:progressDrawable="@drawable/progress_bar_shape"
-        app:layout_constraintStart_toStartOf="@+id/profilePicture"
+        app:layout_constraintStart_toEndOf="@+id/profilePicture"
         app:layout_constraintTop_toBottomOf="@+id/levelText" />
 
     <TextView
@@ -198,7 +196,7 @@
 
     <TextView
         android:id="@+id/levelText"
-        android:layout_width="112dp"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="-10dp"
         android:fontFamily="@font/poppins"

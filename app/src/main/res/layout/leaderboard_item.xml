@@ -24,6 +24,7 @@
             android:layout_below="@+id/user_profile_picture"
             android:layout_alignStart="@+id/user_profile_picture"
             android:layout_marginTop="5dp"
+            android:textColor="@color/black"
             android:textSize="18sp" />
 
         <ImageView
@@ -42,6 +43,7 @@
             android:layout_alignStart="@+id/trophy_icon"
             android:layout_marginTop="10dp"
             android:textAlignment="center"
+            android:textColor="@color/black"
             android:textSize="18sp" />
 
         <ImageView
@@ -61,6 +63,7 @@
             android:layout_alignStart="@+id/leaderboard_icon"
             android:layout_marginTop="10dp"
             android:textAlignment="center"
+            android:textColor="@color/black"
             android:textSize="18sp" />
 
     </RelativeLayout>

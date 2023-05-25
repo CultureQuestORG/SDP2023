@@ -9,10 +9,10 @@
 
     <ImageView
         android:id="@+id/back_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="45dp"
         android:elevation="2dp"
         android:src="@drawable/back_button"
         android:onClick="goBack"
@@ -23,14 +23,18 @@
         android:id="@+id/title_notifications"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="50dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="60dp"
         android:fontFamily="@font/poppins_bold"
         android:text="@string/title_notifications"
         android:textColor="@color/colorPrimary"
         android:textSize="28sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:shadowColor="#26000000"
+        android:shadowDx="0"
+        android:shadowDy="4"
+        android:shadowRadius="20"
+        app:layout_constraintStart_toEndOf="@+id/back_button"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
