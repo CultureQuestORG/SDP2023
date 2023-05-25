@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.SignUpActivity;
 import ch.epfl.culturequest.database.Database;
@@ -36,6 +37,10 @@ public class AuthenticatorTest {
     private ComponentActivity activity;
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
+
+    static {
+        BuildConfig.IS_TESTING.set(true);
+    }
 
     @Before
     public void setup() {
@@ -71,19 +76,18 @@ public class AuthenticatorTest {
 
     @Test
     public void SignInWithExistingProfileRedirectsToNavigationActivity() {
-        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0,new HashMap<>(), new ArrayList<>());
+        Profile profile = new Profile(Authenticator.getCurrentUser().getUid(), "test", "test", "test", "test", "test", 0, new HashMap<>(), new ArrayList<>());
 
         try {
             Database.setProfile(profile);
             Thread.sleep(2000);
             String signInState = Authenticator.signIn(activity).get(5, TimeUnit.SECONDS);
             assertEquals(signInState, "User signed in with an existing profile");
+            Thread.sleep(2000);
             onView(withId(R.id.navigation_scan)).check(matches(isDisplayed()));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
-
-        Database.clearDatabase();
     }
 
     @Test
@@ -122,6 +126,21 @@ public class AuthenticatorTest {
             assertTrue(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
             assertFalse(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
 
+            // Signs in the user again for the other tests
+            assertTrue(Authenticator.manualSignIn(email, password).get(5, TimeUnit.SECONDS).get());
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            fail("Test failed because of an exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void checkIfUserIsLoggedInRedirectsToSignUpActivityIfUserIsLoggedOut() {
+        try {
+            assertTrue(Authenticator.signOut(activity).get(5, TimeUnit.SECONDS).get());
+            assertNull(Authenticator.getCurrentUser());
+            Authenticator.checkIfUserIsLoggedIn(activity);
+            Thread.sleep(3000);
+            onView(withId(R.id.sign_in_button)).check(matches(isDisplayed()));
             // Signs in the user again for the other tests
             assertTrue(Authenticator.manualSignIn(email, password).get(5, TimeUnit.SECONDS).get());
         } catch (ExecutionException | InterruptedException | TimeoutException e) {

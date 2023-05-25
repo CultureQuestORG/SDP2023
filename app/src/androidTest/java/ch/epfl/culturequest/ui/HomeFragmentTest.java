@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
@@ -45,6 +46,8 @@ import ch.epfl.culturequest.ui.home.HomeFragment;
 public class HomeFragmentTest {
 
     private HomeFragment fragment;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
 
     public ViewAction clickChildViewWithId(final int id) {
@@ -76,6 +79,15 @@ public class HomeFragmentTest {
 
         // clear the database before starting the following tests
         Database.clearDatabase();
+
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
+
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
 
         // Initialize the database with some test profiles
         ArrayList<String> myFriendsIds = new ArrayList<>();

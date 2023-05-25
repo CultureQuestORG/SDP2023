@@ -4,6 +4,7 @@ import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
@@ -48,6 +49,8 @@ public class SightSeeingActivityTest {
 
 
     Activity sightseeingActivity;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
     @Before
     public void setUp() {
@@ -66,8 +69,11 @@ public class SightSeeingActivityTest {
         //Set up the authentication to run on the local emulator of Firebase
         Authenticator.setEmulatorOn();
 
-        Authenticator.manualSignUp("test@gmail.com", "abcdefg");
-        Authenticator.manualSignIn("test@gmail.com", "abcdefg");
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
 
         Profile.setActiveProfile(new Profile(Authenticator.getCurrentUser().getUid(), "name", "Test", "test@gmail.com", "num", "profile", 0, new HashMap<>(), new ArrayList<>()));
         Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0,new HashMap<>(), new ArrayList<>()));
@@ -165,6 +171,20 @@ public class SightSeeingActivityTest {
         onView(withId(R.id.map_fragment)).check(matches(isDisplayed()));
         onView(withId(R.id.back_button)).perform(click());
         onView(withId(R.id.map_fragment)).check(matches(not(isDisplayed())));
+    }
+
+    @Test
+    public void noLocationsSetsNothingFoundInCity(){
+        Intent mockIntent = new Intent(ApplicationProvider.getApplicationContext(),
+                SightseeingActivity.class);
+        mockIntent.putExtra("city", "Paris, France");
+
+        mockIntent.putStringArrayListExtra("locations", new ArrayList<>());
+        // launch the activity with the mock Intent
+        ActivityScenario.launch(mockIntent).onActivity(activity -> {
+            sightseeingActivity = activity;
+        });
+        onView(withId(R.id.city_text)).check(matches(withText("Couldn't find anything in Paris")));
     }
 
     @Test
