@@ -18,7 +18,7 @@ public class ArtQuiz {
         // For Serialization
         artName = "";
         questions = null;
-        scores = null;
+        scores = new HashMap<>();
     }
 
     public void setQuestions(ArrayList<QuizQuestion> questions) {
