@@ -1,11 +1,13 @@
 package ch.epfl.culturequest;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.utils.AndroidUtils;
@@ -37,6 +39,16 @@ public class SignUpActivity extends AppCompatActivity {
         // Otherwise directly signIn
         else {
             Authenticator.signIn(this);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try{
+            TournamentManagerApi.handleTournaments(this);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

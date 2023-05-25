@@ -25,11 +25,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.squareup.picasso.Picasso;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
 import ch.epfl.culturequest.social.Profile;
@@ -178,6 +180,17 @@ public class SettingsActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         CropUtils.manageCropFlow(requestCode, resultCode, data, this, this::displayProfilePic, rootView);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            TournamentManagerApi.handleTournaments(this);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
