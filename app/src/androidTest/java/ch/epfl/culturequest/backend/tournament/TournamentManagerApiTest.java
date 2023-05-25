@@ -12,6 +12,7 @@ import static ch.epfl.culturequest.database.Database.isEqualAsync;
 import static ch.epfl.culturequest.database.Database.isTournamentGenerationLocked;
 import static ch.epfl.culturequest.database.Database.lockTournamentGeneration;
 import static ch.epfl.culturequest.database.Database.unlockTournamentGeneration;
+import static ch.epfl.culturequest.database.Database.uploadSeedToDatabase;
 import static ch.epfl.culturequest.database.Database.uploadTournamentToDatabase;
 
 import android.content.Context;
@@ -71,16 +72,14 @@ public class TournamentManagerApiTest {
     @Test
     public void tournamentCorrectlyScheduledWhenFirstTime() {
 
-        TournamentManagerApi.handleTournaments(targetContext);
+        TournamentManagerApi.handleTournaments(targetContext).join();
 
         SharedPreferences tournamentSharedPref = getTournamentSharedPrefLocation();
 
         // from tournamentSharedPref, get the tournament date tournamentDate long variable
-
         Long tournamentDate = tournamentSharedPref.getLong("tournamentDate", 0);
-
-        // check that slot isn't empty
         assertThat(tournamentDate, is(not(0)));
+
     }
 
     // Correct handling when tournament is over
@@ -104,7 +103,6 @@ public class TournamentManagerApiTest {
 
         // main function call (in the real app, this is called by onResume() handler of main activities)
         TournamentManagerApi.handleTournaments(targetContext).join();
-
 
         // check that the tournament date/schedule has been updated
         Long tournamentDate = tournamentSharedPref.getLong("tournamentDate", 0);
