@@ -290,7 +290,7 @@ public class TournamentManagerApiTest {
             add(fakeQuestion);
             add(fakeQuestion);
         }};
-        ArtQuiz fakQuiz = new ArtQuiz(fakeQuestions);
+        ArtQuiz fakQuiz = new ArtQuiz("fakeArt",fakeQuestions);
         HashMap<String, ArtQuiz> fakeQuizDict = new HashMap<String, ArtQuiz>() {{
             put("fakeArt", fakQuiz);
         }};
