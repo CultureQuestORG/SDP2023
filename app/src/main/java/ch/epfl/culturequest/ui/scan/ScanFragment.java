@@ -55,6 +55,8 @@ public class ScanFragment extends Fragment {
     private ConstraintLayout scanningLayout;
     private CompletableFuture<Void> currentProcessing;
 
+    private String scannedImageUrl;
+
     //SurfaceTextureListener is used to detect when the TextureView is ready to be used
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -93,6 +95,7 @@ public class ScanFragment extends Fragment {
                             localStorage.storeImageLocally(bitmap, isWifiAvailable);
                             Intent intent = new Intent(getContext(), ArtDescriptionDisplayActivity.class);
                             currentProcessing = FireStorage.uploadAndGetUrlFromImage(bitmap, true).thenCompose(url -> {
+                                        scannedImageUrl = url;
                                         intent.putExtra("downloadUrl", url);
                                         return processingApi.getArtDescriptionFromUrl(url);
                                     })
@@ -139,7 +142,6 @@ public class ScanFragment extends Fragment {
                         }
                     }).exceptionally(e -> {
                         loadingAnimation.stopLoading();
-
                         View rootView = requireActivity().findViewById(android.R.id.content);
                         CustomSnackbar.showCustomSnackbar("Failed to take picture.", R.drawable.camera_error, rootView);
                         return null;
@@ -160,6 +162,7 @@ public class ScanFragment extends Fragment {
                     .setNegativeButton("Wait", ((dialog, which) -> dialog.cancel()))
                     .setPositiveButton("Cancel scan", (dialog, id) -> {
                         loadingAnimation.stopLoading();
+                        FireStorage.deleteImage(scannedImageUrl);
                         scanningLayout.setVisibility(View.GONE);
                         if (currentProcessing != null)
                             currentProcessing.cancel(true);
@@ -168,6 +171,7 @@ public class ScanFragment extends Fragment {
             builder.create().show();
         } else {
             loadingAnimation.stopLoading();
+            FireStorage.deleteImage(scannedImageUrl);
             scanningLayout.setVisibility(View.GONE);
             // Cancel the current processing if it exists
             if (currentProcessing != null)

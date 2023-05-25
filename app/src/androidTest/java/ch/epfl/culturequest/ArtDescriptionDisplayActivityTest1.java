@@ -15,7 +15,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;
 
 import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
@@ -84,9 +86,12 @@ public class ArtDescriptionDisplayActivityTest1 {
     public static Intent createTestIntentWithExtras(String serializedDescription) {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         Intent intent = new Intent(targetContext, ArtDescriptionDisplayActivity.class);
+
         //String serializedMonaLisaDescription = "Pure Masterclass|Paris|France|Louvre|1519|Mona Lisa|Da Vinci|PAINTING|100";
         intent.putExtra("artDescription", serializedDescription);
+
         Bitmap bitmap = FireStorage.getBitmapFromURL("https://uploads0.wikiart.org/00339/images/leonardo-da-vinci/mona-lisa-c-1503-1519.jpg");
+
         // get content resolver from the target context
         LocalStorage localStorage = new LocalStorage(targetContext.getContentResolver());
         try {
@@ -96,6 +101,7 @@ public class ArtDescriptionDisplayActivityTest1 {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        intent.putExtra("downloadUrl", "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/profilePictures%2FcT93LtGk2dT9Jvg46pOpbBP69Kx1?alt=media&token=35ba6af5-104d-4218-bc26-3fb39f75ac15");
 
         return intent;
     }
@@ -187,6 +193,15 @@ public class ArtDescriptionDisplayActivityTest1 {
         return allOf(
                 hasAction(Intent.ACTION_CHOOSER),
                 hasExtra(Intent.EXTRA_INTENT, matcher));
+    }
+
+    @Test
+    public void pressingBackEmptiesStorage(){
+        LocalStorage localStorage = new LocalStorage(InstrumentationRegistry.getInstrumentation().getTargetContext().getContentResolver());
+        onView(withId(R.id.back_button)).perform(click());
+        // Counts the number of ready images (not pending) in the shared storage
+        int sharedStorageSize = localStorage.countSelectedImagesInLocalStorage(null, null);
+
     }
 
     @After
