@@ -24,7 +24,19 @@ import ch.epfl.culturequest.database.Database;
 
 public class GeneralDescriptionApi {
 
-    public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY);
+    //public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY);
+
+    private WikipediaDescriptionApi wikipediaDescriptionApi;
+    private OpenAiService service;
+
+    private static final int DEFAULT_SCORE = 50;
+
+    public GeneralDescriptionApi(WikipediaDescriptionApi wikipediaDescriptionApi, OpenAiService openAiService) {
+        this.wikipediaDescriptionApi = wikipediaDescriptionApi;
+        this.service = openAiService;
+    }
+
+
 
     enum RecoveryState {
 
@@ -34,8 +46,8 @@ public class GeneralDescriptionApi {
 
     public CompletableFuture<BasicArtDescription> getArtDescription(ArtRecognition recognizedArt) {
 
-        return new WikipediaDescriptionApi().getArtDescription(recognizedArt)
-                .thenCompose(basicArtDescription -> recoverPotentialMissesAndGetScore(basicArtDescription, recognizedArt, RecoveryState.PartialRecovery))
+        return wikipediaDescriptionApi.getArtDescription(recognizedArt)
+                .thenCompose(basicArtDescription -> recoverPotentialMissesAndGetScore(basicArtDescription, recognizedArt, RecoveryState.PartialRecovery)) // Wikipedia didn't fail so it either provided a full description or an incomplete one
                 .handle((filledArtDescription, e) -> {
                     if (e != null && !openAiFullRecoveryFailed(e)){                    // if Wikipedia fails, we attempt a full recover with OpenAi
                         BasicArtDescription emptyArtDescription = new BasicArtDescription();
@@ -44,10 +56,11 @@ public class GeneralDescriptionApi {
                     }
 
                     else if( e != null && openAiFullRecoveryFailed(e)){ // if both Wikipedia fails and OpenAi fails, we throw an exception leading to an error message
-                        throw new CompletionException(new OpenAiFailedException("OpenAi failed the complete recovery of the missing data"));
+                        throw new CompletionException(new OpenAiFailedException("OpenAi failed to complete recovery of the missing data"));
                     }
 
-                    return CompletableFuture.completedFuture(filledArtDescription);
+                    Database.setArtwork(filledArtDescription);
+                    return CompletableFuture.completedFuture(filledArtDescription); // No initial missing data or Open AI successfully provided the score and recovered the potential missing data
                 }).thenCompose(Function.identity());
     }
 
@@ -56,34 +69,42 @@ public class GeneralDescriptionApi {
         OpenAIDescriptionApi openAIDescriptionApi = new OpenAIDescriptionApi(service);
         CompletableFuture<Integer> score = openAIDescriptionApi.getScore(recognizedArt);
 
-        ArrayList<String> missingFields = getNullFields(incompleteDescription, recoveryState);
+        ArrayList<String> nullFields = getNullFields(incompleteDescription, recoveryState);
 
-        if (missingFields.size() == 0) {
+        if (nullFields.size() == 0) { // No missing data, we just have to provide the score
             return score
                     .thenApply(s -> {
                         incompleteDescription.setScore(s);
-                        Database.setArtwork(incompleteDescription);
                         return incompleteDescription;
                     })
-                    .exceptionally(e -> incompleteDescription);
+                    .exceptionally(e -> {
+                        incompleteDescription.setScore(DEFAULT_SCORE);
+                        Database.setArtwork(incompleteDescription);
+                        return incompleteDescription;
+                    });
         }
 
 
-        CompletableFuture<Map<String, Object>> missingData = openAIDescriptionApi.getMissingData(recognizedArt, missingFields);
+        CompletableFuture<Map<String, String>> missingData = openAIDescriptionApi.getMissingData(recognizedArt, nullFields);
 
         return missingData.
                 thenCombine(score, (data, s) -> {
-                    // iterate over the data keys, and set the corresponding field in basicArtDescription
+
+                    // fill the incomplete basicArtDescription with the missing data & score
+
                     for (String key : data.keySet()) {
                         try {
                             Field field = BasicArtDescription.class.getDeclaredField(key);
                             field.setAccessible(true);
 
-                            field.set(incompleteDescription, (String) data.get(key));
+                            field.set(incompleteDescription, data.get(key));
                         } catch (NoSuchFieldException | IllegalAccessException e) {
                             e.printStackTrace();
                         }
                     }
+
+                    // If Open AI successfully helped for the recovery, we indicate than Open AI was used
+                    incompleteDescription.setRequiredOpenAi(true);
 
                     incompleteDescription.setScore(s);
 
@@ -92,9 +113,12 @@ public class GeneralDescriptionApi {
                 })
                 .exceptionally(e -> {
                     if (recoveryState == RecoveryState.FullRecovery) {
+                        // Exception coming from statement: else if( e != null && openAiFullRecoveryFailed(e)){
+                        // if both Wikipedia fails and OpenAi fails, we throw an exception leading to an error message
                         throw new CompletionException(new OpenAiFailedException("OpenAI failed to fully recover the missing data"));
                     }
                     else {  // Partial recovery
+                        incompleteDescription.setScore(DEFAULT_SCORE);
                         return incompleteDescription;
                     }
                 });
@@ -119,7 +143,7 @@ public class GeneralDescriptionApi {
             String fieldName = field.getName();
             Object fieldValue;
 
-            if (isIrrelevantFieldForRecovery(fieldName)) {
+            if (isIrrelevantFieldForRecovery(fieldName, basicArtDescription.getType())) {
                 continue;
             }
 
@@ -146,7 +170,13 @@ public class GeneralDescriptionApi {
     }
 
     // Fields that are not relevant to the OpenAI prompt for missing data
-    private Boolean isIrrelevantFieldForRecovery(String fieldName){
+    private Boolean isIrrelevantFieldForRecovery(String fieldName, BasicArtDescription.ArtType artType){
+
+        // if art type is of type architecture, the museum is irrelevant
+        if (artType == BasicArtDescription.ArtType.ARCHITECTURE && fieldName == "museum") {
+            return true;
+        }
+
         return fieldName == "score" || fieldName == "requiredOpenAi" || fieldName == "type" || fieldName == "name";
     }
 

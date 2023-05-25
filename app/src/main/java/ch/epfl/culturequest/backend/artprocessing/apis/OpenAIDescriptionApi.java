@@ -44,10 +44,21 @@ public class OpenAIDescriptionApi {
 
     // make a function that returns a completable future of an array containing the artistName, yearOfCreation, locationCity, locationCountry, given the artRecognition object
 
-    public CompletableFuture<Map<String, Object>> getMissingData(ArtRecognition recognizedArchitecture, ArrayList<String> missingDataNames) {
+    public CompletableFuture<Map<String, String>> getMissingData(ArtRecognition recognizedArchitecture, ArrayList<String> missingDataNames) {
         BasicArtDescription.ArtType artType = WikipediaDescriptionApi.getArtType(recognizedArchitecture);
         this.missingDataNames = getPromptReadyMissingFieldsList(missingDataNames, artType);
-        return getJsonApiResponse(recognizedArchitecture, ResponseDataType.MISSING_DATA).thenApply(this::parseApiResponse);
+        return getJsonApiResponse(recognizedArchitecture, ResponseDataType.MISSING_DATA).thenApply(jsonData -> {
+            Map<String, Object> missingDataMap = parseApiResponse(jsonData);
+            Map<String, String> missingDataStringMap = new HashMap<>();
+
+            // turn each object into a string and put it in the map
+            for (Map.Entry<String, Object> entry : missingDataMap.entrySet()) {
+                String stringVal = entry.getValue() == null ? null : entry.getValue().toString();
+                missingDataStringMap.put(entry.getKey(), stringVal);
+            }
+
+            return missingDataStringMap;
+        });
     }
 
     public CompletableFuture<Integer> getScore(ArtRecognition recognizedArchitecture) {
@@ -106,7 +117,8 @@ public class OpenAIDescriptionApi {
 
                         switch (fieldType) {
                             case STRING:
-                                parsedData.put(normalizedKey, jsonObject.optString(key, null));
+                                String parsedStringVal = jsonObject.optString(key) == "null" ? null : jsonObject.optString(key);
+                                parsedData.put(normalizedKey, parsedStringVal);
                                 break;
                             case INTEGER:
                                 parsedData.put(normalizedKey, jsonObject.optInt(key, 50));
@@ -126,6 +138,7 @@ public class OpenAIDescriptionApi {
 
 
     // Depending on the art type, we might ask different field names referring to the same thing (e.g. designer vs artist) so need normalization
+    // We would apply this normalization to the Open AI output.
     private Pair<String, FieldType> normalizeFieldAndGetType(String jsonKey) {
 
         switch(jsonKey) {
@@ -135,12 +148,14 @@ public class OpenAIDescriptionApi {
 
             case "yearOfCreation":
             case "yearOfInauguration":
-                return new Pair<>("year", FieldType.INTEGER);
+                return new Pair<>("year", FieldType.STRING);
 
             case "locationCity":
+            case "museumCity":
                 return new Pair<>("city", FieldType.STRING);
 
             case "locationCountry":
+            case "museumCountry":
                 return new Pair<>("country", FieldType.STRING);
 
             case "description":
@@ -155,6 +170,8 @@ public class OpenAIDescriptionApi {
         }
     }
 
+    // Given a list of missing class attribute (null field), return a new list where each attribute/field name is mapped to the actual field name that would be included in the OpenAI prompt
+    // e.g. "artist" -> "artistName" if the art type is a painting or sculpture and "artist" -> "designer" if the art type is an architecture
     private ArrayList<String> getPromptReadyMissingFieldsList(ArrayList<String> missingFields, BasicArtDescription.ArtType artType){
 
         ArrayList<String> promptReadyMissingFields = new ArrayList<>();
@@ -166,6 +183,7 @@ public class OpenAIDescriptionApi {
         return promptReadyMissingFields;
     }
 
+    // sub-component of getPromptReadyMissingFieldsList that individually deals with each element of the list
     private String getOptimalPromptFieldName(String missingFieldName, BasicArtDescription.ArtType artType){
 
         String promptFieldName = "";
@@ -191,11 +209,24 @@ public class OpenAIDescriptionApi {
                 break;
 
             case "city":
-                promptFieldName = "locationCity";
+
+                if(isPaintingOrSculpture(artType)){
+                    promptFieldName = "museumCity";
+                }
+                else {
+                    promptFieldName = "locationCity";
+                }
                 break;
 
             case "country":
-                promptFieldName = "locationCountry";
+
+                if(isPaintingOrSculpture(artType)){
+                    promptFieldName = "museumCountry";
+                }
+                else {
+                    promptFieldName = "locationCountry";
+                }
+
                 break;
 
             case "summary":

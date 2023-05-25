@@ -1,7 +1,13 @@
 package ch.epfl.culturequest.backend.artprocessing.apis;
 
+import android.annotation.SuppressLint;
+
+import com.theokanning.openai.service.OpenAiService;
+
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
+import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.database.Database;
 
@@ -16,11 +22,15 @@ public class ProcessingApi {
 
 
     /** Returns an art description object (as a future) given the URL of the image associated to the scanned piece of art */
-
+    @SuppressLint("NewApi")
     public CompletableFuture<BasicArtDescription> getArtDescriptionFromUrl(String imageUrl){
 
-        RecognitionApi recognitionApi = new RecognitionApi();
-        GeneralDescriptionApi descriptionApi = new GeneralDescriptionApi();
+        RecognitionApi recognitionApi = new RecognitionApi("https://lens.google.com/uploadbyurl");
+
+
+        OpenAiService openAiService = new OpenAiService(BuildConfig.OPEN_AI_API_KEY, Duration.ofSeconds(40));
+        WikipediaDescriptionApi wikipediaDescriptionApi = new WikipediaDescriptionApi("https://en.wikipedia.org/wiki/Special:Search?search=");
+        GeneralDescriptionApi descriptionApi = new GeneralDescriptionApi(wikipediaDescriptionApi, openAiService);
 
         return recognitionApi.getArtName(imageUrl)
                 .thenCompose((artRecognition) -> {
