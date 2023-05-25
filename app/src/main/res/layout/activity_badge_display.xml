@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/back_button"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="45dp"
         android:elevation="2dp"
@@ -27,15 +27,17 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="60dp"
         android:fontFamily="@font/poppins_bold"
-        android:text="Badge Collection"
-        android:textColor="@color/colorPrimary"
-        android:textSize="28sp"
-        android:textStyle="bold"
         android:shadowColor="#26000000"
         android:shadowDx="0"
         android:shadowDy="4"
         android:shadowRadius="20"
-        app:layout_constraintStart_toEndOf="@+id/back_button"
+        android:text="Badge Collection"
+        android:textColor="@color/colorPrimary"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
