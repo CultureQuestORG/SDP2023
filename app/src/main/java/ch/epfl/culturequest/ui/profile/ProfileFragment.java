@@ -82,7 +82,7 @@ public class ProfileFragment extends Fragment {
         progressBar.setOnClickListener(v -> {
             // open the badges activity
             Intent intent = new Intent(getActivity(), DisplayUserBadgeCollectionActivity.class);
-            intent.putExtra("uid", Authenticator.getCurrentUser().getUid());
+            intent.putExtra("uid", Profile.getActiveProfile().getUid());
             startActivity(intent);
         });
 
@@ -101,27 +101,25 @@ public class ProfileFragment extends Fragment {
         super.onResume();
         if (POSTS_ADDED > 0) {
             if (Profile.getActiveProfile() != null) {
-                update_posts();
+                updatePosts();
             } else {
                 Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, e) -> {
-                    if(e != null || profile == null) return;
+                    if (e != null || profile == null) return;
                     Profile.setActiveProfile(profile);
-                    update_posts();
+                    updatePosts();
                 });
             }
         }
     }
 
-    private void update_posts() {
-        List<Post> images = this.images.getValue();
-        Profile.getActiveProfile().retrievePosts(POSTS_ADDED, 0)
+    private void updatePosts() {
+        Profile.getActiveProfile().retrievePosts()
                 .whenComplete((posts, e) -> {
-                    assert images != null;
-                    images.addAll(0, posts);
-                    images.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
-                    pictureAdapter.notifyItemRangeInserted(0, POSTS_ADDED);
+                    posts.sort((p1, p2) -> Long.compare(p2.getTime(), p1.getTime()));
+                    this.images.setValue(posts);
+                    binding.pictureGrid.setAdapter(new PictureAdapter(posts));
+                    POSTS_ADDED = 0;
                 });
-        POSTS_ADDED = 0;
     }
 
     @Override

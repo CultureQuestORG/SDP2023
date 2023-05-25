@@ -30,7 +30,11 @@ public class QuizViewModel extends ViewModel {
 
     private final MutableLiveData<Integer> questionNumber = new MutableLiveData<>();
 
+    private final MutableLiveData<String> image = new MutableLiveData<>();
 
+    public MutableLiveData<String> getImage() {
+        return image;
+    }
 
     public QuizViewModel(Quiz quiz, QuizActivity quizActivity, String uid) {
         this.quiz.postValue(quiz);
@@ -39,6 +43,8 @@ public class QuizViewModel extends ViewModel {
         nextScore.postValue(100);
         this.uid.postValue(uid);
         questionNumber.postValue(0);
+        Database.getImageForArt(quiz.getArtName()).thenAccept(image::postValue);
+
 
 
     }
