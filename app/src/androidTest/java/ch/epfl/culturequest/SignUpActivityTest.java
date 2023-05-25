@@ -95,12 +95,6 @@ public class SignUpActivityTest {
     public void signUpSetsIssuesWhenIncorrectPW() throws InterruptedException {
         Authenticator.signOut(activity).join();
 
-        EditText password = activity.findViewById(R.id.editTextTextPassword);
-        EditText email = activity.findViewById(R.id.editTextTextEmailAddress);
-        Button signUp = activity.findViewById(R.id.sign_up_manually);
-        Button signIn = activity.findViewById(R.id.sign_in_manually);
-        TextView issues = activity.findViewById(R.id.issues);
-
         onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText("test@gmail.com")).perform(closeSoftKeyboard());
 
         onView(withId(R.id.editTextTextPassword)).perform(replaceText("abcd"));
@@ -119,7 +113,7 @@ public class SignUpActivityTest {
 
     @Test
     public void signingUpEmailIsSuccessful() {
-        onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText(UUID.randomUUID().toString() + "@gmail.com"));
+        onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText(UUID.randomUUID().toString().substring(0,7) + "@gmail.com"));
         onView(withId(R.id.editTextTextPassword)).perform(replaceText("abcdefg1!"));
         onView(withId(R.id.sign_up_manually)).check(matches(isEnabled())).perform(click());
     }
@@ -133,18 +127,16 @@ public class SignUpActivityTest {
     }
 
     @Test
-    public void signingInWithCorrectEmailWorks() throws InterruptedException {
-        Authenticator.manualSignUp("testx@gmail.com", "password1!");
-        Thread.sleep(3000);
+    public void signingInWithCorrectEmailWorks() {
+        Authenticator.manualSignUp("testx@gmail.com", "password1!").join();
         onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText("testx@gmail.com"));
         onView(withId(R.id.editTextTextPassword)).perform(replaceText("password1!"));
         onView(withId(R.id.sign_in_manually)).perform(click());
     }
 
     @Test
-    public void signingInWithIncorrectCredentialsSetsIssue() throws InterruptedException {
-        Authenticator.manualSignUp("testx@gmail.com", "password1!");
-        Thread.sleep(3000);
+    public void signingInWithIncorrectCredentialsSetsIssue() {
+        Authenticator.manualSignUp("testx@gmail.com", "password1!").join();
         onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText("testx@gmail.com"));
         onView(withId(R.id.editTextTextPassword)).perform(replaceText("wrongpassword1!"));
         onView(withId(R.id.sign_in_manually)).perform(click());
@@ -152,7 +144,7 @@ public class SignUpActivityTest {
     }
 
     @Test
-    public void settingRightCredentialsAndUndoingPreventsLogin() throws InterruptedException {
+    public void settingRightCredentialsAndUndoingPreventsLogin() {
         onView(withId(R.id.editTextTextEmailAddress)).perform(replaceText("testx@gmail.com"));
         onView(withId(R.id.editTextTextPassword)).perform(replaceText("wrongpassword1!"));
         onView(withId(R.id.sign_in_manually)).check(matches(isClickable()));
