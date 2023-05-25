@@ -163,7 +163,7 @@ public class SightSeeingActivityTest {
                 .atPosition(0).perform(click());
         onView(withId(R.id.preview)).perform(click());
         onView(withId(R.id.map_fragment)).check(matches(isDisplayed()));
-        onView(withId(R.id.localisation_button)).perform(click());
+        onView(withId(R.id.back_button)).perform(click());
         onView(withId(R.id.map_fragment)).check(matches(not(isDisplayed())));
     }
 
@@ -173,7 +173,7 @@ public class SightSeeingActivityTest {
                 .inAdapterView(withId(R.id.places_to_see))
                 .atPosition(0).perform(click());
         onView(withId(R.id.invite_friends)).perform(click());
-        onView(withId(R.id.localisation_button)).perform(click());
+        onView(withId(R.id.back_button)).perform(click());
     }
 
     @Test
