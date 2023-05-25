@@ -13,6 +13,8 @@ public class QuizQuestion {
     private int correctAnswerIndex;
 
     public QuizQuestion(String questionContent, ArrayList<String> possibleAnswers, int correctAnswerIndex){
+        assert correctAnswerIndex < possibleAnswers.size();
+        assert correctAnswerIndex >= 0;
         this.possibleAnswers = possibleAnswers;
         this.correctAnswerIndex = correctAnswerIndex;
         this.questionContent = questionContent;
@@ -27,6 +29,8 @@ public class QuizQuestion {
     }
 
     public void setCorrectAnswerIndex(int correctAnswerIndex) {
+        assert correctAnswerIndex < possibleAnswers.size();
+        assert correctAnswerIndex >= 0;
         this.correctAnswerIndex = correctAnswerIndex;
     }
 
@@ -51,6 +55,10 @@ public class QuizQuestion {
 
     public String getQuestionContent(){
         return questionContent;
+    }
+
+    public boolean isCorrect(int selectedAnswer) {
+        return selectedAnswer == correctAnswerIndex;
     }
 
 

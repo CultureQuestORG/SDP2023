@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -91,7 +92,7 @@ public class QuizGeneratorApi {
             throw new CompletionException(new OpenAiFailedException("Quiz parsing failed - Questions not parsed correctly"));
         }
 
-        return new ArtQuiz(artName,quizQuestions);
+        return new ArtQuiz(artName,quizQuestions,new HashMap<>());
     }
 
     private QuizQuestion parseQuestion(JSONObject questionObject) throws JSONException{

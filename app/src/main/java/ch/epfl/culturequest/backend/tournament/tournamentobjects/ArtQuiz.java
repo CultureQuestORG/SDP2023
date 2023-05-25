@@ -18,9 +18,23 @@ public class ArtQuiz {
         // For Serialization
     }
 
-    public ArtQuiz(String artName,ArrayList<QuizQuestion> questions){
+    public void setQuestions(ArrayList<QuizQuestion> questions) {
+        this.questions = questions;
+    }
+
+    public void setScores(HashMap<String, Integer> scores) {
+        this.scores = scores;
+    }
+
+    public void setArtName(String artName) {
+        this.artName = artName;
+    }
+
+    public ArtQuiz(String artName, ArrayList<QuizQuestion> questions,HashMap<String, Integer> scores){
         this.questions = questions;
         this.artName = artName;
+        this.scores = scores;
+
     }
 
     public ArrayList<QuizQuestion> getQuestions(){
