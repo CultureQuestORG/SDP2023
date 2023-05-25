@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -65,9 +66,12 @@ public class MapsFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
 
+    private boolean firstLocationUpdate = true;
+
     private final static MapUnavailableFragment unavailableFragment = new MapUnavailableFragment();
 
     private FragmentMapsBinding binding;
+    private ImageView centerButton;
     private MapsViewModel viewModel;
 
     private OTMProvider otmProvider;
@@ -112,10 +116,12 @@ public class MapsFragment extends Fragment {
     private void checkInternet() {
         if (!AndroidUtils.hasConnection(this.getContext())) {
             isWifiAvailable = false;
+            centerButton.setVisibility(View.GONE);
             this.getParentFragmentManager().beginTransaction().hide(this).show(unavailableFragment).setReorderingAllowed(true).commit();
             AndroidUtils.showNoConnectionAlert(getContext(), "It seems that you are not connected to the internet. You can't use the map without internet connection.");
         } else {
             isWifiAvailable = true;
+            centerButton.setVisibility(View.VISIBLE);
             this.getParentFragmentManager().beginTransaction().hide(unavailableFragment).show(this).setReorderingAllowed(true).commit();
         }
     }
@@ -254,19 +260,18 @@ public class MapsFragment extends Fragment {
         }
 
         binding = FragmentMapsBinding.inflate(inflater, container, false);
+        centerButton = binding.localisationButton;
         View mapView = binding.getRoot();
 
         checkInternet();
         if (!isWifiAvailable) return null;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         viewModel = new MapsViewModel();
+        centerButton.setOnClickListener(v -> {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
+        });
 
         otmProvider = new RetryingOTMProvider(new BasicOTMProvider());
-        viewModel.getCurrentLocation().observe(getViewLifecycleOwner(), location -> {
-            if (mMap != null) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
-            }
-        });
         return mapView;
     }
 
@@ -304,7 +309,7 @@ public class MapsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         SupportMapFragment mapFragment =
-                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapsFragment);
+                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
@@ -321,7 +326,7 @@ public class MapsFragment extends Fragment {
         try {
             if (viewModel.isLocationPermissionGranted()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    locationRequest = new LocationRequest.Builder(200000).build();
+                    locationRequest = new LocationRequest.Builder(10000).build();
                 }
                 LocationCallback locationCallback = new LocationCallback() {
                     @Override
@@ -343,9 +348,11 @@ public class MapsFragment extends Fragment {
                                     getProfilePicture();
                                 }
                             }
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
 
+                            if(firstLocationUpdate) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM));
+                                firstLocationUpdate = false;
+                            }
                             getMarkers(viewModel.getCurrentLocation().getValue());
                         }
 
@@ -357,5 +364,9 @@ public class MapsFragment extends Fragment {
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage(), e);
         }
+    }
+
+    private void recenter(View view) {
+        Toast.makeText(getContext(), "Recentering...", Toast.LENGTH_SHORT).show();
     }
 }

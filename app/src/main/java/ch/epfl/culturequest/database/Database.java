@@ -887,6 +887,31 @@ public class Database {
         quizRef.setValue(score);
     }
 
+    public static CompletableFuture<String> getImageForArt(String artwork){
+        CompletableFuture<String> future = new CompletableFuture<>();
+        // get the first post with "artworkName" = artwork
+        DatabaseReference postsRef = databaseInstance.getReference("posts");
+        postsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                //iterate over the users
+                for (DataSnapshot snapshot : task.getResult().getChildren()) {
+                    //iterate over the posts
+                    for (DataSnapshot post : snapshot.getChildren()) {
+                        if (post.child("artworkName").getValue().equals(artwork)) {
+                            future.complete(post.child("imageUrl").getValue().toString());
+                            return;
+                        }
+
+                    }
+                }
+                future.completeExceptionally(new Exception("No post found for artwork " + artwork));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
     ///// TOURNAMENTS //////
 
 
