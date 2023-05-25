@@ -30,6 +30,7 @@
     <string name="log_out">Log out</string>
     <string name="update_profile">Update profile</string>
     <string name="location">Location</string>
+    <string name="like_count">Like Count</string>
     <string name="image_name">Image Name</string>
     <string name="Post">Post</string>
     <string name="cancel">Cancel</string>

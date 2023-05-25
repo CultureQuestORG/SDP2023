@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:textAlignment="center"
+    android:id="@+id/profileFragment"
     android:visibility="visible"
     tools:context=".ui.profile.ProfileFragment"
     tools:visibility="visible">
