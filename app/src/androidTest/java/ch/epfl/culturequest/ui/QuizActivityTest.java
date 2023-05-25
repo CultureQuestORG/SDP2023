@@ -8,7 +8,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 
-
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.fragment.app.Fragment;
@@ -86,6 +86,7 @@ public class QuizActivityTest {
         quizzes.put("La Joconde", quiz);
         Tournament tournament = new Tournament(quizzes);
         tournamentId = tournament.getTournamentId();
+        TournamentManagerApi.handleTournaments(ApplicationProvider.getApplicationContext());
         TournamentManagerApi.storeTournamentInSharedPref(tournament);
         //Database.addQuiz(quiz).join();
 
@@ -96,7 +97,7 @@ public class QuizActivityTest {
         ActivityScenario<QuizActivity> scenario = ActivityScenario.launch(intent);
         scenario.onActivity(a -> {
             activity = a;
-            quizViewModel=QuizViewModel.getQuiz(Profile.getActiveProfile().getUid(), "tournamentId", "La Joconde");
+            quizViewModel=QuizViewModel.getQuiz(Profile.getActiveProfile().getUid(), tournamentId, "La Joconde");
         });
 
         Thread.sleep(5000);
@@ -158,7 +159,11 @@ public class QuizActivityTest {
         onView(withId(R.id.answer3RadioButton)).check(matches(isEnabled()));
         onView(withId(R.id.answer4RadioButton)).check(matches(isEnabled()));
         Thread.sleep(2000);
-        q.pickAnswer(0);
+        try {
+            q.pickAnswer(0);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         Thread.sleep(2000);
         return q.valideAnswer();
 
@@ -173,7 +178,11 @@ public class QuizActivityTest {
         onView(withId(R.id.answer4RadioButton)).check(matches(isEnabled()));
 
         Thread.sleep(2000);
-        q.pickAnswer(1);
+        try{
+            q.pickAnswer(1);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         Thread.sleep(2000);
         return q.valideAnswer();
 

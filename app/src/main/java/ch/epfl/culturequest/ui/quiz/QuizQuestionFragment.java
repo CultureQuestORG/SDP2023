@@ -1,5 +1,8 @@
 package ch.epfl.culturequest.ui.quiz;
 
+import static androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
+
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -72,8 +75,14 @@ public class QuizQuestionFragment extends Fragment {
     }
 
 
-    public void pickAnswer(int answer) {
+    @SuppressLint("RestrictedApi")
+    public void pickAnswer(int answer) throws Throwable {
+  runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
         possibleAnswers.get(answer).setChecked(true);
+            }
+        });
     }
 
     public Fragment valideAnswer() {
