@@ -32,17 +32,16 @@ public class LeaderboardFragment extends Fragment {
 
     private FragmentLeaderboardBinding binding;
 
-     RadioButton globalLeaderboardButton ;
-     RadioButton friendsLeaderboardButton ;
+    RadioButton globalLeaderboardButton;
+    RadioButton friendsLeaderboardButton;
 
     private TextView currentUsername;
-    private TextView currentUserScore ;
+    private TextView currentUserScore;
     private TextView currentUserRank;
     private CircleImageView currentUserProfilePicture;
     private RecyclerView globalLeaderboardRecyclerView;
     private RecyclerView friendsLeaderboardRecyclerView;
     private LeaderboardViewModel leaderboardViewModel;
-
 
 
     private static final MutableLiveData<Integer> selectedMode = new MutableLiveData<>(R.id.globalLeaderboardButton);
@@ -62,13 +61,13 @@ public class LeaderboardFragment extends Fragment {
         leaderboardViewModel.getCurrentUsername().observe(getViewLifecycleOwner(), currentUsername::setText);
         leaderboardViewModel.getCurrentUserScore().observe(getViewLifecycleOwner(), currentUserScore::setText);
 
-        leaderboardViewModel.getCurrentUserRank().observe(getViewLifecycleOwner(), rank ->{
-            if (selectedMode.getValue()==R.id.globalLeaderboardButton) {
+        leaderboardViewModel.getCurrentUserRank().observe(getViewLifecycleOwner(), rank -> {
+            if (selectedMode.getValue() == R.id.globalLeaderboardButton) {
                 currentUserRank.setText(rank);
             }
         });
-        leaderboardViewModel.getCurrentUserRankFriends().observe(getViewLifecycleOwner(), rank ->{
-            if (selectedMode.getValue()==R.id.friendsLeaderboardButton) {
+        leaderboardViewModel.getCurrentUserRankFriends().observe(getViewLifecycleOwner(), rank -> {
+            if (selectedMode.getValue() == R.id.friendsLeaderboardButton) {
                 currentUserRank.setText(rank);
             }
         });
@@ -77,13 +76,13 @@ public class LeaderboardFragment extends Fragment {
         leaderboardViewModel.getCurrentUserProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(currentUserProfilePicture));
 
         // define the RecyclerView's adapter
-        LeaderboardRecycleViewAdapter globalAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel,Mode.GLOBAL);
+        LeaderboardRecycleViewAdapter globalAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel, Mode.GLOBAL);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
         globalLeaderboardRecyclerView.setLayoutManager(layoutManager);
         globalLeaderboardRecyclerView.setAdapter(globalAdapter);
         globalLeaderboardRecyclerView.addItemDecoration(new DividerItemDecoration(this.requireActivity(), DividerItemDecoration.VERTICAL));
 
-        LeaderboardRecycleViewAdapter friendsAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel,Mode.FRIENDS);
+        LeaderboardRecycleViewAdapter friendsAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel, Mode.FRIENDS);
         RecyclerView.LayoutManager friendsLayoutManager = new LinearLayoutManager(this.getActivity());
         friendsLeaderboardRecyclerView.setLayoutManager(friendsLayoutManager);
         friendsLeaderboardRecyclerView.setAdapter(friendsAdapter);
@@ -95,7 +94,7 @@ public class LeaderboardFragment extends Fragment {
     }
 
 
-    private void handleModeSelection(Integer mode){
+    private void handleModeSelection(Integer mode) {
         if (mode == R.id.friendsLeaderboardButton) {
             currentUserRank.setText(leaderboardViewModel.getCurrentUserRankFriends().getValue());
             globalLeaderboardRecyclerView.setVisibility(View.GONE);
@@ -108,7 +107,7 @@ public class LeaderboardFragment extends Fragment {
     }
 
 
-    private void bind(){
+    private void bind() {
         currentUsername = binding.currentUsername;
         currentUserScore = binding.currentUserScore;
         currentUserRank = binding.currentUserRank;
@@ -128,7 +127,7 @@ public class LeaderboardFragment extends Fragment {
     @SuppressLint("NonConstantResourceId")
     public void chooseLeaderboard(View view) {
 
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.globalLeaderboardButton:
                 selectedMode.setValue(R.id.globalLeaderboardButton);
                 globalLeaderboardButton.setChecked(true);
@@ -139,7 +138,7 @@ public class LeaderboardFragment extends Fragment {
                 selectedMode.setValue(R.id.friendsLeaderboardButton);
                 globalLeaderboardButton.setChecked(false);
                 friendsLeaderboardButton.setChecked(true);
-                    break;
+                break;
         }
 
     }

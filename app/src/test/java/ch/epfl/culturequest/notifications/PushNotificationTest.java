@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.is;
 
 public class PushNotificationTest {
 
-    private static final PushNotification notification = new PushNotification("title", "text", "channelId");
+    private static final PushNotification notification = new PushNotification("title", "text", "channelId", "senderId");
     private static final PushNotification emptyNotification = new PushNotification();
 
     @Test
@@ -32,6 +32,11 @@ public class PushNotificationTest {
     @Test
     public void testGetTime() {
         assertThat(emptyNotification.getTime(), is(0L));
+    }
+
+    @Test
+    public void testGetSenderId() {
+        assertThat(notification.getSenderId(), is("senderId"));
     }
 
     @Test
@@ -62,5 +67,11 @@ public class PushNotificationTest {
     public void testSetTime() {
         notification.setTime(1);
         assertThat(notification.getTime(), is(1L));
+    }
+
+    @Test
+    public void testSetSenderId() {
+        emptyNotification.setSenderId("senderId");
+        assertThat(emptyNotification.getSenderId(), is("senderId"));
     }
 }

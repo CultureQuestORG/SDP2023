@@ -127,9 +127,30 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
 
 
+        // Set the like count
+        holder.likeCount.setText(getNumberOfLikes(post.getLikes()));
+
         // Set handlers for the like and delete buttons
         handleLike(holder, post);
         handleDelete(holder, post);
+    }
+
+    /**
+     * Adapts the like count string to the number of likes.
+     *
+     * @param likes the number of likes
+     */
+    public static String getNumberOfLikes(int likes) {
+        if (likes <= 0) {
+            return null;
+        } else if (likes == 1) {
+            return "1 like";
+        } else if (likes / 1000d >= 1){
+            return String.format("%.2fK likes", (likes/1000d));
+        }
+        else {
+            return likes + " likes";
+        }
     }
 
     /**
@@ -175,8 +196,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 // send the like notification
                 Database.getProfile(post.getUid()).thenAccept(profile -> {
                     if (profile != null) {
-                        LikeNotification notif = new LikeNotification(profile.getUsername());
-                        FireMessaging.sendNotification(profile.getUid(), notif);
+                        LikeNotification notification = new LikeNotification(profile.getUsername());
+                        FireMessaging.sendNotification(profile.getUid(), notification);
                     }
                 });
                 Picasso.get().load(R.drawable.like_full).into(holder.like);
@@ -348,6 +369,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView username;
         public TextView location;
         public ImageView like;
+        public TextView likeCount;
         public ImageView delete;
         public TextView artName;
         public TextView artist;
@@ -377,6 +399,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             location = itemView.findViewById(R.id.location);
             profilePicture = itemView.findViewById(R.id.profile_picture);
             like = itemView.findViewById(R.id.like_button);
+            likeCount = itemView.findViewById(R.id.like_count);
             delete = itemView.findViewById(R.id.delete_button);
             View descriptionContainer = itemView.findViewById(R.id.descriptionContainerPost);
 

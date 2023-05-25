@@ -9,7 +9,6 @@ import android.content.Intent;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.IdlingRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.After;
@@ -19,19 +18,19 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
-import ch.epfl.culturequest.utils.EspressoIdlingResource;
-import ch.epfl.culturequest.utils.ProfileUtils;
 
 @RunWith(AndroidJUnit4.class)
 public class DisplayUserProfileTest {
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
-   @Before
+    @Before
     public void setUp() {
         // Set up the database to run on the local emulator of Firebase
         Database.setEmulatorOn();
@@ -39,7 +38,16 @@ public class DisplayUserProfileTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
-        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0,new HashMap<>(), new ArrayList<>()));
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
+
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
+
+        Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0, new HashMap<>(), new ArrayList<>()));
     }
 
     @After
