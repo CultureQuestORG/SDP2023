@@ -16,6 +16,9 @@ public class ArtQuiz {
 
     public ArtQuiz(){
         // For Serialization
+        artName = "";
+        questions = null;
+        scores = null;
     }
 
     public void setQuestions(ArrayList<QuizQuestion> questions) {
