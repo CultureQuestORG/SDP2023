@@ -200,6 +200,18 @@ public class Authenticator {
     }
 
     /**
+     * Checks if the user is logged in, if not redirects to the sign up activity.
+     * Useful to check if the user is logged in when the app is opened from a notification.
+     *
+     * @param activity the activity where the check is done
+     */
+    public static void checkIfUserIsLoggedIn(ComponentActivity activity) {
+        if (getCurrentUser() == null) {
+            AndroidUtils.redirectToActivity(activity, SignUpActivity.class);
+        }
+    }
+
+    /**
      * @return the current user signed in
      */
     public static FirebaseUser getCurrentUser() {

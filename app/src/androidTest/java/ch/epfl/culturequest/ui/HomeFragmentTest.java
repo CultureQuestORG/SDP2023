@@ -6,6 +6,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
@@ -34,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
@@ -44,6 +46,8 @@ import ch.epfl.culturequest.ui.home.HomeFragment;
 public class HomeFragmentTest {
 
     private HomeFragment fragment;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
 
     public ViewAction clickChildViewWithId(final int id) {
@@ -76,6 +80,15 @@ public class HomeFragmentTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
+        //Set up the authentication to run on the local emulator of Firebase
+        Authenticator.setEmulatorOn();
+
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
+
         // Initialize the database with some test profiles
         ArrayList<String> myFriendsIds = new ArrayList<>();
         myFriendsIds.add("friendID");
@@ -98,7 +111,7 @@ public class HomeFragmentTest {
                 DEFAULT_PROFILE_PIC_PATH,
                 "Mona Lisa",
                 1,
-                0,
+                50,
                 new ArrayList<>()));
 
         Database.setArtwork(new BasicArtDescription(
@@ -131,6 +144,13 @@ public class HomeFragmentTest {
         // the recycler view should contains 1 element (id is feed_container)
         Thread.sleep(2000);
         onView(withId(R.id.feed_container)).check(matches(hasChildCount(1)));
+    }
+
+    // Test that the like count is displayed correctly
+    @Test
+    public void likeCountIsVisible() throws InterruptedException {
+        Thread.sleep(2000);
+        onView(withId(R.id.like_count)).check(matches(withText("50 likes")));
     }
 
     @Test

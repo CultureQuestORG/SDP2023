@@ -49,6 +49,8 @@ public class SightSeeingActivityTest {
 
 
     Activity sightseeingActivity;
+    private final String email = "test@gmail.com";
+    private final String password = "abcdefg";
 
     @Before
     public void setUp() {
@@ -67,8 +69,11 @@ public class SightSeeingActivityTest {
         //Set up the authentication to run on the local emulator of Firebase
         Authenticator.setEmulatorOn();
 
-        Authenticator.manualSignUp("test@gmail.com", "abcdefg");
-        Authenticator.manualSignIn("test@gmail.com", "abcdefg");
+        // Signs up a test user used in all the tests
+        Authenticator.manualSignUp(email, password).join();
+
+        // Manually signs in the user before the tests
+        Authenticator.manualSignIn(email, password).join();
 
         Profile.setActiveProfile(new Profile(Authenticator.getCurrentUser().getUid(), "name", "Test", "test@gmail.com", "num", "profile", 0, new HashMap<>(), new ArrayList<>()));
         Database.setProfile(new Profile("testUid1", "testName1", "alice", "currentUserEmail", "currentUserPhone", "currentUserProfilePicture", 0,new HashMap<>(), new ArrayList<>()));

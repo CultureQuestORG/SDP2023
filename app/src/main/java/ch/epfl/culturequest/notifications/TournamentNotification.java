@@ -4,20 +4,20 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 
 /**
- * Class that represents notifications for a new offline scan. It will be created on each
- * where there is a new scan available by using a service, so as it is the phone of the
+ * Class that represents a notification for a new tournament. It will be created on each
+ * phone of the users that are in the tournament by using a service, so as it is the phone of the
  * user that will create and send it to the user itself, without using CLoud Messaging,
  * the senderId is not needed.
  */
-public class ScanNotification extends PushNotification {
-    public static final String CHANNEL_ID = "SCAN";
+public class TournamentNotification extends PushNotification {
+    public static final String CHANNEL_ID = "TOURNAMENT";
 
     /**
-     * Constructor for the ScanNotification
+     * Constructor for the TournamentNotification
      */
-    public ScanNotification() {
-        super("You have a new scan!",
-                "We found a new offline scan result!",
+    public TournamentNotification() {
+        super("A new tournament has started!",
+                "Click here to see your new tournament!",
                 CHANNEL_ID, "");
     }
 
@@ -28,8 +28,8 @@ public class ScanNotification extends PushNotification {
      */
     public static NotificationChannel getNotificationChannel() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            CharSequence name = "ScanNotification";
-            String description = "ScanNotification";
+            CharSequence name = "TournamentNotification";
+            String description = "TournamentNotification";
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
