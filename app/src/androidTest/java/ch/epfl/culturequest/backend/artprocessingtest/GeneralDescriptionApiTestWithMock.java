@@ -50,7 +50,7 @@ public class GeneralDescriptionApiTestWithMock {
     public void successfulFullRecoveryIfWikipediaFailing() {
 
         FailingWikipediaDescriptionApi failingWikipediaDescriptionApi = new FailingWikipediaDescriptionApi("useless");
-        OpenAiService openAiService = new OpenAiService(BuildConfig.OPEN_AI_API_KEY, Duration.ofSeconds(40));
+        OpenAiService openAiService = new OpenAiService(BuildConfig.OPEN_AI_API_KEY, Duration.ofMinutes(2)); // timeout of 2 minutes, we sometimes decide to take our time
 
         GeneralDescriptionApi generalDescriptionApi = new GeneralDescriptionApi(failingWikipediaDescriptionApi, openAiService);
 
