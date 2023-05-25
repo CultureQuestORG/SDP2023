@@ -9,11 +9,14 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.not;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 
 import androidx.fragment.app.Fragment;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.action.ViewActions;
+
+import com.google.android.gms.auth.api.signin.internal.Storage;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +28,7 @@ import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.tournament.quiz.Question;
 import ch.epfl.culturequest.tournament.quiz.Quiz;
 import ch.epfl.culturequest.ui.quiz.QuizActivity;
@@ -53,6 +57,10 @@ public class QuizActivityTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
+        FireStorage.setEmulatorOn();
+
+        FireStorage.clearStorage();
+
         //Set up the authentication to run on the local emulator of Firebase
         Authenticator.setEmulatorOn();
 
@@ -64,11 +72,14 @@ public class QuizActivityTest {
 
         Profile.setActiveProfile(new Profile("testUser",""));
 
+        Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        String url=FireStorage.uploadAndGetUrlFromImage(bitmap, true).join();
         Post post = new Post("postID",
                 "uid",
-                "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/images%2FAcZdcTtQxkUtA4gLRj9rgaFoWVv1%2Fa6a2f12c-401b-4f02-a394-928e1e6bea74?alt=media&token=24102b4b-7a82-4692-bce2-36f770b065c3",
+                url,
         "La Joconde",1234,0,new ArrayList<>());
         Database.uploadPost(post).join();
+
 
 
         ArrayList<String> possibilities = new ArrayList<>();
