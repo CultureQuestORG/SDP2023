@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#FFFFFF" /> <!-- Background color of the EditText -->
+    <solid android:color="@android:color/transparent" /> <!-- Set background color to transparent -->
     <stroke
         android:color="#000000"
-        android:width="2dp" /> <!-- Border width of the EditText -->
-    <corners android:radius="8dp" /> <!-- Corner radius of the EditText -->
+        android:width="2dp" />
+    <corners android:radius="8dp" />
 </shape>
