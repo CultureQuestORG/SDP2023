@@ -42,6 +42,7 @@ public class SignUpActivity extends AppCompatActivity {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             issues.setText("");
+            //basically enable the buttons only when both the email field and password have the correct regex
             if (email.getText().toString().matches(EMAIL_REGEX)) {
                 setEnabled(s.toString().matches(PW_REGEX));
             } else {
@@ -127,7 +128,7 @@ public class SignUpActivity extends AppCompatActivity {
                 return null;
             });
         } else {
-            password.setClickable(false);
+            signIn.setClickable(false);
         }
     }
 
