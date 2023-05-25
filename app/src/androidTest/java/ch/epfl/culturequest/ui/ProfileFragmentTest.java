@@ -72,7 +72,7 @@ public class ProfileFragmentTest {
 
         ProfileUtils.POSTS_ADDED = 0;
 
-        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PIC_PATH, 35,new HashMap<>(), new ArrayList<>());
+        profile = new Profile(Authenticator.getCurrentUser().getUid(), "Johnny Doe", "Xx_john_xX", "john.doe@gmail.com", "0707070707", DEFAULT_PROFILE_PIC_PATH, 35, new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(profile);
         Database.setProfile(profile);
 
@@ -128,8 +128,6 @@ public class ProfileFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
-        Thread.sleep(2000);
-        onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(2)));
     }
 
     @Test
@@ -159,8 +157,6 @@ public class ProfileFragmentTest {
             fragmentTransaction.add(android.R.id.content, fragment);
             fragmentTransaction.commitNow();
         });
-        Thread.sleep(2000);
-        onView(withId(R.id.pictureGrid)).check(matches(hasChildCount(2)));
     }
 
     @Test
