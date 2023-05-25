@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.ui.notifications;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,30 +59,10 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
 
         holder.itemView.setOnClickListener(view -> {
             System.out.println(notificationTexts.get(position).getChannelId());
-            switch (notificationTexts.get(position).getChannelId()) {
-                case ScanNotification.CHANNEL_ID:
-                    Intent intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
-                    intent.putExtra("redirect", "profile");
-                    holder.itemView.getContext().startActivity(intent);
-                    break;
-                case LikeNotification.CHANNEL_ID:
-                case FollowNotification.CHANNEL_ID:
-                    intent = new Intent(holder.itemView.getContext(), DisplayUserProfileActivity.class);
-                    intent.putExtra("uid", notificationTexts.get(position).getSenderId());
-                    holder.itemView.getContext().startActivity(intent);
-                    return;
-//                case TournamentNotification.CHANNEL_ID:
-//                    intent = new Intent(holder.itemView.getContext(), EventActivity.class);
-//                    intent.putExtra("redirect", "tournament");
-//                    holder.itemView.getContext().startActivity(intent);
-//                    return;
-//                case SightseeingNotification.CHANNEL_ID:
-//                    intent = new Intent(holder.itemView.getContext(), EventActivity.class);
-//                    intent.putExtra("redirect", "sightseeing");
-//                    holder.itemView.getContext().startActivity(intent);
-//                    return;
-                default:
-                    break;
+            try {
+                notificationTexts.get(position).selectPendingIntent(holder.itemView.getContext(), notificationTexts.get(position).getChannelId()).send();
+            } catch (PendingIntent.CanceledException e) {
+                throw new RuntimeException(e);
             }
         });
     }
