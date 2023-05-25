@@ -179,7 +179,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             if (holder.isLiked) {
                 holder.isLiked = false;
                 Database.removeLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
-                    if (throwable == null) {
+                    if (throwable == null && aVoid != null) {
                         post.setLikers(aVoid.getLikers());
                         holder.setLike(aVoid.getLikes());
                     }
@@ -190,7 +190,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             } else {
                 holder.isLiked = true;
                 Database.addLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
-                    if (throwable == null) {
+                    if (throwable == null && aVoid != null) {
                         post.setLikers(aVoid.getLikers());
                         holder.setLike(aVoid.getLikes());
                     }
