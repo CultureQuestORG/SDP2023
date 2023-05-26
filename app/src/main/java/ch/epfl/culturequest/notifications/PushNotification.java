@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.ui.events.EventsActivity;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 /**
@@ -126,15 +127,14 @@ public class PushNotification {
                 intent = new Intent(context, NavigationActivity.class);
                 intent.putExtra("redirect", "profile");
                 break;
-            // case TournamentNotification.CHANNEL_ID:
-//                   intent = new Intent(holder.itemView.getContext(), EventActivity.class);
-//                   intent.putExtra("redirect", "tournament");
-//                   break;
-            // case SightseeingNotification.CHANNEL_ID:
-//                    intent = new Intent(holder.itemView.getContext(), EventActivity.class);
-//                    intent.putExtra("redirect", "sightseeing");
-//                    break;
-            // opens the scan fragment
+             case TournamentNotification.CHANNEL_ID:
+                   intent = new Intent(context, EventsActivity.class);
+                   intent.putExtra("redirect", "tournament");
+                   break;
+             case SightseeingNotification.CHANNEL_ID:
+                    intent = new Intent(context, EventsActivity.class);
+                    intent.putExtra("redirect", "sightseeing");
+                    break;
             default:
                 intent = new Intent(context, NavigationActivity.class);
                 break;
