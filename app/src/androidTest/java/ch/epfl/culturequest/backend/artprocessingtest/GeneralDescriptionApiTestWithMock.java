@@ -122,9 +122,35 @@ public class GeneralDescriptionApiTestWithMock {
         CompletionException exception = assertThrows(CompletionException.class, future::join);
 
         assertThat(exception.getCause() instanceof OpenAiFailedException, is(true));
-        assertThat(exception.getCause().getMessage(), is("OpenAI failed to fully recover the missing data"));
+        assertThat(exception.getCause().getMessage(), is("Open AI critical fail"));
     }
 
+    // regression test for a previous bug
+    @Test
+    public void IncompleteWikipediaDescriptionAndOpenAiDoubleFailsThrowsException() {
+        IncompleteWikipediaDescriptionApi incompleteWikipediaDescriptionApi = new IncompleteWikipediaDescriptionApi("useless");
+
+        ArrayList<String> fieldsToBeNull = new ArrayList<>();
+        fieldsToBeNull.add("artist");
+        fieldsToBeNull.add("year");
+        fieldsToBeNull.add("city");
+
+        // Incomplete description
+        incompleteWikipediaDescriptionApi.indicateFieldsToBeNull(fieldsToBeNull);
+
+        MockOpenAiService mockOpenAiService = new MockOpenAiService("Useless");
+        mockOpenAiService.setChatCompletionThrowsException(true);
+
+        GeneralDescriptionApi generalDescriptionApi = new GeneralDescriptionApi(incompleteWikipediaDescriptionApi, mockOpenAiService);
+
+        CompletableFuture<BasicArtDescription> future =
+                generalDescriptionApi.getArtDescription(arcDeTriompheRecognition);
+
+        CompletionException exception = assertThrows(CompletionException.class, future::join);
+
+        assertThat(exception.getCause() instanceof OpenAiFailedException, is(true));
+        assertThat(exception.getCause().getMessage(), is("Open AI critical fail"));
+    }
 
     private ArrayList<String> getNullFields(BasicArtDescription recoveredBasicArtDescription) {
         Field[] fields = BasicArtDescription.class.getDeclaredFields();
