@@ -48,17 +48,6 @@ public class QuizzesRecycleViewAdapter extends RecyclerView.Adapter<QuizzesRecyc
     public void onBindViewHolder(@NonNull QuizzViewHolder holder, int position) {
         holder.getQuizzTitle().setText(quizzes.keySet().toArray()[position].toString());
 
-        Profile.getActiveProfile().retrievePosts().whenComplete((posts, throwable) -> {
-            if (throwable != null) {
-                throwable.printStackTrace();
-            } else {
-                boolean alreadyPosted = posts.stream().anyMatch(post -> post.getArtworkName().equals(quizzes.keySet().toArray()[position].toString()));
-                if (!alreadyPosted ) {
-                    setAvailable(false, holder, quizzes.keySet().toArray()[position].toString(), null);
-                }
-            }
-        });
-
         Database.getScoreQuiz(tournament, quizzes.get(quizzes.keySet().toArray()[position].toString()).getArtName(), Profile.getActiveProfile().getUid()).whenComplete((score, throwable) -> {
             if (throwable != null) {
                 throwable.printStackTrace();
@@ -69,6 +58,17 @@ public class QuizzesRecycleViewAdapter extends RecyclerView.Adapter<QuizzesRecyc
                 } else {
                     holder.getQuizzStatus().setText("Not started yet");
                     setAvailable(true, holder, quizzes.keySet().toArray()[position].toString(), null);
+                }
+            }
+        });
+
+        Profile.getActiveProfile().retrievePosts().whenComplete((posts, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+            } else {
+                boolean alreadyPosted = posts.stream().anyMatch(post -> post.getArtworkName().equals(quizzes.keySet().toArray()[position].toString()));
+                if (!alreadyPosted ) {
+                    setAvailable(false, holder, quizzes.keySet().toArray()[position].toString(), null);
                 }
             }
         });
