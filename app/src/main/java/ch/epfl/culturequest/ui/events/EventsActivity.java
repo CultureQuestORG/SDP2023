@@ -12,7 +12,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Objects;
+
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.databinding.ActivityEventsBinding;
 import ch.epfl.culturequest.ui.events.sightseeing.SightseeingRecycleViewAdapter;
 import ch.epfl.culturequest.ui.events.tournaments.TournamentsRecycleViewAdapter;
@@ -35,9 +38,13 @@ public class EventsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Authenticator.checkIfUserIsLoggedIn(this);
+
         binding = ActivityEventsBinding.inflate(getLayoutInflater());
         AndroidUtils.removeStatusBar(getWindow());
         setContentView(binding.getRoot());
+
         sightseeingButton = binding.sightseeingButton;
         sightseeingButton.setOnClickListener(this::displaySigthseeing);
 
@@ -54,6 +61,15 @@ public class EventsActivity extends AppCompatActivity {
         eventsRecyclerView.setLayoutManager(layoutManager);
         eventsRecyclerView.setAdapter(sightseeingRecycleViewAdapter);
         eventsRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+        // allows to redirect to the correct listview after an intent with redirection
+        String redirect = getIntent().getStringExtra("redirect");
+        if (Objects.equals(redirect, "sightseeing")) {
+            displaySigthseeing(binding.getRoot());
+        }
+        if (Objects.equals(redirect, "tournament")) {
+            displayTournaments(binding.getRoot());
+        }
     }
 
     private void swapColors() {
