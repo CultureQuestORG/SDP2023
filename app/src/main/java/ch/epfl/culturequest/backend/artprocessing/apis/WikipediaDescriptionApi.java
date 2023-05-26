@@ -29,7 +29,13 @@ import okhttp3.Response;
  */
 
 public class WikipediaDescriptionApi {
-    public static String wikipediaBaseUrl = "https://en.wikipedia.org/wiki/Special:Search?search=";
+
+    String wikipediaBaseUrl;
+    //public static String wikipediaBaseUrl = "https://en.wikipedia.org/wiki/Special:Search?search=";
+
+    public WikipediaDescriptionApi(String wikipediaBaseUrl) {
+        this.wikipediaBaseUrl = wikipediaBaseUrl;
+    }
 
     /** Returns an art description object (as a future) given a recognized piece of art (represented by ArtRecognition) */
     public CompletableFuture<BasicArtDescription> getArtDescription(ArtRecognition recognizedArt) {
@@ -159,7 +165,7 @@ public class WikipediaDescriptionApi {
         return summary;
     }
 
-    private BasicArtDescription.ArtType getArtType(ArtRecognition recognizedArt) {
+    public static BasicArtDescription.ArtType getArtType(ArtRecognition recognizedArt) {
 
         String additionalInfo = recognizedArt.getAdditionalInfo();
         String firstWord = additionalInfo.split(" ")[0].toUpperCase();

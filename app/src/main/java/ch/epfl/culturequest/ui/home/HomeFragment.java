@@ -42,6 +42,9 @@ public class HomeFragment extends Fragment {
         final ImageView eventIcon = binding.eventsIcon;
         eventIcon.setOnClickListener(view -> startActivity(new Intent(getActivity(), EventsActivity.class)));
 
+        final ImageView logo = binding.logoApp;
+        logo.setOnClickListener(view -> feed.smoothScrollToPosition(0));
+
         homeViewModel.getPosts().observe(getViewLifecycleOwner(), images -> {
             // Create a new PictureAdapter and set it as the adapter for the RecyclerView
             PictureAdapter pictureAdapter = new PictureAdapter(images);

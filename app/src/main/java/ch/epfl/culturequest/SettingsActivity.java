@@ -193,5 +193,12 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Returns to the profile fragment
+     */
+    public void goBack(View view) {
+        super.onBackPressed();
+    }
+
 
 }

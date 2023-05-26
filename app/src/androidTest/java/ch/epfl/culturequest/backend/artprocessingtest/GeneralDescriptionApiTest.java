@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.fail;
 
+import com.theokanning.openai.service.OpenAiService;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.apis.GeneralDescriptionApi;
 import ch.epfl.culturequest.backend.artprocessing.apis.WikipediaDescriptionApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
@@ -20,6 +23,10 @@ import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDesc
 import ch.epfl.culturequest.database.Database;
 
 public class GeneralDescriptionApiTest {
+
+    private OpenAiService openAiService = new OpenAiService(BuildConfig.OPEN_AI_API_KEY);
+    private WikipediaDescriptionApi wikipediaDescriptionApi = new WikipediaDescriptionApi("https://en.wikipedia.org/wiki/Special:Search?search=");
+    private GeneralDescriptionApi generalDescriptionApi = new GeneralDescriptionApi(wikipediaDescriptionApi, openAiService);
 
     @Before
     public void setUp() {
@@ -35,7 +42,7 @@ public class GeneralDescriptionApiTest {
 
         ArtRecognition artRecognition = new ArtRecognition("Arc de Triomphe", "Monument");
 
-        CompletableFuture<BasicArtDescription> descriptionFuture = new GeneralDescriptionApi().getArtDescription(artRecognition);
+        CompletableFuture<BasicArtDescription> descriptionFuture = generalDescriptionApi.getArtDescription(artRecognition);
 
         BasicArtDescription description = descriptionFuture.join();
 
@@ -46,6 +53,7 @@ public class GeneralDescriptionApiTest {
         assertThat(description.getCountry(), is("France"));
         assertThat(description.isOpenAiRequired(), is(true));
 
+
         try {
             Thread.sleep(2000);
             assertThat(Database.getArtwork("Arc de Triomphe").get(5, java.util.concurrent.TimeUnit.SECONDS).getName(), is("Arc de Triomphe"));
@@ -54,13 +62,12 @@ public class GeneralDescriptionApiTest {
             fail("Test failed because of an exception: " + e.getMessage());
         }
 
-        Database.clearDatabase();
     }
 
     @Test
     public void getArtDescriptionReturnsCorrectDataWhenPainting(){
         ArtRecognition artRecognition = new ArtRecognition("Mona Lisa", "Painting");
-        BasicArtDescription artDescription = new GeneralDescriptionApi().getArtDescription(artRecognition).join();
+        BasicArtDescription artDescription = generalDescriptionApi.getArtDescription(artRecognition).join();
 
         String expectedSummaryMonaLisa = "The Mona Lisa is a half-length portrait painting by Italian artist Leonardo da Vinci. Considered an archetypal masterpiece of the Italian Renaissance, it has been described as \"the best known, the most visited, the most written about, the most sung about, the most parodied work of art in the world\". The painting's novel qualities include the subject's enigmatic expression, monumentality of the composition, the subtle modelling of forms, and the atmospheric illusionism.";
 
@@ -69,7 +76,10 @@ public class GeneralDescriptionApiTest {
         assertThat(artDescription.getArtist(), is("Leonardo da Vinci"));
         assertThat(artDescription.getYear(), is("1517"));
         assertThat(artDescription.getCity(), is("Paris"));
-        assertThat(artDescription.getCountry(), is(nullValue()));
+        assertThat(artDescription.getCountry(), is("France"));
+
+        //todo: investigate Wikipedia doesn't correctly parse the country for Mona Lisa.
+
         assertThat(artDescription.getMuseum(), is("Louvre"));
         assertThat(artDescription.getType(), is(BasicArtDescription.ArtType.PAINTING));
         assertThat(artDescription.getScore() >= 90, is(true));
@@ -82,8 +92,6 @@ public class GeneralDescriptionApiTest {
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
             fail("Test failed because of an exception: " + e.getMessage());
         }
-
-        Database.clearDatabase();
     }
 
     @After

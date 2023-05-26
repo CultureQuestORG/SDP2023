@@ -11,7 +11,7 @@
         android:id="@+id/search"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="60dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/rounded_bg"
@@ -25,8 +25,7 @@
         android:textColor="@color/black"
         android:textColorHint="@color/colorSecondary"
         android:textSize="15sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/list_view"
+        android:elevation="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/back_icon1"
         app:layout_constraintTop_toTopOf="parent" />
@@ -44,8 +43,8 @@
 
     <ImageView
         android:id="@+id/back_icon1"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="10dp"
         android:onClick="goBack"
         app:layout_constraintBottom_toBottomOf="@+id/search"
@@ -64,7 +63,7 @@
         android:layout_marginBottom="10dp"
         android:onClick="lookForUsers"
         android:text="Users"
-
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/list_view"
         app:layout_constraintEnd_toStartOf="@+id/search_cities"
         app:layout_constraintHorizontal_bias="0.0"
@@ -87,6 +86,7 @@
         android:layout_marginBottom="10dp"
         android:onClick="lookForCities"
         android:text="Cities"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/list_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search"

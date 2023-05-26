@@ -151,7 +151,7 @@ public class SightseeingActivity extends AppCompatActivity {
         mapFragment.setVisibility(View.VISIBLE);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(googleMap -> {
-            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.maps_style_json));
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.maps_style_json_alternative));
             backButton.setOnClickListener(l2 -> {
                 googleMap.clear();
                 onBackPressed();

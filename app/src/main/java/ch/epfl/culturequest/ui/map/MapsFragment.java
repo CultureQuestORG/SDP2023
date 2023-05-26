@@ -106,7 +106,7 @@ public class MapsFragment extends Fragment {
             if (!isWifiAvailable) return;
             mMap = googleMap;
             getProfilePicture();
-            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.maps_style_json));
+            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.maps_style_json_alternative));
             getLocationPermission();
             mMap.moveCamera(CameraUpdateFactory
                     .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM)); // Set to Default location anyway

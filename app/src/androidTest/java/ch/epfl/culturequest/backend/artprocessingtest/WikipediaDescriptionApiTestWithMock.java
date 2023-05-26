@@ -28,12 +28,11 @@ public class WikipediaDescriptionApiTestWithMock {
 
     MockWebServer mockWebServer = new MockWebServer();
 
-    WikipediaDescriptionApi wikipediaDescriptionApi = new WikipediaDescriptionApi();
+    WikipediaDescriptionApi wikipediaDescriptionApi = new WikipediaDescriptionApi("http://localhost:8080/");
 
     @Before
     public void setUp() throws Exception {
         mockWebServer.start(8080);
-        wikipediaDescriptionApi.wikipediaBaseUrl = "http://localhost:8080/";
     }
 
     @Test
@@ -138,7 +137,6 @@ public class WikipediaDescriptionApiTestWithMock {
     @After
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
-        WikipediaDescriptionApi.wikipediaBaseUrl = "https://en.wikipedia.org/wiki/Special:Search?search=";
     }
 
 
