@@ -19,18 +19,16 @@ import java.util.concurrent.TimeUnit;
 import ch.epfl.culturequest.backend.artprocessing.apis.WikipediaDescriptionApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.SocketPolicy;
 
 public class WikipediaDescriptionApiTest {
 
-    WikipediaDescriptionApi wikipediaDescriptionApi = new WikipediaDescriptionApi();
+    WikipediaDescriptionApi wikipediaDescriptionApi = new WikipediaDescriptionApi("https://en.wikipedia.org/wiki/Special:Search?search=");
 
     BasicArtDescription descriptionMonaLisa;
     BasicArtDescription descriptionDavidOfMichelangelo;
 
     BasicArtDescription descriptionArcDeTriomphe;
+
     BasicArtDescription getBasicArtDescription(String artName, String additionalInfo){
         ArtRecognition artRecognition = new ArtRecognition(artName, additionalInfo);
         CompletableFuture<BasicArtDescription> descriptionFuture = wikipediaDescriptionApi.getArtDescription(artRecognition);

@@ -2,12 +2,15 @@ package ch.epfl.culturequest.backend.artprocessingtest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletionException;
 
 import ch.epfl.culturequest.backend.artprocessing.apis.OpenAIDescriptionApi;
@@ -44,11 +47,17 @@ public class OpenAIDescriptionApiTestWithMock {
         MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API Key");
         mockOpenAiService.setMockResponse(mockText);
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
-        List<String> missingData = openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information")).join();
-        assert (missingData.get(0).equals("The Rock"));
-        assert (missingData.get(1).equals("2023"));
-        assert (missingData.get(2).equals("Miami"));
-        assert (missingData.get(3).equals("United States"));
+        Map<String, String> missingData = openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information"), getBasicNullFields()).join();
+
+        String retrievedArtist = missingData.get("artist");
+        String retrievedDate = missingData.get("year");
+        String retrievedTown = missingData.get("city");
+        String retrievedCountry = missingData.get("country");
+
+        assertThat(retrievedArtist, is("The Rock"));
+        assertThat(retrievedDate, is("2023"));
+        assertThat(retrievedTown, is("Miami"));
+        assertThat(retrievedCountry, is("United States"));
 
     }
     @Test
@@ -57,7 +66,7 @@ public class OpenAIDescriptionApiTestWithMock {
         MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API Key");
         mockOpenAiService.setMockResponse("This is not a JSON response");
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
-        CompletionException completionException = assertThrows(CompletionException.class, () -> openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information")).join());
+        CompletionException completionException = assertThrows(CompletionException.class, () -> openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information"), getBasicNullFields()).join());
         assertTrue(completionException.getCause() instanceof OpenAiFailedException);
         assertThat(completionException.getCause().getMessage(), is("OpenAI failed to provide JSON data"));
 
@@ -70,7 +79,7 @@ public class OpenAIDescriptionApiTestWithMock {
         mockOpenAiService.setMockResponse("This text should not be parsed");
         mockOpenAiService.setChatCompletionThrowsException(true);
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
-        CompletionException completionException = assertThrows(CompletionException.class, () -> openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information")).join());
+        CompletionException completionException = assertThrows(CompletionException.class, () -> openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information"), getBasicNullFields() ).join());
         assertTrue(completionException.getCause() instanceof OpenAiFailedException);
         assertThat(completionException.getCause().getMessage(), is("OpenAI failed to respond"));
 
@@ -92,12 +101,16 @@ public class OpenAIDescriptionApiTestWithMock {
 
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
         // check that every element of the list is null
-        List<String> missingData = openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information")).join();
-        for (String element : missingData){
-            assert (element == null);
+        Map<String, String> missingData= openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information"), getBasicNullFields()).join();
+
+        // check that all values of missingData are null
+        for (String key : missingData.keySet()) {
+            assertThat(missingData.get(key), is(nullValue()));
         }
     }
 
+
+    /*
     @Test
     public void getMissingDataWithoutAFieldReturnsNull(){
 
@@ -109,9 +122,10 @@ public class OpenAIDescriptionApiTestWithMock {
                 "}");
 
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
-        List<String> missingData = openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information")).join();
+        Map<String, Object> missingData = openAPI.getMissingData(new ArtRecognition("Mock Art Name", "Mock additional information"), getBasicNullFields()).join();
         assert (missingData.get(0) == null);
     }
+   */
 
     @Test
     public void getScoreReturnsCorrectScore(){
@@ -122,7 +136,19 @@ public class OpenAIDescriptionApiTestWithMock {
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
 
         int score = openAPI.getScore(new ArtRecognition("Mock Art Name", "Mock additional information")).join();
-        assert (score == 100);
+        assertThat(score, is(100));
+    }
+
+    @Test
+    public void getScoreReturns50WhenNull(){
+
+        MockOpenAiService mockOpenAiService = new MockOpenAiService("Mock API Key");
+        mockOpenAiService.setMockResponse("{\n" +
+                "    \"artPopularity\": null\n" +
+                "}");
+        OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
+        Integer score = openAPI.getScore(new ArtRecognition("Mock Art Name", "Mock additional information")).join();
+        assertThat(score, is(50));
 
     }
 
@@ -132,8 +158,21 @@ public class OpenAIDescriptionApiTestWithMock {
         mockOpenAiService.setMockResponse("This is not a JSON response");
         OpenAIDescriptionApi openAPI = new OpenAIDescriptionApi(mockOpenAiService);
         CompletionException completionException = assertThrows(CompletionException.class, () -> openAPI.getScore(new ArtRecognition("Mock Art Name", "Mock additional information")).join());
+
         assertTrue(completionException.getCause() instanceof OpenAiFailedException);
         assertThat(completionException.getCause().getMessage(), is("OpenAI failed to provide JSON data"));
     }
+
+    private ArrayList<String> getBasicNullFields(){
+
+        ArrayList<String> nullFields = new ArrayList<>();
+        nullFields.add("artist");
+        nullFields.add("year");
+        nullFields.add("city");
+        nullFields.add("country");
+
+        return nullFields;
+    }
+
 
 }

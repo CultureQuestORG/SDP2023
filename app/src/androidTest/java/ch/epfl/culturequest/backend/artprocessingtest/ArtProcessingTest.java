@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
@@ -12,10 +14,26 @@ import java.util.concurrent.TimeoutException;
 
 import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.database.Database;
 
 public class ArtProcessingTest {
 
     String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/'David'_by_Michelangelo_Fir_JBU005_denoised.jpg/1280px-'David'_by_Michelangelo_Fir_JBU005_denoised.jpg";
+
+    @Before
+    public void setUp() {
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+    }
+
+    @After
+    public void tearDown(){
+        // clear the database after the tests
+        Database.clearDatabase();
+    }
 
     @Test
     public void artProcessingOutputsCorrectDescription() {
@@ -28,5 +46,4 @@ public class ArtProcessingTest {
             fail("Test failed because of an exception: " + e.getMessage());
         }
     }
-
 }

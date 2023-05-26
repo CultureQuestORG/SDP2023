@@ -25,22 +25,22 @@ public class RecognitionApiTestWithMock {
 
     MockWebServer mockWebServer = new MockWebServer();
 
+    RecognitionApi recognitionApi = new RecognitionApi("http://localhost:8080/");
+
     @Before
     public void setUp() throws Exception {
         mockWebServer.start(8080);
-        RecognitionApi.baseGoogleLensAPIURL = "http://localhost:8080/";
     }
 
     @After
     public void tearDown() throws Exception {
         mockWebServer.shutdown();
-        RecognitionApi.baseGoogleLensAPIURL = "https://lens.google.com/uploadbyurl";
     }
 
     @Test
     public void getArtNameReturnsFailedFutureWhenTimeout() {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
-        CompletionException completionException = assertThrows(CompletionException.class, () -> new RecognitionApi().getArtName("url").join());
+        CompletionException completionException = assertThrows(CompletionException.class, () -> recognitionApi.getArtName("url").join());
         assertTrue(completionException.getCause() instanceof RecognitionFailedException);
         assertThat(completionException.getCause().getMessage(), is("Failed to reach Google Lens API"));
     }
@@ -48,7 +48,7 @@ public class RecognitionApiTestWithMock {
     @Test
     public void getArtNameReturnsFailedFutureWhen404() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(404));
-        CompletionException completionException = assertThrows(CompletionException.class, () -> new RecognitionApi().getArtName("url").join());
+        CompletionException completionException = assertThrows(CompletionException.class, () -> recognitionApi.getArtName("url").join());
         assertTrue(completionException.getCause() instanceof RecognitionFailedException);
         assertThat(completionException.getCause().getMessage(), is("Failed to retrieve response from Google Lens API"));
     }
@@ -56,7 +56,7 @@ public class RecognitionApiTestWithMock {
     @Test
     public void completionExceptionWhenParsingFails() {
         mockWebServer.enqueue(new MockResponse().setBody("<html><body><div class=\"notfound\">Image not recognized</div></body></html>"));
-        CompletableFuture<ArtRecognition> artRecognitionCompletableFuture = new RecognitionApi().getArtName("url");
+        CompletableFuture<ArtRecognition> artRecognitionCompletableFuture = recognitionApi.getArtName("url");
 
         CompletionException completionException = assertThrows(CompletionException.class, () -> artRecognitionCompletableFuture.join());
         assertTrue(completionException.getCause() instanceof RecognitionFailedException);
