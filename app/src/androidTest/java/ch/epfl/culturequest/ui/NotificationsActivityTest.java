@@ -20,10 +20,12 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,6 +40,7 @@ import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.ui.notifications.NotificationsActivity;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
@@ -81,6 +84,7 @@ public class NotificationsActivityTest {
         Database.addNotification(activeProfile.getUid(), notif3);
 
         ActivityScenario<NotificationsActivity> testRule = ActivityScenario.launch(NotificationsActivity.class);
+        Intents.init();
 
         Thread.sleep(5000);
     }
@@ -148,5 +152,13 @@ public class NotificationsActivityTest {
             }
         };
 
+    }
+
+    @After
+    public void tearDown() {
+        // clear the database after finishing the tests
+        Database.clearDatabase();
+
+        Intents.release();
     }
 }
