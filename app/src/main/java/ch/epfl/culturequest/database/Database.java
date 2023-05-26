@@ -923,7 +923,7 @@ public class Database {
 
                 CompletableFuture<Profile>[] futures = leaderboard.keySet().stream().map((uid) -> getProfile(uid)).toArray(CompletableFuture[]::new);
 
-                CompletableFuture.allOf(futures).orTimeout(10, TimeUnit.SECONDS).whenComplete((v, e) -> {
+                CompletableFuture.allOf(futures).whenComplete((v, e) -> {
                     if (e != null) {
                         System.out.println("getLeaderboard failed");
                         future.completeExceptionally(e);
