@@ -13,6 +13,7 @@ import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.databinding.ActivityTournamentBinding;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.leaderboard.LeaderboardFragment;
 import ch.epfl.culturequest.ui.leaderboard.LeaderboardRecycleViewAdapter;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
@@ -52,12 +53,20 @@ public class TournamentActivity extends AppCompatActivity {
         tournamentDescription.setText("Ongoing tournament of the week");
 
         TournamentViewModel tournamentViewModel = new TournamentViewModel(tournament);
+
         RecyclerView quizzRecyclerView = binding.quizzRecyclerView;
         QuizzesRecycleViewAdapter quizzesRecycleViewAdapter = new QuizzesRecycleViewAdapter(tournamentViewModel, getSupportFragmentManager());
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         quizzRecyclerView.setLayoutManager(layoutManager);
         quizzRecyclerView.setAdapter(quizzesRecycleViewAdapter);
+
+        LeaderboardRecycleViewAdapter globalAdapter = new LeaderboardRecycleViewAdapter(tournamentViewModel);
+        RecyclerView globalLeaderboardRecyclerView = binding.leaderboardTournament;
+
+        RecyclerView.LayoutManager globalLayoutManager = new LinearLayoutManager(this);
+        globalLeaderboardRecyclerView.setLayoutManager(globalLayoutManager);
+        globalLeaderboardRecyclerView.setAdapter(globalAdapter);
     }
 
     /**

@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -920,26 +921,31 @@ public class Database {
                     }
                 }
 
-                CompletableFuture<List<Profile>>[] futures = leaderboard.keySet().stream().map((uid) -> {
-                    return getProfile(uid);
-                }).toArray(CompletableFuture[]::new);
+                CompletableFuture<Profile>[] futures = leaderboard.keySet().stream().map((uid) -> getProfile(uid)).toArray(CompletableFuture[]::new);
 
-                CompletableFuture.allOf(futures).whenComplete((v, e) -> {
+                CompletableFuture.allOf(futures).orTimeout(10, TimeUnit.SECONDS).whenComplete((v, e) -> {
                     if (e != null) {
+                        System.out.println("getLeaderboard failed");
                         future.completeExceptionally(e);
                         return;
                     }
 
                     //Merge all posts into one list
                     List<Profile> profiles = new ArrayList<>();
-                    for (CompletableFuture<List<Profile>> futureProfile : futures) {
-                        profiles.addAll(futureProfile.join());
+                    for (CompletableFuture<Profile> futureProfile : futures) {
+                        profiles.add(futureProfile.join());
                     }
                     Map<Profile, Integer> leaderboardWithProfiles = new HashMap<>();
                     for (Profile profile : profiles) {
                         leaderboardWithProfiles.put(profile, leaderboard.get(profile.getUid()));
                     }
+                    System.out.println("getLeaderboard finished");
+
                     future.complete(leaderboardWithProfiles);
+                }).exceptionally(e -> {
+                    System.out.println("getLeaderboard failed: " + e.getMessage());
+                    future.completeExceptionally(e);
+                    return null;
                 });
 
             } else {
