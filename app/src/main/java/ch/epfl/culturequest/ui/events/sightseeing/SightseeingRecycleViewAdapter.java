@@ -42,7 +42,7 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
 
     @Override
     public void onBindViewHolder(@NonNull SightseeingViewHolder holder, int position) {
-        holder.getSightseeingName().setText(sightseeingEvents.get(position).getOwner().getName() + "'s sightseeing");
+        holder.getSightseeingName().setText(sightseeingEvents.get(position).getOwner().getUsername() + "'s sightseeing");
         List<OTMLocation> locations = sightseeingEvents.get(position).getLocations();
         for (OTMLocation location : locations) {
             TextView locationView = new TextView(holder.getLocationsList().getContext());

@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F2F2"
+    android:background="@color/background"
     >
 
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:progress="20"
         android:layout_alignParentTop="true"
         android:indeterminateDrawable="@drawable/progress_bar_quizz"
@@ -28,7 +28,7 @@
         android:text="@string/quizz_1"
         android:textColor="@color/colorPrimary"
         android:textSize="36sp"
-        android:textStyle="bold" />
+        android:fontFamily="@font/poppins_bold"/>
 
     <TextView
         android:id="@+id/blackTextView"
@@ -40,12 +40,12 @@
         android:text="@string/name_of_the_painting"
         android:textColor="#000000"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:fontFamily="@font/poppins_semibold"/>
 
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:layout_height="241dp"
+        android:layout_height="200dp"
         android:layout_below="@id/blackTextView"
         android:layout_marginStart="40dp"
         android:layout_marginTop="4dp"
@@ -60,6 +60,7 @@
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
             android:background="@drawable/round_corner"
+            android:fontFamily="@font/poppins_medium"
             android:src="@drawable/joconde" />
 
     </FrameLayout>
@@ -82,17 +83,20 @@
         android:layout_marginEnd="50dp"
         android:background="@drawable/round_corner"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:elevation="5dp">
 
         <TextView
             android:id="@+id/questionTextView"
             android:layout_width="match_parent"
-            android:layout_height="63dp"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:text="What is the color of the blablabla in the painting ?"
             android:textColor="#000000"
+            android:fontFamily="@font/poppins_medium"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -109,6 +113,7 @@
                 android:id="@+id/answer1RadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
                 android:button="@drawable/radio_button_custom"
                 android:checked="false"
                 android:text="Answer 1"
@@ -121,6 +126,7 @@
                 android:id="@+id/answer2RadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
                 android:button="@drawable/radio_button_custom"
                 android:text="Answer 2"
                 android:textColor="#000000"
@@ -130,6 +136,7 @@
                 android:id="@+id/answer3RadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
                 android:button="@drawable/radio_button_custom"
                 android:text="Answer 3"
                 android:textColor="#000000"
@@ -139,6 +146,7 @@
                 android:id="@+id/answer4RadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
                 android:button="@drawable/radio_button_custom"
                 android:text="Answer 4"
                 android:textColor="#000000"
@@ -150,12 +158,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-
+            android:layout_marginBottom="10dp"
             android:paddingStart="40dp"
             android:paddingEnd="40dp"
             android:background="@drawable/rounded_button"
             android:text="Next"
+            android:fontFamily="@font/poppins_bold"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="24sp" />

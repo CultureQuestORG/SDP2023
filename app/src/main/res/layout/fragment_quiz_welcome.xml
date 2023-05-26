@@ -12,6 +12,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="25dp"
         android:src="@drawable/back_button"
+        android:onClick="goBack"
          />
 
     <TextView
@@ -23,6 +24,7 @@
         android:gravity="center"
         android:text="@string/quizz_1"
         android:layout_marginTop="35dp"
+        android:fontFamily="@font/poppins_bold"
         android:textColor="@color/colorPrimary"
         android:textSize="36sp"
         android:textStyle="bold" />
@@ -35,6 +37,7 @@
         android:gravity="center"
         android:layout_marginTop="35dp"
         android:text="@string/name_of_the_painting"
+        android:fontFamily="@font/poppins_semibold"
         android:textColor="#000000"
         android:textSize="24sp"
         android:textStyle="bold" />
@@ -43,7 +46,7 @@
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_marginTop="45dp"
-        android:layout_height="241dp"
+        android:layout_height="200dp"
         android:layout_below="@id/blackTextView"
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
@@ -61,21 +64,22 @@
 
     </FrameLayout>
 
+
     <TextView
         android:id="@+id/textDisclaimer"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/frameLayout"
+        android:layout_alignStart="@+id/frameLayout"
+        android:layout_alignEnd="@+id/frameLayout"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="20dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="40dp"
-        android:textSize="20sp"
-        android:textAlignment="center"
+        android:layout_marginEnd="0dp"
+        android:fontFamily="@font/poppins"
         android:text="@string/disclaimer"
+        android:textAlignment="center"
         android:textColor="@color/colorTertiary"
-        />
-
-
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/startButton"
@@ -95,6 +99,7 @@
         android:text="@string/start"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
+        android:fontFamily="@font/poppins_medium"
         android:textSize="24sp" />
 
 </RelativeLayout>
