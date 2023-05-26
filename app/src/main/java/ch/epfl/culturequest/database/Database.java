@@ -853,33 +853,6 @@ public class Database {
         return future;
     }
 
-    public static CompletableFuture<ArtQuiz> getQuiz(String tournament, String artName) {
-        CompletableFuture<ArtQuiz> future = new CompletableFuture<>();
-
-        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName);
-        quizRef.get().addOnCompleteListener(task -> {
-            //returns a list of questions
-            if (task.isSuccessful()) {
-                // there is a child questions and a child scores
-
-                ArrayList<QuizQuestion> questions = new ArrayList<>();
-                for (DataSnapshot child : task.getResult().child("questions").getChildren()) {
-                    QuizQuestion question = child.getValue(QuizQuestion.class);
-                    questions.add(question);
-                }
-                HashMap<String, Integer> scores = new HashMap<>();
-                for (DataSnapshot child : task.getResult().child("scores").getChildren()) {
-                    scores.put(child.getKey(), child.getValue(Integer.class));
-                }
-                future.complete(new ArtQuiz(artName, questions, scores));
-            } else {
-                future.completeExceptionally(new Exception("Quiz not found"));
-            }
-        });
-        return future;
-    }
-
-
     public static void startQuiz(String tournament, String artName, String uid) {
         setScoreQuiz(tournament, artName, uid, 0);
     }

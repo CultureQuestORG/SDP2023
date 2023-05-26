@@ -31,7 +31,6 @@ public class TournamentActivity extends AppCompatActivity {
         // To make the status bar transparent
         AndroidUtils.removeStatusBar(getWindow());
         // fetch the tournament from the intent
-        // tournament = getIntent().getStringExtra("tournament_id");
         tournament = TournamentManagerApi.getTournamentFromSharedPref();
 
         if (Profile.getActiveProfile() != null) {
@@ -41,7 +40,8 @@ public class TournamentActivity extends AppCompatActivity {
         }
 
         if (tournament == null ) {
-            throw new RuntimeException("Null argument");
+            super.onBackPressed();
+            return;
         }
 
         binding = ActivityTournamentBinding.inflate(getLayoutInflater());
