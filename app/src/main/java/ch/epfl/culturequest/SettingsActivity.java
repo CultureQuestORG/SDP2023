@@ -75,7 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (hasConnection(context)) Authenticator.signOut(this);
             else {
                 View rootView = v.getRootView();
-                CustomSnackbar.showCustomSnackbar("Cannot log out. You are not connected to the internet", R.drawable.unknown_error, rootView);
+                CustomSnackbar.showCustomSnackbar("Cannot log out. You are not connected to the internet", R.drawable.unknown_error, rootView, (Void) -> null);
             }
         });
 

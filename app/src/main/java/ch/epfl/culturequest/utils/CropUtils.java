@@ -58,7 +58,7 @@ public final class CropUtils {
                         .start(activity);
             }
         } else {
-            CustomSnackbar.showCustomSnackbar("Error while choosing a picture,please retry", R.drawable.unknown_error, rootView);
+            CustomSnackbar.showCustomSnackbar("Error while choosing a picture,please retry", R.drawable.unknown_error, rootView, (Void) -> null);
         }
     }
 
