@@ -106,7 +106,6 @@ public class QuizActivityTest {
         tournament = new Tournament(quizzes);
         tournamentId = tournament.getTournamentId();
         TournamentManagerApi.storeTournamentInSharedPref(tournament);
-        //Database.addQuiz(quiz).join();
 
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(), QuizActivity.class);
         intent.putExtra("tournament", tournamentId);
@@ -258,9 +257,9 @@ public class QuizActivityTest {
         Database.setProfile(activeprofile);
         Profile profile2 = new Profile("abc","TestMan","TestMan","a@b.c","1234567890","profilePicture",0,new HashMap<>(),new ArrayList<>());
         Database.setProfile(profile2);
-        Database.setScoreQuiz(tournamentId,"art1",activeprofile.getUid(),1);
-        Database.setScoreQuiz(tournamentId,"art1",profile2.getUid(),2);
-        Database.setScoreQuiz(tournamentId,"art2",profile2.getUid(),25);
+        Database.setScoreQuiz(tournamentId,"La Joconde",activeprofile.getUid(),1);
+        Database.setScoreQuiz(tournamentId,"La Joconde",profile2.getUid(),2);
+        Database.setScoreQuiz(tournamentId,"La Joconde2",profile2.getUid(),25);
 
         Thread.sleep(2000);
         Database.getLeaderboard(tournament).thenAccept(

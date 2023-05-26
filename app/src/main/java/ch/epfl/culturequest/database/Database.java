@@ -878,18 +878,6 @@ public class Database {
         return future;
     }
 
-    public static CompletableFuture<AtomicBoolean> addQuiz(ArtQuiz quiz, String tournament) {
-        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(quiz.getArtName()).child("questions");
-        quizRef.setValue(quiz.getQuestions()).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                future.complete(new AtomicBoolean(true));
-            } else {
-                future.complete(new AtomicBoolean(false));
-            }
-        });
-        return future;
-    }
 
     public static void startQuiz(String tournament, String artName, String uid) {
         setScoreQuiz(tournament, artName, uid, 0);
