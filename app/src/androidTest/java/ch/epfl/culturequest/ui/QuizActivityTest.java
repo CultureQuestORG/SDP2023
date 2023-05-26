@@ -53,6 +53,8 @@ public class QuizActivityTest {
 
     QuizViewModel quizViewModel;
 
+    Tournament tournament;
+
 
     @Before
     public void setUp() throws InterruptedException {
@@ -98,9 +100,10 @@ public class QuizActivityTest {
         ArtQuiz quiz = new ArtQuiz("La Joconde", questions,new HashMap<>());
         HashMap<String, ArtQuiz> quizzes = new HashMap<>();
         quizzes.put("La Joconde", quiz);
+        quizzes.put("La Joconde2", quiz);
         TournamentManagerApi.handleTournaments(ApplicationProvider.getApplicationContext());
         SeedApi.storeSeedInSharedPref(SeedApi.generateSeed());
-        Tournament tournament = new Tournament(quizzes);
+        tournament = new Tournament(quizzes);
         tournamentId = tournament.getTournamentId();
         TournamentManagerApi.storeTournamentInSharedPref(tournament);
         //Database.addQuiz(quiz).join();
@@ -244,6 +247,31 @@ public class QuizActivityTest {
     public void scoreDB(){
         Database.getScoreQuiz("tournament1","art1","user1").thenAccept(
                 score -> assertEquals(1,score.intValue())
+        );
+    }
+
+
+
+    @Test
+    public void leaderboard() throws InterruptedException {
+        Profile activeprofile = Profile.getActiveProfile();
+        Database.setProfile(activeprofile);
+        Profile profile2 = new Profile("abc","TestMan","TestMan","a@b.c","1234567890","profilePicture",0,new HashMap<>(),new ArrayList<>());
+        Database.setProfile(profile2);
+        Database.setScoreQuiz(tournamentId,"art1",activeprofile.getUid(),1);
+        Database.setScoreQuiz(tournamentId,"art1",profile2.getUid(),2);
+        Database.setScoreQuiz(tournamentId,"art2",profile2.getUid(),25);
+
+        Thread.sleep(2000);
+        Database.getLeaderboard(tournament).thenAccept(
+                leaderboard -> {
+
+                    assertEquals(2,leaderboard.size());
+                    leaderboard.get(activeprofile);
+                    assertEquals(1,(int) leaderboard.get(activeprofile));
+
+                    assertEquals(27,(int)leaderboard.get(profile2));
+                }
         );
     }
 

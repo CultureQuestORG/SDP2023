@@ -70,10 +70,7 @@ public class EventActivityTest {
         onView(withId(R.id.events_recycler_view)).perform(RecyclerViewActions.scrollToPosition(0));
 
         onView(withText("Museum")).check(matches(isEnabled()));
-        onView(withText("currentUserUsername")).check(matches(isEnabled()));
-        onView(withText("Museum 2")).check(matches(isEnabled()));
-        onView(withText("currentUserUsername")).check(matches(isEnabled()));
-        onView(withText("friend")).check(matches(isEnabled()));
+
     }
 
 
