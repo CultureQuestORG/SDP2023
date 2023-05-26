@@ -13,13 +13,14 @@ import java.util.HashMap;
 
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
+import ch.epfl.culturequest.database.Database;
 
 public class QuizTest {
 
     ArtQuiz ArtQuiz;
 
     @Before
-    public void setUp() {
+    public void setUp(){
         ArtQuiz = new ArtQuiz("artName", null,new HashMap<>());
     }
 
@@ -66,9 +67,6 @@ public class QuizTest {
         ArtQuiz.setScores(null);
         assertNull(ArtQuiz.getScores());
     }
-
-
-
 
 
 }

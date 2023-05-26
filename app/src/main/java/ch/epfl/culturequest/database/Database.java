@@ -896,7 +896,6 @@ public class Database {
         CompletableFuture<Integer> future = new CompletableFuture<>();
         quizRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                System.out.println("Score: " + task.getResult().getValue(Integer.class));
                 future.complete(task.getResult().getValue(Integer.class));
             } else {
                 future.completeExceptionally(task.getException());
