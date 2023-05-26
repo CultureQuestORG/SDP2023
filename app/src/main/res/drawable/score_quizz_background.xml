@@ -5,14 +5,14 @@
 
     <!-- Add gradient effect to mimic casino theme -->
     <gradient
-        android:startColor="#FFC107"
+        android:startColor="@color/colorSecondary"
     android:endColor="@color/colorPrimary"
     android:type="linear"
     android:angle="45" />
 
     <!-- Add border to the background -->
     <stroke
-        android:color="#000000"
+        android:color="@color/colorTertiary"
     android:width="2dp" />
 </shape>
 

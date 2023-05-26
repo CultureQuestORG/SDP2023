@@ -113,12 +113,12 @@ public class SearchActivity extends AppCompatActivity {
                 ));
 
                 List<String> matchingUsernames = AutoComplete.topNMatches(query,usernameToProfileMap.keySet(),NUMBER_USERS_TO_DISPLAY);
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, matchingUsernames);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.simple_list_item_1, matchingUsernames);
                 listView.setAdapter(adapter);
                 listView.setOnItemClickListener((parent, ignored, position, ignored2) -> searchBarOnClickListener(parent, position, usernameToProfileMap));
             });
         } else {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, List.of());
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.simple_list_item_1, List.of());
             listView.setAdapter(adapter);
         }
     }
@@ -133,13 +133,13 @@ public class SearchActivity extends AppCompatActivity {
         if (!query.isEmpty()) {
             Set<String> cities = CITY_COORDINATES.keySet();
             List<String> topMatches = AutoComplete.topNMatches(query, cities, NUMBER_CITIES_TO_DISPLAY);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, topMatches);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.simple_list_item_1, topMatches);
             listView.setAdapter(adapter);
             listView.setOnItemClickListener((parent, view, position, ignored2) -> {
                 findStuffToDoIn(topMatches.get(position));
             });
         } else {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, List.of());
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.simple_list_item_1, List.of());
             listView.setAdapter(adapter);
         }
     }
@@ -209,10 +209,14 @@ public class SearchActivity extends AppCompatActivity {
     private void swapColors() {
         if (Boolean.TRUE.equals(searchingForUsers.getValue())){
             searchUsers.setBackgroundResource(R.drawable.rounded_button);
+            searchUsers.setTextColor(getResources().getColor(R.color.white, null));
             searchCities.setBackgroundResource(R.drawable.rounded_button_transparent);
+            searchCities.setTextColor(getResources().getColor(R.color.colorPrimary, null));
         } else {
             searchCities.setBackgroundResource(R.drawable.rounded_button);
+            searchCities.setTextColor(getResources().getColor(R.color.white, null));
             searchUsers.setBackgroundResource(R.drawable.rounded_button_transparent);
+            searchUsers.setTextColor(getResources().getColor(R.color.colorPrimary, null));
         }
     }
 
