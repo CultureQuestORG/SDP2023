@@ -90,7 +90,7 @@ public class NavigationActivityTest {
                 .perform(click());
         Thread.sleep(2000);
         // check map fragment is displayed
-        onView(withId(R.id.mapsFragment)).check(matches(isEnabled()));
+        onView(withId(R.id.map_fragment)).check(matches(isEnabled()));
     }
 
     @Test

@@ -33,6 +33,7 @@ import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.notifications.LikeNotification;
+import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.CustomSnackbar;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -231,17 +232,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
      * @param post the post
      */
     private void handleDeletePopUp(View v, Post post) {
-
         AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete this post?")
                 .setPositiveButton("Yes", (dialog, which) -> {
                     pictures.remove(post);
                     notifyItemRemoved(pictures.indexOf(post));
                     notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
                     Database.removePost(post);
-                    //TODO: delete image from storage when the mock is removed
-                    //FirebaseStorage storage = FirebaseStorage.getInstance();
-                    //storage.getReferenceFromUrl(post.getImageUrl()).delete();
-
+                    FireStorage.deleteImage(post.getImageUrl());
                     View rootView = v.getRootView();
                     CustomSnackbar.showCustomSnackbar("Post deleted successfully", R.drawable.image_recognition_error, rootView);
                 })

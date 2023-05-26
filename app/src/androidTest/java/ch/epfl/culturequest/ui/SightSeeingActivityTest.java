@@ -4,6 +4,7 @@ import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
@@ -170,6 +171,20 @@ public class SightSeeingActivityTest {
         onView(withId(R.id.map_fragment)).check(matches(isDisplayed()));
         onView(withId(R.id.back_button)).perform(click());
         onView(withId(R.id.map_fragment)).check(matches(not(isDisplayed())));
+    }
+
+    @Test
+    public void noLocationsSetsNothingFoundInCity(){
+        Intent mockIntent = new Intent(ApplicationProvider.getApplicationContext(),
+                SightseeingActivity.class);
+        mockIntent.putExtra("city", "Paris, France");
+
+        mockIntent.putStringArrayListExtra("locations", new ArrayList<>());
+        // launch the activity with the mock Intent
+        ActivityScenario.launch(mockIntent).onActivity(activity -> {
+            sightseeingActivity = activity;
+        });
+        onView(withId(R.id.city_text)).check(matches(withText("Couldn't find anything in Paris")));
     }
 
     @Test
