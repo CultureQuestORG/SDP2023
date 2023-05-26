@@ -107,12 +107,12 @@ public class ScanFragment extends Fragment {
                                         startActivity(intent);
 
                                         // Reset state of the scan fragment
-                                        loadingAnimation.stopLoading();
+
                                         scanningLayout.setVisibility(View.GONE);
                                         currentProcessing = null;
+                                        loadingAnimation.stopLoading();
                                     })
                                     .exceptionally(ex -> {
-                                        loadingAnimation.stopLoading();
                                         Throwable cause = ex.getCause();
                                         String errorMessage;
                                         int drawableId;
@@ -134,6 +134,8 @@ public class ScanFragment extends Fragment {
                                         View rootView = requireActivity().findViewById(android.R.id.content);
                                         CustomSnackbar.showCustomSnackbar(errorMessage, drawableId, rootView);
 
+                                        scanningLayout.setVisibility(View.GONE);
+                                        loadingAnimation.stopLoading();
                                         return null;
                                     });
 
@@ -141,6 +143,7 @@ public class ScanFragment extends Fragment {
                             throw new RuntimeException(e);
                         }
                     }).exceptionally(e -> {
+                        scanningLayout.setVisibility(View.GONE);
                         loadingAnimation.stopLoading();
                         View rootView = requireActivity().findViewById(android.R.id.content);
                         CustomSnackbar.showCustomSnackbar("Failed to take picture.", R.drawable.camera_error, rootView);
