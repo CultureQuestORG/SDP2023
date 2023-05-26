@@ -37,7 +37,7 @@ public class TournamentNotificationTest {
         assertThat(tournamentNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(tournamentNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(tournamentNotification.getChannelId(), is(TournamentNotification.CHANNEL_ID));
-        Intent intent = new Intent(context, EventsActivity.class);
+        Intent intent = new Intent(context, EventsActivity.class).putExtra("redirect", "tournament");
         assertThat(tournamentNotification.contentIntent, is(PendingIntent.getActivity(context, notification.getNotificationId().hashCode(), intent, PendingIntent.FLAG_MUTABLE)));
     }
 

@@ -43,7 +43,7 @@ public class SightseeingNotificationTest {
         assertThat(sightseeingNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(sightseeingNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(sightseeingNotification.getChannelId(), is(SightseeingNotification.CHANNEL_ID));
-        Intent intent = new Intent(context, EventsActivity.class);
+        Intent intent = new Intent(context, EventsActivity.class).putExtra("redirect", "sightseeing");
         assertThat(sightseeingNotification.contentIntent, is(PendingIntent.getActivity(context, notification.getNotificationId().hashCode(), intent, PendingIntent.FLAG_MUTABLE)));
     }
 }
