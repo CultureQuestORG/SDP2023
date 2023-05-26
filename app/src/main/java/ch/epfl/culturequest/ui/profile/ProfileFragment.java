@@ -87,7 +87,7 @@ public class ProfileFragment extends Fragment {
         View.OnClickListener badgesListener = v -> {
             // open the badges activity
             Intent intent = new Intent(getActivity(), DisplayUserBadgeCollectionActivity.class);
-            intent.putExtra("uid", Profile.getActiveProfile().getUid());
+            intent.putExtra("uid", Authenticator.getCurrentUser().getUid());
             startActivity(intent);
         };
 
