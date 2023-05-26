@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/congratulations"
-
+        android:fontFamily="@font/poppins_bold"
         android:textSize="36sp"
         android:textStyle="bold" />
 
@@ -27,9 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:background="@drawable/rounded_button"
-
-
-
-        android:text="@string/back_to_the_tournament" />
+        android:text="@string/back_to_the_tournament"
+        android:fontFamily="@font/poppins_medium"
+        android:textColor="@color/white"/>
 
 </LinearLayout>

@@ -43,7 +43,7 @@ public class LikeNotificationTest {
         assertThat(likeNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(likeNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(likeNotification.getChannelId(), is(LikeNotification.CHANNEL_ID));
-        Intent intent = new Intent(context, NavigationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        Intent intent = new Intent(context, NavigationActivity.class)
                 .putExtra("redirect", "profile");
         assertThat(likeNotification.contentIntent, is(PendingIntent.getActivity(context, notification.getNotificationId().hashCode(), intent, PendingIntent.FLAG_MUTABLE)));
     }

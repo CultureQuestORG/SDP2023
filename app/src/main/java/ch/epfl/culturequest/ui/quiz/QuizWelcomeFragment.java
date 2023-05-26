@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import com.squareup.picasso.Picasso;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.databinding.FragmentQuizWelcomeBinding;
 
 public class QuizWelcomeFragment extends Fragment {
@@ -30,17 +32,19 @@ public class QuizWelcomeFragment extends Fragment {
         }
 
         String uid = getArguments().getString("uid");
-        String tournament = getArguments().getString("tournament");
+        // String tournament = getArguments().getString("tournament");
+        Tournament tournament = TournamentManagerApi.getTournamentFromSharedPref();
         String artName = getArguments().getString("artName");
 
-        if ( uid == null || tournament == null || artName == null) {
+        if ( uid == null || artName == null) {
             throw new RuntimeException("Null argument");
         }
 
-        quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
+        quizViewModel = QuizViewModel.getQuiz(uid, tournament.getTournamentId(), artName);
 
-        binding.titleTextView.setText(tournament);
+        binding.titleTextView.setText("The " + artName + " Quiz");
         binding.blackTextView.setText(artName);
+
 
         quizViewModel.getImage().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(binding.imageView));
 

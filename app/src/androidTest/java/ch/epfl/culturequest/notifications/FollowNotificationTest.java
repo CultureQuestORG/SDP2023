@@ -43,7 +43,7 @@ public class FollowNotificationTest {
         assertThat(followNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(followNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(followNotification.getChannelId(), is(FollowNotification.CHANNEL_ID));
-        Intent intent = new Intent(context, DisplayUserProfileActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        Intent intent = new Intent(context, DisplayUserProfileActivity.class)
                 .putExtra("uid", profile.getUid()).putExtra("redirect", "home");
         assertThat(followNotification.contentIntent, is(PendingIntent.getActivity(context, notification.getNotificationId().hashCode(), intent, PendingIntent.FLAG_MUTABLE)));
     }

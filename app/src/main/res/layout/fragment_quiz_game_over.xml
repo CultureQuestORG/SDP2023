@@ -33,6 +33,7 @@
         android:textSize="18sp"
         android:fontFamily="@font/poppins_bold"
         android:textAllCaps="true"
-        android:text="@string/back_to_the_tournament" />
+        android:text="@string/back_to_the_tournament"
+        android:textColor="@color/white"/>
 
 </LinearLayout>

@@ -25,6 +25,7 @@ import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.notifications.ScanNotification;
 import ch.epfl.culturequest.notifications.SightseeingNotification;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.events.EventsActivity;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<NotificationsRecycleViewAdapter.NotificationViewHolder> {
@@ -58,12 +59,33 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
         });
 
         holder.itemView.setOnClickListener(view -> {
-            System.out.println(notificationTexts.get(position).getChannelId());
-            try {
-                notificationTexts.get(position).selectPendingIntent(holder.itemView.getContext(), notificationTexts.get(position).getChannelId()).send();
-            } catch (PendingIntent.CanceledException e) {
-                throw new RuntimeException(e);
+            Intent intent;
+            switch (notificationTexts.get(position).getChannelId()) {
+                // opens the profile of the user who sent the notification
+                case FollowNotification.CHANNEL_ID:
+                    intent = new Intent(holder.itemView.getContext(), DisplayUserProfileActivity.class);
+                    intent.putExtra("uid", notificationTexts.get(position).getSenderId());
+                    intent.putExtra("redirect", "home");
+                    break;
+                // opens the profile of the current user
+                case LikeNotification.CHANNEL_ID:
+                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
+                    intent.putExtra("redirect", "profile");
+                    break;
+                case TournamentNotification.CHANNEL_ID:
+                    intent = new Intent(holder.itemView.getContext(), EventsActivity.class);
+                    intent.putExtra("redirect", "tournament");
+                    break;
+                case SightseeingNotification.CHANNEL_ID:
+                    intent = new Intent(holder.itemView.getContext(), EventsActivity.class);
+                    intent.putExtra("redirect", "sightseeing");
+                    break;
+                default:
+                    intent = new Intent(holder.itemView.getContext(), NavigationActivity.class);
+                    break;
             }
+
+            holder.itemView.getContext().startActivity(intent);
         });
     }
 

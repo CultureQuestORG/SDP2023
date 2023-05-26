@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import ch.epfl.culturequest.databinding.FragmentHomeBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.ui.SearchActivity;
+import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.events.EventsActivity;
 import ch.epfl.culturequest.ui.notifications.NotificationsActivity;
 
 public class HomeFragment extends Fragment {
@@ -36,6 +38,9 @@ public class HomeFragment extends Fragment {
 
         final ImageView notificationIcon = binding.notificationIcon;
         notificationIcon.setOnClickListener(view -> startActivity(new Intent(getActivity(), NotificationsActivity.class)));
+
+        final ImageView eventIcon = binding.eventsIcon;
+        eventIcon.setOnClickListener(view -> startActivity(new Intent(getActivity(), EventsActivity.class)));
 
         final ImageView logo = binding.logoApp;
         logo.setOnClickListener(view -> feed.smoothScrollToPosition(0));

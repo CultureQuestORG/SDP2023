@@ -53,7 +53,6 @@ public class TournamentManagerApiTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
-
         unlockTournamentGeneration().join();
         indicateTournamentNotGenerated().join();
     }
@@ -290,7 +289,7 @@ public class TournamentManagerApiTest {
             add(fakeQuestion);
             add(fakeQuestion);
         }};
-        ArtQuiz fakQuiz = new ArtQuiz(fakeQuestions);
+        ArtQuiz fakQuiz = new ArtQuiz("fakeArt",fakeQuestions,new HashMap<>());
         HashMap<String, ArtQuiz> fakeQuizDict = new HashMap<String, ArtQuiz>() {{
             put("fakeArt", fakQuiz);
         }};

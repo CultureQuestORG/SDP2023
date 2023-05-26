@@ -58,6 +58,10 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
+
+        <activity
+            android:name=".ui.events.EventsActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.notifications.NotificationsActivity"
             android:exported="false" />
@@ -78,7 +82,11 @@
             android:label="@string/title_activity_navigation" />
         <activity
             android:name=".ui.quiz.QuizActivity"
-            android:exported="true">
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".ui.events.tournaments.TournamentActivity"
+            android:exported="false">
         </activity>
 
         <activity

@@ -15,29 +15,33 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Follows;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
-import ch.epfl.culturequest.tournament.quiz.Question;
-import ch.epfl.culturequest.tournament.quiz.Quiz;
 
 
 /**
@@ -70,14 +74,18 @@ public class Database {
 
     public static CompletableFuture<AtomicBoolean> clearDatabase() {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        databaseInstance.getReference().setValue(null).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                future.complete(new AtomicBoolean(true));
-            } else {
-                future.complete(new AtomicBoolean(false));
-            }
-        });
-        return future;
+        if (isEmulatorOn) {
+            databaseInstance.getReference().setValue(null).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    future.complete(new AtomicBoolean(true));
+                } else {
+                    future.complete(new AtomicBoolean(false));
+                }
+            });
+
+            return future;
+        }
+        return CompletableFuture.completedFuture(new AtomicBoolean(false));
     }
 
     private static <T> CompletableFuture<T> getValue(DatabaseReference ref, Class<T> valueType) {
@@ -822,7 +830,7 @@ public class Database {
     }
 
     /**
-     * Returns the event or events organized by the user with Uid
+     * Returns the event or events user with Uid is invited to/organizes
      *
      * @param Uid user id
      * @return the event or events organized by someone
@@ -845,30 +853,10 @@ public class Database {
         return future;
     }
 
-    public static CompletableFuture<Quiz> getQuiz(String tournament, String artName) {
-        CompletableFuture<Quiz> future = new CompletableFuture<>();
-
-        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName).child("questions");
-        quizRef.get().addOnCompleteListener(task -> {
-            //returns a list of questions
-            if (task.isSuccessful()) {
-                ArrayList<Question> questions = new ArrayList<>();
-                for (DataSnapshot child : task.getResult().getChildren()) {
-                    Question question = child.getValue(Question.class);
-                    questions.add(question);
-                }
-                future.complete(new Quiz(artName, questions, tournament));
-            } else {
-                future.completeExceptionally(new Exception("Quiz not found"));
-            }
-        });
-        return future;
-    }
-
-    public static CompletableFuture<AtomicBoolean> addQuiz(Quiz quiz) {
+    public static CompletableFuture<AtomicBoolean> deleteSightseeingEvent(String Uid, String eventId) {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(quiz.getTournament()).child(quiz.getArtName()).child("questions");
-        quizRef.setValue(quiz.getQuestions()).addOnCompleteListener(task -> {
+        DatabaseReference usersRef = databaseInstance.getReference("sightseeing_event").child(Uid).child(String.valueOf(eventId));
+        usersRef.removeValue().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 future.complete(new AtomicBoolean(true));
             } else {
@@ -883,11 +871,75 @@ public class Database {
     }
 
     public static void setScoreQuiz(String tournament, String artName, String uid, int score) {
-        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName).child("scores").child(uid);
+        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child("artQuizzes").child(artName).child("scores").child(uid);
         quizRef.setValue(score);
     }
 
-    public static CompletableFuture<String> getImageForArt(String artwork){
+    public static CompletableFuture<Integer> getScoreQuiz(String tournament, String artName, String uid) {
+        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child("artQuizzes").child(artName).child("scores").child(uid);
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        quizRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(task.getResult().getValue(Integer.class));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<Map<Profile, Integer>> getLeaderboard(Tournament tournament) {
+        CompletableFuture<Map<Profile, Integer>> future = new CompletableFuture<>();
+        DatabaseReference tournamentRef = databaseInstance.getReference("tournaments").child(tournament.getTournamentId());
+        tournamentRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Tournament t = task.getResult().getValue(Tournament.class);
+
+                if (t == null) {
+                    future.completeExceptionally(new Exception("Tournament not found"));
+                    return;
+                }
+
+                Map<String, Integer> leaderboard = new HashMap<>();
+                for (ArtQuiz quizz : t.getArtQuizzes().values()) {
+                    for (Map.Entry<String, Integer> score : quizz.getScores().entrySet()) {
+                        leaderboard.put(score.getKey(), leaderboard.getOrDefault(score.getKey(), 0) + score.getValue());
+                    }
+                }
+
+                CompletableFuture<Profile>[] futures = leaderboard.keySet().stream().map((uid) -> getProfile(uid)).toArray(CompletableFuture[]::new);
+
+                CompletableFuture.allOf(futures).whenComplete((v, e) -> {
+                    if (e != null) {
+                        future.completeExceptionally(e);
+                        return;
+                    }
+
+                    //Merge all posts into one list
+                    List<Profile> profiles = new ArrayList<>();
+                    for (CompletableFuture<Profile> futureProfile : futures) {
+                        profiles.add(futureProfile.join());
+                    }
+                    Map<Profile, Integer> leaderboardWithProfiles = new HashMap<>();
+                    for (Profile profile : profiles) {
+                        leaderboardWithProfiles.put(profile, leaderboard.get(profile.getUid()));
+                    }
+
+                    future.complete(leaderboardWithProfiles);
+                }).exceptionally(e -> {
+                    System.out.println("getLeaderboard failed: " + e.getMessage());
+                    future.completeExceptionally(e);
+                    return null;
+                });
+
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
+    }
+
+    public static CompletableFuture<String> getImageForArt(String artwork) {
         CompletableFuture<String> future = new CompletableFuture<>();
         // get the first post with "artworkName" = artwork
         DatabaseReference postsRef = databaseInstance.getReference("posts");
@@ -1058,7 +1110,7 @@ public class Database {
         });
     }
 
-    public static CompletableFuture<Tournament> waitForTournamentGenerationAndFetchIt(AtomicReference<Tournament> fetchedTournament, CompletableFuture<Tournament> future, String tournamentId){
+    public static CompletableFuture<Tournament> waitForTournamentGenerationAndFetchIt(AtomicReference<Tournament> fetchedTournament, CompletableFuture<Tournament> future, String tournamentId) {
 
         DatabaseReference dbRef = databaseInstance.getReference();
         DatabaseReference tournamentRef = dbRef.child("tournaments").child(tournamentId);
@@ -1074,11 +1126,16 @@ public class Database {
                             fetchedTournament.set(dataSnapshot.getValue(Tournament.class));
                             future.complete(fetchedTournament.get());
                         }
+
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                             // todo: handle it better
                             future.completeExceptionally(new RuntimeException("Failed to read data from Firebase: " + databaseError.getMessage()));
-                        }});}}
+                        }
+                    });
+                }
+            }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // todo: handle it better
@@ -1115,7 +1172,7 @@ public class Database {
         return seedFuture;
     }
 
-    public static CompletableFuture<Void> uploadSeedToDatabase(Long seed){
+    public static CompletableFuture<Void> uploadSeedToDatabase(Long seed) {
 
         CompletableFuture<Void> voidFuture = new CompletableFuture<>();
 

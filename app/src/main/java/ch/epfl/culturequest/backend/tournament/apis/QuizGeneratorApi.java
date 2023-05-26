@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -44,7 +45,7 @@ public class QuizGeneratorApi {
     public CompletableFuture<ArtQuiz> generateArtQuiz(String artName){
 
         CompletableFuture<String> jsonApiResponse = getJsonApiResponse(artName, quizGenerationPrompt);
-        return jsonApiResponse.thenApply(this::parseQuiz);
+        return jsonApiResponse.thenApply(a->parseQuiz(a,artName));
     }
 
     private CompletableFuture<String> getJsonApiResponse(String artName, String quizPromptTemplate) {
@@ -71,7 +72,7 @@ public class QuizGeneratorApi {
                 });
     }
 
-    private ArtQuiz parseQuiz(String quizJson){
+    private ArtQuiz parseQuiz(String quizJson,String artName){
 
         ArrayList<QuizQuestion> quizQuestions = new ArrayList<>();
 
@@ -91,7 +92,7 @@ public class QuizGeneratorApi {
             throw new CompletionException(new OpenAiFailedException("Quiz parsing failed - Questions not parsed correctly"));
         }
 
-        return new ArtQuiz(quizQuestions);
+        return new ArtQuiz(artName,quizQuestions,new HashMap<>());
     }
 
     private QuizQuestion parseQuestion(JSONObject questionObject) throws JSONException{

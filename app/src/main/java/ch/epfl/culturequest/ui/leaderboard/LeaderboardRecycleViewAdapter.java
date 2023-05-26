@@ -14,9 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.events.tournaments.TournamentViewModel;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -127,6 +130,17 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
                 break;
 
         }
+    }
+
+    public LeaderboardRecycleViewAdapter(TournamentViewModel tournamentViewModel) {
+        tournamentViewModel.getTournamentLeaderboard().observeForever(v -> {
+            this.topNUserNames = v.stream().map(x -> x.getKey().getName()).collect(Collectors.toList());
+            this.topNUids = v.stream().map(x -> x.getKey().getUid()).collect(Collectors.toList());
+            this.topNUserScores = v.stream().map(x -> x.getValue().toString()).collect(Collectors.toList());
+            this.topNUserRanks = Stream.iterate(1, i -> i + 1).limit(v.size()).map(i -> Integer.toString(i)).collect(Collectors.toList());
+            this.topNUserProfilePicturesUri = v.stream().map(x -> x.getKey().getProfilePicture()).collect(Collectors.toList());
+            notifyItemRangeChanged(0, getItemCount());
+        });
     }
 
 

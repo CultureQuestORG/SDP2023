@@ -13,13 +13,29 @@ public class QuizQuestion {
     private int correctAnswerIndex;
 
     public QuizQuestion(String questionContent, ArrayList<String> possibleAnswers, int correctAnswerIndex){
+
         this.possibleAnswers = possibleAnswers;
         this.correctAnswerIndex = correctAnswerIndex;
         this.questionContent = questionContent;
     }
 
+    public void setPossibleAnswers(ArrayList<String> possibleAnswers) {
+        this.possibleAnswers = possibleAnswers;
+    }
+
+    public void setQuestionContent(String questionContent) {
+        this.questionContent = questionContent;
+    }
+
+    public void setCorrectAnswerIndex(int correctAnswerIndex) {
+        this.correctAnswerIndex = correctAnswerIndex;
+    }
+
     public QuizQuestion(){
         // For Serialization
+        this.possibleAnswers = null;
+        this.correctAnswerIndex = 0;
+        this.questionContent = "";
     }
 
     public ArrayList<String> getPossibleAnswers(){
@@ -37,5 +53,13 @@ public class QuizQuestion {
     public String getQuestionContent(){
         return questionContent;
     }
+
+    public boolean isCorrect(int selectedAnswer) {
+        return selectedAnswer == correctAnswerIndex;
+    }
+
+
+
+
 
 }

@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 
 import java.util.Objects;
 
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.databinding.FragmentHomeBinding;
 import ch.epfl.culturequest.databinding.FragmentQuizInterBinding;
 
@@ -60,7 +62,8 @@ public class QuizInterFragment extends Fragment {
             throw new RuntimeException("No arguments passed to QuizInterFragment");
         }
         String uid = getArguments().getString("uid");
-        String tournament = getArguments().getString("tournament");
+        // String tournament = getArguments().getString("tournament");
+        Tournament tournament = TournamentManagerApi.getTournamentFromSharedPref();
         String artName = getArguments().getString("artName");
         int score = getArguments().getInt("score");
 
@@ -68,7 +71,7 @@ public class QuizInterFragment extends Fragment {
             throw new RuntimeException("Null argument");
         }
 
-        quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
+        quizViewModel = QuizViewModel.getQuiz(uid, tournament.getTournamentId(), artName);
 
         View root = binding.getRoot();
         binding.score.setText(String.format("%d", score));

@@ -1,12 +1,15 @@
 package ch.epfl.culturequest.ui.quiz;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import ch.epfl.culturequest.databinding.FragmentQuizVictoryBinding;
+import ch.epfl.culturequest.ui.events.tournaments.TournamentActivity;
 
 public class QuizVictoryFragment extends Fragment {
 
@@ -30,7 +33,9 @@ public class QuizVictoryFragment extends Fragment {
 
 
         binding.btnBackToTournament.setOnClickListener(a-> {
-            //handle back to tournament
+            Intent intent = new Intent(getActivity(), TournamentActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            getActivity().startActivity(intent);
         });
 
 

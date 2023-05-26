@@ -32,12 +32,15 @@ import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.artprocessing.apis.ProcessingApi;
 import ch.epfl.culturequest.backend.artprocessing.utils.DescriptionSerializer;
 import ch.epfl.culturequest.backend.exceptions.OpenAiFailedException;
 import ch.epfl.culturequest.backend.exceptions.RecognitionFailedException;
 import ch.epfl.culturequest.backend.exceptions.WikipediaDescriptionFailedException;
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.FragmentScanBinding;
+import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.ui.commons.LoadingAnimation;
@@ -187,6 +190,13 @@ public class ScanFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         ScanViewModel ScanViewModel =
                 new ViewModelProvider(this).get(ScanViewModel.class);
+
+        if (Profile.getActiveProfile() == null) {
+            Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, throwable) -> {
+                if (throwable != null || profile == null) return;
+                Profile.setActiveProfile(profile);
+            });
+        }
 
         binding = FragmentScanBinding.inflate(inflater, container, false);
         View root = binding.getRoot();

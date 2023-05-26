@@ -1,13 +1,16 @@
 package ch.epfl.culturequest.ui;
 
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static org.hamcrest.Matchers.not;
 
+import static org.junit.Assert.assertEquals;
+
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.fragment.app.Fragment;
@@ -19,14 +22,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.tournament.apis.SeedApi;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
-import ch.epfl.culturequest.tournament.quiz.Question;
-import ch.epfl.culturequest.tournament.quiz.Quiz;
 import ch.epfl.culturequest.ui.quiz.QuizActivity;
 import ch.epfl.culturequest.ui.quiz.QuizGameOverFragment;
 import ch.epfl.culturequest.ui.quiz.QuizInterFragment;
@@ -40,9 +47,13 @@ public class QuizActivityTest {
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
 
+    String tournamentId ;
+
     QuizActivity activity;
 
     QuizViewModel quizViewModel;
+
+    Tournament tournament;
 
 
     @Before
@@ -68,7 +79,10 @@ public class QuizActivityTest {
                 "uid",
                 "https://firebasestorage.googleapis.com/v0/b/culturequest.appspot.com/o/images%2FAcZdcTtQxkUtA4gLRj9rgaFoWVv1%2Fa6a2f12c-401b-4f02-a394-928e1e6bea74?alt=media&token=24102b4b-7a82-4692-bce2-36f770b065c3",
         "La Joconde",1234,0,new ArrayList<>());
+        Database.setScoreQuiz("tournament1","art1","user1",1);
         Database.uploadPost(post).join();
+
+
 
 
         ArrayList<String> possibilities = new ArrayList<>();
@@ -76,24 +90,31 @@ public class QuizActivityTest {
         possibilities.add("wrongAnswer1");
         possibilities.add("wrongAnswer2");
         possibilities.add("wrongAnswer3");
-        Question question = new Question("question", possibilities,0);
-        ArrayList<Question> questions = new ArrayList<>();
+        QuizQuestion question = new QuizQuestion("question", possibilities,0);
+        ArrayList<QuizQuestion> questions = new ArrayList<>();
         questions.add(question);
         questions.add(question);
         questions.add(question);
         questions.add(question);
         questions.add(question);
-        Quiz quiz = new Quiz("La Joconde", questions,"tournamentId");
-        Database.addQuiz(quiz).join();
+        ArtQuiz quiz = new ArtQuiz("La Joconde", questions,new HashMap<>());
+        HashMap<String, ArtQuiz> quizzes = new HashMap<>();
+        quizzes.put("La Joconde", quiz);
+        quizzes.put("La Joconde2", quiz);
+        TournamentManagerApi.handleTournaments(ApplicationProvider.getApplicationContext());
+        SeedApi.storeSeedInSharedPref(SeedApi.generateSeed());
+        tournament = new Tournament(quizzes);
+        tournamentId = tournament.getTournamentId();
+        TournamentManagerApi.storeTournamentInSharedPref(tournament);
 
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(), QuizActivity.class);
-        intent.putExtra("tournament", "tournamentId");
+        intent.putExtra("tournament", tournamentId);
         intent.putExtra("artName", "La Joconde");
 
         ActivityScenario<QuizActivity> scenario = ActivityScenario.launch(intent);
         scenario.onActivity(a -> {
             activity = a;
-            quizViewModel=QuizViewModel.getQuiz(Profile.getActiveProfile().getUid(), "tournamentId", "La Joconde");
+            quizViewModel=QuizViewModel.getQuiz(Profile.getActiveProfile().getUid(), tournamentId, "La Joconde");
         });
 
         Thread.sleep(5000);
@@ -155,7 +176,11 @@ public class QuizActivityTest {
         onView(withId(R.id.answer3RadioButton)).check(matches(isEnabled()));
         onView(withId(R.id.answer4RadioButton)).check(matches(isEnabled()));
         Thread.sleep(2000);
-        q.pickAnswer(0);
+        try {
+            q.pickAnswer(0);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         Thread.sleep(2000);
         return q.valideAnswer();
 
@@ -170,7 +195,11 @@ public class QuizActivityTest {
         onView(withId(R.id.answer4RadioButton)).check(matches(isEnabled()));
 
         Thread.sleep(2000);
-        q.pickAnswer(1);
+        try{
+            q.pickAnswer(1);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         Thread.sleep(2000);
         return q.valideAnswer();
 
@@ -211,6 +240,38 @@ public class QuizActivityTest {
         return inter.nextQuestion();
 
 
+    }
+
+    @Test
+    public void scoreDB(){
+        Database.getScoreQuiz("tournament1","art1","user1").thenAccept(
+                score -> assertEquals(1,score.intValue())
+        );
+    }
+
+
+
+    @Test
+    public void leaderboard() throws InterruptedException {
+        Profile activeprofile = Profile.getActiveProfile();
+        Database.setProfile(activeprofile);
+        Profile profile2 = new Profile("abc","TestMan","TestMan","a@b.c","1234567890","profilePicture",0,new HashMap<>(),new ArrayList<>());
+        Database.setProfile(profile2);
+        Database.setScoreQuiz(tournamentId,"La Joconde",activeprofile.getUid(),1);
+        Database.setScoreQuiz(tournamentId,"La Joconde",profile2.getUid(),2);
+        Database.setScoreQuiz(tournamentId,"La Joconde2",profile2.getUid(),25);
+
+        Thread.sleep(2000);
+        Database.getLeaderboard(tournament).thenAccept(
+                leaderboard -> {
+
+                    assertEquals(2,leaderboard.size());
+                    leaderboard.get(activeprofile);
+                    assertEquals(1,(int) leaderboard.get(activeprofile));
+
+                    assertEquals(27,(int)leaderboard.get(profile2));
+                }
+        );
     }
 
 

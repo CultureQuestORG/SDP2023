@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     >
 
 
@@ -13,6 +14,7 @@
         android:layout_marginTop="24dp"
         android:gravity="center"
         android:text="@string/quizz_1"
+        android:fontFamily="@font/poppins_bold"
         android:textColor="@color/colorPrimary"
         android:textSize="36sp"
         android:textStyle="bold" />
@@ -25,6 +27,7 @@
         android:layout_marginTop="6dp"
         android:gravity="center"
         android:text="@string/name_of_the_painting"
+        android:fontFamily="@font/poppins_semibold"
         android:textColor="#000000"
         android:textSize="24sp"
         android:textStyle="bold" />
@@ -36,8 +39,9 @@
         android:layout_alignTop="@id/score"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:textSize="20sp"
-
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
         android:text="@string/your_score_is"
 
         />
@@ -54,7 +58,7 @@
         android:textAlignment="center"
         android:gravity="center"
         android:textColor="@color/white"
-
+        android:fontFamily="@font/poppins_medium"
         android:textSize="20sp"
         android:layout_marginTop="20dp"
 
@@ -65,11 +69,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/could_be"
-        android:textSize="20sp"
-
+        android:textSize="20dp"
+        android:textColor="@color/black"
         android:layout_marginStart="20dp"
         android:layout_alignTop="@id/newscore"
-
+        android:fontFamily="@font/poppins_medium"
         />
 
     <TextView
@@ -86,7 +90,7 @@
         android:background="@drawable/score_quizz_background"
         android:textSize="20sp"
         android:layout_marginTop="20dp"
-
+        android:fontFamily="@font/poppins_medium"
 
         />
 
@@ -126,6 +130,8 @@
         android:background="@drawable/button_rounded_corner"
         android:layout_marginTop="20dp"
         android:textSize="30sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/poppins_bold"
         android:text="@string/spin" />
 
     <Button
@@ -137,7 +143,9 @@
         android:background="@drawable/button_rounded_corner"
         android:layout_marginTop="20dp"
         android:textSize="30sp"
+        android:textColor="@color/white"
         android:text="@string/next"
+        android:fontFamily="@font/poppins_bold"
         android:visibility="invisible"/>
 
     <TextView
@@ -148,6 +156,8 @@
         android:layout_below="@id/spinButton"
         android:layout_marginTop="30dp"
         android:textSize="15sp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins_medium"
         android:text="@string/quit" />
 
 

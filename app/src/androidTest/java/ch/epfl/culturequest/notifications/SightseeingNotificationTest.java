@@ -21,6 +21,7 @@ import java.util.HashMap;
 import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.events.EventsActivity;
 
 @RunWith(AndroidJUnit4.class)
 public class SightseeingNotificationTest {
@@ -42,7 +43,7 @@ public class SightseeingNotificationTest {
         assertThat(sightseeingNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(sightseeingNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(sightseeingNotification.getChannelId(), is(SightseeingNotification.CHANNEL_ID));
-        Intent intent = new Intent(context, NavigationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Intent intent = new Intent(context, EventsActivity.class).putExtra("redirect", "sightseeing");
         assertThat(sightseeingNotification.contentIntent, is(PendingIntent.getActivity(context, notification.getNotificationId().hashCode(), intent, PendingIntent.FLAG_MUTABLE)));
     }
 }

@@ -37,7 +37,7 @@ public class ScanNotificationTest {
         assertThat(scanNotification.priority, is(Notification.PRIORITY_HIGH));
         assertThat(scanNotification.getSmallIcon().getResId(), is(R.drawable.logo_compact));
         assertThat(scanNotification.getChannelId(), is(ScanNotification.CHANNEL_ID));
-        Intent intent = new Intent(context, NavigationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Intent intent = new Intent(context, NavigationActivity.class);
         assertThat(scanNotification.contentIntent, is(PendingIntent.getActivity(context, notification.getNotificationId().hashCode(), intent, PendingIntent.FLAG_MUTABLE)));
     }
 

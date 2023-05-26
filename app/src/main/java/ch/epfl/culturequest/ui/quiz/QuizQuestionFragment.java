@@ -1,5 +1,8 @@
 package ch.epfl.culturequest.ui.quiz;
 
+import static androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
+
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +20,8 @@ import java.util.List;
 import java.util.Objects;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
+import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.databinding.FragmentQuizQuestionBinding;
 
 public class QuizQuestionFragment extends Fragment {
@@ -39,7 +44,8 @@ public class QuizQuestionFragment extends Fragment {
             throw new RuntimeException("QuizQuestionFragment needs arguments");
         }
         String uid = getArguments().getString("uid");
-        String tournament = getArguments().getString("tournament");
+        Tournament tournament = TournamentManagerApi.getTournamentFromSharedPref();
+        // String tournament = getArguments().getString("tournament");
         String artName = getArguments().getString("artName");
         questionNumber = getArguments().getInt("questionNumber");
         question = getArguments().getString("question");
@@ -50,14 +56,13 @@ public class QuizQuestionFragment extends Fragment {
         }
 
 
-        quizViewModel = QuizViewModel.getQuiz(uid, tournament, artName);
+        quizViewModel = QuizViewModel.getQuiz(uid, tournament.getTournamentId(), artName);
 
         binding.questionTextView.setText(question);
 
         binding.progressBar.setProgress(100*questionNumber/ Objects.requireNonNull(quizViewModel.getQuiz().getValue()).getQuestions().size());
 
         quizViewModel.getImage().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(binding.imageView));
-
 
        possibleAnswers.add(binding.answer1RadioButton);
        possibleAnswers.add(binding.answer2RadioButton);
@@ -73,8 +78,14 @@ public class QuizQuestionFragment extends Fragment {
     }
 
 
-    public void pickAnswer(int answer) {
+    @SuppressLint("RestrictedApi")
+    public void pickAnswer(int answer) throws Throwable {
+  runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
         possibleAnswers.get(answer).setChecked(true);
+            }
+        });
     }
 
     public Fragment valideAnswer() {
