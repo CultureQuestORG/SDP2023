@@ -53,7 +53,7 @@ public class GeneralDescriptionApi {
                     if (e != null) {  // Wikipedia or Open AI error
 
                        // If Open Ai failed and we are in a partial recovery state (since Wikipedia didn't fail), we attempt a second partial recovery with Open AI
-                       if(openAiFullRecoveryFailed(e) && savedWikipediaDescription != null){
+                       if(openAiRecoverableFail(e) && savedWikipediaDescription != null){
                            return recoverPotentialMissesAndGetScore(savedWikipediaDescription, recognizedArt, RecoveryState.PartialRecovery, 2);
                        }
 
@@ -75,7 +75,7 @@ public class GeneralDescriptionApi {
 
         ArrayList<String> nullFields = getNullFields(incompleteDescription, recoveryState);
 
-        if (nullFields.size() == 0) { // No missing data, we just have to provide the score
+        if (nullFields.size() == 0) { // No missing data, we just have to provide the score. Even it fails here, it doesn't really matter. We just set the score to the default value and still return the object.
             return score
                     .thenApply(s -> {
                         incompleteDescription.setScore(s);
@@ -119,11 +119,11 @@ public class GeneralDescriptionApi {
                     if (tryCount == 2) {
 
                         // if both Wikipedia fails and OpenAi fails or Open AI failed two times in a row, we throw an exception leading to a displayed error message in the app
-                        throw new CompletionException(new OpenAiFailedException("OpenAI failed to fully recover the missing data")); // forward the exception to Processing API
+                        throw new CompletionException(new OpenAiFailedException("Open AI critical fail")); // forward the exception to Processing API, it won't get handled by the handle method of getArtDescription method
                     }
                     else {  // Partial recovery
-                        incompleteDescription.setScore(DEFAULT_SCORE);
-                        return incompleteDescription;
+
+                        throw new CompletionException(new RecognitionFailedException("Open AI recoverable fail")); // forward the exception to handle of getArtDescription method
                     }
                 });
     }
@@ -189,8 +189,8 @@ public class GeneralDescriptionApi {
         basicArtDescription.setType(WikipediaDescriptionApi.getArtType(recognizedArt));
     }
 
-    private boolean openAiFullRecoveryFailed(Throwable exception){
-        return exception.getCause() instanceof OpenAiFailedException && exception.getMessage().contains("OpenAI failed to fully recover the missing data");
+    private boolean openAiRecoverableFail(Throwable exception){
+        return exception.getCause() instanceof OpenAiFailedException && exception.getMessage().contains("Open AI recoverable fail");
     }
 
 }
