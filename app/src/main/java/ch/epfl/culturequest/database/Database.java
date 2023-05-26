@@ -73,14 +73,18 @@ public class Database {
 
     public static CompletableFuture<AtomicBoolean> clearDatabase() {
         CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
-        databaseInstance.getReference().setValue(null).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                future.complete(new AtomicBoolean(true));
-            } else {
-                future.complete(new AtomicBoolean(false));
-            }
-        });
-        return future;
+        if (isEmulatorOn) {
+            databaseInstance.getReference().setValue(null).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    future.complete(new AtomicBoolean(true));
+                } else {
+                    future.complete(new AtomicBoolean(false));
+                }
+            });
+
+            return future;
+        }
+        return CompletableFuture.completedFuture(new AtomicBoolean(false));
     }
 
     private static <T> CompletableFuture<T> getValue(DatabaseReference ref, Class<T> valueType) {
@@ -901,7 +905,6 @@ public class Database {
         CompletableFuture<Integer> future = new CompletableFuture<>();
         quizRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                System.out.println("Score: " + task.getResult().getValue(Integer.class));
                 future.complete(task.getResult().getValue(Integer.class));
             } else {
                 future.completeExceptionally(task.getException());

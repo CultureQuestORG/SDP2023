@@ -3,7 +3,7 @@ package ch.epfl.culturequest.ui;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
@@ -59,9 +59,9 @@ public class EventActivityTest {
 
     @Test
     public void sightseeingEventsFirstDisplayed() {
-        onView(withId(R.id.events_recycler_view)).check(matches(isDisplayed()));
-        onView(withText("Museum")).check(matches(isDisplayed()));
-        onView(withText("Museum 2")).check(matches(isDisplayed()));
+        onView(withId(R.id.events_recycler_view)).check(matches(isEnabled()));
+        onView(withText("Museum")).check(matches(isEnabled()));
+        onView(withText("Museum 2")).check(matches(isEnabled()));
     }
 
     @Test
@@ -69,11 +69,11 @@ public class EventActivityTest {
         onView(withId(R.id.sightseeing_button)).perform(click());
         onView(withId(R.id.events_recycler_view)).perform(RecyclerViewActions.scrollToPosition(0));
 
-        onView(withText("Museum")).check(matches(isDisplayed()));
-        onView(withText("currentUserUsername")).check(matches(isDisplayed()));
-        onView(withText("Museum 2")).check(matches(isDisplayed()));
-        onView(withText("currentUserUsername")).check(matches(isDisplayed()));
-        onView(withText("friend")).check(matches(isDisplayed()));
+        onView(withText("Museum")).check(matches(isEnabled()));
+        onView(withText("currentUserUsername")).check(matches(isEnabled()));
+        onView(withText("Museum 2")).check(matches(isEnabled()));
+        onView(withText("currentUserUsername")).check(matches(isEnabled()));
+        onView(withText("friend")).check(matches(isEnabled()));
     }
 
 

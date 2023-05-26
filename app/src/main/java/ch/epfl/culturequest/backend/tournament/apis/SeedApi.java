@@ -41,7 +41,7 @@ public class SeedApi {
         return generatedSeed;
     }
 
-    private static Long generateSeed(){
+    public static Long generateSeed(){
 
         return System.currentTimeMillis();
     }
@@ -89,7 +89,7 @@ public class SeedApi {
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
         return sharedPreferences.getLong("seed", -1) != -1;
     }
-    private static void storeSeedInSharedPref(Long seed) {
+    public static void storeSeedInSharedPref(Long seed) {
         SharedPreferences sharedPreferences = getTournamentSharedPrefLocation();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong("seed", seed);
