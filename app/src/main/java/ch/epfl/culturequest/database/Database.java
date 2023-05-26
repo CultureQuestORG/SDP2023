@@ -925,7 +925,6 @@ public class Database {
 
                 CompletableFuture.allOf(futures).whenComplete((v, e) -> {
                     if (e != null) {
-                        System.out.println("getLeaderboard failed");
                         future.completeExceptionally(e);
                         return;
                     }
@@ -939,7 +938,6 @@ public class Database {
                     for (Profile profile : profiles) {
                         leaderboardWithProfiles.put(profile, leaderboard.get(profile.getUid()));
                     }
-                    System.out.println("getLeaderboard finished");
 
                     future.complete(leaderboardWithProfiles);
                 }).exceptionally(e -> {
