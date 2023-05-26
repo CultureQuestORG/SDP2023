@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.ui.notifications;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
+import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.notifications.TournamentNotification;
@@ -20,6 +25,7 @@ import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.notifications.ScanNotification;
 import ch.epfl.culturequest.notifications.SightseeingNotification;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
 public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<NotificationsRecycleViewAdapter.NotificationViewHolder> {
 
@@ -42,11 +48,22 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
     @Override
     public void onBindViewHolder(@NonNull NotificationsRecycleViewAdapter.NotificationViewHolder holder, int position) {
         holder.getNotificationText().setText(notificationTexts.get(position).getText());
-        setIconNotification(holder.getNotificationIcon(), notificationTexts.get(position).getChannelId());
+        setIconNotification(holder.getNotificationIcon(), notificationTexts.get(position).getChannelId(), notificationTexts.get(position).getSenderId());
+
         holder.getDeleteButton().setOnClickListener(view -> {
             Database.deleteNotification(Profile.getActiveProfile().getUid(), notificationTexts.get(position));
             notificationTexts.remove(position);
             notifyItemRemoved(position);
+            notifyItemRangeChanged(0, getItemCount());
+        });
+
+        holder.itemView.setOnClickListener(view -> {
+            System.out.println(notificationTexts.get(position).getChannelId());
+            try {
+                notificationTexts.get(position).selectPendingIntent(holder.itemView.getContext(), notificationTexts.get(position).getChannelId()).send();
+            } catch (PendingIntent.CanceledException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
@@ -55,7 +72,7 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
         return notificationTexts.size();
     }
 
-    private void setIconNotification(ImageView icon, String channel) {
+    private void setIconNotification(ImageView icon, String channel, String uid) {
         switch (channel) {
             case ScanNotification.CHANNEL_ID:
                 icon.setImageResource(R.drawable.scan_icon_unsel);
@@ -64,7 +81,12 @@ public class NotificationsRecycleViewAdapter extends RecyclerView.Adapter<Notifi
                 icon.setImageResource(R.drawable.like_full);
                 break;
             case FollowNotification.CHANNEL_ID:
-                icon.setImageResource(R.drawable.profile_icon_unsel);
+                Database.getProfile(uid).thenAccept(profile -> {
+                    Picasso.get()
+                            .load(profile.getProfilePicture())
+                            .placeholder(R.drawable.profile_icon_unsel)
+                            .into(icon);
+                });
                 break;
             case TournamentNotification.CHANNEL_ID:
                 icon.setImageResource(R.drawable.planner);

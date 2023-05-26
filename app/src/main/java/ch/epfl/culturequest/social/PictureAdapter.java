@@ -129,7 +129,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
 
         // Set the like count
-        holder.likeCount.setText(getNumberOfLikes(post.getLikes()));
+        holder.setLike(post.getLikes());
 
         // Set handlers for the like and delete buttons
         handleLike(holder, post);
@@ -180,8 +180,9 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             if (holder.isLiked) {
                 holder.isLiked = false;
                 Database.removeLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
-                    if (throwable != null) {
+                    if (throwable == null && aVoid != null) {
                         post.setLikers(aVoid.getLikers());
+                        holder.setLike(aVoid.getLikes());
                     }
                 });
                 Picasso.get()
@@ -190,8 +191,9 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             } else {
                 holder.isLiked = true;
                 Database.addLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
-                    if (throwable != null) {
+                    if (throwable == null && aVoid != null) {
                         post.setLikers(aVoid.getLikers());
+                        holder.setLike(aVoid.getLikes());
                     }
                 });
                 // send the like notification
@@ -469,6 +471,11 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     inVisibleView.setVisibility(View.INVISIBLE);
                 }
             });
+        }
+
+        public void setLike(int likeCount) {
+            System.out.println("setLike");
+            this.likeCount.setText(getNumberOfLikes(likeCount));
         }
     }
 }
