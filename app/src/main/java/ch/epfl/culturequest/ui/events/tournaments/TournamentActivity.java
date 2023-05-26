@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.databinding.ActivityTournamentBinding;
@@ -33,11 +34,7 @@ public class TournamentActivity extends AppCompatActivity {
         // fetch the tournament from the intent
         tournament = TournamentManagerApi.getTournamentFromSharedPref();
 
-        if (Profile.getActiveProfile() != null) {
-            uid = Profile.getActiveProfile().getUid();
-        } else {
-            uid = "1234";
-        }
+        uid = Authenticator.getCurrentUser().getUid();
 
         if (tournament == null ) {
             super.onBackPressed();
