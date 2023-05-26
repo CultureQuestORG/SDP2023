@@ -59,9 +59,14 @@ public class CustomSnackbar {
         snackbarLayout.setAnimation(AnimationUtils.loadAnimation(rootView.getContext(), R.anim.snackbar_enter));
         snackbar.addCallback(new Snackbar.Callback() {
             @Override
+            public void onShown(Snackbar sb) {
+                callback.apply(null);
+                super.onShown(sb);
+            }
+
+            @Override
             public void onDismissed(Snackbar transientBottomBar, int event) {
                 snackbarLayout.setAnimation(AnimationUtils.loadAnimation(rootView.getContext(), R.anim.snackbar_exit));
-                callback.apply(null);
                 super.onDismissed(transientBottomBar, event);
             }
         });
