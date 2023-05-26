@@ -110,6 +110,7 @@ public class MapsFragment extends Fragment {
             getLocationPermission();
             mMap.moveCamera(CameraUpdateFactory
                     .newLatLngZoom(viewModel.getCurrentLocation().getValue(), DEFAULT_ZOOM)); // Set to Default location anyway
+            mMap.setOnInfoWindowClickListener(Marker::hideInfoWindow);
         }
     };
 
