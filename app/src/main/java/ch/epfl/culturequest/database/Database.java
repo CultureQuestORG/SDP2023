@@ -853,6 +853,19 @@ public class Database {
         return future;
     }
 
+    public static CompletableFuture<AtomicBoolean> deleteSightseeingEvent(String Uid, String eventId) {
+        CompletableFuture<AtomicBoolean> future = new CompletableFuture<>();
+        DatabaseReference usersRef = databaseInstance.getReference("sightseeing_event").child(Uid).child(String.valueOf(eventId));
+        usersRef.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(new AtomicBoolean(true));
+            } else {
+                future.complete(new AtomicBoolean(false));
+            }
+        });
+        return future;
+    }
+
     public static void startQuiz(String tournament, String artName, String uid) {
         setScoreQuiz(tournament, artName, uid, 0);
     }

@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
 import ch.epfl.culturequest.ui.events.EventsViewModel;
@@ -73,9 +75,15 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
         if(sightseeingEvents.get(position).getOwner().getUid().equals(Profile.getActiveProfile().getUid())) {
             holder.getDeleteButton().setVisibility(View.VISIBLE);
             holder.getDeleteButton().setOnClickListener(view -> {
-                sightseeingEvents.remove(position);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, getItemCount());
+                Database.deleteSightseeingEvent(Authenticator.getCurrentUser().getUid(), sightseeingEvents.get(position).getEventId()).whenComplete((aVoid, throwable) -> {
+                    if (throwable != null) {
+                        throwable.printStackTrace();
+                    } else {
+                        sightseeingEvents.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, getItemCount());
+                    }
+                });
             });
         }
 
