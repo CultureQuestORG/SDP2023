@@ -45,6 +45,8 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
         for (OTMLocation location : locations) {
             TextView locationView = new TextView(holder.getLocationsList().getContext());
             locationView.setText(location.getName());
+            locationView.setTextColor(holder.itemView.getContext().getColor(R.color.black));
+            locationView.setPadding(10, 0, 0, 0);
             holder.getLocationsList().addView(locationView);
         }
 
@@ -52,6 +54,8 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
         for (Profile participant : participants) {
             TextView participantView = new TextView(holder.getParticipantsList().getContext());
             participantView.setText(participant.getName());
+            participantView.setTextColor(holder.itemView.getContext().getColor(R.color.black));
+            participantView.setPadding(10, 0, 0, 0);
             participantView.setOnClickListener(view -> {
                 Intent intent = new Intent(holder.itemView.getContext(), DisplayUserProfileActivity.class);
                 intent.putExtra("uid", participant.getUid());

@@ -42,12 +42,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sightseeing_title"
         android:orientation="vertical" >
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Locations"
             android:fontFamily="@font/poppins_medium"
-            android:textColor="@color/white"/>
+            android:text="Locations"
+            android:textColor="@color/black" />
     </LinearLayout>
 
     <LinearLayout
@@ -59,11 +60,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/locations_list"
         android:orientation="vertical" >
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Participants"
             android:fontFamily="@font/poppins_medium"
-            android:textColor="@color/white"/>
+            android:text="Participants"
+            android:textColor="@color/black" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
