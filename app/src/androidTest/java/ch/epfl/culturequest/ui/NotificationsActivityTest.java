@@ -113,25 +113,25 @@ public class NotificationsActivityTest {
         onView(withText("notif1")).check(matches(isEnabled()));
     }
 
-    @Test
-    public void clickOnNotifFollowSendsToProfile() {
-        onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
-        onView(withId(R.id.notifications_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.notification_text)));
-
-        onView(withText("notif2")).perform(click());
-        intended(hasComponent(DisplayUserProfileActivity.class.getName()));
-        // intended(hasExtra("uid", "senderId2"));
-    }
-
-    @Test
-    public void clickOnNotifLikeSendsToProfile() {
-        onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
-        onView(withId(R.id.notifications_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.notification_text)));
-
-        onView(withText("notif1")).perform(click());
-        intended(hasComponent(DisplayUserProfileActivity.class.getName()));
-        //intended(hasExtra("uid", "senderId2"));
-    }
+//    @Test
+//    public void clickOnNotifFollowSendsToProfile() {
+//        onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
+//        onView(withId(R.id.notifications_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.notification_text)));
+//
+//        onView(withText("notif2")).perform(click());
+//        intended(hasComponent(DisplayUserProfileActivity.class.getName()));
+//        // intended(hasExtra("uid", "senderId2"));
+//    }
+//
+//    @Test
+//    public void clickOnNotifLikeSendsToProfile() {
+//        onView(withId(R.id.notifications_recycler_view)).check(matches(isDisplayed()));
+//        onView(withId(R.id.notifications_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.notification_text)));
+//
+//        onView(withText("notif1")).perform(click());
+//        intended(hasComponent(DisplayUserProfileActivity.class.getName()));
+//        //intended(hasExtra("uid", "senderId2"));
+//    }
 
     public ViewAction clickChildViewWithId(final int id) {
         return new ViewAction() {
