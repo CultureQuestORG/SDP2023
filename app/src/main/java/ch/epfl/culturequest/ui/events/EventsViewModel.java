@@ -46,6 +46,7 @@ public class EventsViewModel extends ViewModel {
         Tournament tournament = TournamentManagerApi.getTournamentFromSharedPref();
 
         if(tournament == null) {
+            System.out.println("Tournament is null");
             return;
         }
 

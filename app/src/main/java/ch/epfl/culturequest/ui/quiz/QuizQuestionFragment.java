@@ -13,6 +13,8 @@ import android.widget.RadioButton;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +62,7 @@ public class QuizQuestionFragment extends Fragment {
 
         binding.progressBar.setProgress(100*questionNumber/ Objects.requireNonNull(quizViewModel.getQuiz().getValue()).getQuestions().size());
 
+        quizViewModel.getImage().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(binding.imageView));
 
        possibleAnswers.add(binding.answer1RadioButton);
        possibleAnswers.add(binding.answer2RadioButton);

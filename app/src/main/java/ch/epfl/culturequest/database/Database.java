@@ -887,8 +887,22 @@ public class Database {
     }
 
     public static void setScoreQuiz(String tournament, String artName, String uid, int score) {
-        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child(artName).child("scores").child(uid);
+        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child("artQuizzes").child(artName).child("scores").child(uid);
         quizRef.setValue(score);
+    }
+
+    public static CompletableFuture<Integer> getScoreQuiz(String tournament, String artName, String uid) {
+        DatabaseReference quizRef = databaseInstance.getReference("tournaments").child(tournament).child("artQuizzes").child(artName).child("scores").child(uid);
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        quizRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                System.out.println("Score: " + task.getResult().getValue(Integer.class));
+                future.complete(task.getResult().getValue(Integer.class));
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
+        return future;
     }
 
     public static CompletableFuture<String> getImageForArt(String artwork){
