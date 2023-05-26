@@ -1,7 +1,12 @@
 package ch.epfl.culturequest.ui.events;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -43,6 +48,9 @@ public class EventsViewModel extends ViewModel {
     }
 
     public void refreshTournamentsEvents() {
+
+
+
         Tournament tournament = TournamentManagerApi.getTournamentFromSharedPref();
 
         if(tournament == null) {

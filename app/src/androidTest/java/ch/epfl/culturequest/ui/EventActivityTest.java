@@ -8,6 +8,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -23,6 +24,7 @@ import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
 import ch.epfl.culturequest.backend.map_collection.OTMLocation;
+import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
@@ -52,6 +54,7 @@ public class EventActivityTest {
         Database.setSightseeingEvent(new SightseeingEvent(activeProfile, List.of(activeProfile), List.of(new OTMLocation("Museum", new OTMLatLng(10, 10), "Museum"))));
         Database.setSightseeingEvent(new SightseeingEvent(activeProfile, List.of(activeProfile, friendProfile), List.of(new OTMLocation("Museum 2", new OTMLatLng(10, 10), "Museum 2"))));
 
+        TournamentManagerApi.handleTournaments(ApplicationProvider.getApplicationContext());
         ActivityScenario<EventsActivity> testRule = ActivityScenario.launch(EventsActivity.class);
 
         Thread.sleep(5000);
