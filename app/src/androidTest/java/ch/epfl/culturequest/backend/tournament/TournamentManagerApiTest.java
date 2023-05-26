@@ -53,7 +53,6 @@ public class TournamentManagerApiTest {
         // clear the database before starting the following tests
         Database.clearDatabase();
 
-
         unlockTournamentGeneration().join();
         indicateTournamentNotGenerated().join();
     }

@@ -13,6 +13,7 @@ import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.databinding.ActivityTournamentBinding;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.leaderboard.LeaderboardRecycleViewAdapter;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class TournamentActivity extends AppCompatActivity {
