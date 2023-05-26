@@ -127,9 +127,13 @@ public class PushNotification {
                 intent.putExtra("redirect", "profile");
                 break;
             // case TournamentNotification.CHANNEL_ID:
-                // TODO: open the tournament activity
+//                   intent = new Intent(holder.itemView.getContext(), EventActivity.class);
+//                   intent.putExtra("redirect", "tournament");
+//                   break;
             // case SightseeingNotification.CHANNEL_ID:
-                //TODO: open the sightseeing activity
+//                    intent = new Intent(holder.itemView.getContext(), EventActivity.class);
+//                    intent.putExtra("redirect", "sightseeing");
+//                    break;
             // opens the scan fragment
             default:
                 intent = new Intent(context, NavigationActivity.class);

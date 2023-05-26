@@ -14,6 +14,7 @@ import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.ArtRecognition;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.exceptions.OpenAiFailedException;
+import ch.epfl.culturequest.backend.exceptions.RecognitionFailedException;
 import ch.epfl.culturequest.database.Database;
 
 /**
@@ -23,8 +24,6 @@ import ch.epfl.culturequest.database.Database;
  */
 
 public class GeneralDescriptionApi {
-
-    //public static OpenAiService service = new OpenAiService(BuildConfig.OPEN_AI_API_KEY);
 
     private WikipediaDescriptionApi wikipediaDescriptionApi;
     private OpenAiService service;
@@ -36,10 +35,9 @@ public class GeneralDescriptionApi {
         this.service = openAiService;
     }
 
-
+    private BasicArtDescription savedWikipediaDescription;
 
     enum RecoveryState {
-
         PartialRecovery,
         FullRecovery,
     }
@@ -47,16 +45,22 @@ public class GeneralDescriptionApi {
     public CompletableFuture<BasicArtDescription> getArtDescription(ArtRecognition recognizedArt) {
 
         return wikipediaDescriptionApi.getArtDescription(recognizedArt)
-                .thenCompose(basicArtDescription -> recoverPotentialMissesAndGetScore(basicArtDescription, recognizedArt, RecoveryState.PartialRecovery)) // Wikipedia didn't fail so it either provided a full description or an incomplete one
+                .thenCompose(basicArtDescription -> {
+                        savedWikipediaDescription = basicArtDescription; // We save it in case of subsequent Open AI failure
+                        return recoverPotentialMissesAndGetScore(basicArtDescription, recognizedArt, RecoveryState.PartialRecovery, 1); // Wikipedia didn't fail so it either provided a full description or an incomplete one
+                    })
                 .handle((filledArtDescription, e) -> {
-                    if (e != null && !openAiFullRecoveryFailed(e)){                    // if Wikipedia fails, we attempt a full recover with OpenAi
-                        BasicArtDescription emptyArtDescription = new BasicArtDescription();
-                        initializeDescriptionByRecognition(emptyArtDescription, recognizedArt); // initialize the description with the data we already have
-                        return recoverPotentialMissesAndGetScore(emptyArtDescription, recognizedArt, RecoveryState.FullRecovery);
-                    }
+                    if (e != null) {  // Wikipedia or Open AI error
 
-                    else if( e != null && openAiFullRecoveryFailed(e)){ // if both Wikipedia fails and OpenAi fails, we throw an exception leading to an error message
-                        throw new CompletionException(new OpenAiFailedException("OpenAi failed to complete recovery of the missing data"));
+                       // If Open Ai failed and we are in a partial recovery state (since Wikipedia didn't fail), we attempt a second partial recovery with Open AI
+                       if(openAiFullRecoveryFailed(e) && savedWikipediaDescription != null){
+                           return recoverPotentialMissesAndGetScore(savedWikipediaDescription, recognizedArt, RecoveryState.PartialRecovery, 2);
+                       }
+
+                       // if Wikipedia completely fails, we attempt a full recover with OpenAi
+                       BasicArtDescription emptyArtDescription = new BasicArtDescription();
+                       initializeDescriptionByRecognition(emptyArtDescription, recognizedArt); // initialize the description with the data we already have
+                       return recoverPotentialMissesAndGetScore(emptyArtDescription, recognizedArt, RecoveryState.FullRecovery, 2);
                     }
 
                     Database.setArtwork(filledArtDescription);
@@ -64,7 +68,7 @@ public class GeneralDescriptionApi {
                 }).thenCompose(Function.identity());
     }
 
-    private CompletableFuture<BasicArtDescription> recoverPotentialMissesAndGetScore(BasicArtDescription incompleteDescription, ArtRecognition recognizedArt, RecoveryState recoveryState) {
+    private CompletableFuture<BasicArtDescription> recoverPotentialMissesAndGetScore(BasicArtDescription incompleteDescription, ArtRecognition recognizedArt, RecoveryState recoveryState, int tryCount) {
 
         OpenAIDescriptionApi openAIDescriptionApi = new OpenAIDescriptionApi(service);
         CompletableFuture<Integer> score = openAIDescriptionApi.getScore(recognizedArt);
@@ -112,10 +116,10 @@ public class GeneralDescriptionApi {
 
                 })
                 .exceptionally(e -> {
-                    if (recoveryState == RecoveryState.FullRecovery) {
-                        // Exception coming from statement: else if( e != null && openAiFullRecoveryFailed(e)){
-                        // if both Wikipedia fails and OpenAi fails, we throw an exception leading to an error message
-                        throw new CompletionException(new OpenAiFailedException("OpenAI failed to fully recover the missing data"));
+                    if (tryCount == 2) {
+
+                        // if both Wikipedia fails and OpenAi fails or Open AI failed two times in a row, we throw an exception leading to a displayed error message in the app
+                        throw new CompletionException(new OpenAiFailedException("OpenAI failed to fully recover the missing data")); // forward the exception to Processing API
                     }
                     else {  // Partial recovery
                         incompleteDescription.setScore(DEFAULT_SCORE);
