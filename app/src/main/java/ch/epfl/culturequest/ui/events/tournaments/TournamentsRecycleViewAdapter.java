@@ -36,7 +36,7 @@ public class TournamentsRecycleViewAdapter extends RecyclerView.Adapter<Tourname
 
     @Override
     public void onBindViewHolder(@NonNull TournamentViewHolder holder, int position) {
-        holder.getTournamentName().setText("Quizz of the week");
+        holder.getTournamentName().setText("Quiz of the week");
         holder.getTournamentStatus().setText("Status: In progress");
 
         holder.itemView.setOnClickListener(view -> {

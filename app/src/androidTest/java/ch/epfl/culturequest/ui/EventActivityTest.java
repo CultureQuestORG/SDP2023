@@ -73,5 +73,15 @@ public class EventActivityTest {
 
     }
 
+    @Test
+    public void TournamentEventsRightDisplay() {
+        onView(withId(R.id.tournaments_button)).perform(click());
+        onView(withId(R.id.events_recycler_view)).perform(RecyclerViewActions.scrollToPosition(0));
+
+        onView(withText("Quiz of the week")).check(matches(isEnabled()));
+        onView(withText("Quiz of the week")).perform(click());
+
+    }
+
 
 }
