@@ -17,6 +17,8 @@ public class FailingWikipediaDescriptionApi extends WikipediaDescriptionApi {
     @Override
         public CompletableFuture<BasicArtDescription> getArtDescription(ArtRecognition artRecognition) {
 
-            return CompletableFuture.failedFuture(new WikipediaDescriptionFailedException("Wikipedia miserably failed... Encore un coup de Macron"));
+            CompletableFuture<BasicArtDescription> completableFuture = new CompletableFuture<>();
+            completableFuture.completeExceptionally(new CompletionException(new WikipediaDescriptionFailedException("Wikipedia description failed.")));
+            return completableFuture;
         }
 }

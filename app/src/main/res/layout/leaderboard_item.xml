@@ -1,57 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="100dp">
+    android:layout_height="wrap_content">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="20dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/user_profile_picture"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/basic_profile_picture"/>
+            android:src="@drawable/basic_profile_picture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/username"
-            android:layout_width="140dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/user_profile_picture"
-            android:layout_alignStart="@+id/user_profile_picture"
-            android:layout_marginTop="5dp"
-            android:textSize="18sp" />
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toStartOf="@+id/user_score"
+            app:layout_constraintStart_toStartOf="@+id/user_profile_picture"
+            app:layout_constraintTop_toBottomOf="@+id/user_profile_picture" />
 
         <ImageView
             android:id="@+id/trophy_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginTop="5dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/trophee" />
+            android:src="@drawable/trophee"
+            app:layout_constraintBottom_toBottomOf="@+id/user_profile_picture"
+            app:layout_constraintEnd_toStartOf="@+id/leaderboard_icon"
+            app:layout_constraintStart_toEndOf="@+id/user_profile_picture"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/user_score"
-            android:layout_width="40dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/trophy_icon"
             android:layout_alignStart="@+id/trophy_icon"
-            android:layout_marginTop="10dp"
+            android:layout_alignEnd="@+id/trophy_icon"
             android:textAlignment="center"
-            android:textSize="18sp" />
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/trophy_icon"
+            app:layout_constraintStart_toStartOf="@+id/trophy_icon"
+            app:layout_constraintTop_toTopOf="@+id/username" />
 
         <ImageView
             android:id="@+id/leaderboard_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginTop="5dp"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="20dp"
-            android:src="@drawable/leaderboard_icon_unsel" />
+            android:src="@drawable/leaderboard_icon_unsel"
+            app:layout_constraintBottom_toBottomOf="@+id/user_profile_picture"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/user_rank"
@@ -59,10 +73,13 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/leaderboard_icon"
             android:layout_alignStart="@+id/leaderboard_icon"
-            android:layout_marginTop="10dp"
             android:textAlignment="center"
-            android:textSize="18sp" />
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/leaderboard_icon"
+            app:layout_constraintTop_toTopOf="@+id/username" />
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>

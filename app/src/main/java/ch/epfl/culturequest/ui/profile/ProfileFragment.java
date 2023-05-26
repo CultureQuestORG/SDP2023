@@ -16,6 +16,8 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
@@ -76,15 +78,28 @@ public class ProfileFragment extends Fragment {
         });
         //handle the score
         profileViewModel.getScore().observe(getViewLifecycleOwner(), s -> ProfileUtils.handleScore(level, levelText, progressBar, s));
+
         // set the onClickListener for the settings button
         settingsButton.setOnClickListener(this::goToSettings);
+        profilePicture.setOnClickListener(this::goToSettings);
 
-        progressBar.setOnClickListener(v -> {
+        // set the onClickListener for badges
+        View.OnClickListener badgesListener = v -> {
             // open the badges activity
             Intent intent = new Intent(getActivity(), DisplayUserBadgeCollectionActivity.class);
             intent.putExtra("uid", Profile.getActiveProfile().getUid());
             startActivity(intent);
-        });
+        };
+
+        progressBar.setOnClickListener(badgesListener);
+        levelText.setOnClickListener(badgesListener);
+        level.setOnClickListener(badgesListener);
+
+        ConstraintLayout constraintLayout = binding.getRoot();
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(constraintLayout);
+        constraintSet.connect(binding.pictureGrid.getId(),ConstraintSet.TOP, binding.progressBar.getId(),ConstraintSet.BOTTOM,50);
+        constraintSet.applyTo(constraintLayout);
 
         requestPermissions();
         return root;
