@@ -11,7 +11,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="60dp"
         android:elevation="2dp"
         android:onClick="goBack"
         android:src="@drawable/back_button"
@@ -22,15 +22,15 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginStart="30dp"
         android:fontFamily="@font/poppins_bold"
         android:text="Settings"
         android:textColor="@color/colorPrimary"
         android:textSize="28sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/back_button2"
         app:layout_constraintStart_toEndOf="@+id/back_button2"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/back_button2" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_picture"
