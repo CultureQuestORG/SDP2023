@@ -127,20 +127,19 @@ public class PushNotification {
                 intent = new Intent(context, NavigationActivity.class);
                 intent.putExtra("redirect", "profile");
                 break;
-             case TournamentNotification.CHANNEL_ID:
-                   intent = new Intent(context, EventsActivity.class);
-                   intent.putExtra("redirect", "tournament");
-                   break;
-             case SightseeingNotification.CHANNEL_ID:
-                    intent = new Intent(context, EventsActivity.class);
-                    intent.putExtra("redirect", "sightseeing");
-                    break;
+            case TournamentNotification.CHANNEL_ID:
+                intent = new Intent(context, EventsActivity.class);
+                intent.putExtra("redirect", "tournament");
+                break;
+            case SightseeingNotification.CHANNEL_ID:
+                intent = new Intent(context, EventsActivity.class);
+                intent.putExtra("redirect", "sightseeing");
+                break;
             default:
                 intent = new Intent(context, NavigationActivity.class);
                 break;
         }
 
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return PendingIntent.getActivity(context, notificationId.hashCode(), intent, PendingIntent.FLAG_MUTABLE);
     }
 

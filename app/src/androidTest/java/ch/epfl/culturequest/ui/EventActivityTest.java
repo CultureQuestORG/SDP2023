@@ -44,6 +44,7 @@ public class EventActivityTest {
         ArrayList<String> myFriendsIds = new ArrayList<>();
         myFriendsIds.add("friendID");
 
+        Authenticator.setEmulatorOn();
         Authenticator.manualSignUp("test@gmail.com", "abcdefg");
         Authenticator.manualSignIn("test@gmail.com", "abcdefg");
 

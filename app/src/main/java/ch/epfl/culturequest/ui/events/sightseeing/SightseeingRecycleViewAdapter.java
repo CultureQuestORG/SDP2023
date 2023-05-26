@@ -72,7 +72,7 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
             holder.itemView.getContext().startActivity(intent);
         });
 
-        if(sightseeingEvents.get(position).getOwner().getUid().equals(Profile.getActiveProfile().getUid())) {
+        if(sightseeingEvents.get(position).getOwner().getUid().equals(Authenticator.getCurrentUser().getUid())) {
             holder.getDeleteButton().setVisibility(View.VISIBLE);
             holder.getDeleteButton().setOnClickListener(view -> {
                 Database.deleteSightseeingEvent(Authenticator.getCurrentUser().getUid(), sightseeingEvents.get(position).getEventId()).whenComplete((aVoid, throwable) -> {

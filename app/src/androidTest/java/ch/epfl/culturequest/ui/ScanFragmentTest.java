@@ -32,6 +32,7 @@ import org.junit.runner.RunWith;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.storage.FireStorage;
 import ch.epfl.culturequest.storage.LocalStorage;
 import ch.epfl.culturequest.ui.scan.ScanFragment;
@@ -49,6 +50,12 @@ public class ScanFragmentTest {
 
     @Before
     public void setup() throws InterruptedException {
+        // Set up the database to run on the local emulator of Firebase
+        Database.setEmulatorOn();
+
+        // clear the database before starting the following tests
+        Database.clearDatabase();
+
         // Set up the online storage to run on the local emulator of Firebase
         FireStorage.setEmulatorOn();
 

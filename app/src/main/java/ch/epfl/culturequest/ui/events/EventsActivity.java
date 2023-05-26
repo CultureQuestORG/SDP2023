@@ -16,7 +16,9 @@ import java.util.Objects;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivityEventsBinding;
+import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.ui.events.sightseeing.SightseeingRecycleViewAdapter;
 import ch.epfl.culturequest.ui.events.tournaments.TournamentsRecycleViewAdapter;
 import ch.epfl.culturequest.utils.AndroidUtils;
@@ -62,8 +64,23 @@ public class EventsActivity extends AppCompatActivity {
         eventsRecyclerView.setAdapter(sightseeingRecycleViewAdapter);
         eventsRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-        // allows to redirect to the correct listview after an intent with redirection
+
         String redirect = getIntent().getStringExtra("redirect");
+        if (redirect != null) {
+            if (Profile.getActiveProfile() != null) {
+                redirectToCorrectActivity(redirect);
+            } else {
+                Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, throwable) -> {
+                    if (throwable != null || profile == null) return;
+                    Profile.setActiveProfile(profile);
+                    redirectToCorrectActivity(redirect);
+                });
+            }
+        }
+    }
+
+    // allows to redirect to the correct listview after an intent with redirection
+    private void redirectToCorrectActivity(String redirect) {
         if (Objects.equals(redirect, "sightseeing")) {
             displaySigthseeing(binding.getRoot());
         }
@@ -73,7 +90,7 @@ public class EventsActivity extends AppCompatActivity {
     }
 
     private void swapColors() {
-        if (Boolean.TRUE.equals(searchingForUsers.getValue())){
+        if (Boolean.TRUE.equals(searchingForUsers.getValue())) {
             sightseeingButton.setBackgroundResource(R.drawable.rounded_button);
             sightseeingButton.setTextColor(getResources().getColor(R.color.white, null));
             tournamentsButton.setBackgroundResource(R.drawable.rounded_button_transparent);
@@ -90,6 +107,7 @@ public class EventsActivity extends AppCompatActivity {
 
     /**
      * When we click on the button sightseeing, we want to display the sightseeing events
+     *
      * @param v the view
      */
     public void displaySigthseeing(View v) {
@@ -99,6 +117,7 @@ public class EventsActivity extends AppCompatActivity {
 
     /**
      * When we click on the button tournaments, we want to display the tournaments
+     *
      * @param v the view
      */
     public void displayTournaments(View v) {
