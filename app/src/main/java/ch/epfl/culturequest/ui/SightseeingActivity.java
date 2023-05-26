@@ -124,7 +124,7 @@ public class SightseeingActivity extends AppCompatActivity {
                         List<Profile> selectedFriends = profiles.stream().filter(profile -> usernamesSelected.contains(profile.getUsername())).collect(Collectors.toList());
                         SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces);
                         Database.setSightseeingEvent(newEvent);
-                        CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v);
+                        CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v, (Void) -> null);
                         // send out notifications to the selected friends
                         for (Profile profile : selectedFriends) {
                             SightseeingNotification notification = new SightseeingNotification(profile.getUsername());

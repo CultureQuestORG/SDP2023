@@ -131,10 +131,11 @@ public class ScanFragment extends Fragment {
                                             drawableId = R.drawable.unknown_error;
                                         }
 
-                                        View rootView = requireActivity().findViewById(android.R.id.content);
-                                        CustomSnackbar.showCustomSnackbar(errorMessage, drawableId, rootView);
+                                        CustomSnackbar.showCustomSnackbar(errorMessage, drawableId, binding.getRoot(), (n) -> {
+                                            scanningLayout.setVisibility(View.GONE);
+                                            return null;
+                                        });
 
-                                        scanningLayout.setVisibility(View.GONE);
                                         loadingAnimation.stopLoading();
                                         return null;
                                     });
@@ -146,7 +147,7 @@ public class ScanFragment extends Fragment {
                         scanningLayout.setVisibility(View.GONE);
                         loadingAnimation.stopLoading();
                         View rootView = requireActivity().findViewById(android.R.id.content);
-                        CustomSnackbar.showCustomSnackbar("Failed to take picture.", R.drawable.camera_error, rootView);
+                        CustomSnackbar.showCustomSnackbar("Failed to take picture.", R.drawable.camera_error, rootView, (n) -> null);
                         return null;
                     });
                 }

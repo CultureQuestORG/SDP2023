@@ -14,12 +14,14 @@ import androidx.cardview.widget.CardView;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.function.Function;
+
 import ch.epfl.culturequest.R;
 
 public class CustomSnackbar {
 
     public static TextView currentSnackbarText;
-    public static void showCustomSnackbar(String message, int imageResourceName, View rootView) {
+    public static void showCustomSnackbar(String message, int imageResourceName, View rootView, Function<Void, Void> callback) {
 
         // Inflate custom Snackbar layout
         LayoutInflater inflater = LayoutInflater.from(rootView.getContext());
@@ -51,6 +53,7 @@ public class CustomSnackbar {
         snackbarLayout.setPadding(0, 0, 0, 200); // Remove the default padding
         snackbarLayout.setBackgroundColor(Color.TRANSPARENT); // Make the background transparent
         snackbarLayout.addView(customView, 0);
+        snackbarLayout.setZ(100);
 
         // Custom enter and exit animations
         snackbarLayout.setAnimation(AnimationUtils.loadAnimation(rootView.getContext(), R.anim.snackbar_enter));
@@ -58,6 +61,7 @@ public class CustomSnackbar {
             @Override
             public void onDismissed(Snackbar transientBottomBar, int event) {
                 snackbarLayout.setAnimation(AnimationUtils.loadAnimation(rootView.getContext(), R.anim.snackbar_exit));
+                callback.apply(null);
                 super.onDismissed(transientBottomBar, event);
             }
         });

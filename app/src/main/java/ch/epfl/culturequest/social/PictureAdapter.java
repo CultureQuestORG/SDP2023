@@ -240,7 +240,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                     Database.removePost(post);
                     FireStorage.deleteImage(post.getImageUrl());
                     View rootView = v.getRootView();
-                    CustomSnackbar.showCustomSnackbar("Post deleted successfully", R.drawable.image_recognition_error, rootView);
+                    CustomSnackbar.showCustomSnackbar("Post deleted successfully", R.drawable.image_recognition_error, rootView, (Void) -> null);
                 })
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
         dial.show();
