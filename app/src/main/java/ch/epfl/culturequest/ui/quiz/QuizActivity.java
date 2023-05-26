@@ -3,6 +3,7 @@ package ch.epfl.culturequest.ui.quiz;
 
 
 import android.os.Bundle;
+import android.view.View;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -124,5 +125,12 @@ public class QuizActivity extends AppCompatActivity {
                 .commit();
         return fragment;
 
+    }
+
+    /**
+     * Returns to the previous activity
+     */
+    public void goBack(View view) {
+        onBackPressed();
     }
 }
