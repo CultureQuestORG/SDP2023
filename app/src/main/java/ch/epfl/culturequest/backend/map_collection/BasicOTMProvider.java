@@ -1,16 +1,11 @@
 package ch.epfl.culturequest.backend.map_collection;
 
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import net.bytebuddy.description.method.MethodDescription;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -18,7 +13,6 @@ import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.utils.City;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -65,9 +59,10 @@ public class BasicOTMProvider implements OTMProvider {
     }
 
     private OTMFetchInterface getOTMFetchService(){
+        Gson gson = new GsonBuilder().registerTypeAdapter(new TypeToken<List<OTMLocation>>(){}.getType(), new OTMLocationDeserializer()).create();
         Retrofit req = new Retrofit.Builder()
                 .baseUrl(base_url)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         return req.create(OTMFetchInterface.class);
     }

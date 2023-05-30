@@ -36,12 +36,6 @@ public class OTMLocationTest {
         assertThrows(IllegalArgumentException.class, () -> new OTMLocation("name", new OTMLatLng(0.,0.), ""));
     }
 
-    // Test that the constructor puts the name to the kinds if the name is empty
-    @Test
-    public void testConstructorPutsNameToKindsIfNameIsEmpty() {
-        OTMLocation location = new OTMLocation("", new OTMLatLng(0.,0.), "tag1,tag2");
-        assertThat(location.getName(), is("tag1,tag2"));
-    }
 
     // Test if coordinates are correctly set
     @Test

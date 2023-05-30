@@ -45,6 +45,7 @@ import com.squareup.picasso.Target;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
@@ -176,7 +177,7 @@ public class MapsFragment extends Fragment {
         Location.distanceBetween(latestLocation.latitude, latestLocation.longitude, viewModel.getCenterOfLocations().latitude, viewModel.getCenterOfLocations().longitude, distance);
 
         if (viewModel.getLocations() != null && distance[0] < 1000) {
-            places = CompletableFuture.completedFuture(viewModel.getLocations());
+            places = CompletableFuture.completedFuture(viewModel.getLocations().stream().filter(otmLocation -> otmLocation.getName()!=null).collect(Collectors.toList()));
         } else {
             mMap.clear();
             drawPositionMarker(latestLocation);
@@ -326,7 +327,7 @@ public class MapsFragment extends Fragment {
          */
         try {
             if (viewModel.isLocationPermissionGranted()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     locationRequest = new LocationRequest.Builder(10000).build();
                 }
                 LocationCallback locationCallback = new LocationCallback() {

@@ -29,7 +29,7 @@ public class SightseeingEventTest {
         OTMLocation location2 = new OTMLocation("name2", new OTMLatLng(1, 1), "arts,museums,architecture");
         OTMLocation location3 = new OTMLocation("name3", new OTMLatLng(2, 2), "arts,museums,architecture");
         locations = List.of(location1, location2, location3);
-        event = new SightseeingEvent(owner, invited, locations);
+        event = new SightseeingEvent(owner, invited, locations, "paris");
 
     }
 
@@ -56,7 +56,7 @@ public class SightseeingEventTest {
 
     @Test
     public void throwsExceptionsWithWrongArgs(){
-        assertThrows(IllegalArgumentException.class, () -> new SightseeingEvent(null, invited, locations));
+        assertThrows(IllegalArgumentException.class, () -> new SightseeingEvent(null, invited, locations, ""));
     }
 
     @Test

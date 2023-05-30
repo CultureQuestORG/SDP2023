@@ -11,8 +11,7 @@ public class SightseeingEvent {
     private Profile owner;
     private List<Profile> invited;
     private List<OTMLocation> locations;
-
-    private String eventId;
+    private String eventId, city;
 
     /**
      * This private constructor takes an event id which is generated with the public constructor
@@ -21,12 +20,13 @@ public class SightseeingEvent {
      * @param invited the friends that have been invited
      * @param locations the places ppl are invited to visit with the owner of the event
      */
-    private SightseeingEvent(String eventId, Profile owner, List<Profile> invited, List<OTMLocation> locations) {
+    private SightseeingEvent(String eventId, Profile owner, List<Profile> invited, List<OTMLocation> locations, String city) {
         if (owner == null) throw new IllegalArgumentException();
         this.owner = owner;
         this.invited = invited;
         this.locations = locations;
         this.eventId = eventId;
+        this.city = city;
     }
 
     /**
@@ -35,12 +35,12 @@ public class SightseeingEvent {
      * @param invited the friends that have been invited
      * @param locations the places ppl are invited to visit with the owner of the event
      */
-    public SightseeingEvent(Profile owner, List<Profile> invited, List<OTMLocation> locations) {
-        this(UUID.randomUUID().toString(), owner, invited, locations);
+    public SightseeingEvent(Profile owner, List<Profile> invited, List<OTMLocation> locations, String city) {
+        this(UUID.randomUUID().toString(), owner, invited, locations, city);
     }
 
     public SightseeingEvent(){
-        this(UUID.randomUUID().toString(), new Profile(), List.of(), List.of());
+        this(UUID.randomUUID().toString(), new Profile(), List.of(), List.of(), "");
     }
 
     /**
@@ -68,6 +68,10 @@ public class SightseeingEvent {
         return locations;
     }
 
+    public String getCity() {
+        return city;
+    }
+
     /**
      * Returns the event id of the given event
      * @return the event id
@@ -91,5 +95,9 @@ public class SightseeingEvent {
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }
