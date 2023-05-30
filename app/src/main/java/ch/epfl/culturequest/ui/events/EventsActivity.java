@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.ui.events;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.List;
 import java.util.Objects;
 
+import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
@@ -47,7 +49,6 @@ public class EventsActivity extends AppCompatActivity {
     private RecyclerView eventsRecyclerView;
     private SightseeingRecycleViewAdapter sightseeingRecycleViewAdapter;
     private TournamentsRecycleViewAdapter tournamentsRecycleViewAdapter;
-
     private static View mapFragmentView;
     private static SupportMapFragment mapFragment;
 
@@ -55,6 +56,10 @@ public class EventsActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Authenticator.checkIfUserIsLoggedIn(this);
+
+        binding = ActivityEventsBinding.inflate(getLayoutInflater());
+        AndroidUtils.removeStatusBar(getWindow());
+        setContentView(binding.getRoot());
 
         if (Profile.getActiveProfile() != null) {
             setupActivity();
@@ -69,10 +74,6 @@ public class EventsActivity extends AppCompatActivity {
 
     // Setup EventsActivity
     private void setupActivity() {
-        binding = ActivityEventsBinding.inflate(getLayoutInflater());
-        AndroidUtils.removeStatusBar(getWindow());
-        setContentView(binding.getRoot());
-
         sightseeingButton = binding.sightseeingButton;
         sightseeingButton.setOnClickListener(this::displaySigthseeing);
 
@@ -155,7 +156,9 @@ public class EventsActivity extends AppCompatActivity {
         if (mapFragmentView.getVisibility() == View.VISIBLE) {
             mapFragmentView.setVisibility(View.INVISIBLE);
         } else {
-            super.onBackPressed();
+            Intent intent = new Intent(this, NavigationActivity.class);
+            intent.putExtra("redirect", "home");
+            startActivity(intent);
         }
     }
 
