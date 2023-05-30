@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -26,7 +25,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
@@ -38,6 +36,7 @@ import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.notifications.SightseeingNotification;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
+import ch.epfl.culturequest.ui.events.EventsActivity;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.SightSeeingArrayAdapter;
@@ -108,9 +107,10 @@ public class SightseeingActivity extends AppCompatActivity {
     /**
      * In this function, we map the users friends to their profiles to display users usernames.
      * We also use this to send out notifications to particular profiles and to create a new event
+     *
      * @param selectedPlaces the list of selected places
      */
-    private void handleFriendsLogic(List<OTMLocation> selectedPlaces){
+    private void handleFriendsLogic(List<OTMLocation> selectedPlaces) {
         Profile.getActiveProfile().retrieveFriends()
                 .thenApply(friends -> friends.stream().map(Database::getProfile).collect(Collectors.toList()))
                 .thenCompose(futures -> CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
@@ -133,7 +133,7 @@ public class SightseeingActivity extends AppCompatActivity {
                         CompletableFuture.runAsync(() -> {
                             //we do this to wait for the snackbar to be visible for 1 second before going back to the nav activity.
                             SystemClock.sleep(1000);
-                            AndroidUtils.redirectToActivity(this, NavigationActivity.class);
+                            AndroidUtils.redirectToActivity(this, EventsActivity.class);
                         });
                     });
                 });

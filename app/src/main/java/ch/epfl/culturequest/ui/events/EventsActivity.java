@@ -54,9 +54,21 @@ public class EventsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Authenticator.checkIfUserIsLoggedIn(this);
 
+        if (Profile.getActiveProfile() != null) {
+            setupActivity();
+        } else {
+            Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, throwable) -> {
+                if (throwable != null || profile == null) return;
+                Profile.setActiveProfile(profile);
+                setupActivity();
+            });
+        }
+    }
+
+    // Setup EventsActivity
+    private void setupActivity() {
         binding = ActivityEventsBinding.inflate(getLayoutInflater());
         AndroidUtils.removeStatusBar(getWindow());
         setContentView(binding.getRoot());
@@ -80,23 +92,7 @@ public class EventsActivity extends AppCompatActivity {
         eventsRecyclerView.setAdapter(sightseeingRecycleViewAdapter);
         eventsRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-
         String redirect = getIntent().getStringExtra("redirect");
-        if (redirect != null) {
-            if (Profile.getActiveProfile() != null) {
-                redirectToCorrectActivity(redirect);
-            } else {
-                Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, throwable) -> {
-                    if (throwable != null || profile == null) return;
-                    Profile.setActiveProfile(profile);
-                    redirectToCorrectActivity(redirect);
-                });
-            }
-        }
-    }
-
-    // allows to redirect to the correct listview after an intent with redirection
-    private void redirectToCorrectActivity(String redirect) {
         if (Objects.equals(redirect, "sightseeing")) {
             displaySigthseeing(binding.getRoot());
         }
@@ -127,7 +123,7 @@ public class EventsActivity extends AppCompatActivity {
      * @param v the view
      */
     public void displaySigthseeing(View v) {
-        if (mapFragmentView.getVisibility() == View.VISIBLE){
+        if (mapFragmentView.getVisibility() == View.VISIBLE) {
             mapFragmentView.setVisibility(View.INVISIBLE);
         }
         searchingForUsers.setValue(true);
@@ -140,7 +136,7 @@ public class EventsActivity extends AppCompatActivity {
      * @param v the view
      */
     public void displayTournaments(View v) {
-        if (mapFragmentView.getVisibility() == View.VISIBLE){
+        if (mapFragmentView.getVisibility() == View.VISIBLE) {
             mapFragmentView.setVisibility(View.INVISIBLE);
         }
         searchingForUsers.setValue(false);
@@ -153,9 +149,10 @@ public class EventsActivity extends AppCompatActivity {
     public void goBack(View view) {
         onBackPressed();
     }
+
     @Override
-    public void onBackPressed(){
-        if (mapFragmentView.getVisibility() == View.VISIBLE){
+    public void onBackPressed() {
+        if (mapFragmentView.getVisibility() == View.VISIBLE) {
             mapFragmentView.setVisibility(View.INVISIBLE);
         } else {
             super.onBackPressed();

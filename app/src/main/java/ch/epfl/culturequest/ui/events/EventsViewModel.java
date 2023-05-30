@@ -1,19 +1,14 @@
 package ch.epfl.culturequest.ui.events;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.gson.Gson;
-
 import java.util.List;
 
+import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
 
 public class EventsViewModel extends ViewModel {
@@ -33,7 +28,7 @@ public class EventsViewModel extends ViewModel {
     }
 
     public void refreshSightseeingEvents() {
-        Database.getSightseeingEvents(Profile.getActiveProfile().getUid()).whenComplete((events, throwable) -> {
+        Database.getSightseeingEvents(Authenticator.getCurrentUser().getUid()).whenComplete((events, throwable) -> {
             if (throwable != null) {
                 throwable.printStackTrace();
                 return;
@@ -50,10 +45,9 @@ public class EventsViewModel extends ViewModel {
     public void refreshTournamentsEvents() {
 
 
-
         Tournament tournament = TournamentManagerApi.getTournamentFromSharedPref();
 
-        if(tournament == null) {
+        if (tournament == null) {
             System.out.println("Tournament is null");
             return;
         }
