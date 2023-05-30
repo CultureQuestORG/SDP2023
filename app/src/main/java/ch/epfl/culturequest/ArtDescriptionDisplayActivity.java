@@ -271,7 +271,9 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
                         POSTS_ADDED++;
                         activeProfile.incrementScore(artwork.getScore());
                         activeProfile.addBadges(badges);
-                        finish();
+                        Intent intent = new Intent(this, NavigationActivity.class);
+                        intent.putExtra("redirect", "profile");
+                        startActivity(intent);
                     } else {
                         e.printStackTrace();
                     }
@@ -296,10 +298,12 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 POSTS_ADDED++;
+                Intent intent = new Intent(this, NavigationActivity.class);
+                intent.putExtra("redirect", "profile");
+                startActivity(intent);
                 return null;
             });
             dialog.cancel();
-            finish();
         });
         builder.setNegativeButton("Cancel", (dialog, id) -> {
             dialog.dismiss();
