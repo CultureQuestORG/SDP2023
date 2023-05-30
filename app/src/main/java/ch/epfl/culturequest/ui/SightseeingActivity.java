@@ -67,7 +67,7 @@ public class SightseeingActivity extends AppCompatActivity {
         inviteFriends = binding.inviteFriends;
         preview = binding.preview;
         backButton = binding.backButton;
-        mapFragment = binding.mapFragment;
+        mapFragment = binding.mapFragmentSightseeing;
         backButton.setOnClickListener(l -> onBackPressed());
         Map<String, OTMLocation> placeToLocation = getIntent().getStringArrayListExtra("locations").stream().map(OTMLocationSerializer::deserialize)
                 .collect(Collectors.toMap(OTMLocation::getName, location -> location, (existing, newValue) -> existing));
@@ -122,7 +122,7 @@ public class SightseeingActivity extends AppCompatActivity {
                     inviteFriends.setOnClickListener(v -> {
                         List<String> usernamesSelected = adapter.getSelected();
                         List<Profile> selectedFriends = profiles.stream().filter(profile -> usernamesSelected.contains(profile.getUsername())).collect(Collectors.toList());
-                        SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces);
+                        SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces, getIntent().getStringExtra("city").split(",")[0]);
                         Database.setSightseeingEvent(newEvent);
                         CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v, (Void) -> null);
                         // send out notifications to the selected friends
@@ -149,26 +149,19 @@ public class SightseeingActivity extends AppCompatActivity {
     private void openMap(Map<String, OTMLocation> placeToLocation, List<String> selected) {
         Map<String, OTMLocation> selectedPlaces = placeToLocation.entrySet().stream().filter(entry -> selected.contains(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         mapFragment.setVisibility(View.VISIBLE);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment_sightseeing);
         mapFragment.getMapAsync(googleMap -> {
+            googleMap.clear();
             googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.maps_style_json_alternative));
-            backButton.setOnClickListener(l2 -> {
-                googleMap.clear();
-                onBackPressed();
-            });
-            for (OTMLocation location : selectedPlaces.values()) {
-                OTMLatLng coord = location.getCoordinates();
-                LatLng mapCoord = new LatLng(coord.getLat(), coord.getLon());
-                MarkerOptions markerOptions = new MarkerOptions().position(mapCoord).title(location.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-                googleMap.addMarker(markerOptions);
-            }
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (OTMLocation location : selectedPlaces.values()) {
                 OTMLatLng coord = location.getCoordinates();
-                builder.include(new LatLng(coord.getLat(), coord.getLon()));
+                LatLng mapCoord = new LatLng(coord.getLat(), coord.getLon());
+                builder.include(mapCoord);
+                MarkerOptions markerOptions = new MarkerOptions().position(mapCoord).title(location.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                googleMap.addMarker(markerOptions);
             }
-            LatLngBounds bounds = builder.build();
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 150));
         });
     }
 }

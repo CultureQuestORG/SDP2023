@@ -11,27 +11,27 @@ import java.util.List;
  * Represents a location on the map
  */
 public final class OTMLocation {
-    private final String name;
-    private final OTMLatLng point;
-    private final String kinds;
+    private String name;
+    private OTMLatLng coordinates;
+    private String kinds;
     private List<String> kindsList;
 
-    public OTMLocation(String name, OTMLatLng point, String kinds) {
-        if(point == null){
+    public OTMLocation(String name, OTMLatLng coordinates, String kinds) {
+        if(coordinates == null){
             throw new IllegalArgumentException("Coordinates cannot be null");
         }
         if(kinds.length() == 0){
             throw new IllegalArgumentException("Tags cannot be empty");
         }
-        this.name = name.isEmpty()? kinds : name;
-        this.point = point;
+        this.name = name;
+        this.coordinates = coordinates;
         this.kinds = kinds;
     }
 
 
     public OTMLocation(){
         this.name = "";
-        this.point = new OTMLatLng();
+        this.coordinates = new OTMLatLng();
         this.kinds = "art";
     }
 
@@ -46,7 +46,7 @@ public final class OTMLocation {
      * @return the coordinates of the location
      */
     public OTMLatLng getCoordinates() {
-        return point;
+        return coordinates;
     }
 
     /**
@@ -64,8 +64,24 @@ public final class OTMLocation {
         return kinds;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCoordinates(OTMLatLng coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public void setKinds(String kinds) {
+        this.kinds = kinds;
+    }
+
+    public void setKindsList(List<String> kindsList) {
+        this.kindsList = kindsList;
+    }
+
     @NonNull
     public String toString(){
-        return "Name: " + name + " Coordinates: " + point + " Tags: " + kinds;
+        return "Name: " + name + " Coordinates: " + coordinates + " Tags: " + kinds;
     }
 }

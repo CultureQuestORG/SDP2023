@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
+import ch.epfl.culturequest.ui.events.EventsActivity;
 import ch.epfl.culturequest.ui.events.EventsViewModel;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 
@@ -42,8 +44,9 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
 
     @Override
     public void onBindViewHolder(@NonNull SightseeingViewHolder holder, int position) {
-        holder.getSightseeingName().setText(sightseeingEvents.get(position).getOwner().getUsername() + "'s sightseeing");
-        List<OTMLocation> locations = sightseeingEvents.get(position).getLocations();
+        SightseeingEvent event = sightseeingEvents.get(position);
+        holder.getSightseeingName().setText(event.getOwner().getUsername() + "'s sightseeing in " + event.getCity());
+        List<OTMLocation> locations = event.getLocations();
         for (OTMLocation location : locations) {
             TextView locationView = new TextView(holder.getLocationsList().getContext());
             locationView.setText(location.getName());
@@ -52,7 +55,8 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
             holder.getLocationsList().addView(locationView);
         }
 
-        List<Profile> participants = sightseeingEvents.get(position).getInvited();
+
+        List<Profile> participants = event.getInvited();
         for (Profile participant : participants) {
             TextView participantView = new TextView(holder.getParticipantsList().getContext());
             participantView.setText(participant.getName());
@@ -68,14 +72,18 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
 
         holder.sightseeingName.setOnClickListener(view -> {
             Intent intent = new Intent(holder.itemView.getContext(), DisplayUserProfileActivity.class);
-            intent.putExtra("uid", sightseeingEvents.get(position).getOwner().getUid());
+            intent.putExtra("uid", event.getOwner().getUid());
             holder.itemView.getContext().startActivity(intent);
         });
 
-        if(sightseeingEvents.get(position).getOwner().getUid().equals(Authenticator.getCurrentUser().getUid())) {
+        holder.getPreviewButton().setOnClickListener(view -> {
+            EventsActivity.openMap(event.getLocations());
+        });
+
+        if(event.getOwner().getUid().equals(Authenticator.getCurrentUser().getUid())) {
             holder.getDeleteButton().setVisibility(View.VISIBLE);
             holder.getDeleteButton().setOnClickListener(view -> {
-                Database.deleteSightseeingEvent(Authenticator.getCurrentUser().getUid(), sightseeingEvents.get(position).getEventId()).whenComplete((aVoid, throwable) -> {
+                Database.deleteSightseeingEvent(Authenticator.getCurrentUser().getUid(), event.getEventId()).whenComplete((aVoid, throwable) -> {
                     if (throwable != null) {
                         throwable.printStackTrace();
                     } else {
@@ -100,6 +108,9 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
         private final LinearLayout locationsList;
         private final LinearLayout participantsList;
         private final ImageView deleteButton;
+        private final Button previewButton;
+
+
 
         public SightseeingViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -108,6 +119,7 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
             locationsList = itemView.findViewById(R.id.locations_list);
             participantsList = itemView.findViewById(R.id.invited_list);
             deleteButton = itemView.findViewById(R.id.delete_button);
+            previewButton = itemView.findViewById(R.id.preview_button);
         }
 
         public TextView getSightseeingName() {
@@ -125,5 +137,10 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
         public ImageView getDeleteButton() {
             return deleteButton;
         }
+
+        public Button getPreviewButton() {
+            return previewButton;
+        }
+
     }
 }
