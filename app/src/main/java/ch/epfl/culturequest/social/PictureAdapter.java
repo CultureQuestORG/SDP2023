@@ -25,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.Objects;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
@@ -305,7 +306,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
      * @param country the country
      */
     private void setCountryBadge(ImageView countryBadge, TextView countryText, String country) {
-        if (country != null) {
+        if (!Objects.equals(country, "none")) {
             countryBadge.setImageResource(ScanBadge.Country.fromString(country).getBadge());
             countryText.setText(country);
             countryBadge.setTag(ScanBadge.Country.fromString(country).name());
@@ -322,7 +323,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
      * @param city the city
      */
     private void setCityBadge(ImageView cityBadge, TextView cityText, String city) {
-        if (city != null) {
+        if (!Objects.equals(city, "none")) {
             cityBadge.setImageResource(ScanBadge.City.fromString(city).getBadge());
             cityText.setText(city);
             cityBadge.setTag(ScanBadge.City.fromString(city).name());
@@ -339,7 +340,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
      * @param museum the museum
      */
     private void setMuseumBadge(ImageView museumBadge, TextView museumText, String museum) {
-        if (museum != null) {
+        if (!Objects.equals(museum, "none")) {
             museumBadge.setImageResource(ScanBadge.Museum.fromString(museum).getBadge());
             museumText.setText(museum);
             museumBadge.setTag(ScanBadge.Museum.fromString(museum).name());

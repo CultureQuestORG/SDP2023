@@ -60,6 +60,10 @@ public class BasicArtDescription {
         return summary;
     }
 
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
     public String getCity() {
         return city;
     }

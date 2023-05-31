@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
@@ -48,6 +49,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     private Button shareButton;
 
     private String imageDownloadUrl;
+    private String imageUriExtra;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +61,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
         // Get serialized artDescription and images from intent
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
-        String imageUriExtra = getIntent().getStringExtra("imageUri");
+        imageUriExtra = getIntent().getStringExtra("imageUri");
         imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
 
         // Check if the activity was started from the scanning activity
@@ -123,7 +125,9 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        FireStorage.deleteImage(imageDownloadUrl);
+        if (imageUriExtra != null){
+            FireStorage.deleteImage(imageDownloadUrl);
+        }
     }
 
     private void displayArtInformation(BasicArtDescription artDescription) {
@@ -217,7 +221,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     }
 
     private void setCountryBadge(ImageView countryBadge, TextView countryText, String country) {
-        if (country != null) {
+        if (!Objects.equals(country, "none")) {
             countryBadge.setImageResource(ScanBadge.Country.fromString(country).getBadge());
             countryText.setText(country);
             countryBadge.setTag(ScanBadge.Country.fromString(country).name());
@@ -228,7 +232,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     }
 
     private void setCityBadge(ImageView cityBadge, TextView cityText, String city) {
-        if (city != null) {
+        if (!Objects.equals(city, "none")) {
             cityBadge.setImageResource(ScanBadge.City.fromString(city).getBadge());
             cityText.setText(city);
             cityBadge.setTag(ScanBadge.City.fromString(city).name());
@@ -239,7 +243,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     }
 
     private void setMuseumBadge(ImageView museumBadge, TextView museumText, String museum) {
-        if (museum != null) {
+        if (!Objects.equals(museum, "none")) {
             museumBadge.setImageResource(ScanBadge.Museum.fromString(museum).getBadge());
             museumText.setText(museum);
             museumBadge.setTag(ScanBadge.Museum.fromString(museum).name());
