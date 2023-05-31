@@ -59,7 +59,7 @@ public class SightseeingRecycleViewAdapter extends RecyclerView.Adapter<Sightsee
         List<Profile> participants = event.getInvited();
         for (Profile participant : participants) {
             TextView participantView = new TextView(holder.getParticipantsList().getContext());
-            participantView.setText(participant.getName());
+            participantView.setText(participant.getUsername());
             participantView.setTextColor(holder.itemView.getContext().getColor(R.color.black));
             participantView.setPadding(10, 0, 0, 0);
             participantView.setOnClickListener(view -> {
