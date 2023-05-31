@@ -49,7 +49,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     private Button shareButton;
 
     private String imageDownloadUrl;
-    private String imageUriExtra;
+    private boolean scan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +61,11 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
         // Get serialized artDescription and images from intent
         String serializedArtDescription = getIntent().getStringExtra("artDescription");
-        imageUriExtra = getIntent().getStringExtra("imageUri");
+        String imageUriExtra = getIntent().getStringExtra("imageUri");
         imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
 
         // Check if the activity was started from the scanning activity
-        boolean scan = getIntent().getBooleanExtra("scanning", true);
+        scan = getIntent().getBooleanExtra("scanning", true);
 
         if(scan) {
             Uri imageUri = Uri.parse(imageUriExtra);
@@ -125,7 +125,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        if (imageUriExtra != null){
+        if (scan){
             FireStorage.deleteImage(imageDownloadUrl);
         }
     }
