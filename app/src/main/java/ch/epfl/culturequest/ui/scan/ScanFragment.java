@@ -119,7 +119,7 @@ public class ScanFragment extends Fragment {
                                         Throwable cause = ex.getCause();
                                         String errorMessage;
                                         int drawableId;
-
+                                        FireStorage.deleteImage(scannedImageUrl);
                                         if (cause instanceof OpenAiFailedException) {
                                             errorMessage = "OpenAI failed to process the art.";
                                             drawableId = R.drawable.openai_logo;
