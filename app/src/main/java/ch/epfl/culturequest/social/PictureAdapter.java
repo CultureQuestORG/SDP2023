@@ -238,7 +238,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 .setPositiveButton("Yes", (dialog, which) -> {
                     pictures.remove(post);
                     notifyItemRemoved(pictures.indexOf(post));
-                    notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
+                    notifyItemRangeChanged(0, pictures.size());
                     Database.removePost(post);
                     FireStorage.deleteImage(post.getImageUrl());
                     View rootView = v.getRootView();
