@@ -28,7 +28,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.io.IOException;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
@@ -104,16 +103,18 @@ public class ScanFragment extends Fragment {
                                         return processingApi.getArtDescriptionFromUrl(url);
                                     })
                                     .thenAccept(artDescription -> {
-                                        scannedImageUrl = null;
-                                        Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
-                                        String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
-                                        intent.putExtra("artDescription", serializedArtDescription);
-                                        intent.putExtra("imageUri", lastlyStoredImageUri.toString());
-                                        startActivity(intent);
+                                        if (scannedImageUrl != null) {
+                                            scannedImageUrl = null;
+                                            Uri lastlyStoredImageUri = localStorage.lastlyStoredImageUri;
+                                            String serializedArtDescription = DescriptionSerializer.serialize(artDescription);
+                                            intent.putExtra("artDescription", serializedArtDescription);
+                                            intent.putExtra("imageUri", lastlyStoredImageUri.toString());
+                                            startActivity(intent);
+                                        }
 
                                         // Reset state of the scan fragment
                                         scanningLayout.setVisibility(View.GONE);
-                                        currentProcessing = null;
+                                        currentProcessing.cancel(true);
                                         loadingAnimation.stopLoading();
                                     })
                                     .exceptionally(ex -> {
@@ -143,6 +144,7 @@ public class ScanFragment extends Fragment {
                                         });
 
                                         loadingAnimation.stopLoading();
+                                        currentProcessing.cancel(true);
                                         return null;
                                     });
 
@@ -182,10 +184,10 @@ public class ScanFragment extends Fragment {
         } else {
             loadingAnimation.stopLoading();
             FireStorage.deleteImage(scannedImageUrl);
+            scannedImageUrl = null;
             scanningLayout.setVisibility(View.GONE);
             // Cancel the current processing if it exists
-            if (currentProcessing != null)
-                currentProcessing.cancel(true);
+            currentProcessing.cancel(true);
         }
     };
 
