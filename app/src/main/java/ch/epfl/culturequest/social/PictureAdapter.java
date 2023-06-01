@@ -101,7 +101,12 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             holder.year.setText(artwork.getYear());
             holder.description.setText(shortenDescription(artwork.getSummary()));
             holder.score.setText("+" + artwork.getScore() + " pts");
-            holder.location.setText(artwork.getCity()!=null ? artwork.getCity() : artwork.getCountry()!=null ? artwork.getCountry() : "World");
+            String locationText = "";
+            if (!Objects.equals(artwork.getCountry(), "none"))
+                locationText = artwork.getCountry();
+            if (!Objects.equals(artwork.getCity(), "none"))
+                locationText = artwork.getCity();
+            holder.location.setText(locationText);
 
 
             // Put a see more button if the description is too long

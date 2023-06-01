@@ -13,6 +13,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
@@ -140,12 +141,10 @@ public class ScanFragment extends Fragment {
 
                                         CustomSnackbar.showCustomSnackbar(errorMessage, drawableId, binding.getRoot(), (n) -> {
                                             scanningLayout.setVisibility(View.GONE);
+                                            currentProcessing.cancel(true);
+                                            loadingAnimation.stopLoading();
                                             return null;
                                         });
-
-                                        scanningLayout.setVisibility(View.GONE);
-                                        loadingAnimation.stopLoading();
-                                        currentProcessing.cancel(true);
                                         return null;
                                     });
 
