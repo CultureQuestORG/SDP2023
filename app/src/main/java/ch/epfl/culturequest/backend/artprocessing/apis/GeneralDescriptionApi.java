@@ -64,6 +64,7 @@ public class GeneralDescriptionApi {
                        return recoverPotentialMissesAndGetScore(emptyArtDescription, recognizedArt, RecoveryState.FullRecovery, 2);
                     }
 
+                    filledArtDescription.reformatBadges();
                     Database.setArtwork(filledArtDescription);
                     return CompletableFuture.completedFuture(filledArtDescription); // No initial missing data or Open AI successfully provided the score and recovered the potential missing data
                 }).thenCompose(Function.identity());
@@ -84,6 +85,7 @@ public class GeneralDescriptionApi {
                     })
                     .exceptionally(e -> {
                         incompleteDescription.setScore(DEFAULT_SCORE);
+                        incompleteDescription.reformatBadges();
                         Database.setArtwork(incompleteDescription);
                         return incompleteDescription;
                     });
@@ -125,6 +127,7 @@ public class GeneralDescriptionApi {
                         incompleteDescription.setCountry("none");
                     }
 
+                    incompleteDescription.reformatBadges();
                     Database.setArtwork(incompleteDescription);
                     return incompleteDescription;
 

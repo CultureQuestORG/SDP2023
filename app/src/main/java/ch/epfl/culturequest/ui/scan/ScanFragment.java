@@ -143,6 +143,7 @@ public class ScanFragment extends Fragment {
                                             return null;
                                         });
 
+                                        scanningLayout.setVisibility(View.GONE);
                                         loadingAnimation.stopLoading();
                                         currentProcessing.cancel(true);
                                         return null;
