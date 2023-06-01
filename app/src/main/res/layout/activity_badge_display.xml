@@ -48,4 +48,21 @@
         android:layout_marginTop="20dp"
         android:paddingHorizontal="20dp"/>
 
+    <TextView
+        android:id="@+id/no_badge_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="60dp"
+        android:text="You don't have any badge yet. Scan an artwork to get some."
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:alpha="0.5"
+        android:fontFamily="@font/poppins"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/badge_collection"
+        android:visibility="gone"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -45,6 +46,8 @@ public class HomeFragment extends Fragment {
         final ImageView logo = binding.logoApp;
         logo.setOnClickListener(view -> feed.smoothScrollToPosition(0));
 
+        final TextView noFriends = binding.noFiendsText;
+
         homeViewModel.getPosts().observe(getViewLifecycleOwner(), images -> {
             // Create a new PictureAdapter and set it as the adapter for the RecyclerView
             PictureAdapter pictureAdapter = new PictureAdapter(images);
@@ -53,6 +56,13 @@ public class HomeFragment extends Fragment {
             // Set the layout manager for the RecyclerView
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
             feed.setLayoutManager(gridLayoutManager);
+
+            // Hide the "no friends" text if there are posts
+            if (images.size() > 0) {
+                noFriends.setVisibility(View.GONE);
+            } else {
+                noFriends.setVisibility(View.VISIBLE);
+            }
         });
 
         return root;

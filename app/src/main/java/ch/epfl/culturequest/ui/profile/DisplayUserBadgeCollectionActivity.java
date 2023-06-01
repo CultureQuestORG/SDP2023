@@ -2,6 +2,7 @@ package ch.epfl.culturequest.ui.profile;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,12 +34,19 @@ public class DisplayUserBadgeCollectionActivity extends AppCompatActivity {
 
 
         final RecyclerView recyclerView = binding.badgeCollection;
+        final TextView noBadges = binding.noBadgeText;
 
         profileViewModel.getBadges().observe(this, badges -> {
             badgeDisplayAdapter = new BadgeDisplayAdapter(badges);
             recyclerView.setAdapter(badgeDisplayAdapter);
             GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
             recyclerView.setLayoutManager(gridLayoutManager);
+
+            if (badges.size() == 0) {
+                noBadges.setVisibility(View.VISIBLE);
+            } else {
+                noBadges.setVisibility(View.GONE);
+            }
 });
         
 

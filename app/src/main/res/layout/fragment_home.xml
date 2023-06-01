@@ -69,4 +69,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/logo_compact" />
 
+    <TextView
+        android:id="@+id/no_fiends_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="40dp"
+        android:alpha="0.3"
+        android:fontFamily="@font/poppins"
+        android:text="You don't have any post to see yet. Search for users on the top left to meet new people."
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/feed_container" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
