@@ -68,7 +68,7 @@
         android:text="Sightseeing"
         android:fontFamily="@font/poppins_semibold"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/list_view"
+        app:layout_constraintBottom_toTopOf="@+id/events_recycler_view"
         app:layout_constraintEnd_toStartOf="@+id/tournaments_button"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -91,7 +91,7 @@
         android:textColor="@color/colorPrimary"
         android:topLeftRadius="50dp"
         android:topRightRadius="50dp"
-        app:layout_constraintBottom_toTopOf="@+id/list_view"
+        app:layout_constraintBottom_toTopOf="@+id/events_recycler_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title_events"
         app:layout_constraintVertical_bias="0.0" />
