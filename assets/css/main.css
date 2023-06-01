@@ -185,6 +185,14 @@ p {
   align-items: center;
 }
 
+.displace-right {
+  margin-left: -150px;
+}
+
+.displace-left {
+  margin-right: -150px;
+}
+
 .concept-card-image-container {
   margin-bottom: 10px;
   flex: 3;
@@ -311,4 +319,57 @@ p {
   justify-content: space-between;
   align-items: center;
   margin-top: 20px;
+}
+
+@media (orientation: portrait) {
+  body {
+    width: 90vw;
+    margin: 0 5vw;
+  }
+
+  .landing-container {
+    width: 100%;
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 50px;
+  }
+
+  .divider-museum {
+    width: 100vw !important;
+  }
+
+  .divider-museum-image {
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .concept-image {
+    margin-bottom: 60px;
+  }
+
+  .concept-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .concept-div.reverse {
+    flex-direction: column-reverse;
+  }
+
+  .displace-left {
+    margin-right: 0px;
+  }
+
+  .displace-right {
+    margin-left: 0px;
+  }
+
+  .download-container {
+    width: 80%;
+  }
 }
