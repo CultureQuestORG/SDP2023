@@ -78,7 +78,7 @@
         android:layout_marginStart="40dp"
         android:alpha="0.3"
         android:fontFamily="@font/poppins"
-        android:text="You don't have any post to see yet. Search for users on the top left to meet new people."
+        android:text="You don't have any post to see yet. Search for users on the top right to meet new people."
         android:textAlignment="center"
         android:textColor="@color/black"
         android:visibility="gone"
