@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="./assets/css/main.css" rel="stylesheet" />
+    <link href="./assets/css/forms.css" rel="stylesheet" />
+    <title>CultureQuest - Contact Us</title>
+  </head>
+  <body>
+    <div class="header">
+        <a href="/">
+            <div class="header-name">
+              <img
+                class="header-logo"
+                src="assets\images\v518_1176.png"
+                alt="CultureQuest"
+              />
+              CultureQuest
+            </div>
+        </a>
+        <div class="header-actions">
+          <h5 class="header-action"><a href="/#concept">Concept</a></h5>
+          <h5 class="header-action">The Team</h5>
+          <h5 class="header-action"><a href="contact-us.html">Contact</a></h5>
+          <h5 class="header-action button">
+            <a href="/#download">Download Now</a>
+          </h5>
+        </div>
+      </div>
+    <div class="content-container">
+        <form
+        action="https://formspree.io/f/xdovrbvg"
+        method="POST"
+        class="form-container"
+        >
+            <h1 class="landing-title">Contact Us</h1>
+            <input type="hidden" name="_subject" value="Contact request from app website" />
+            <label>
+                Your email
+            </label>
+            <input type="email" name="email">
+            <label>
+                Your message
+            </label>
+            <textarea name="message"></textarea>
+            <!-- your other form fields go here -->
+            <button class="header-action button" type="submit">Send</button>
+        </form>
+        <img
+            class="illustration-image"
+            src="assets/images/undraw_mailbox_re_dvds.svg"
+            alt="Concept"
+        />
+    </div>
+  </body>
+</html>
