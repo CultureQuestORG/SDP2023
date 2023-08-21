@@ -4,7 +4,7 @@
         android:duration="750"
         android:propertyName="rotationY"
         android:valueFrom="0"
-        android:valueTo="180" />
+        android:valueTo="-180" />
 
     <objectAnimator
         android:duration="0"

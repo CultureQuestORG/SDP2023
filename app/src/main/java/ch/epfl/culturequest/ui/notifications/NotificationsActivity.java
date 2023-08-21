@@ -34,6 +34,14 @@ public class NotificationsActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(globalAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+        notificationsViewModel.getNotificationTexts().observe(this, pushNotifications -> {
+            if(pushNotifications.size() == 0) {
+                findViewById(R.id.no_notification_text).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.no_notification_text).setVisibility(View.GONE);
+            }
+        });
     }
 
     /**

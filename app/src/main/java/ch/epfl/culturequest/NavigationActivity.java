@@ -1,5 +1,6 @@
 package ch.epfl.culturequest;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.databinding.ActivityNavigationBinding;
 import ch.epfl.culturequest.notifications.PushNotification;
+import ch.epfl.culturequest.ui.events.EventsActivity;
 import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class NavigationActivity extends AppCompatActivity {
@@ -72,6 +74,11 @@ public class NavigationActivity extends AppCompatActivity {
         }
         if (Objects.equals(redirect, "home")) {
             navController.navigate(R.id.navigation_home);
+        }
+        if (Objects.equals(redirect, "sightseeing") || Objects.equals(redirect, "tournament")) {
+            Intent intent = new Intent(this, EventsActivity.class);
+            intent.putExtra("redirect", redirect);
+            startActivity(intent);
         }
     }
 

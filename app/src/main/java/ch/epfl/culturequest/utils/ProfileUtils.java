@@ -19,8 +19,8 @@ public class ProfileUtils {
 
 
     public static final String GALLERY_PERMISSION =
-            //Version code R is android 11.
-            Build.VERSION.SDK_INT > Build.VERSION_CODES.R ?
+            //Version code S is android 12.
+            Build.VERSION.SDK_INT > Build.VERSION_CODES.S ?
                     Manifest.permission.READ_MEDIA_IMAGES :
                     Manifest.permission.READ_EXTERNAL_STORAGE;
 

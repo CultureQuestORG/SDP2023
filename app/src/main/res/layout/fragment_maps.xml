@@ -8,6 +8,8 @@
     android:id="@+id/map_fragment"
     tools:context=".ui.map.MapsFragment"
     tools:visibility="visible">
+
+
     <androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
@@ -25,4 +27,21 @@
         android:src="@drawable/location_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBarLoader"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+
+        android:progressDrawable="@drawable/progress_bar_loader"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fragment_info_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

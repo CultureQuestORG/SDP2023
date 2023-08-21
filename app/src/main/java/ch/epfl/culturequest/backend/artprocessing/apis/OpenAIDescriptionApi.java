@@ -21,7 +21,8 @@ import ch.epfl.culturequest.backend.exceptions.OpenAiFailedException;
 
 public class OpenAIDescriptionApi {
 
-    private final String missingDataPrompt = "Given the input \"%s (%s)\", fill following fields: %s. Return your response as a JSON object.";
+    private final String missingDataPrompt = "Given the input \"%s (%s)\", fill following fields: %s. Return your response as a JSON object. If one of the empty fields is locationCity or locationCountry it should correspond to where the artwork or the monument is exhibited." +
+            "If the description field is empty it should be at least around 500 characters long.";
     private final String scorePrompt = "On a scale from 1 to 100 (ceil round to 10), evaluate the popularity of \"%s (%s)\". Fill the field \"artPopularity\", as JSON.";
 
     private ArrayList<String> missingDataNames;

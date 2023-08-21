@@ -15,11 +15,43 @@
       },
       "oauth_client": [
         {
+          "client_id": "296582792540-1lf2esblr8953prgtaj6o0pfl68dgv3k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.epfl.culturequest",
+            "certificate_hash": "927bfe4bc7bf777ef2d252014f235f2879a2a1e1"
+          }
+        },
+        {
           "client_id": "296582792540-bk4gln5kbeum82kdnb62eonfeildj15g.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "ch.epfl.culturequest",
             "certificate_hash": "5965c273d29540ec3b6a2c3be4b85e259b29c995"
+          }
+        },
+        {
+          "client_id": "296582792540-jgm5p5h92gq7qukoioskhlmfq1dvvm51.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.epfl.culturequest",
+            "certificate_hash": "02cef44e4c6ac01455f5139ed6c335ec54ef3a8b"
+          }
+        },
+        {
+          "client_id": "296582792540-qb5l2b7bj7gqf9l9hpa0i4na80mkfdq1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.epfl.culturequest",
+            "certificate_hash": "990cdfb787c35fd64f5f5787aa1492a84e6f0cbb"
+          }
+        },
+        {
+          "client_id": "296582792540-roerntpi2krlt4gnh7c2nfgovhq04me0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.epfl.culturequest",
+            "certificate_hash": "6c691c45f230d2111f2ebe9db9cbde40eb673d5d"
           }
         },
         {

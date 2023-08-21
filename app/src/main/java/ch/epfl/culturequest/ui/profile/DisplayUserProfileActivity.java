@@ -71,6 +71,7 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
 
         profileViewModel.getUsername().observe(this, textView::setText);
         profileViewModel.getProfilePictureUri().observe(this, uri -> Picasso.get().load(uri).into(profilePicture));
+        profileViewModel.getCity().observe(this, s -> binding.profilePlace.setText(s));
         profileViewModel.getPosts().observe(this, images -> {
             pictureAdapter = new PictureAdapter(images);
             pictureGrid.setAdapter(pictureAdapter);
@@ -85,7 +86,6 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
         homeIcon = findViewById(R.id.home_icon);
 
         final TextView profilePlace = binding.profilePlace;
-        profilePlace.setText("Lausanne");
 
         if (uid.equals(Authenticator.getCurrentUser().getUid())) {
             binding.profileFollowButton.setVisibility(View.INVISIBLE);
@@ -96,12 +96,17 @@ public class DisplayUserProfileActivity extends AppCompatActivity {
             followButton.setOnClickListener(v -> profileViewModel.changeFollow());
         }
 
-        progressBar.setOnClickListener(v -> {
+        // set the onClickListener for badges
+        View.OnClickListener badgesListener = v -> {
             // open the badges activity
             Intent intent = new Intent(this, DisplayUserBadgeCollectionActivity.class);
             intent.putExtra("uid", uid);
             startActivity(intent);
-        });
+        };
+
+        progressBar.setOnClickListener(badgesListener);
+        levelText.setOnClickListener(badgesListener);
+        level.setOnClickListener(badgesListener);
 
         binding.settingsButton.setVisibility(View.INVISIBLE);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.pictureGrid.getLayoutParams();

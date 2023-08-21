@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -26,7 +25,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
@@ -38,6 +36,7 @@ import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.notifications.SightseeingNotification;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.SightseeingEvent;
+import ch.epfl.culturequest.ui.events.EventsActivity;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.SightSeeingArrayAdapter;
@@ -67,7 +66,7 @@ public class SightseeingActivity extends AppCompatActivity {
         inviteFriends = binding.inviteFriends;
         preview = binding.preview;
         backButton = binding.backButton;
-        mapFragment = binding.mapFragment;
+        mapFragment = binding.mapFragmentSightseeing;
         backButton.setOnClickListener(l -> onBackPressed());
         Map<String, OTMLocation> placeToLocation = getIntent().getStringArrayListExtra("locations").stream().map(OTMLocationSerializer::deserialize)
                 .collect(Collectors.toMap(OTMLocation::getName, location -> location, (existing, newValue) -> existing));
@@ -108,9 +107,10 @@ public class SightseeingActivity extends AppCompatActivity {
     /**
      * In this function, we map the users friends to their profiles to display users usernames.
      * We also use this to send out notifications to particular profiles and to create a new event
+     *
      * @param selectedPlaces the list of selected places
      */
-    private void handleFriendsLogic(List<OTMLocation> selectedPlaces){
+    private void handleFriendsLogic(List<OTMLocation> selectedPlaces) {
         Profile.getActiveProfile().retrieveFriends()
                 .thenApply(friends -> friends.stream().map(Database::getProfile).collect(Collectors.toList()))
                 .thenCompose(futures -> CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
@@ -122,7 +122,7 @@ public class SightseeingActivity extends AppCompatActivity {
                     inviteFriends.setOnClickListener(v -> {
                         List<String> usernamesSelected = adapter.getSelected();
                         List<Profile> selectedFriends = profiles.stream().filter(profile -> usernamesSelected.contains(profile.getUsername())).collect(Collectors.toList());
-                        SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces);
+                        SightseeingEvent newEvent = new SightseeingEvent(Profile.getActiveProfile(), selectedFriends, selectedPlaces, getIntent().getStringExtra("city").split(",")[0]);
                         Database.setSightseeingEvent(newEvent);
                         CustomSnackbar.showCustomSnackbar("Invite sent!", R.drawable.logo_compact, v, (Void) -> null);
                         // send out notifications to the selected friends
@@ -133,7 +133,7 @@ public class SightseeingActivity extends AppCompatActivity {
                         CompletableFuture.runAsync(() -> {
                             //we do this to wait for the snackbar to be visible for 1 second before going back to the nav activity.
                             SystemClock.sleep(1000);
-                            AndroidUtils.redirectToActivity(this, NavigationActivity.class);
+                            AndroidUtils.redirectToActivity(this, EventsActivity.class);
                         });
                     });
                 });
@@ -149,26 +149,19 @@ public class SightseeingActivity extends AppCompatActivity {
     private void openMap(Map<String, OTMLocation> placeToLocation, List<String> selected) {
         Map<String, OTMLocation> selectedPlaces = placeToLocation.entrySet().stream().filter(entry -> selected.contains(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         mapFragment.setVisibility(View.VISIBLE);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment_sightseeing);
         mapFragment.getMapAsync(googleMap -> {
+            googleMap.clear();
             googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.maps_style_json_alternative));
-            backButton.setOnClickListener(l2 -> {
-                googleMap.clear();
-                onBackPressed();
-            });
-            for (OTMLocation location : selectedPlaces.values()) {
-                OTMLatLng coord = location.getCoordinates();
-                LatLng mapCoord = new LatLng(coord.getLat(), coord.getLon());
-                MarkerOptions markerOptions = new MarkerOptions().position(mapCoord).title(location.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-                googleMap.addMarker(markerOptions);
-            }
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (OTMLocation location : selectedPlaces.values()) {
                 OTMLatLng coord = location.getCoordinates();
-                builder.include(new LatLng(coord.getLat(), coord.getLon()));
+                LatLng mapCoord = new LatLng(coord.getLat(), coord.getLon());
+                builder.include(mapCoord);
+                MarkerOptions markerOptions = new MarkerOptions().position(mapCoord).title(location.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                googleMap.addMarker(markerOptions);
             }
-            LatLngBounds bounds = builder.build();
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 150));
         });
     }
 }

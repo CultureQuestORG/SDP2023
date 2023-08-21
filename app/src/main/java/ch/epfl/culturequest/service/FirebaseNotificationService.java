@@ -9,9 +9,14 @@ import androidx.annotation.NonNull;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Objects;
+
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
+import ch.epfl.culturequest.notifications.FollowNotification;
+import ch.epfl.culturequest.notifications.LikeNotification;
 import ch.epfl.culturequest.notifications.PushNotification;
+import ch.epfl.culturequest.notifications.TournamentNotification;
 import ch.epfl.culturequest.social.Profile;
 
 /**
@@ -65,6 +70,7 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
      * @param remoteMessage the notification message received
      */
     private void sendNotification(RemoteMessage remoteMessage) {
+        if(isNotificationOff(remoteMessage)) return;
         PushNotification pushNotification = new PushNotification(remoteMessage.getData().get("title"),
                 remoteMessage.getData().get("text"), remoteMessage.getData().get("channelId"),
                 remoteMessage.getData().get("senderId"));
@@ -74,5 +80,17 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(pushNotification.getNotificationId().hashCode(), notification);
+    }
+
+    private boolean isNotificationOff(RemoteMessage remoteMessage) {
+        if(Objects.equals(remoteMessage.getData().get("channelId"), FollowNotification.CHANNEL_ID)) {
+            return !SettingsService.getSettings(getApplicationContext(), "notificationsNew", true);
+        } else if (Objects.equals(remoteMessage.getData().get("channelId"), LikeNotification.CHANNEL_ID)) {
+            return !SettingsService.getSettings(getApplicationContext(), "notificationsLike", true);
+        } else if (Objects.equals(remoteMessage.getData().get("channelId"), TournamentNotification.CHANNEL_ID)) {
+            return !SettingsService.getSettings(getApplicationContext(), "notificationsTournament", true);
+        } else {
+            return false;
+        }
     }
 }

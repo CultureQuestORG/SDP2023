@@ -75,7 +75,7 @@ public class RecognitionApi {
     }
 
     private CompletableFuture<ArtRecognition> getArtFromParsing(CompletableFuture<String> responseBody){
-        Pattern patternArt = Pattern.compile("(?<=\\[\")([a-zàâçéèêëîïôûùüÿñæœ -]*)(?=\",\"((?:monument|peinture|painting|sculpture|photo|historical|lieu)[a-zàâçéèêëîïôûùüÿñæœ -]*)\")", Pattern.CASE_INSENSITIVE);
+        Pattern patternArt = Pattern.compile("(?<=\\[\")([a-zàâçéèêëîïôûùüÿñæœ -]*)(?=\",\"((?:monument|peinture|painting|sculpture|photo|historical|appartment|apartment|building|landmark|landmarks|landscape|paint|statue|bridge|tower)[a-zàâçéèêëîïôûùüÿñæœ -]*)\")", Pattern.CASE_INSENSITIVE);
 
         return responseBody.thenApply((String s) -> {
 

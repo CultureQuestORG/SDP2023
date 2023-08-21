@@ -1,6 +1,5 @@
 package ch.epfl.culturequest.social;
 
-import android.graphics.drawable.Drawable;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,26 +10,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 import ch.epfl.culturequest.R;
 
 public class BadgeDisplayAdapter extends RecyclerView.Adapter<BadgeDisplayAdapter.BadgeDisplayViewHolder> {
     private final List<Pair<String, Integer>> badges;
 
-    public BadgeDisplayAdapter(HashMap<String, Integer> badges) {
+    public BadgeDisplayAdapter(List<Pair<String, Integer>> badges) {
         // sort the badges by decreasing order of count
         if (badges == null) {
             this.badges = new ArrayList<>();
             return;
         }
-        this.badges = badges.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).sorted((p1, p2) -> Integer.compare(p2.second, p1.second)).filter(s->ScanBadge.Badge.identifyPlace(s.first)!= ScanBadge.Country.OTHER).collect(Collectors.toList());
+        this.badges = badges;
     }
 
     @NonNull

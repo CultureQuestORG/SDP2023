@@ -8,34 +8,32 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
-import com.squareup.picasso.Picasso;
-
-import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.notifications.FireMessaging;
+import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.ImageFetcher;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.CropUtils;
-import ch.epfl.culturequest.utils.CustomSnackbar;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -70,6 +68,11 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         profileView = findViewById(R.id.profile_picture);
         textView = findViewById(R.id.username);
         initialDrawable = profileView.getDrawable();
+        Button button = findViewById(R.id.update_profile);
+        EditText city = findViewById(R.id.city);
+
+        textView.addTextChangedListener(onInputChange(button, (s) -> s.toString().length() > 0 && city.getText().toString().length() > 0));
+        city.addTextChangedListener(onInputChange(button, (s) -> s.toString().length() > 0 && textView.getText().toString().length() > 0));
     }
 
     @Override
@@ -107,6 +110,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
 
         profile.setUsername(username);
         profile.setUid(Authenticator.getCurrentUser().getUid());
+        profile.setCity(((EditText) findViewById(R.id.city)).getText().toString());
 
         // Get first the device token, then store the profile in the database if it is not anonymous
         FireMessaging.getDeviceToken().whenComplete((token, ex) -> {
@@ -169,8 +173,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
      */
     private Void displayProfilePic(Uri result) {
         CircleImageView image = findViewById(R.id.profile_picture);
-        Picasso.get().load(result).into(image);
-        ((TextView) findViewById(R.id.profile_pic_text)).setText("");
+        ImageFetcher.fetchImage(this, result.toString(), image);
         profilePicUri = result.toString();
         try {
             profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), result);
@@ -183,7 +186,7 @@ public class ProfileCreatorActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        CropUtils.manageCropFlow(requestCode, resultCode, data, this, this::displayProfilePic, profileView);
+        CropUtils.manageCropFlow(requestCode, resultCode, data, this, this::displayProfilePic, profileView, (v) -> {});
     }
 
 
@@ -200,4 +203,22 @@ public class ProfileCreatorActivity extends AppCompatActivity {
         return profilePicUri;
     }
 
+    private TextWatcher onInputChange(Button button, Predicate<Editable> isValid) {
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                button.setEnabled(isValid.test(s));
+            }
+        };
+    }
 }

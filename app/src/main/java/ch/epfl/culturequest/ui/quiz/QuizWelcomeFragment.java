@@ -8,12 +8,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.squareup.picasso.Picasso;
-
-import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.databinding.FragmentQuizWelcomeBinding;
+import ch.epfl.culturequest.storage.ImageFetcher;
 
 public class QuizWelcomeFragment extends Fragment {
 
@@ -46,7 +44,7 @@ public class QuizWelcomeFragment extends Fragment {
         binding.blackTextView.setText(artName);
 
 
-        quizViewModel.getImage().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(binding.imageView));
+        quizViewModel.getImage().observe(getViewLifecycleOwner(), uri -> ImageFetcher.fetchImage(this, uri, binding.imageView));
 
         binding.startButton.setOnClickListener(a-> startQuiz());
 

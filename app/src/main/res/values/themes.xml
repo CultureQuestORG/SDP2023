@@ -15,4 +15,10 @@
         <!-- Customize your theme here. -->
         <item name="android:windowLightStatusBar">true</item>
     </style>
+    <style name="Theme.CultureQuest.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.CultureQuest.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.CultureQuest.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

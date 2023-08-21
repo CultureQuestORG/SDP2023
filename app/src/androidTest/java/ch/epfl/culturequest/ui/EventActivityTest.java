@@ -52,8 +52,8 @@ public class EventActivityTest {
         Profile friendProfile = new Profile("friend", "friend", "friend", "friendEmail", "friendPhone", "friendProfilePicture", 400, new HashMap<>(), new ArrayList<>());
         Profile.setActiveProfile(activeProfile);
         Database.setProfile(activeProfile);
-        Database.setSightseeingEvent(new SightseeingEvent(activeProfile, List.of(activeProfile), List.of(new OTMLocation("Museum", new OTMLatLng(10, 10), "Museum"))));
-        Database.setSightseeingEvent(new SightseeingEvent(activeProfile, List.of(activeProfile, friendProfile), List.of(new OTMLocation("Museum 2", new OTMLatLng(10, 10), "Museum 2"))));
+        Database.setSightseeingEvent(new SightseeingEvent(activeProfile, List.of(activeProfile), List.of(new OTMLocation("Museum", new OTMLatLng(10, 10), "Museum")), ""));
+        Database.setSightseeingEvent(new SightseeingEvent(activeProfile, List.of(activeProfile, friendProfile), List.of(new OTMLocation("Museum 2", new OTMLatLng(10, 10), "Museum 2")), ""));
 
         TournamentManagerApi.handleTournaments(ApplicationProvider.getApplicationContext());
         ActivityScenario<EventsActivity> testRule = ActivityScenario.launch(EventsActivity.class);

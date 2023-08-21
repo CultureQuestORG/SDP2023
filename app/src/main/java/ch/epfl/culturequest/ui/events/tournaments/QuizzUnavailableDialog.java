@@ -18,7 +18,7 @@ public class QuizzUnavailableDialog extends DialogFragment {
     private final String text;
 
     public QuizzUnavailableDialog() {
-        this.text = "This quizz is not available, please scan this artwork to unlock it.";
+        this.text = "This quiz is not available, please scan this artwork to unlock it.";
     }
 
     public QuizzUnavailableDialog(String text) {

@@ -29,13 +29,15 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.epfl.culturequest.SettingsActivity;
+import ch.epfl.culturequest.NavigationActivity;
+import ch.epfl.culturequest.ui.settings.UserSettingsActivity;
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.FragmentProfileBinding;
 import ch.epfl.culturequest.social.PictureAdapter;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.ui.settings.MenuSettingsActivity;
 import ch.epfl.culturequest.utils.PermissionRequest;
 import ch.epfl.culturequest.utils.ProfileUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -63,10 +65,11 @@ public class ProfileFragment extends Fragment {
         final TextView level = binding.level;
         final TextView levelText = binding.levelText;
         final ProgressBar progressBar = binding.progressBar;
-        profilePlace.setText("Lausanne");
+        final TextView noPostText = binding.noPostTextAction;
         // set the observers for the views so that they are updated when the data changes
         profileViewModel.getUsername().observe(getViewLifecycleOwner(), profileName::setText);
         profileViewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(profilePicture));
+        profileViewModel.getCity().observe(getViewLifecycleOwner(), profilePlace::setText);
         profileViewModel.getPosts().observe(getViewLifecycleOwner(), images -> {
             this.images.setValue(images);
             // Create a new PictureAdapter and set it as the adapter for the RecyclerView
@@ -75,13 +78,21 @@ public class ProfileFragment extends Fragment {
             // Set the layout manager for the RecyclerView
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
             pictureGrid.setLayoutManager(gridLayoutManager);
+
+            if(images.size() == 0) {
+                binding.noPostLayout.setVisibility(View.VISIBLE);
+            }
         });
         //handle the score
         profileViewModel.getScore().observe(getViewLifecycleOwner(), s -> ProfileUtils.handleScore(level, levelText, progressBar, s));
 
         // set the onClickListener for the settings button
-        settingsButton.setOnClickListener(this::goToSettings);
-        profilePicture.setOnClickListener(this::goToSettings);
+        settingsButton.setOnClickListener(v -> {
+            goToSettings(v, false);
+        });
+        profilePicture.setOnClickListener(v -> {
+            goToSettings(v, true);
+        });
 
         // set the onClickListener for badges
         View.OnClickListener badgesListener = v -> {
@@ -91,9 +102,16 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         };
 
+        View.OnClickListener noPostListener = v -> {
+            // open navigation activity
+            Intent intent = new Intent(getActivity(), NavigationActivity.class);
+            startActivity(intent);
+        };
+
         progressBar.setOnClickListener(badgesListener);
         levelText.setOnClickListener(badgesListener);
         level.setOnClickListener(badgesListener);
+        noPostText.setOnClickListener(noPostListener);
 
         ConstraintLayout constraintLayout = binding.getRoot();
         ConstraintSet constraintSet = new ConstraintSet();
@@ -148,8 +166,8 @@ public class ProfileFragment extends Fragment {
      *
      * @param view the view that was clicked
      */
-    public void goToSettings(View view) {
-        startActivity(new Intent(this.getContext(), SettingsActivity.class));
+    public void goToSettings(View view, boolean profile) {
+        startActivity(new Intent(this.getContext(), profile? UserSettingsActivity.class : MenuSettingsActivity.class));
     }
 
     /////////////////////////// PERMISSIONS ///////////////////////////

@@ -22,12 +22,11 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.squareup.picasso.Picasso;
-
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
@@ -37,6 +36,8 @@ import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.ScanBadge;
 import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.ImageFetcher;
+import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
@@ -48,11 +49,16 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     private Button shareButton;
 
     private String imageDownloadUrl;
+    private boolean scan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
+
+        // To make the status bar transparent
+        AndroidUtils.removeStatusBar(getWindow());
+
         findViewById(R.id.back_button).setOnClickListener(view -> onBackPressed());
         postButton = findViewById(R.id.post_button);
         shareButton = findViewById(R.id.share_button);
@@ -63,7 +69,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
         imageDownloadUrl = getIntent().getStringExtra("downloadUrl");
 
         // Check if the activity was started from the scanning activity
-        boolean scan = getIntent().getBooleanExtra("scanning", true);
+        scan = getIntent().getBooleanExtra("scanning", true);
 
         if(scan) {
             Uri imageUri = Uri.parse(imageUriExtra);
@@ -105,10 +111,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             displayArtInformation(artDescription);
 
             // Display image on the page from the server
-            Picasso.get()
-                    .load(imageDownloadUrl)
-                    .placeholder(android.R.drawable.progress_horizontal)
-                    .into((ImageView) findViewById(R.id.artImage));
+            ImageFetcher.fetchImage(this, imageDownloadUrl, findViewById(R.id.artImage));
 
             // Remove post button as the image was not scanned
             postButton.setVisibility(View.GONE);
@@ -123,7 +126,9 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        FireStorage.deleteImage(imageDownloadUrl);
+        if (scan){
+            FireStorage.deleteImage(imageDownloadUrl);
+        }
     }
 
     private void displayArtInformation(BasicArtDescription artDescription) {
@@ -217,7 +222,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     }
 
     private void setCountryBadge(ImageView countryBadge, TextView countryText, String country) {
-        if (country != null) {
+        if (!Objects.equals(country, "none")) {
             countryBadge.setImageResource(ScanBadge.Country.fromString(country).getBadge());
             countryText.setText(country);
             countryBadge.setTag(ScanBadge.Country.fromString(country).name());
@@ -228,7 +233,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     }
 
     private void setCityBadge(ImageView cityBadge, TextView cityText, String city) {
-        if (city != null) {
+        if (!Objects.equals(city, "none")) {
             cityBadge.setImageResource(ScanBadge.City.fromString(city).getBadge());
             cityText.setText(city);
             cityBadge.setTag(ScanBadge.City.fromString(city).name());
@@ -239,7 +244,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     }
 
     private void setMuseumBadge(ImageView museumBadge, TextView museumText, String museum) {
-        if (museum != null) {
+        if (!Objects.equals(museum, "none")) {
             museumBadge.setImageResource(ScanBadge.Museum.fromString(museum).getBadge());
             museumText.setText(museum);
             museumBadge.setTag(ScanBadge.Museum.fromString(museum).name());
@@ -271,7 +276,9 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
                         POSTS_ADDED++;
                         activeProfile.incrementScore(artwork.getScore());
                         activeProfile.addBadges(badges);
-                        finish();
+                        Intent intent = new Intent(this, NavigationActivity.class);
+                        intent.putExtra("redirect", "profile");
+                        startActivity(intent);
                     } else {
                         e.printStackTrace();
                     }
@@ -296,10 +303,12 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 POSTS_ADDED++;
+                Intent intent = new Intent(this, NavigationActivity.class);
+                intent.putExtra("redirect", "profile");
+                startActivity(intent);
                 return null;
             });
             dialog.cancel();
-            finish();
         });
         builder.setNegativeButton("Cancel", (dialog, id) -> {
             dialog.dismiss();

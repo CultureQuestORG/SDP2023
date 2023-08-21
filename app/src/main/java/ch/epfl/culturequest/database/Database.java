@@ -15,7 +15,6 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,19 +22,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.BuildConfig;
 import ch.epfl.culturequest.backend.artprocessing.processingobjects.BasicArtDescription;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.ArtQuiz;
-import ch.epfl.culturequest.backend.tournament.tournamentobjects.QuizQuestion;
 import ch.epfl.culturequest.backend.tournament.tournamentobjects.Tournament;
 import ch.epfl.culturequest.notifications.PushNotification;
 import ch.epfl.culturequest.social.Follows;
@@ -317,10 +311,12 @@ public class Database {
                             badges = new HashMap<>();
                         }
                         for (String badge : newbadges) {
-                            if (badges.containsKey(badge)) {
-                                badges.put(badge, badges.get(badge) + 1);
-                            } else {
-                                badges.put(badge, 1);
+                            if (badge != null && !badge.isEmpty()) {
+                                if (badges.containsKey(badge)) {
+                                    badges.put(badge, badges.get(badge) + 1);
+                                } else {
+                                    badges.put(badge, 1);
+                                }
                             }
                         }
                         mutableData.setValue(badges);

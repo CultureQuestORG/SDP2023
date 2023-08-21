@@ -353,7 +353,6 @@ public class TournamentManagerApi {
     }
 
     public static SharedPreferences getTournamentSharedPrefLocation() {
-
         return currentContext.getSharedPreferences("tournament", Context.MODE_PRIVATE);
     }
 

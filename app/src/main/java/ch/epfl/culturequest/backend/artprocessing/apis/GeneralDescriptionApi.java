@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Function;
@@ -63,6 +64,7 @@ public class GeneralDescriptionApi {
                        return recoverPotentialMissesAndGetScore(emptyArtDescription, recognizedArt, RecoveryState.FullRecovery, 2);
                     }
 
+                    filledArtDescription.reformatBadges();
                     Database.setArtwork(filledArtDescription);
                     return CompletableFuture.completedFuture(filledArtDescription); // No initial missing data or Open AI successfully provided the score and recovered the potential missing data
                 }).thenCompose(Function.identity());
@@ -83,6 +85,7 @@ public class GeneralDescriptionApi {
                     })
                     .exceptionally(e -> {
                         incompleteDescription.setScore(DEFAULT_SCORE);
+                        incompleteDescription.reformatBadges();
                         Database.setArtwork(incompleteDescription);
                         return incompleteDescription;
                     });
@@ -112,6 +115,20 @@ public class GeneralDescriptionApi {
 
                     incompleteDescription.setScore(s);
 
+                    if(incompleteDescription.getMuseum().isEmpty() || incompleteDescription.getMuseum().equals("") || incompleteDescription.getMuseum() == null){
+                        incompleteDescription.setMuseum("none");
+                    }
+
+                    if(incompleteDescription.getCity() == null || incompleteDescription.getCity().isEmpty() || incompleteDescription.getCity().equals("")){
+                        incompleteDescription.setCity("none");
+                    }
+
+                    if(incompleteDescription.getCountry() == null || incompleteDescription.getCountry().isEmpty() || incompleteDescription.getCountry().equals("")){
+                        incompleteDescription.setCountry("none");
+                    }
+
+                    incompleteDescription.reformatBadges();
+                    Database.setArtwork(incompleteDescription);
                     return incompleteDescription;
 
                 })
@@ -155,8 +172,14 @@ public class GeneralDescriptionApi {
                 try {
                     fieldValue = field.get(basicArtDescription);
                     // if fieldValue is null, add the field name to the list of missing data
-                    if (fieldValue == null) {
+                    if (fieldValue == null || fieldValue.equals("")) {
                         missingFields.add(fieldName);
+                    }
+                    else{
+                        if (fieldName == "summary" && fieldValue.toString().length() < 450) {
+                            basicArtDescription.setSummary("");
+                            missingFields.add(fieldName);
+                        }
                     }
 
                 } catch (IllegalAccessException e) {
@@ -177,7 +200,7 @@ public class GeneralDescriptionApi {
     private Boolean isIrrelevantFieldForRecovery(String fieldName, BasicArtDescription.ArtType artType){
 
         // if art type is of type architecture, the museum is irrelevant
-        if (artType == BasicArtDescription.ArtType.ARCHITECTURE && fieldName == "museum") {
+        if (artType == BasicArtDescription.ArtType.ARCHITECTURE && Objects.equals(fieldName, "museum")) {
             return true;
         }
 

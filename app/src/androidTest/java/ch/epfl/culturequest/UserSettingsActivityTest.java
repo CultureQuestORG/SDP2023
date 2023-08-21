@@ -1,6 +1,5 @@
 package ch.epfl.culturequest;
 
-import static android.app.Activity.RESULT_OK;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -8,10 +7,8 @@ import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
-import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -20,9 +17,6 @@ import static org.junit.Assert.assertTrue;
 import static ch.epfl.culturequest.utils.ProfileUtils.DEFAULT_PROFILE_PIC_PATH;
 
 import android.Manifest;
-import android.app.Instrumentation;
-import android.content.Intent;
-import android.net.Uri;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.intent.Intents;
@@ -39,15 +33,16 @@ import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.ui.settings.UserSettingsActivity;
 
 @RunWith(AndroidJUnit4.class)
-public class SettingsActivityTest {
+public class UserSettingsActivityTest {
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
 //    @Rule
 //    public GrantPermissionRule grantPermissionRule2 = GrantPermissionRule.grant(Manifest.permission.READ_MEDIA_IMAGES);
 
-    private static SettingsActivity activity;
+    private static UserSettingsActivity activity;
     private final String email = "test@gmail.com";
     private final String password = "abcdefg";
 
@@ -76,7 +71,7 @@ public class SettingsActivityTest {
 
         Profile.setActiveProfile(new Profile("userName", DEFAULT_PROFILE_PIC_PATH));
 
-        ActivityScenario.launch(SettingsActivity.class).onActivity(a -> activity = a);
+        ActivityScenario.launch(UserSettingsActivity.class).onActivity(a -> activity = a);
         Intents.init();
     }
 

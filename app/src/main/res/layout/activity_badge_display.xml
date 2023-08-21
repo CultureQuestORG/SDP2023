@@ -25,8 +25,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="13dp"
-        android:paddingHorizontal="7dp"
         android:fontFamily="@font/poppins_bold"
+        android:paddingHorizontal="7dp"
         android:shadowColor="#26000000"
         android:shadowDx="0"
         android:shadowDy="4"
@@ -39,13 +39,113 @@
         app:layout_constraintStart_toEndOf="@+id/back_button"
         app:layout_constraintTop_toTopOf="@+id/back_button" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/badge_collection"
+    <ScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title_leaderboard"
+        android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:paddingHorizontal="20dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_leaderboard">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/title_country"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:fontFamily="@font/poppins_bold"
+        android:paddingHorizontal="7dp"
+        android:text="Countries"
+        android:textColor="@color/black"
+        android:textSize="24dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/title_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppins_bold"
+        android:paddingHorizontal="7dp"
+        android:textColor="@color/black"
+        android:textSize="24dp"
+        android:text="Cities"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/badge_collection_country" />
+
+    <TextView
+        android:id="@+id/title_museum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppins_bold"
+        android:paddingHorizontal="7dp"
+        android:textColor="@color/black"
+        android:textSize="24dp"
+        android:text="Museums"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/badge_collection_city" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/badge_collection_country"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:paddingHorizontal="20dp"
+        android:isScrollContainer="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_country" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/badge_collection_city"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_city" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/badge_collection_museum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_museum" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+
+    <TextView
+        android:id="@+id/no_badge_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="40dp"
+        android:text="You don't have any badge yet. Scan an artwork to get some."
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:alpha="0.3"
+        android:fontFamily="@font/poppins"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/scroll_view"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

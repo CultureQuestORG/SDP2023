@@ -1,5 +1,6 @@
 package ch.epfl.culturequest.ui.events;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,10 +13,22 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
 import java.util.Objects;
 
+import ch.epfl.culturequest.NavigationActivity;
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.backend.map_collection.OTMLatLng;
+import ch.epfl.culturequest.backend.map_collection.OTMLocation;
 import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.databinding.ActivityEventsBinding;
 import ch.epfl.culturequest.social.Profile;
@@ -36,17 +49,31 @@ public class EventsActivity extends AppCompatActivity {
     private RecyclerView eventsRecyclerView;
     private SightseeingRecycleViewAdapter sightseeingRecycleViewAdapter;
     private TournamentsRecycleViewAdapter tournamentsRecycleViewAdapter;
+    private static View mapFragmentView;
+    private static SupportMapFragment mapFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Authenticator.checkIfUserIsLoggedIn(this);
 
         binding = ActivityEventsBinding.inflate(getLayoutInflater());
         AndroidUtils.removeStatusBar(getWindow());
         setContentView(binding.getRoot());
 
+        if (Profile.getActiveProfile() != null) {
+            setupActivity();
+        } else {
+            Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, throwable) -> {
+                if (throwable != null || profile == null) return;
+                Profile.setActiveProfile(profile);
+                setupActivity();
+            });
+        }
+    }
+
+    // Setup EventsActivity
+    private void setupActivity() {
         sightseeingButton = binding.sightseeingButton;
         sightseeingButton.setOnClickListener(this::displaySigthseeing);
 
@@ -56,6 +83,8 @@ public class EventsActivity extends AppCompatActivity {
         eventsRecyclerView = binding.eventsRecyclerView;
 
         eventsViewModel = new ViewModelProvider(this).get(EventsViewModel.class);
+        mapFragmentView = findViewById(R.id.map_fragment);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         sightseeingRecycleViewAdapter = new SightseeingRecycleViewAdapter(eventsViewModel);
         tournamentsRecycleViewAdapter = new TournamentsRecycleViewAdapter(eventsViewModel);
 
@@ -64,23 +93,7 @@ public class EventsActivity extends AppCompatActivity {
         eventsRecyclerView.setAdapter(sightseeingRecycleViewAdapter);
         eventsRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-
         String redirect = getIntent().getStringExtra("redirect");
-        if (redirect != null) {
-            if (Profile.getActiveProfile() != null) {
-                redirectToCorrectActivity(redirect);
-            } else {
-                Database.getProfile(Authenticator.getCurrentUser().getUid()).whenComplete((profile, throwable) -> {
-                    if (throwable != null || profile == null) return;
-                    Profile.setActiveProfile(profile);
-                    redirectToCorrectActivity(redirect);
-                });
-            }
-        }
-    }
-
-    // allows to redirect to the correct listview after an intent with redirection
-    private void redirectToCorrectActivity(String redirect) {
         if (Objects.equals(redirect, "sightseeing")) {
             displaySigthseeing(binding.getRoot());
         }
@@ -111,6 +124,9 @@ public class EventsActivity extends AppCompatActivity {
      * @param v the view
      */
     public void displaySigthseeing(View v) {
+        if (mapFragmentView.getVisibility() == View.VISIBLE) {
+            mapFragmentView.setVisibility(View.INVISIBLE);
+        }
         searchingForUsers.setValue(true);
         swapColors();
     }
@@ -121,6 +137,9 @@ public class EventsActivity extends AppCompatActivity {
      * @param v the view
      */
     public void displayTournaments(View v) {
+        if (mapFragmentView.getVisibility() == View.VISIBLE) {
+            mapFragmentView.setVisibility(View.INVISIBLE);
+        }
         searchingForUsers.setValue(false);
         swapColors();
     }
@@ -129,6 +148,35 @@ public class EventsActivity extends AppCompatActivity {
      * Returns to the home fragment
      */
     public void goBack(View view) {
-        super.onBackPressed();
+        onBackPressed();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mapFragmentView.getVisibility() == View.VISIBLE) {
+            mapFragmentView.setVisibility(View.INVISIBLE);
+        } else {
+            Intent intent = new Intent(this, NavigationActivity.class);
+            intent.putExtra("redirect", "home");
+            startActivity(intent);
+        }
+    }
+
+    public static void openMap(List<OTMLocation> locations) {
+        mapFragmentView.setVisibility(View.VISIBLE);
+        mapFragment.getMapAsync(googleMap -> {
+            googleMap.clear();
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(mapFragmentView.getContext(), R.raw.maps_style_json_alternative));
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (OTMLocation location : locations) {
+                OTMLatLng coord = location.getCoordinates();
+                LatLng mapCoord = new LatLng(coord.getLat(), coord.getLon());
+                MarkerOptions markerOptions = new MarkerOptions().position(mapCoord).title(location.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                googleMap.addMarker(markerOptions);
+                builder.include(new LatLng(coord.getLat(), coord.getLon()));
+            }
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 200));
+        });
+
     }
 }

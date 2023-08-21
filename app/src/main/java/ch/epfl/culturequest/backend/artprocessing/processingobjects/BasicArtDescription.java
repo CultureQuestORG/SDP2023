@@ -2,6 +2,8 @@ package ch.epfl.culturequest.backend.artprocessing.processingobjects;
 
 import java.util.List;
 
+import ch.epfl.culturequest.social.ScanBadge;
+
 /**
  * A basic description of a piece of art (name, summary, type, year, city, country, museum)
  */
@@ -58,6 +60,10 @@ public class BasicArtDescription {
 
     public String getSummary() {
         return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public String getCity() {
@@ -123,6 +129,18 @@ public class BasicArtDescription {
 
     public void setMuseum(String museum) {
         this.museum = museum;
+    }
+
+    public void reformatBadges(){
+        if (city != null){
+            city = ScanBadge.City.toUniqueString(city);
+        }
+        if (country != null){
+            country = ScanBadge.Country.toUniqueString(country);
+        }
+        if (museum != null){
+            museum = ScanBadge.Museum.toUniqueString(museum);
+        }
     }
 
 

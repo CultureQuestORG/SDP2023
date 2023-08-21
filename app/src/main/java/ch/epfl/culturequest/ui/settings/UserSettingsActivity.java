@@ -1,41 +1,45 @@
-package ch.epfl.culturequest;
+package ch.epfl.culturequest.ui.settings;
 
 import static ch.epfl.culturequest.utils.AndroidUtils.hasConnection;
 import static ch.epfl.culturequest.utils.AndroidUtils.showNoConnectionAlert;
 import static ch.epfl.culturequest.utils.CropUtils.TAKE_PICTURE;
 import static ch.epfl.culturequest.utils.ProfileUtils.setProblemHintTextIfAny;
 
-import android.app.Activity;
-import android.content.Context;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.squareup.picasso.Picasso;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.function.Predicate;
 
-import ch.epfl.culturequest.authentication.Authenticator;
+import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.backend.tournament.apis.TournamentManagerApi;
 import ch.epfl.culturequest.database.Database;
-import ch.epfl.culturequest.databinding.ActivitySettingsBinding;
+import ch.epfl.culturequest.databinding.ActivityProfileSettingsBinding;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.ImageFetcher;
 import ch.epfl.culturequest.utils.AndroidUtils;
 import ch.epfl.culturequest.utils.CropUtils;
 import ch.epfl.culturequest.utils.CustomSnackbar;
@@ -46,13 +50,14 @@ import ch.epfl.culturequest.utils.ProfileUtils;
 /**
  * Activity that allows the user to change his profile picture and username
  */
-public class SettingsActivity extends AppCompatActivity {
+public class UserSettingsActivity extends AppCompatActivity {
     private ImageView profilePictureView;
     private String profilePicUri;
     private Bitmap profilePicBitmap;
     private Profile activeProfile;
 
     private TextView username;
+    Button updateProfileButton;
 
     private View rootView;
 
@@ -63,21 +68,18 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_profile_settings);
         AndroidUtils.removeStatusBar(getWindow());
-        ch.epfl.culturequest.databinding.ActivitySettingsBinding binding = ActivitySettingsBinding.inflate(getLayoutInflater());
+
+        ch.epfl.culturequest.databinding.ActivityProfileSettingsBinding binding = ActivityProfileSettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        //appear from right
+        getWindow().setEnterTransition(new Slide(Gravity.END));
 
         //handle logout
         Button logoutButton = binding.logOut;
-        logoutButton.setOnClickListener(v -> {
-            Context context = v.getContext();
-            if (hasConnection(context)) Authenticator.signOut(this);
-            else {
-                View rootView = v.getRootView();
-                CustomSnackbar.showCustomSnackbar("Cannot log out. You are not connected to the internet", R.drawable.unknown_error, rootView, (Void) -> null);
-            }
-        });
+        logoutButton.setOnClickListener(this::handleDeletePopUp);
 
         activeProfile = Profile.getActiveProfile();
 
@@ -87,17 +89,24 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
 
+        // handle the update profile button
+        updateProfileButton = binding.updateProfile;
+        updateProfileButton.setOnClickListener(this::UpdateProfile);
+
         username = binding.username;
         username.setText(activeProfile.getUsername());
+        username.addTextChangedListener(onInputChange(updateProfileButton, (s) -> !s.toString().equals(activeProfile.getUsername())));
+
+        EditText city = binding.city;
+        city.setText(activeProfile.getCity());
+        city.addTextChangedListener(onInputChange(updateProfileButton, (s) -> !s.toString().equals("Lausanne")));
+
 
         // load the profile picture
         profilePictureView = binding.profilePicture;
-        Picasso.get().load(activeProfile.getProfilePicture()).into(profilePictureView);
         profilePicUri = activeProfile.getProfilePicture();
+        ImageFetcher.fetchImage(this, profilePicUri, profilePictureView, android.R.drawable.progress_horizontal);
 
-        // handle the update profile button
-        Button updateProfileButton = binding.updateProfile;
-        updateProfileButton.setOnClickListener(this::UpdateProfile);
 
         rootView = binding.getRoot();
     }
@@ -112,6 +121,7 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         activeProfile.setUsername(username.getText().toString());
+        activeProfile.setCity(((EditText) findViewById(R.id.city)).getText().toString());
         // if the profile picture has not been changed, we don't need to upload it again
         if (profilePicUri.equals(activeProfile.getProfilePicture())) {
             Database.setProfile(activeProfile);
@@ -147,7 +157,7 @@ public class SettingsActivity extends AppCompatActivity {
      * @param result the result of the activity launched to select the profile picture
      */
     private Void displayProfilePic(Uri result) {
-        Picasso.get().load(result).into(profilePictureView);
+        ImageFetcher.fetchImage(this, result.toString(), profilePictureView, android.R.drawable.progress_horizontal);
         profilePicUri = result.toString();
         try {
             profilePicBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), result);
@@ -179,7 +189,9 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        CropUtils.manageCropFlow(requestCode, resultCode, data, this, this::displayProfilePic, rootView);
+        CropUtils.manageCropFlow(requestCode, resultCode, data, this, this::displayProfilePic, rootView, (v) -> {
+            updateProfileButton.setEnabled(true);
+        });
     }
 
     @Override
@@ -200,5 +212,46 @@ public class SettingsActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    private TextWatcher onInputChange(Button button, Predicate<Editable> isValid) {
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                button.setEnabled(isValid.test(s));
+            }
+        };
+    }
+
+    /**
+     * Displays a pop up to confirm the deletion of a post.
+     *
+     * @param v    the view
+     */
+    private void handleDeletePopUp(View v) {
+        AlertDialog dial = new AlertDialog.Builder(v.getContext()).setMessage("Are you sure you want to delete your account?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    System.out.println(user);
+                    user.delete()
+                            .addOnCompleteListener(task -> {
+                                System.out.println(task.isSuccessful());
+                                if (task.isSuccessful()) {
+                                    View rootView = v.getRootView();
+                                    CustomSnackbar.showCustomSnackbar("Account deleted successfully", R.drawable.account, rootView, (Void) -> null);
+                                }
+                            });
+                })
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
+        dial.show();
+    }
 
 }

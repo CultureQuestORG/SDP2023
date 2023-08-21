@@ -10,21 +10,19 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.squareup.picasso.Picasso;
-
 import java.util.List;
+import java.util.Objects;
 
 import ch.epfl.culturequest.ArtDescriptionDisplayActivity;
 import ch.epfl.culturequest.R;
@@ -34,6 +32,8 @@ import ch.epfl.culturequest.database.Database;
 import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.notifications.LikeNotification;
 import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.ImageFetcher;
+import ch.epfl.culturequest.ui.commons.LikeAnimation;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import ch.epfl.culturequest.utils.CustomSnackbar;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -65,11 +65,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         Post post = pictures.get(position);
         String pictureUrl = post.getImageUrl();
 
-        // Load the picture into the ImageView using Picasso
-        Picasso.get()
-                .load(pictureUrl)
-                .placeholder(android.R.drawable.progress_horizontal)
-                .into(holder.pictureImageView);
+        ImageFetcher.fetchImage(holder.itemView.getContext(), pictureUrl, holder.pictureImageView);
 
         // Set the text of the title
         holder.title.setText(post.getArtworkName());
@@ -77,10 +73,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         // Get the profile picture and username of the user who posted the picture
         Database.getProfile(post.getUid()).thenAccept(profile -> {
             holder.username.setText(profile.getUsername());
-            Picasso.get()
-                    .load(profile.getProfilePicture())
-                    .placeholder(android.R.drawable.progress_horizontal)
-                    .into(holder.profilePicture);
+
+            ImageFetcher.fetchImage(holder.itemView.getContext(), profile.getProfilePicture(), holder.profilePicture, android.R.drawable.progress_horizontal);
         });
 
         // Set listeners for the username and profile picture to open the profile of the user
@@ -94,17 +88,24 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
         // Set the text of the details on the verso of the post card
         Database.getArtwork(post.getArtworkName()).thenAccept(artwork -> {
+            boolean hasBadge = (artwork.getCountry().length() > 0 && !Objects.equals(artwork.getCountry(), "none"))
+                    || (artwork.getCity().length() > 0 && !Objects.equals(artwork.getCountry(), "none"))
+                    || (artwork.getMuseum().length() > 0 && !Objects.equals(artwork.getMuseum(), "none"));
             // Set the text of the info in their respective TextViews
             holder.artName.setText(artwork.getName());
             holder.artist.setText(artwork.getArtist());
             holder.year.setText(artwork.getYear());
-            holder.description.setText(shortenDescription(artwork.getSummary()));
-            holder.score.setText("+" + artwork.getScore() + " pts");
-            holder.location.setText(artwork.getCity()!=null ? artwork.getCity() : artwork.getCountry()!=null ? artwork.getCountry() : "World");
+            holder.description.setText(shortenDescription(artwork.getSummary(), hasBadge));
+            String locationText = "";
+            if (!Objects.equals(artwork.getCountry(), "none"))
+                locationText = artwork.getCountry();
+            if (!Objects.equals(artwork.getCity(), "none"))
+                locationText = artwork.getCity();
+            holder.location.setText(locationText);
 
 
             // Put a see more button if the description is too long
-            displaySeeMore(artwork, holder.seeMore, pictureUrl);
+            displaySeeMore(artwork, holder.seeMore, pictureUrl, hasBadge);
 
             // Set the badges
             setCountryBadge(holder.countryBadge, holder.countryText, artwork.getCountry());
@@ -116,8 +117,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             holder.artName.setText("N/A");
             holder.artist.setText("N/A");
             holder.year.setText("N/A");
-            holder.description.setText(shortenDescription("N/A"));
-            holder.score.setText("+" + 0 + " pts");
+            holder.description.setText(shortenDescription("N/A", false));
 
             setCountryBadge(holder.countryBadge, holder.countryText, "N/A");
             setCityBadge(holder.cityBadge, holder.cityText, "N/A");
@@ -125,7 +125,6 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             setRarityBadge(holder.rarityBadge, 0);
             return null;
         });
-
 
 
         // Set the like count
@@ -146,18 +145,18 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             return null;
         } else if (likes == 1) {
             return "1 like";
-        } else if (likes / 1000d >= 1){
-            return String.format("%.2fK likes", (likes/1000d));
-        }
-        else {
+        } else if (likes / 1000d >= 1) {
+            return String.format("%.2fK likes", (likes / 1000d));
+        } else {
             return likes + " likes";
         }
     }
 
     /**
      * Handles the like of a post.
+     *
      * @param holder the holder view of the post
-     * @param post the post
+     * @param post   the post
      */
     private void handleLike(@NonNull PictureViewHolder holder, Post post) {
         if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
@@ -169,10 +168,10 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
         if (post.isLikedBy(Profile.getActiveProfile().getUid())) {
             holder.isLiked = true;
-            Picasso.get().load(R.drawable.like_full).into(holder.like);
+            holder.like.setImageResource(R.drawable.like_full);
         } else {
             holder.isLiked = false;
-            Picasso.get().load(R.drawable.like_empty).into(holder.like);
+            holder.like.setImageResource(R.drawable.like_empty);
         }
 
         // Set the listener for the like button
@@ -185,9 +184,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                         holder.setLike(aVoid.getLikes());
                     }
                 });
-                Picasso.get()
-                        .load(R.drawable.like_empty)
-                        .into(holder.like);
+                holder.like.setImageResource(R.drawable.like_empty);
             } else {
                 holder.isLiked = true;
                 Database.addLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
@@ -203,17 +200,39 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                         FireMessaging.sendNotification(profile.getUid(), notification);
                     }
                 });
-                Picasso.get().load(R.drawable.like_full).into(holder.like);
+                holder.like.setImageResource(R.drawable.like_full);
             }
         });
+
+        holder.onDoubleTapClickListener = (v) -> {
+            holder.likeAnimation.play();
+            if (!holder.isLiked) {
+                holder.isLiked = true;
+                Database.addLike(post, Profile.getActiveProfile().getUid()).whenComplete((aVoid, throwable) -> {
+                    if (throwable == null && aVoid != null) {
+                        post.setLikers(aVoid.getLikers());
+                        holder.setLike(aVoid.getLikes());
+                    }
+                });
+                // send the like notification
+                Database.getProfile(post.getUid()).thenAccept(profile -> {
+                    if (profile != null) {
+                        LikeNotification notification = new LikeNotification(profile.getUsername());
+                        FireMessaging.sendNotification(profile.getUid(), notification);
+                    }
+                });
+                holder.like.setImageResource(R.drawable.like_full);
+            }
+        };
 
     }
 
 
     /**
      * Handles the deletion of a post.
+     *
      * @param holder the holder view of the post
-     * @param post the post
+     * @param post   the post
      */
     private void handleDelete(@NonNull PictureViewHolder holder, Post post) {
         if (post.getUid().equals(Profile.getActiveProfile().getUid())) {
@@ -230,7 +249,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     /**
      * Displays a pop up to confirm the deletion of a post.
-     * @param v the view
+     *
+     * @param v    the view
      * @param post the post
      */
     private void handleDeletePopUp(View v, Post post) {
@@ -238,7 +258,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                 .setPositiveButton("Yes", (dialog, which) -> {
                     pictures.remove(post);
                     notifyItemRemoved(pictures.indexOf(post));
-                    notifyItemRangeChanged(pictures.indexOf(post), pictures.size());
+                    notifyItemRangeChanged(0, pictures.size());
                     Database.removePost(post);
                     FireStorage.deleteImage(post.getImageUrl());
                     View rootView = v.getRootView();
@@ -250,12 +270,15 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     /**
      * Shortens the description of an artwork if it is too long (> 200 chars).
+     *
      * @param description the description
      * @return the shortened description
      */
-    private String shortenDescription(String description) {
-        if (description.length() > 200) {
-            return description.substring(0, 200) + "...";
+    private String shortenDescription(String description, boolean hasBadge) {
+        if (hasBadge && description.length() > 250) {
+            return description.substring(0, 250) + "...";
+        } else if (description.length() > 400) {
+            return description.substring(0, 400) + "...";
         } else {
             return description;
         }
@@ -263,12 +286,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     /**
      * Displays a see more button if the description is too long.
+     *
      * @param description the description
-     * @param seeMore the see more button
-     * @param pictureUrl the picture url of the post
+     * @param seeMore     the see more button
+     * @param pictureUrl  the picture url of the post
      */
-    private void displaySeeMore(BasicArtDescription description, TextView seeMore, String pictureUrl) {
-        if(description.getSummary().length() > 200) {
+    private void displaySeeMore(BasicArtDescription description, TextView seeMore, String pictureUrl, boolean hasBadge) {
+        if ((hasBadge && description.getSummary().length() > 250) || description.getSummary().length() > 400) {
             seeMore.setVisibility(View.VISIBLE);
 
             // Set the listener for the see more button to open the description activity
@@ -285,8 +309,9 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     /**
      * Sets the rarity badge of a post.
+     *
      * @param rarityBadge the rarity badge
-     * @param score the score of the post
+     * @param score       the score of the post
      */
     private void setRarityBadge(ImageView rarityBadge, Integer score) {
         if (score != null) {
@@ -300,12 +325,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     /**
      * Sets the country badge of a post.
+     *
      * @param countryBadge the country badge
-     * @param countryText the country text
-     * @param country the country
+     * @param countryText  the country text
+     * @param country      the country
      */
     private void setCountryBadge(ImageView countryBadge, TextView countryText, String country) {
-        if (country != null) {
+        if (!Objects.equals(country, "none")) {
             countryBadge.setImageResource(ScanBadge.Country.fromString(country).getBadge());
             countryText.setText(country);
             countryBadge.setTag(ScanBadge.Country.fromString(country).name());
@@ -317,12 +343,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     /**
      * Sets the city badge of a post.
+     *
      * @param cityBadge the city badge
-     * @param cityText the city text
-     * @param city the city
+     * @param cityText  the city text
+     * @param city      the city
      */
     private void setCityBadge(ImageView cityBadge, TextView cityText, String city) {
-        if (city != null) {
+        if (!Objects.equals(city, "none")) {
             cityBadge.setImageResource(ScanBadge.City.fromString(city).getBadge());
             cityText.setText(city);
             cityBadge.setTag(ScanBadge.City.fromString(city).name());
@@ -334,12 +361,13 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     /**
      * Sets the museum badge of a post.
+     *
      * @param museumBadge the museum badge
-     * @param museumText the museum text
-     * @param museum the museum
+     * @param museumText  the museum text
+     * @param museum      the museum
      */
     private void setMuseumBadge(ImageView museumBadge, TextView museumText, String museum) {
-        if (museum != null) {
+        if (!Objects.equals(museum, "none")) {
             museumBadge.setImageResource(ScanBadge.Museum.fromString(museum).getBadge());
             museumText.setText(museum);
             museumBadge.setTag(ScanBadge.Museum.fromString(museum).name());
@@ -374,8 +402,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public TextView artist;
         public TextView year;
         public TextView description;
-        public TextView score;
         public TextView seeMore;
+        public LikeAnimation likeAnimation;
 
         public ImageView countryBadge;
         public TextView countryText;
@@ -384,6 +412,8 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         public ImageView museumBadge;
         public TextView museumText;
         public ImageView rarityBadge;
+
+        public View.OnClickListener onDoubleTapClickListener = view -> {};
 
         public boolean isLiked = false;
 
@@ -401,12 +431,12 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             likeCount = itemView.findViewById(R.id.like_count);
             delete = itemView.findViewById(R.id.delete_button);
             View descriptionContainer = itemView.findViewById(R.id.descriptionContainerPost);
+            likeAnimation = itemView.findViewById(R.id.like_animation);
 
             // Get the views on the verso
             artName = itemView.findViewById(R.id.artNamePost);
             artist = itemView.findViewById(R.id.artistNamePost);
             year = itemView.findViewById(R.id.artYearPost);
-            score = itemView.findViewById(R.id.artScorePost);
             description = itemView.findViewById(R.id.artSummaryPost);
             seeMore = itemView.findViewById(R.id.seeMorePost);
 
@@ -422,16 +452,73 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             View postVerso = itemView.findViewById(R.id.post_verso);
             postVerso.setVisibility(View.INVISIBLE);
 
+
             // Enables flipping the post from recto to verso
-            pictureImageView.setOnClickListener(v -> {
-                if (isFlipping) return;
-                flip(v.getContext(), postVerso, postRecto);
+            final GestureDetector gestureDetector = new GestureDetector(itemView.getContext(),
+                    new GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onDown(MotionEvent e) {
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                               float velocityX, float velocityY) {
+                            final float xDistance = Math.abs(e1.getX() - e2.getX());
+                            final float yDistance = Math.abs(e1.getY() - e2.getY());
+                            if (xDistance > yDistance) {
+                                if (isFlipping) return false;
+                                flip(itemView.getContext(), postVerso, postRecto);
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onSingleTapConfirmed(MotionEvent e) {
+                            if (isFlipping) return false;
+                            flip(itemView.getContext(), postVerso, postRecto);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onDoubleTap(MotionEvent e) {
+                            onDoubleTapClickListener.onClick(itemView);
+                            return true;
+                        }
+                    });
+            pictureImageView.setOnTouchListener((v, event) -> {
+                return gestureDetector.onTouchEvent(event);
             });
 
             // Enables flipping the post from verso to recto
-            descriptionContainer.setOnClickListener(v -> {
-                if (isFlipping) return;
-                flip(v.getContext(), postRecto, postVerso);
+            final GestureDetector gestureDetector2 = new GestureDetector(itemView.getContext(),
+                    new GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onDown(MotionEvent e) {
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                               float velocityX, float velocityY) {
+                            final float xDistance = Math.abs(e1.getX() - e2.getX());
+                            final float yDistance = Math.abs(e1.getY() - e2.getY());
+                            if (xDistance > yDistance) {
+                                if (isFlipping) return false;
+                                flip(itemView.getContext(), postRecto, postVerso);
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onSingleTapConfirmed(MotionEvent e) {
+                            if (isFlipping) return false;
+                            flip(itemView.getContext(), postRecto, postVerso);
+                            return true;
+                        }
+                    });
+            descriptionContainer.setOnTouchListener((v, event) -> {
+                return gestureDetector2.onTouchEvent(event);
             });
         }
 

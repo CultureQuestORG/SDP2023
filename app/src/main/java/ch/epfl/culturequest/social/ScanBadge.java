@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.social;
 
+import androidx.annotation.NonNull;
+
 import ch.epfl.culturequest.R;
 
 public class ScanBadge {
@@ -22,13 +24,29 @@ public class ScanBadge {
             }
             return Country.OTHER;
         }
+
+        static String getType(String s) {
+            Country country = Country.fromString(s);
+            if (country != Country.OTHER) {
+                return "country";
+            }
+            City city = City.fromString(s);
+            if (city != City.OTHER) {
+                return "city";
+            }
+            Museum museum = Museum.fromString(s);
+            if (museum != Museum.OTHER) {
+                return "museum";
+            }
+            return "other";
+        }
     }
 
 
     /**
      * Represents the country of the badge
      */
-    public enum Country implements Badge{
+    public enum Country implements Badge {
         //List of supported countries
         AUSTRALIA, EGYPT, FRANCE, INDIA, ITALY, MEXICO, SWITZERLAND, USA, OTHER;
 
@@ -91,6 +109,34 @@ public class ScanBadge {
                     return USA;
                 default:
                     return OTHER;
+            }
+        }
+
+        public static String toUniqueString(String country){
+            switch (country.toUpperCase()) {
+                case "AUSTRALIA":
+                case "AUSTRALIE":
+                case "COMMONWEALTH OF AUSTRALIA":
+                    return "Australia";
+                case "EGYPT":
+                    return "Egypt";
+                case "FRANCE":
+                case "REPUBLIC OF FRANCE":
+                    return "France";
+                case "INDIA":
+                    return "India";
+                case "ITALY":
+                    return "Italy";
+                case "MEXICO":
+                    return "Mexico";
+                case "SWITZERLAND":
+                    return "Switzerland";
+                case "USA":
+                case "UNITED STATES":
+                case "UNITED STATES OF AMERICA":
+                    return "USA";
+                default:
+                    return country;
             }
         }
     }
@@ -175,6 +221,40 @@ public class ScanBadge {
                     return OTHER;
             }
         }
+
+        public static String toUniqueString(String city) {
+            switch (city.toUpperCase()) {
+                case "BARCELONA":
+                    return "Barcelona";
+                case "BERLIN":
+                    return "Berlin";
+                case "GENEVA":
+                case "GENÈVE":
+                    return "Geneva";
+                case "LAUSANNE":
+                    return "Lausanne";
+                case "LONDON":
+                    return "London";
+                case "MADRID":
+                    return "Madrid";
+                case "MUNICH":
+                case "MÜNCHEN":
+                    return "Munich";
+                case "NEW YORK":
+                    return "New York";
+                case "PARIS":
+                    return "Paris";
+                case "ROME":
+                case "ROMA":
+                    return "Rome";
+                case "WASHINGTON, D.C.":
+                case "WASHINGTON, DC":
+                case "WASHINGTON":
+                    return "Washington";
+                default:
+                    return city;
+            }
+        }
     }
 
     /**
@@ -238,6 +318,33 @@ public class ScanBadge {
                     return VATICAN;
                 default:
                     return OTHER;
+            }
+        }
+
+        public static String toUniqueString(String museum){
+            switch (museum.toUpperCase()){
+                case "BRITISH MUSEUM":
+                case "BRITISH MUSEUM, LONDON":
+                    return "British Museum";
+                case "GUGGENHEIM MUSEUM":
+                case "GUGGENHEIM":
+                    return "Guggenheim Museum";
+                case "LOUVRE":
+                case "MUSÉE DU LOUVRE":
+                    return "Musée du Louvre";
+                case "METROPOLITAN MUSEUM OF ART":
+                case "METROPOLITAN MUSEUM":
+                case "MET":
+                    return "Metropolitan Museum of Art";
+                case "MUSEUM OF MODERN ART":
+                case "MOMA":
+                    return "Museum of Modern Art";
+                case "VATICAN MUSEUMS":
+                case "VATICAN":
+                case "MUSEI VATICANI":
+                    return "Vatican Museums";
+                default:
+                    return museum;
             }
         }
     }
