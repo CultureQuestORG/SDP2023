@@ -24,6 +24,22 @@ public class ScanBadge {
             }
             return Country.OTHER;
         }
+
+        static String getType(String s) {
+            Country country = Country.fromString(s);
+            if (country != Country.OTHER) {
+                return "country";
+            }
+            City city = City.fromString(s);
+            if (city != City.OTHER) {
+                return "city";
+            }
+            Museum museum = Museum.fromString(s);
+            if (museum != Museum.OTHER) {
+                return "museum";
+            }
+            return "other";
+        }
     }
 
 

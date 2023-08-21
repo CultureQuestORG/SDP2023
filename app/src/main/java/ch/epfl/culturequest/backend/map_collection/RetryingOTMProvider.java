@@ -90,7 +90,43 @@ public class RetryingOTMProvider implements OTMProvider{
         }).thenApply(CompletableFuture::join);
     }
 
+    private CompletableFuture<List<OTMLocation>> getLocationsNTimes(LatLng center, int n) {
+        return wrapped.getLocations(center).handle((result, throwable) -> {
+            CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
+            if (throwable == null){
+                future.complete(result);
+                return future;
+            }
+            else if (isOTMException(throwable)) {
+                future.completeExceptionally(new OTMException(throwable.getMessage()));
+                return future;
+            } else if (n == 0){
+                future.completeExceptionally(new OTMException("Too many retries"));
+                return future;
+            } else {
+                return getLocationsNTimes(center, n-1);
+            }
+        }).thenApply(CompletableFuture::join);
+    }
 
+    private CompletableFuture<OTMLocation> getLocationNTimes(String xid, int n) {
+        return wrapped.getLocation(xid).handle((result, throwable) -> {
+            CompletableFuture<OTMLocation> future = new CompletableFuture<>();
+            if (throwable == null){
+                future.complete(result);
+                return future;
+            }
+            else if (isOTMException(throwable)) {
+                future.completeExceptionally(new OTMException(throwable.getMessage()));
+                return future;
+            } else if (n == 0){
+                future.completeExceptionally(new OTMException("Too many retries"));
+                return future;
+            } else {
+                return getLocationNTimes(xid, n-1);
+            }
+        }).thenApply(CompletableFuture::join);
+    }
 
     @Override
     public CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight) {
@@ -98,7 +134,18 @@ public class RetryingOTMProvider implements OTMProvider{
     }
 
     @Override
+    public CompletableFuture<List<OTMLocation>> getLocations(LatLng center) {
+       return getLocationsNTimes(center, numberOfRetries);
+    }
+
+
+    @Override
     public CompletableFuture<List<OTMLocation>> getLocations(String city) {
         return getLocationsNTimes(city, DEFAULT_NUMBER_OF_RETRIES);
+    }
+
+    @Override
+    public CompletableFuture<OTMLocation> getLocation(String xid) {
+        return getLocationNTimes(xid, DEFAULT_NUMBER_OF_RETRIES);
     }
 }

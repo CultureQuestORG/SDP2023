@@ -89,6 +89,8 @@ public class SearchActivity extends AppCompatActivity {
         searchCities = binding.searchCities;
         search = binding.search;
         search.addTextChangedListener(watcher);
+
+        search.requestFocus();
     }
 
     /**
@@ -190,8 +192,9 @@ public class SearchActivity extends AppCompatActivity {
      * @param v
      */
     public void lookForCities(View v) {
-        search.setText("");
         searchingForUsers.setValue(false);
+        if(!search.getText().toString().isEmpty())
+            searchForCityDynamically(search.getText().toString());
         swapColors();
     }
 
@@ -200,8 +203,9 @@ public class SearchActivity extends AppCompatActivity {
      * @param v
      */
     public void lookForUsers(View v) {
-        search.setText("");
         searchingForUsers.setValue(true);
+        if(!search.getText().toString().isEmpty())
+            searchUserDynamically(search.getText().toString());
         swapColors();
     }
 

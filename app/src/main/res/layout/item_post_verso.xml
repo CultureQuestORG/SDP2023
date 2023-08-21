@@ -64,34 +64,16 @@
                 tools:text="Year" />
 
             <TextView
-                android:id="@+id/artScorePost"
-                android:layout_width="102dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:fontFamily="@font/poppins_extrabold"
-                android:textAlignment="viewEnd"
-                android:textColor="#F27329"
-                android:textSize="24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/artYearPost"
-                app:layout_constraintEnd_toStartOf="@id/rarityPost"
-                app:layout_constraintHorizontal_bias="0.959"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/artistNamePost"
-                app:layout_constraintVertical_bias="0.6"
-                tools:text="Score" />
-
-            <TextView
                 android:id="@+id/artSummaryPost"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="10dp"
                 android:fontFamily="@font/poppins"
                 android:justificationMode="inter_word"
                 android:textColor="#000000"
                 android:textSize="18dp"
-                app:layout_constraintBottom_toTopOf="@+id/cityBadgePost"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -104,9 +86,9 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginEnd="12dp"
-                app:layout_constraintBottom_toBottomOf="@+id/artScorePost"
+                app:layout_constraintBottom_toBottomOf="@+id/artistNamePost"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/artScorePost"
+                app:layout_constraintTop_toBottomOf="@+id/artNamePost"
                 app:srcCompat="@drawable/rare" />
 
             <ImageView
@@ -184,12 +166,12 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="4dp"
                 android:background="#FFFFFF"
-                android:fontFamily="@font/poppins"
+                android:fontFamily="@font/poppins_medium"
                 android:text="See More"
                 android:textColor="@color/colorAccent"
-                android:textSize="15dp"
+                android:textSize="18dp"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/artSummaryPost"
+                app:layout_constraintTop_toBottomOf="@+id/artSummaryPost"
                 app:layout_constraintEnd_toEndOf="@+id/artSummaryPost" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

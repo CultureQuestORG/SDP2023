@@ -11,13 +11,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ch.epfl.culturequest.R;
+import ch.epfl.culturequest.storage.ImageFetcher;
 import ch.epfl.culturequest.ui.events.tournaments.TournamentViewModel;
 import ch.epfl.culturequest.ui.profile.DisplayUserProfileActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -166,7 +165,7 @@ public class LeaderboardRecycleViewAdapter extends RecyclerView.Adapter<Leaderbo
         leaderboardViewHolder.getUserName().setText(topNUserNames.get(position));
         leaderboardViewHolder.getUserScore().setText(topNUserScores.get(position));
         leaderboardViewHolder.getUserRank().setText(topNUserRanks.get(position));
-        Picasso.get().load(topNUserProfilePicturesUri.get(position)).into(leaderboardViewHolder.getUserProfilePicture());
+        ImageFetcher.fetchImage(itemViewContext, topNUserProfilePicturesUri.get(position), leaderboardViewHolder.getUserProfilePicture(), android.R.drawable.progress_horizontal);
 
     }
 

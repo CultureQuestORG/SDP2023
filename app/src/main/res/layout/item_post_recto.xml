@@ -32,7 +32,7 @@
 
             android:layout_alignBottom="@id/profile_picture"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="10dp"
             android:layout_toEndOf="@id/profile_picture"
             android:fontFamily="@font/poppins"
             android:text="@string/username"
@@ -54,13 +54,22 @@
     </RelativeLayout>
 
     <!-- Second section -->
-    <ImageView
-        android:id="@+id/image_view"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/joconde" />
+        android:adjustViewBounds="true">
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_image" />
+        <ch.epfl.culturequest.ui.commons.LikeAnimation
+            android:id="@+id/like_animation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Third section -->
     <RelativeLayout
@@ -99,7 +108,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="40dp"
             android:fontFamily="@font/poppins_bold"
-            android:gravity="center"
+            android:gravity="center_horizontal"
             android:text="@string/like_count"
             android:textAlignment="center"
             android:textColor="@color/colorPrimary"

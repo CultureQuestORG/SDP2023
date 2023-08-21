@@ -1,5 +1,7 @@
 package ch.epfl.culturequest.ui.profile;
 
+import android.util.Pair;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -7,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import ch.epfl.culturequest.authentication.Authenticator;
 import ch.epfl.culturequest.database.Database;
@@ -14,12 +17,14 @@ import ch.epfl.culturequest.notifications.FireMessaging;
 import ch.epfl.culturequest.notifications.FollowNotification;
 import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
+import ch.epfl.culturequest.social.ScanBadge;
 
 
 public class ProfileViewModel extends ViewModel {
 
     private final MutableLiveData<String> username;
     private final MutableLiveData<String> profilePictureUri;
+    private final MutableLiveData<String> city;
 
     private final MutableLiveData<List<Post>> pictures;
     private final MutableLiveData<Boolean> followed;
@@ -43,6 +48,7 @@ public class ProfileViewModel extends ViewModel {
         score = new MutableLiveData<>();
         followed = new MutableLiveData<>(false);
         badges = new MutableLiveData<>(new HashMap<>());
+        city = new MutableLiveData<>();
 
         if (activeProfile == null) {
             // Sets the active profile, useful when app is opened from a notification
@@ -68,6 +74,7 @@ public class ProfileViewModel extends ViewModel {
                 username.setValue(selectedProfile.getUsername());
                 score.setValue(selectedProfile.getScore());
                 badges.setValue(selectedProfile.getBadges());
+                city.setValue(selectedProfile.getCity().length() > 0 ? selectedProfile.getCity() : "Somewhere");
                 profilePictureUri.setValue(selectedProfile.getProfilePicture());
                 // We load all the posts for a user in 1 query to the database. Initially, I queried only 4 posts at
                 // a time, but it is computationally more efficient to do 1 big query:
@@ -94,6 +101,7 @@ public class ProfileViewModel extends ViewModel {
                     //set the values of the live data
                     username.setValue(activeProfile.getUsername());
                     profilePictureUri.setValue(activeProfile.getProfilePicture());
+                    city.setValue(activeProfile.getCity().length() > 0 ? activeProfile.getCity() : "Somewhere");
                     score.setValue(activeProfile.getScore());
                     badges.setValue(activeProfile.getBadges());
                     pictures.setValue(posts);
@@ -104,6 +112,7 @@ public class ProfileViewModel extends ViewModel {
                 Profile p = (Profile) profileObject;
                 username.postValue(p.getUsername());
                 profilePictureUri.postValue(p.getProfilePicture());
+                city.postValue(p.getCity().length() > 0 ? p.getCity() : "Somewhere");
                 score.postValue(p.getScore());
                 badges.postValue(p.getBadges());
                 // pictures.postValue(p.getPosts());
@@ -123,6 +132,13 @@ public class ProfileViewModel extends ViewModel {
      */
     public LiveData<String> getProfilePictureUri() {
         return profilePictureUri;
+    }
+
+    /**
+     * @return the city of the profile
+     */
+    public LiveData<String> getCity() {
+        return city;
     }
 
     /**

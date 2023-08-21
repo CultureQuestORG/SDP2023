@@ -15,6 +15,7 @@ import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import ch.epfl.culturequest.R;
@@ -37,11 +38,12 @@ public final class CropUtils {
         return options;
     }
 
-    public static void manageCropFlow(int requestCode, int resultCode, Intent data, Activity activity, Function<Uri, Void> displayProfilePic, View rootView) {
+    public static void manageCropFlow(int requestCode, int resultCode, Intent data, Activity activity, Function<Uri, Void> displayProfilePic, View rootView, Consumer<Void> callback) {
         // handle the result of the crop activity
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             final Uri resultUri = UCrop.getOutput(data);
             if (resultUri != null) {
+                callback.accept(null);
                 displayProfilePic.apply(resultUri);
             }
             // handle the result of the gallery activity

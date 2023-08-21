@@ -20,6 +20,9 @@ public interface OTMProvider {
      */
     CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight);
 
+    CompletableFuture<List<OTMLocation>> getLocations(LatLng center);
+
     CompletableFuture<List<OTMLocation>> getLocations(String city);
 
+    CompletableFuture<OTMLocation> getLocation(String xid);
 }

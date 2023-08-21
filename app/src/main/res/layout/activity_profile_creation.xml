@@ -13,6 +13,10 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="60dp"
         android:fontFamily="@font/poppins_bold"
+        android:shadowColor="#26000000"
+        android:shadowDx="0"
+        android:shadowDy="4"
+        android:shadowRadius="20"
         android:text="Account Creation"
         android:textColor="@color/colorPrimary"
         android:textSize="28sp"
@@ -20,76 +24,113 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="0dp"
-        android:layout_height="78dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginStart="20dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toTopOf="@+id/textView"
-        app:srcCompat="@drawable/logo_compact" />
-
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_picture"
         android:layout_width="193dp"
         android:layout_height="158dp"
         android:layout_marginStart="162dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="39dp"
         android:layout_marginEnd="159dp"
         android:onClick="selectProfilePicture"
-        android:src="@drawable/plus"
+        android:src="@drawable/placeholder_image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-    <TextView
-        android:id="@+id/profile_pic_text"
-        android:layout_width="193dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
-        android:paddingStart="10dp"
-        android:text="Add Profile Picture"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.46"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_picture" />
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imageView4"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
+        android:src="@drawable/plus"
+        app:layout_constraintBottom_toBottomOf="@+id/profile_picture"
+        app:layout_constraintEnd_toEndOf="@+id/profile_picture" />
 
-    <EditText
-        android:id="@+id/username"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginHorizontal="40dp"
-        android:background="@drawable/my_border"
-        android:backgroundTint="@color/white"
-        android:elevation="5dp"
-        android:ems="10"
-        android:hint="@string/username"
-        android:inputType="textPersonName"
-        android:padding="10dp"
-        android:textColor="@color/black"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_pic_text" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_picture">
+
+        <TextView
+            android:id="@+id/username_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:fontFamily="@font/poppins_medium"
+            android:labelFor="@+id/username"
+            android:text="@string/username"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/my_border"
+            android:backgroundTint="@color/white"
+            android:elevation="5dp"
+            android:ems="10"
+            android:hint="@string/username"
+
+            android:inputType="textPersonName"
+            android:textColorHint="#8C8C8C"
+            android:padding="10dp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/city_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:fontFamily="@font/poppins_medium"
+            android:labelFor="@+id/username"
+            android:text="City"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/city"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/my_border"
+            android:backgroundTint="@color/white"
+            android:elevation="5dp"
+            android:ems="10"
+            android:hint="City"
+            android:inputType="textAutoComplete"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="#8C8C8C" />
+    </LinearLayout>
 
     <Button
-        android:id="@+id/create_profile"
+        android:id="@+id/update_profile"
         android:layout_width="0dp"
-        android:layout_height="65dp"
-        android:layout_marginBottom="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:layout_marginHorizontal="20dp"
         android:background="@drawable/rounded_button"
+        style="?android:attr/borderlessButtonStyle"
         android:onClick="createProfile"
-        android:text="Create my account"
+        android:enabled="false"
+        android:text="@string/update_profile"
+        android:fontFamily="@font/poppins_semibold"
+        android:textColor="@color/white"
         android:visibility="visible"
+        android:textAllCaps="false"
+        android:textSize="22dp"
+        android:letterSpacing="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

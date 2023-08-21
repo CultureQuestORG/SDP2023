@@ -43,23 +43,48 @@ public class BasicOTMProvider implements OTMProvider {
 
     @Override
     public CompletableFuture<List<OTMLocation>> getLocations(LatLng upperLeft, LatLng lowerRight){
-        OTMFetchInterface service = getOTMFetchService();
+        OTMFetchInterface service = getOTMFetchServiceLocations();
         CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
         service.fetchOTMPlaces(BuildConfig.OTM_API_KEY, upperLeft.longitude, lowerRight.longitude, lowerRight.latitude, upperLeft.latitude).enqueue(callback(future));
         return future;
     }
 
     @Override
+    public CompletableFuture<List<OTMLocation>> getLocations(LatLng center){
+        OTMFetchInterface service = getOTMFetchServiceLocations();
+        CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
+        service.fetchOTMPlaces(BuildConfig.OTM_API_KEY, center.longitude, center.latitude).enqueue(callback(future));
+        return future;
+    }
+
+    @Override
     public CompletableFuture<List<OTMLocation>> getLocations(String city) {
         double[] latLon = City.getCoordinates(city);
-        OTMFetchInterface service = getOTMFetchService();
+        OTMFetchInterface service = getOTMFetchServiceLocations();
         CompletableFuture<List<OTMLocation>> future = new CompletableFuture<>();
         service.fetchPlacesInCity(latLon[1], latLon[0], BuildConfig.OTM_API_KEY).enqueue(callback(future));
         return future;
     }
 
-    private OTMFetchInterface getOTMFetchService(){
-        Gson gson = new GsonBuilder().registerTypeAdapter(new TypeToken<List<OTMLocation>>(){}.getType(), new OTMLocationDeserializer()).create();
+    @Override
+    public CompletableFuture<OTMLocation> getLocation(String xid) {
+        OTMFetchInterface service = getOTMFetchServiceLocation();
+        CompletableFuture<OTMLocation> future = new CompletableFuture<>();
+        service.fetchLocation(xid, BuildConfig.OTM_API_KEY).enqueue(callback2(future));
+        return future;
+    }
+
+    private OTMFetchInterface getOTMFetchServiceLocations(){
+        Gson gson = new GsonBuilder().registerTypeAdapter(new TypeToken<List<OTMLocation>>(){}.getType(), new OTMLocationsDeserializer()).create();
+        Retrofit req = new Retrofit.Builder()
+                .baseUrl(base_url)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        return req.create(OTMFetchInterface.class);
+    }
+
+    private OTMFetchInterface getOTMFetchServiceLocation(){
+        Gson gson = new GsonBuilder().registerTypeAdapter(new TypeToken<OTMLocation>(){}.getType(), new OTMLocationDeserializer()).create();
         Retrofit req = new Retrofit.Builder()
                 .baseUrl(base_url)
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -80,6 +105,24 @@ public class BasicOTMProvider implements OTMProvider {
 
             @Override
             public void onFailure(Call<List<OTMLocation>> call, Throwable t) {
+                future.completeExceptionally(t);
+            }
+        };
+    }
+
+    private Callback<OTMLocation> callback2(CompletableFuture<OTMLocation> future){
+        return new Callback<>() {
+            @Override
+            public void onResponse(Call<OTMLocation> call, Response<OTMLocation> response) {
+                if (response.isSuccessful()) {
+                    future.complete(response.body());
+                } else {
+                    future.completeExceptionally(new OTMException("Error while fetching data from OTM, error code: " + response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<OTMLocation> call, Throwable t) {
                 future.completeExceptionally(t);
             }
         };

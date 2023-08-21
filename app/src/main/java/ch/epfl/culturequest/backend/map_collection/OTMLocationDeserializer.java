@@ -14,30 +14,35 @@ import java.util.List;
 /**
  * A deserializer for Location when we fetch the data with retrofit.
  */
-public class OTMLocationDeserializer implements JsonDeserializer<List<OTMLocation>> {
+public class OTMLocationDeserializer implements JsonDeserializer<OTMLocation> {
 
     @Override
-    public List<OTMLocation> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        List<OTMLocation> locations = new ArrayList<>();
+    public OTMLocation deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+
+        System.out.println(json.toString());
 
         JsonObject jsonObject = json.getAsJsonObject();
-        JsonArray featuresArray = jsonObject.getAsJsonArray("features");
+        String name = jsonObject.get("name").getAsString();
+        String kinds = jsonObject.get("kinds").getAsString();
+        String xid = jsonObject.get("xid").getAsString();
 
-        for (JsonElement element : featuresArray) {
-            JsonObject featureObject = element.getAsJsonObject();
-            JsonObject propertiesObject = featureObject.getAsJsonObject("properties");
-            JsonArray coordinatesArray = featureObject.getAsJsonObject("geometry").getAsJsonArray("coordinates");
+        JsonObject coordinatesArray = jsonObject.getAsJsonObject("point");
 
-            double longitude = coordinatesArray.get(0).getAsDouble();
-            double latitude = coordinatesArray.get(1).getAsDouble();
-            String name = propertiesObject.get("name").getAsString();
-            String kinds = propertiesObject.get("kinds").getAsString();
+        double longitude = coordinatesArray.get("lon").getAsDouble();
+        double latitude = coordinatesArray.get("lat").getAsDouble();
 
-            OTMLatLng latLng = new OTMLatLng(longitude, latitude);
+        OTMLatLng latLng = new OTMLatLng(longitude, latitude);
 
-            OTMLocation location = new OTMLocation(name, latLng, kinds);
-            locations.add(location);
-        }
-        return locations;
+        OTMLocation location = new OTMLocation(name, xid, latLng, kinds);
+
+        String description = "";
+        if(jsonObject.get("wikipedia_extracts") != null && jsonObject.get("wikipedia_extracts").getAsJsonObject().get("text") != null) description = jsonObject.get("wikipedia_extracts").getAsJsonObject().get("text").getAsString();
+        String image = "";
+        if(jsonObject.get("preview") != null && jsonObject.get("preview").getAsJsonObject().get("source") != null) image = jsonObject.get("preview").getAsJsonObject().get("source").getAsString();
+
+        location.setDescription(description);
+        location.setImage(image);
+
+        return location;
     }
 }

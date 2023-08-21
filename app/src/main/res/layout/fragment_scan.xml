@@ -9,6 +9,7 @@
     tools:context=".ui.scan.ScanFragment"
     tools:visibility="visible">
 
+
     <TextureView
         android:id="@+id/camera_feedback"
         android:layout_width="match_parent"
@@ -69,6 +70,46 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/no_permission_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/no_permission_image"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="150dp"
+            android:src="@drawable/camera"
+            android:alpha="0.2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/poppins"
+            android:gravity="center"
+            android:text="@string/camera_warning"
+            android:alpha="0.3"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/no_permission_image" />
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

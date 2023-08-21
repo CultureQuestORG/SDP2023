@@ -14,9 +14,14 @@ public final class OTMLocation {
     private String name;
     private OTMLatLng coordinates;
     private String kinds;
+    private String xid;
     private List<String> kindsList;
 
-    public OTMLocation(String name, OTMLatLng coordinates, String kinds) {
+    private String description;
+
+    private String image;
+
+    public OTMLocation(String name, String xid, OTMLatLng coordinates, String kinds) {
         if(coordinates == null){
             throw new IllegalArgumentException("Coordinates cannot be null");
         }
@@ -26,13 +31,19 @@ public final class OTMLocation {
         this.name = name;
         this.coordinates = coordinates;
         this.kinds = kinds;
+        this.xid = xid;
+        this.description = "";
+        this.image = "";
     }
 
 
     public OTMLocation(){
         this.name = "";
+        this.xid = "";
         this.coordinates = new OTMLatLng();
         this.kinds = "art";
+        this.description = "";
+        this.image = "";
     }
 
     /**
@@ -64,6 +75,18 @@ public final class OTMLocation {
         return kinds;
     }
 
+    public String getXid(){
+        return xid;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public String getImage(){
+        return image;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -80,8 +103,20 @@ public final class OTMLocation {
         this.kindsList = kindsList;
     }
 
+    public void setXid(String xid){
+        this.xid = xid;
+    }
+
+    public void setDescription(String description){
+        this.description = description;
+    }
+
+    public void setImage(String image){
+        this.image = image;
+    }
+
     @NonNull
     public String toString(){
-        return "Name: " + name + " Coordinates: " + coordinates + " Tags: " + kinds;
+        return "Name: " + name + " Coordinates: " + coordinates + " Tags: " + kinds + " Xid: " + xid;
     }
 }

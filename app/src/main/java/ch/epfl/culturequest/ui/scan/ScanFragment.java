@@ -61,6 +61,8 @@ public class ScanFragment extends Fragment {
 
     private String scannedImageUrl;
 
+    private ScanViewModel scanViewModel;
+
     //SurfaceTextureListener is used to detect when the TextureView is ready to be used
     private final TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -193,7 +195,7 @@ public class ScanFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ScanViewModel ScanViewModel =
+        scanViewModel =
                 new ViewModelProvider(this).get(ScanViewModel.class);
 
         if (Profile.getActiveProfile() == null) {
@@ -212,6 +214,16 @@ public class ScanFragment extends Fragment {
         scanningLayout = root.findViewById(R.id.scanLoadingLayout);
         scanningLayout.setVisibility(View.GONE);
         root.findViewById(R.id.cancelButtonScan).setOnClickListener(cancelButtonListener);
+
+        View noPermissionLayout = root.findViewById(R.id.no_permission_layout);
+
+        scanViewModel.getCameraPermission().observe(getViewLifecycleOwner(), isGranted -> {
+            if (isGranted) {
+                noPermissionLayout.setVisibility(View.GONE);
+            } else {
+                noPermissionLayout.setVisibility(View.VISIBLE);
+            }
+        });
 
         // Creates the LocalStorage to store the images locally
         ContentResolver resolver = requireActivity().getApplicationContext().getContentResolver();
@@ -238,6 +250,7 @@ public class ScanFragment extends Fragment {
         final ImageButton imageButton = binding.helpButtonScan;
         imageButton.setOnClickListener(view -> helpButtonDialog());
 
+
         return root;
     }
 
@@ -260,9 +273,10 @@ public class ScanFragment extends Fragment {
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (!isGranted) {
                     // Permission is not granted. You can ask for the permission again.
-                    requestPermissions();
+                    scanViewModel.getCameraPermission().postValue(false);
                 } else {
                     // Permission is granted. You can go ahead and use the camera.
+                    scanViewModel.getCameraPermission().postValue(true);
                     cameraSetup.openCamera();
                 }
             });

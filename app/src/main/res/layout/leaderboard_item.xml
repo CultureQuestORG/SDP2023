@@ -26,7 +26,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/user_profile_picture"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:fontFamily="@font/poppins"
+            android:textSize="16sp"
             android:layout_marginEnd="20dp"
             app:layout_constraintEnd_toStartOf="@+id/user_score"
             app:layout_constraintStart_toStartOf="@+id/user_profile_picture"
@@ -37,10 +38,10 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerHorizontal="true"
+            android:layout_marginEnd="75dp"
             android:src="@drawable/trophee"
             app:layout_constraintBottom_toBottomOf="@+id/user_profile_picture"
             app:layout_constraintEnd_toStartOf="@+id/leaderboard_icon"
-            app:layout_constraintStart_toEndOf="@+id/user_profile_picture"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -52,7 +53,8 @@
             android:layout_alignEnd="@+id/trophy_icon"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:fontFamily="@font/poppins"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@+id/trophy_icon"
             app:layout_constraintStart_toStartOf="@+id/trophy_icon"
             app:layout_constraintTop_toTopOf="@+id/username" />
@@ -69,13 +71,14 @@
 
         <TextView
             android:id="@+id/user_rank"
-            android:layout_width="40dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/leaderboard_icon"
             android:layout_alignStart="@+id/leaderboard_icon"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:fontFamily="@font/poppins"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/leaderboard_icon"
             app:layout_constraintTop_toTopOf="@+id/username" />

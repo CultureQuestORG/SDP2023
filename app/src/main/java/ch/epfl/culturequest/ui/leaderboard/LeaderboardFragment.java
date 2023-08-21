@@ -17,10 +17,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
-
 import ch.epfl.culturequest.R;
 import ch.epfl.culturequest.databinding.FragmentLeaderboardBinding;
+import ch.epfl.culturequest.storage.ImageFetcher;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LeaderboardFragment extends Fragment {
@@ -73,7 +72,7 @@ public class LeaderboardFragment extends Fragment {
         });
 
 
-        leaderboardViewModel.getCurrentUserProfilePictureUri().observe(getViewLifecycleOwner(), uri -> Picasso.get().load(uri).into(currentUserProfilePicture));
+        leaderboardViewModel.getCurrentUserProfilePictureUri().observe(getViewLifecycleOwner(), uri -> ImageFetcher.fetchImage(this, uri, currentUserProfilePicture));
 
         // define the RecyclerView's adapter
         LeaderboardRecycleViewAdapter globalAdapter = new LeaderboardRecycleViewAdapter(leaderboardViewModel, Mode.GLOBAL);

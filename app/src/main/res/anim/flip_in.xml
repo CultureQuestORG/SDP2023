@@ -10,7 +10,7 @@
         android:duration="750"
         android:propertyName="rotationY"
         android:repeatMode="reverse"
-        android:valueFrom="-180"
+        android:valueFrom="180"
         android:valueTo="0" />
 
     <objectAnimator

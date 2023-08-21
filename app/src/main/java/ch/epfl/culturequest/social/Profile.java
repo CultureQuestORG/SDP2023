@@ -20,7 +20,7 @@ import ch.epfl.culturequest.database.Database;
  */
 public class Profile extends Observable {
 
-    private String uid, name, username, email, phoneNumber;
+    private String uid, name, username, email, phoneNumber, city;
     private String profilePicture;
     private Integer score;
     private HashMap<String, Integer> badges;
@@ -51,9 +51,10 @@ public class Profile extends Observable {
         this.score = 0;
         this.badges = new HashMap<>();
         this.deviceTokens = new ArrayList<>();
+        this.city = "";
     }
 
-    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, Integer score, HashMap<String, Integer> badges, List<String> deviceTokens) {
+    public Profile(String uid, String name, String username, String email, String phoneNumber, String profilePicture, Integer score, HashMap<String, Integer> badges, List<String> deviceTokens, String city) {
         this.uid = uid;
         this.name = name;
         this.username = username;
@@ -63,6 +64,7 @@ public class Profile extends Observable {
         this.score = score;
         this.badges = badges;
         this.deviceTokens = deviceTokens;
+        this.city = city;
     }
 
 
@@ -81,6 +83,7 @@ public class Profile extends Observable {
         this.score = 0;
         this.badges = new HashMap<>();
         this.deviceTokens = new ArrayList<>();
+        this.city = "";
     }
 
     public String getUid() {
@@ -117,6 +120,10 @@ public class Profile extends Observable {
 
     public List<String> getDeviceTokens() {
         return deviceTokens;
+    }
+
+    public String getCity() {
+        return city;
     }
 
     public void setUid(String uid) {
@@ -163,6 +170,12 @@ public class Profile extends Observable {
 
     public void setDeviceTokens(List<String> deviceTokens) {
         this.deviceTokens = deviceTokens;
+        setChanged();
+        notifyObservers();
+    }
+
+    public void setCity(String city) {
+        this.city = city;
         setChanged();
         notifyObservers();
     }
@@ -257,7 +270,10 @@ public class Profile extends Observable {
                 + "email: " + email + "\n"
                 + "phoneNumber: " + phoneNumber + "\n"
                 + "profilePicture url: " + profilePicture + "\n"
-                + "score: " + score + "\n";
+                + "score: " + score + "\n"
+                + "badges: " + badges + "\n"
+                + "deviceTokens: " + deviceTokens + "\n"
+                + "city: " + city + "\n";
     }
 
     @Override

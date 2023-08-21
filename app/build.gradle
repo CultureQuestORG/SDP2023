@@ -100,6 +100,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:20.1.0'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'androidx.preference:preference:1.2.0'
     testImplementation "androidx.arch.core:core-testing:2.2.0"
     implementation 'androidx.test.espresso:espresso-contrib:3.5.1'
     implementation 'com.google.android.material:material:1.8.0'
@@ -107,8 +108,12 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:2.1.0"
     implementation 'com.google.firebase:firebase-storage'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.github.bumptech.glide:glide:4.14.2'
+    // Skip this if you don't want to use integration libraries or configure Glide.
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.maps.android:android-maps-utils:2.3.0'
 
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'com.theokanning.openai-gpt3-java:service:0.11.0'

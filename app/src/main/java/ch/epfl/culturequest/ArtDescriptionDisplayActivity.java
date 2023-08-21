@@ -22,8 +22,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.squareup.picasso.Picasso;
-
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +36,8 @@ import ch.epfl.culturequest.social.Post;
 import ch.epfl.culturequest.social.Profile;
 import ch.epfl.culturequest.social.ScanBadge;
 import ch.epfl.culturequest.storage.FireStorage;
+import ch.epfl.culturequest.storage.ImageFetcher;
+import ch.epfl.culturequest.utils.AndroidUtils;
 
 public class ArtDescriptionDisplayActivity extends AppCompatActivity {
 
@@ -55,6 +55,10 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_art_description_display);
+
+        // To make the status bar transparent
+        AndroidUtils.removeStatusBar(getWindow());
+
         findViewById(R.id.back_button).setOnClickListener(view -> onBackPressed());
         postButton = findViewById(R.id.post_button);
         shareButton = findViewById(R.id.share_button);
@@ -107,10 +111,7 @@ public class ArtDescriptionDisplayActivity extends AppCompatActivity {
             displayArtInformation(artDescription);
 
             // Display image on the page from the server
-            Picasso.get()
-                    .load(imageDownloadUrl)
-                    .placeholder(android.R.drawable.progress_horizontal)
-                    .into((ImageView) findViewById(R.id.artImage));
+            ImageFetcher.fetchImage(this, imageDownloadUrl, findViewById(R.id.artImage));
 
             // Remove post button as the image was not scanned
             postButton.setVisibility(View.GONE);
